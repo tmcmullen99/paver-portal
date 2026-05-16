@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hot Deals · Bayside Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Onest', system-ui, -apple-system, sans-serif;
+      background: #faf8f3;
+      color: #58595b;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .hd-header {
+      background: white;
+      border-bottom: 1px solid #e7e4dc;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .hd-header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .hd-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2d2e2f;
+      margin: 0 0 4px;
+      letter-spacing: -0.02em;
+    }
+    .hd-subtitle {
+      font-size: 14px;
+      color: #8a8b8d;
+      margin: 0;
+    }
+    .hd-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .hd-last-updated {
+      font-size: 12px;
+      color: #8a8b8d;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .hd-refresh, .hd-back {
+      background: #5d7e69;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s ease;
+      display: inline-block;
+    }
+    .hd-refresh:hover, .hd-back:hover { background: #4d6c58; }
+    .hd-refresh:disabled { background: #c4c4c4; cursor: not-allowed; }
+    .hd-back {
+      background: transparent;
+      color: #8a8b8d;
+      border: 1px solid #d4d2cb;
+      padding: 9px 14px;
+    }
+    .hd-back:hover { background: #f0eee6; color: #58595b; }
+
+    .hd-summary {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 32px 0;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #8a8b8d;
+    }
+    .hd-pill {
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: white;
+      border: 1px solid #e7e4dc;
+    }
+    .hd-pill.is-hot { color: #b73229; border-color: #f3c8c5; background: #fdf3f2; }
+    .hd-pill.is-warm { color: #d97441; border-color: #f5d4be; background: #fdf6f0; }
+    .hd-pill.is-warming { color: #a08217; border-color: #ede2a8; background: #fdfaeb; }
+    .hd-pill.is-cold { color: #6b7280; }
+
+    .hd-main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 32px 60px;
+    }
+    .hd-status {
+      text-align: center;
+      padding: 80px 32px;
+      color: #8a8b8d;
+      font-size: 15px;
+    }
+    .hd-status p { margin: 6px 0; }
+    .hd-status-error { color: #b73229; }
+    .hd-status-error button {
+      margin-left: 12px;
+      background: #b73229;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-family: inherit;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .hd-deals { display: grid; gap: 16px; }
+
+    .hd-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px 28px;
+      border: 1px solid #e7e4dc;
+      display: grid;
+      grid-template-columns: 60px 1fr auto;
+      gap: 24px;
+      align-items: start;
+      transition: all 0.15s ease;
+    }
+    .hd-card:hover {
+      box-shadow: 0 4px 20px rgba(93, 126, 105, 0.08);
+      border-color: #d4d2cb;
+    }
+    .hd-card.is-hot { border-left: 4px solid #b73229; }
+    .hd-card.is-warm { border-left: 4px solid #d97441; }
+    .hd-card.is-warming { border-left: 4px solid #c9a227; }
+    .hd-card.is-cold { border-left: 4px solid #9ca3af; }
+
+    .hd-rank {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      font-weight: 700;
+      color: #d4d2cb;
+      line-height: 1;
+      padding-top: 4px;
+    }
+
+    .hd-body { min-width: 0; }
+    .hd-score-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .hd-score-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 5px 10px;
+      border-radius: 4px;
+      color: white;
+      text-transform: uppercase;
+    }
+    .hd-score-badge.is-hot { background: #b73229; }
+    .hd-score-badge.is-warm { background: #d97441; }
+    .hd-score-badge.is-warming { background: #c9a227; }
+    .hd-score-badge.is-cold { background: #9ca3af; }
+    .hd-cp-status {
+      font-size: 11px;
+      color: #8a8b8d;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .hd-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2d2e2f;
+      margin: 0 0 4px;
+      letter-spacing: -0.01em;
+    }
+    .hd-address {
+      font-size: 14px;
+      color: #8a8b8d;
+      margin: 0 0 14px;
+    }
+    .hd-address strong {
+      color: #5d7e69;
+      font-weight: 600;
+    }
+
+    .hd-signal {
+      background: #faf3ec;
+      border-left: 3px solid #d97441;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: #2d2e2f;
+      font-weight: 500;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 14px;
+    }
+    .hd-card.is-hot .hd-signal { background: #fdf3f2; border-left-color: #b73229; }
+    .hd-card.is-warming .hd-signal { background: #fdfaeb; border-left-color: #c9a227; }
+    .hd-card.is-cold .hd-signal { background: #f0eee6; border-left-color: #9ca3af; }
+
+    .hd-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 24px;
+      font-size: 13px;
+      color: #58595b;
+      margin-bottom: 18px;
+    }
+    .hd-stat strong {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: #2d2e2f;
+    }
+
+    .hd-breakdown {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      padding-top: 16px;
+      border-top: 1px dashed #e7e4dc;
+    }
+    .hd-component {
+      font-size: 11px;
+      color: #8a8b8d;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .hd-component-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #2d2e2f;
+      display: block;
+      margin-top: 2px;
+    }
+    .hd-component-bar {
+      height: 3px;
+      background: #e7e4dc;
+      border-radius: 2px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .hd-component-bar-fill {
+      height: 100%;
+      background: #5d7e69;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    .hd-action {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    .hd-cta {
+      background: #5d7e69;
+      color: white;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+    .hd-cta:hover { background: #4d6c58; }
+    .hd-card.is-hot .hd-cta { background: #b73229; }
+    .hd-card.is-hot .hd-cta:hover { background: #962a23; }
+    .hd-preview {
+      color: #5d7e69;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .hd-preview:hover { text-decoration: underline; }
+
+    @media (max-width: 720px) {
+      .hd-header-inner { padding: 18px 20px; }
+      .hd-title { font-size: 22px; }
+      .hd-summary { padding: 14px 20px 0; }
+      .hd-main { padding: 16px 20px 60px; }
+      .hd-card { grid-template-columns: 1fr; gap: 12px; padding: 18px; }
+      .hd-rank { font-size: 22px; padding: 0; }
+      .hd-action { align-items: flex-start; }
+      .hd-breakdown { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <header class="hd-header">
+    <div class="hd-header-inner">
+      <div>
+        <h1 class="hd-title">🔥 Hot Deals</h1>
+        <p class="hd-subtitle">Active proposals ranked by signing likelihood · auto-refreshes every 60s</p>
+      </div>
+      <div class="hd-meta">
+        <a href="/admin/" class="hd-back">← Admin</a>
+        <span class="hd-last-updated" id="lastUpdated"></span>
+        <button class="hd-refresh" id="refreshBtn" type="button">Refresh</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="hd-summary" id="summaryBar" style="display:none"></div>
+
+  <main class="hd-main">
+    <div id="loading" class="hd-status">Loading hot deals…</div>
+    <div id="error" class="hd-status hd-status-error" style="display:none">
+      <span id="errorMsg">Couldn't load.</span>
+      <button type="button" id="retryBtn">Retry</button>
+    </div>
+    <div id="empty" class="hd-status" style="display:none">
+      <p>No active proposals to rank right now.</p>
+      <p style="font-size: 13px; margin-top: 8px;">Once homeowners start engaging with sent proposals, they'll appear here ranked by signing likelihood.</p>
+    </div>
+    <div id="deals" class="hd-deals" style="display:none"></div>
+  </main>
+
+  <script type="module">
+    import { supa } from './admin-shell.js';
+
+    const REFRESH_INTERVAL_MS = 60_000;
+
+    const $loading = document.getElementById('loading');
+    const $error = document.getElementById('error');
+    const $errorMsg = document.getElementById('errorMsg');
+    const $empty = document.getElementById('empty');
+    const $deals = document.getElementById('deals');
+    const $summary = document.getElementById('summaryBar');
+    const $refreshBtn = document.getElementById('refreshBtn');
+    const $retryBtn = document.getElementById('retryBtn');
+    const $lastUpdated = document.getElementById('lastUpdated');
+
+    let refreshTimer = null;
+
+    function showOnly(el) {
+      [$loading, $error, $empty, $deals].forEach(e => { e.style.display = 'none'; });
+      if (el === $deals) el.style.display = 'grid';
+      else el.style.display = 'block';
+    }
+
+    function scoreClass(score) {
+      if (score >= 70) return 'is-hot';
+      if (score >= 40) return 'is-warm';
+      if (score >= 20) return 'is-warming';
+      return 'is-cold';
+    }
+    function scoreLabel(score) {
+      if (score >= 70) return 'HOT';
+      if (score >= 40) return 'WARM';
+      if (score >= 20) return 'WARMING';
+      return 'COLD';
+    }
+
+    function formatAmount(amount) {
+      const n = Number(amount || 0);
+      if (n === 0) return '—';
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency', currency: 'USD', maximumFractionDigits: 0
+      }).format(n);
+    }
+
+    function escapeHtml(str) {
+      if (str == null) return '';
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function relativeTime(timestamp) {
+      if (!timestamp) return 'no activity';
+      const ms = Date.now() - new Date(timestamp).getTime();
+      const mins = Math.floor(ms / 60_000);
+      if (mins < 1) return 'just now';
+      if (mins < 60) return mins + 'm ago';
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return hrs + 'h ago';
+      const days = Math.floor(hrs / 24);
+      if (days < 30) return days + 'd ago';
+      return Math.floor(days / 30) + 'mo ago';
+    }
+
+    function renderSummary(deals) {
+      const counts = { 'is-hot': 0, 'is-warm': 0, 'is-warming': 0, 'is-cold': 0 };
+      deals.forEach(d => { counts[scoreClass(Number(d.hot_score || 0))]++; });
+      const parts = [];
+      if (counts['is-hot']) parts.push(`<span class="hd-pill is-hot">${counts['is-hot']} HOT</span>`);
+      if (counts['is-warm']) parts.push(`<span class="hd-pill is-warm">${counts['is-warm']} WARM</span>`);
+      if (counts['is-warming']) parts.push(`<span class="hd-pill is-warming">${counts['is-warming']} WARMING</span>`);
+      if (counts['is-cold']) parts.push(`<span class="hd-pill is-cold">${counts['is-cold']} COLD</span>`);
+      parts.push(`<span style="margin-left:auto">${deals.length} total</span>`);
+      $summary.innerHTML = parts.join('');
+      $summary.style.display = 'flex';
+    }
+
+    function renderCard(deal, rank) {
+      const score = Number(deal.hot_score || 0);
+      const klass = scoreClass(score);
+      const label = scoreLabel(score);
+      const cpStatus = String(deal.cp_status || '').toUpperCase();
+      const lastActivity = relativeTime(deal.last_event_at);
+      const previewUrl = deal.slug ? `/p/${encodeURIComponent(deal.slug)}` : null;
+      const warRoomUrl = `/admin/client?id=${encodeURIComponent(deal.client_id || '')}`;
+
+      return `
+        <article class="hd-card ${klass}">
+          <div class="hd-rank">#${rank}</div>
+          <div class="hd-body">
+            <div class="hd-score-row">
+              <span class="hd-score-badge ${klass}">${label} ${score}</span>
+              <span class="hd-cp-status">${escapeHtml(cpStatus)}</span>
+            </div>
+            <h2 class="hd-name">${escapeHtml(deal.client_name || 'Unnamed homeowner')}</h2>
+            <p class="hd-address">
+              ${escapeHtml(deal.project_address || 'No address')}
+              <strong>· ${formatAmount(deal.total_amount)}</strong>
+            </p>
+            <div class="hd-signal">${escapeHtml(deal.top_signal || 'Engaged')}</div>
+            <div class="hd-stats">
+              <div class="hd-stat"><strong>${deal.events_24h}</strong> events 24h</div>
+              <div class="hd-stat"><strong>${deal.events_7d}</strong> events 7d</div>
+              <div class="hd-stat"><strong>${deal.distinct_sessions}</strong> sessions</div>
+              <div class="hd-stat"><strong>${deal.message_count}</strong> messages</div>
+              <div class="hd-stat">Last: <strong>${lastActivity}</strong></div>
+            </div>
+            <div class="hd-breakdown">
+              <div class="hd-component">
+                Engagement
+                <span class="hd-component-value">${deal.engagement_score}</span>
+                <div class="hd-component-bar"><div class="hd-component-bar-fill" style="width:${deal.engagement_score}%"></div></div>
+              </div>
+              <div class="hd-component">
+                Recency
+                <span class="hd-component-value">${deal.recency_score}</span>
+                <div class="hd-component-bar"><div class="hd-component-bar-fill" style="width:${deal.recency_score}%"></div></div>
+              </div>
+              <div class="hd-component">
+                Urgency
+                <span class="hd-component-value">${deal.urgency_score}</span>
+                <div class="hd-component-bar"><div class="hd-component-bar-fill" style="width:${deal.urgency_score}%"></div></div>
+              </div>
+              <div class="hd-component">
+                Intent
+                <span class="hd-component-value">${deal.intent_score}</span>
+                <div class="hd-component-bar"><div class="hd-component-bar-fill" style="width:${deal.intent_score}%"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="hd-action">
+            <a class="hd-cta" href="${warRoomUrl}">Open War Room →</a>
+            ${previewUrl ? `<a class="hd-preview" href="${previewUrl}" target="_blank" rel="noopener">Preview proposal ↗</a>` : ''}
+          </div>
+        </article>
+      `;
+    }
+
+    function updateLastUpdated() {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      $lastUpdated.textContent = `Updated ${hh}:${mm}`;
+    }
+
+    async function load() {
+      $refreshBtn.disabled = true;
+      try {
+        const { data, error } = await supa.rpc('get_hot_deals');
+        if (error) throw error;
+
+        const deals = Array.isArray(data) ? data : [];
+        if (deals.length === 0) {
+          $summary.style.display = 'none';
+          showOnly($empty);
+        } else {
+          renderSummary(deals);
+          $deals.innerHTML = deals.map((d, i) => renderCard(d, i + 1)).join('');
+          showOnly($deals);
+        }
+        updateLastUpdated();
+      } catch (e) {
+        console.error('Hot deals load failed:', e);
+        $errorMsg.textContent = `Couldn't load: ${e?.message || e}`;
+        $summary.style.display = 'none';
+        showOnly($error);
+      } finally {
+        $refreshBtn.disabled = false;
+      }
+    }
+
+    function startAutoRefresh() {
+      stopAutoRefresh();
+      refreshTimer = setInterval(() => {
+        if (!document.hidden) load();
+      }, REFRESH_INTERVAL_MS);
+    }
+    function stopAutoRefresh() {
+      if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; }
+    }
+
+    $refreshBtn.addEventListener('click', load);
+    $retryBtn.addEventListener('click', load);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) load();
+    });
+
+    (async () => {
+      try {
+        const { data: { user } } = await supa.auth.getUser();
+        if (!user) {
+          window.location.href = '/admin/';
+          return;
+        }
+      } catch (e) {
+        console.error('Auth check failed:', e);
+      }
+      load();
+      startAutoRefresh();
+    })();
+  </script>
+</body>
+</html>
