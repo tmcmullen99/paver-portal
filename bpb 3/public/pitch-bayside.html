@@ -2,953 +2,1573 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>BPB — A Sales Platform for Bayside | McMullen Properties</title>
-
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPB · A proposal for Bayside Pavers</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --navy: #1a1f2e;
-      --navy-soft: #2a3142;
-      --blue-gray: #91a1ba;
-      --charcoal: #353535;
+      --ink: #0e1218;
+      --ink-soft: #1f2530;
+      --ink-mute: #4a5260;
+      --ash: #6b7280;
       --bone: #faf8f3;
-      --white: #ffffff;
-      --accent-red: #b73229;
-      --accent-green: #5d7e69;
-      --border: #e7e4dc;
+      --paper: #ffffff;
+      --line: #e9e6dd;
+      --line-strong: #d4d0c5;
+      --accent: #5d7e69;
+      --accent-warm: #c47533;
+      --accent-hot: #c4392e;
+      --accent-cool: #4a76a8;
+      --gold: #b78b3a;
     }
-    .reveal {
-      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
-      font-size: 28px;
-      color: var(--charcoal);
-      font-weight: 400;
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background: var(--bone);
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
-    .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+    h1, h2, h3, h4, h5 {
       font-family: 'Playfair Display', Georgia, serif;
       font-weight: 700;
-      color: var(--navy);
-      text-transform: none;
-      letter-spacing: -0.015em;
+      letter-spacing: -0.025em;
       line-height: 1.1;
+      margin: 0 0 0.5em;
+      color: var(--ink);
     }
-    .reveal h1 { font-size: 3.2em; }
-    .reveal h2 { font-size: 2.4em; margin-bottom: 0.6em; }
-    .reveal h3 { font-size: 1.4em; margin-bottom: 0.5em; }
-    .reveal p, .reveal li { line-height: 1.5; }
+    h1 { font-size: clamp(40px, 6vw, 76px); font-weight: 900; }
+    h2 { font-size: clamp(32px, 4.5vw, 56px); }
+    h3 { font-size: clamp(22px, 2.4vw, 30px); }
+    p { margin: 0 0 1em; }
+    a { color: var(--accent); text-decoration: none; transition: opacity 0.15s; }
+    a:hover { opacity: 0.7; }
+    em { font-style: italic; color: var(--accent); font-family: 'Playfair Display', serif; }
 
-    /* Slides */
-    .reveal .slides { text-align: left; }
-    .reveal section { padding: 5% 7%; }
-    .reveal section.center { text-align: center; }
-
-    /* Hero/dark slides */
-    .reveal section.hero {
-      background: var(--navy);
-      color: var(--white);
-    }
-    .reveal section.hero h1,
-    .reveal section.hero h2,
-    .reveal section.hero h3 { color: var(--white); }
-    .reveal section.hero .subtitle { color: var(--blue-gray); }
-    .reveal section.hero strong { color: var(--blue-gray); }
-
-    /* Body slides */
-    .reveal section.body { background: var(--white); }
-    .reveal section.bone { background: var(--bone); }
-
-    /* Typography helpers */
-    .subtitle {
-      color: var(--charcoal);
-      opacity: 0.7;
-      font-size: 0.85em;
-      font-weight: 400;
-      margin-top: 0;
-    }
-    .reveal .mono {
+    .mono {
       font-family: 'JetBrains Mono', monospace;
-      font-feature-settings: "tnum";
+      font-feature-settings: "tnum" 1, "zero" 1;
     }
-    .reveal .label {
+    .eyebrow {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.5em;
-      letter-spacing: 0.1em;
+      font-size: 12px;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--blue-gray);
-      font-weight: 700;
+      color: var(--ash);
+      font-weight: 500;
+      margin-bottom: 24px;
+      display: inline-block;
     }
-    .reveal .accent { color: var(--accent-green); font-weight: 700; }
-    .reveal .accent-red { color: var(--accent-red); font-weight: 700; }
-    .reveal .navy-accent { color: var(--navy); font-weight: 700; }
 
-    /* Lists */
-    .reveal ul { list-style: none; padding-left: 0; }
-    .reveal ul li {
-      margin: 0.6em 0;
-      padding-left: 1.6em;
-      position: relative;
-      font-size: 0.92em;
+    /* ── Top nav ── */
+    .topnav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(250, 248, 243, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s, background 0.2s;
     }
-    .reveal ul li::before {
-      content: "—";
-      position: absolute;
-      left: 0;
-      color: var(--blue-gray);
+    .topnav.scrolled { border-bottom-color: var(--line); }
+    .topnav-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 18px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: 'Playfair Display', serif;
       font-weight: 700;
+      font-size: 17px;
+      color: var(--ink);
+      letter-spacing: -0.01em;
     }
-    .reveal section.hero ul li::before { color: var(--blue-gray); }
-
-    /* Stat blocks */
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 24px;
-      margin: 36px 0;
-    }
-    .stat {
-      padding: 24px;
-      background: var(--bone);
-      border-left: 4px solid var(--navy);
-    }
-    .reveal section.hero .stat {
-      background: var(--navy-soft);
-      border-left-color: var(--blue-gray);
-    }
-    .stat-num {
+    .nav-brand small {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 2.4em;
+      font-weight: 400;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ash);
+      display: block;
+      margin-top: 1px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .nav-links a {
+      color: var(--ink-mute);
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .nav-cta {
+      background: var(--ink);
+      color: var(--paper) !important;
+      padding: 9px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .nav-cta:hover { background: var(--accent); opacity: 1; transform: translateY(-1px); }
+    @media (max-width: 720px) {
+      .nav-links a:not(.nav-cta) { display: none; }
+    }
+
+    /* ── Layout container ── */
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 36px;
+    }
+    .container-wide {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 36px;
+    }
+    section { padding: 120px 0; position: relative; }
+    @media (max-width: 720px) {
+      .container, .container-wide { padding: 0 22px; }
+      section { padding: 80px 0; }
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding-top: 180px;
+      padding-bottom: 140px;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(93,126,105,0.08), transparent 70%),
+        var(--bone);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(14,18,24,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(14,18,24,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 920px; }
+    .hero h1 { margin-bottom: 32px; }
+    .hero h1 em { display: inline-block; }
+    .hero-sub {
+      font-size: clamp(18px, 2vw, 22px);
+      color: var(--ink-mute);
+      max-width: 680px;
+      margin-bottom: 56px;
+      line-height: 1.55;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 32px 28px;
+      margin: 56px 0;
+      padding: 32px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .hero-stat-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 44px;
       font-weight: 700;
-      color: var(--navy);
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .hero-stat-label {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ash);
+      font-weight: 500;
+    }
+    .hero-stat-context {
+      grid-column: 1 / -1;
+      padding-top: 12px;
+      font-size: 14px;
+      color: var(--ink-mute);
+      text-align: center;
+      font-style: italic;
+    }
+    .hero-stat-context strong { color: var(--ink); font-style: normal; }
+
+    .hero-cta-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.15s, background 0.15s;
+    }
+    .btn-primary:hover { background: var(--accent); opacity: 1; transform: translateY(-2px); }
+    .btn-ghost {
+      color: var(--ink-mute);
+      padding: 14px 4px;
+      font-weight: 500;
+      font-size: 15px;
+    }
+
+    /* ── Section: Problem ── */
+    .problem-section { background: var(--paper); border-top: 1px solid var(--line); }
+    .problem-section h2 { max-width: 800px; margin-bottom: 32px; }
+    .problem-section h2 em { color: var(--accent-hot); font-style: italic; }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin: 64px 0;
+    }
+    .problem-card {
+      padding: 28px;
+      background: var(--bone);
+      border-radius: 12px;
+      border-left: 3px solid var(--accent-hot);
+    }
+    .problem-card h4 {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .problem-card p {
+      font-size: 14px;
+      color: var(--ink-mute);
+      margin: 0;
+      line-height: 1.55;
+    }
+    .problem-conclusion {
+      margin-top: 64px;
+      padding: 40px;
+      background: var(--ink);
+      color: var(--paper);
+      border-radius: 16px;
+      font-size: clamp(20px, 2vw, 24px);
+      font-family: 'Playfair Display', serif;
+      line-height: 1.4;
+      font-style: italic;
+    }
+    .problem-conclusion strong { color: var(--gold); font-style: normal; }
+
+    /* ── Section: Solution headline ── */
+    .solution-headline-section { padding: 100px 0; text-align: center; background: var(--bone); }
+    .solution-headline-section h2 { max-width: 880px; margin: 0 auto 24px; }
+    .solution-headline-section h2 em {
+      background: linear-gradient(120deg, var(--accent) 0%, var(--accent-warm) 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-style: italic;
+    }
+    .solution-headline-section p {
+      font-size: 19px;
+      color: var(--ink-mute);
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* ── Section: Live Hot Deals card replica ── */
+    .product-demo { background: var(--paper); border-top: 1px solid var(--line); }
+    .product-demo .container { max-width: 1080px; }
+    .product-demo .demo-frame {
+      margin-top: 56px;
+      background: linear-gradient(135deg, #f4f1ea 0%, #ebe7dc 100%);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.5) inset,
+        0 25px 60px -20px rgba(14,18,24,0.15),
+        0 10px 30px -10px rgba(14,18,24,0.08);
+      position: relative;
+    }
+    .demo-frame::before {
+      content: '';
+      position: absolute;
+      top: 12px; left: 16px;
+      display: flex;
+      gap: 6px;
+    }
+    .demo-frame .frame-dots {
+      position: absolute;
+      top: 14px; left: 18px;
+      display: flex;
+      gap: 6px;
+    }
+    .frame-dots span {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--line-strong);
+    }
+    .frame-url {
+      position: absolute;
+      top: 9px; left: 50%;
+      transform: translateX(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--ash);
+      background: rgba(255,255,255,0.6);
+      padding: 4px 14px;
+      border-radius: 4px;
+    }
+    .demo-content { margin-top: 32px; }
+
+    /* Hot Deals card replica — matches real product */
+    .hd-card-demo {
+      background: white;
+      border-radius: 12px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--accent-hot);
+      display: grid;
+      grid-template-columns: 50px 1fr auto;
+      gap: 28px;
+      align-items: start;
+      position: relative;
+    }
+    .hd-rank-demo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--line-strong);
+      line-height: 1;
+    }
+    .hd-score-row-demo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .hd-score-badge-demo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 6px 12px;
+      border-radius: 4px;
+      color: white;
+      text-transform: uppercase;
+      background: var(--accent-hot);
+    }
+    .hd-status-demo {
+      font-size: 11px;
+      color: var(--ash);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.06em;
+    }
+    .hd-name-demo {
+      font-family: 'Inter', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 0 0 4px;
+      letter-spacing: -0.01em;
+    }
+    .hd-addr-demo {
+      font-size: 14px;
+      color: var(--ash);
+      margin: 0 0 16px;
+    }
+    .hd-addr-demo strong { color: var(--accent); font-weight: 600; }
+    .hd-signal-demo {
+      background: #fdf3f2;
+      border-left: 3px solid var(--accent-hot);
+      padding: 12px 16px;
+      font-size: 14px;
+      color: var(--ink);
+      font-weight: 500;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 16px;
+    }
+    .hd-trend-demo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-top: 1px dashed var(--line);
+      border-bottom: 1px dashed var(--line);
+      margin-bottom: 16px;
+    }
+    .hd-trend-label-demo {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ash);
+      font-weight: 500;
+    }
+    .hd-stats-demo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 24px;
+      font-size: 13px;
+      color: var(--ink-mute);
+      margin-bottom: 20px;
+    }
+    .hd-stats-demo strong {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .hd-breakdown-demo {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--line);
+    }
+    .hd-comp-demo {
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--ash);
+      font-weight: 600;
+    }
+    .hd-comp-demo span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      display: block;
+      margin-top: 4px;
+    }
+    .hd-comp-bar-demo {
+      height: 3px;
+      background: var(--line);
+      border-radius: 2px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .hd-comp-bar-fill-demo {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s;
+    }
+    .hd-comp-bar-fill-demo.animate { transform: scaleX(var(--w, 1)); }
+
+    .hd-cta-demo {
+      background: var(--accent-hot);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      align-self: start;
+      white-space: nowrap;
+    }
+
+    /* Demo annotations */
+    .demo-callouts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 36px;
+    }
+    .callout {
+      padding: 18px 22px;
+      background: var(--bone);
+      border-radius: 10px;
+      border-top: 3px solid var(--ink);
+    }
+    .callout-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .callout strong {
+      display: block;
+      font-size: 15px;
+      color: var(--ink);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .callout p {
+      font-size: 13px;
+      color: var(--ink-mute);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* ── Elisa timeline ── */
+    .elisa-section { background: var(--bone); border-top: 1px solid var(--line); }
+    .elisa-section .container { max-width: 1080px; }
+    .elisa-header { max-width: 720px; margin-bottom: 56px; }
+    .elisa-meta-row {
+      display: flex;
+      gap: 36px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+      padding: 24px 28px;
+      background: var(--ink);
+      color: var(--paper);
+      border-radius: 12px;
+    }
+    .elisa-meta-row .meta-item strong {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 28px;
+      color: white;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .elisa-meta-row .meta-item span {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+    }
+    .elisa-meta-row .meta-spacer { flex: 1; }
+    .elisa-meta-row .meta-value strong { color: var(--gold); }
+
+    .timeline-container {
+      background: var(--paper);
+      padding: 36px 40px 28px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+    }
+    .timeline-svg-wrap { position: relative; }
+    .timeline-svg { width: 100%; height: 160px; display: block; }
+    .timeline-grid line { stroke: var(--line); stroke-width: 1; }
+    .timeline-axis text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      fill: var(--ash);
+    }
+    .session-dot {
+      cursor: pointer;
+      transition: r 0.2s, fill 0.2s;
+    }
+    .session-dot:hover { r: 9; }
+    .session-tooltip {
+      position: absolute;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -100%) translateY(-12px);
+      transition: opacity 0.15s;
+      white-space: nowrap;
+      font-family: 'JetBrains Mono', monospace;
+      z-index: 5;
+    }
+    .session-tooltip.visible { opacity: 1; }
+    .session-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--ink);
+    }
+    .timeline-legend {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--ink-mute);
+    }
+    .timeline-legend strong { color: var(--ink); font-weight: 600; }
+
+    .interp {
+      margin-top: 48px;
+      max-width: 720px;
+    }
+    .interp p {
+      font-size: 18px;
+      color: var(--ink-mute);
+      line-height: 1.55;
+    }
+    .interp p strong { color: var(--ink); font-weight: 600; }
+
+    /* ── Leadership view ── */
+    .leadership-section { background: var(--paper); border-top: 1px solid var(--line); }
+    .kpi-grid-demo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 56px;
+    }
+    .kpi-card-demo {
+      background: var(--bone);
+      padding: 24px 26px;
+      border-radius: 12px;
+      border-left: 4px solid var(--accent);
+    }
+    .kpi-card-demo .kpi-label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ash);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .kpi-card-demo .kpi-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--ink);
       line-height: 1;
       margin-bottom: 6px;
     }
-    .reveal section.hero .stat-num { color: var(--white); }
-    .stat-label {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.7em;
-      color: var(--charcoal);
-      opacity: 0.7;
+    .kpi-card-demo .kpi-sub {
+      font-size: 12px;
+      color: var(--ash);
     }
-    .reveal section.hero .stat-label { color: var(--blue-gray); opacity: 1; }
+    .kpi-card-demo .kpi-sub strong { color: var(--accent); font-weight: 600; }
 
-    /* Tables */
-    .reveal table {
-      font-size: 0.7em;
-      border-collapse: collapse;
-      margin-top: 28px;
-      width: 100%;
+    /* ── Calculator ── */
+    .calc-section {
+      background: var(--ink);
+      color: var(--paper);
+      border-top: 1px solid var(--line);
     }
-    .reveal th {
-      text-align: left;
-      padding: 14px 18px;
-      background: var(--navy);
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600;
-      font-size: 0.9em;
-      letter-spacing: 0.02em;
+    .calc-section h2 { color: var(--paper); margin-bottom: 24px; }
+    .calc-section h2 em {
+      background: linear-gradient(120deg, var(--gold), var(--accent-warm));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .reveal td {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
+    .calc-section > .container > p {
+      color: rgba(250, 248, 243, 0.7);
+      max-width: 640px;
+      font-size: 18px;
     }
-    .reveal tr:nth-child(even) { background: var(--bone); }
-    .reveal td.mono {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 600;
-      color: var(--navy);
-    }
-
-    /* Two-column layouts */
-    .two-col {
+    .calc-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 56px;
-      align-items: start;
+      gap: 48px;
+      margin-top: 64px;
     }
-    .two-col.uneven {
-      grid-template-columns: 1fr 1.5fr;
+    @media (max-width: 760px) {
+      .calc-grid { grid-template-columns: 1fr; gap: 36px; }
     }
-    .two-col h3 {
-      font-size: 1.2em;
-      color: var(--navy);
-      margin-bottom: 16px;
+    .calc-controls {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 32px;
     }
-    .two-col p, .two-col li { font-size: 0.85em; }
-
-    /* Screenshot placeholders */
-    .screenshot {
-      background: linear-gradient(135deg, #f4f1ea 0%, #ede9df 100%);
-      border: 2px dashed var(--blue-gray);
-      border-radius: 12px;
-      padding: 60px 40px;
-      text-align: center;
-      color: var(--charcoal);
+    .calc-control { margin-bottom: 32px; }
+    .calc-control:last-child { margin-bottom: 0; }
+    .calc-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: rgba(250,248,243, 0.75);
+    }
+    .calc-label-value {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65em;
-      line-height: 1.6;
-      min-height: 380px;
+      font-size: 22px;
+      color: var(--gold);
+      font-weight: 700;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--gold);
+      cursor: grab;
+      box-shadow: 0 0 0 4px rgba(183, 139, 58, 0.2);
+      transition: transform 0.1s;
+    }
+    input[type="range"]::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.15); }
+    input[type="range"]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--gold);
+      cursor: grab;
+      border: none;
+      box-shadow: 0 0 0 4px rgba(183, 139, 58, 0.2);
+    }
+    .calc-results {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 32px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: center;
-      gap: 12px;
     }
-    .screenshot strong {
-      color: var(--navy);
-      font-size: 1.1em;
-      font-weight: 700;
-    }
-    .screenshot .swap-note {
-      color: var(--blue-gray);
-      font-size: 0.85em;
-      font-style: italic;
-      margin-top: 16px;
-    }
-
-    /* Quote-style emphasis */
-    .big-quote {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.6em;
-      font-weight: 400;
-      line-height: 1.3;
-      color: var(--navy);
-      max-width: 90%;
-      margin: 0.4em 0;
-    }
-    .reveal section.hero .big-quote { color: var(--white); }
-    .big-quote em {
-      font-style: italic;
-      color: var(--blue-gray);
-    }
-
-    /* Feature grid */
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
-      margin-top: 32px;
-    }
-    .feature-col h4 {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65em;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--blue-gray);
-      margin-bottom: 14px;
-      font-weight: 700;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-    .feature-col ul li {
-      font-size: 0.7em;
-      margin: 0.4em 0;
-    }
-
-    /* Roadmap timeline */
-    .timeline {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-      margin-top: 36px;
-      position: relative;
-    }
-    .timeline::before {
-      content: '';
-      position: absolute;
-      top: 18px;
-      left: 5%;
-      right: 5%;
-      height: 2px;
-      background: var(--blue-gray);
-      opacity: 0.3;
-      z-index: 0;
-    }
-    .timeline-stop {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-    }
-    .timeline-dot {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--white);
-      border: 3px solid var(--navy);
-      margin: 0 auto 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-      color: var(--navy);
-      font-size: 0.5em;
-    }
-    .timeline-period {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.55em;
-      letter-spacing: 0.05em;
-      color: var(--blue-gray);
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .timeline-label {
-      font-size: 0.65em;
-      color: var(--charcoal);
-      line-height: 1.3;
-    }
-
-    /* Deal mechanics: 2-col styled table */
-    .deal-cols {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-top: 30px;
-    }
-    .deal-col {
-      padding: 28px;
-      background: var(--bone);
-      border-top: 4px solid var(--navy);
-    }
-    .deal-col h4 {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.55em;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--blue-gray);
-      margin-bottom: 18px;
-      font-weight: 700;
-    }
-    .deal-col ul li { font-size: 0.72em; margin: 0.45em 0; }
-
-    /* CTA next-steps */
-    .next-steps {
-      counter-reset: stepcount;
-      list-style: none;
-      padding: 0;
-      max-width: 80%;
-      margin: 40px auto;
-    }
-    .next-steps li {
-      counter-increment: stepcount;
-      padding: 22px 0 22px 80px;
-      position: relative;
-      font-size: 0.85em;
-      border-bottom: 1px solid rgba(145, 161, 186, 0.25);
-    }
-    .next-steps li::before {
-      content: counter(stepcount);
-      position: absolute;
-      left: 0;
-      top: 22px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: var(--blue-gray);
-      color: var(--navy);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.1em;
-      font-weight: 700;
-    }
-    .reveal section.hero .next-steps li::before { background: var(--blue-gray); color: var(--navy); }
-
-    /* Footer brand line */
-    .footer-brand {
-      position: absolute;
-      bottom: 24px;
-      left: 7%;
-      right: 7%;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.45em;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--blue-gray);
-      opacity: 0.6;
+    .calc-result-line {
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
       display: flex;
       justify-content: space-between;
+      align-items: baseline;
     }
-    .reveal section.hero .footer-brand { color: var(--blue-gray); opacity: 0.8; }
-
-    /* Annotation arrows for screenshot slides */
-    .annotations {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+    .calc-result-line:last-child { border-bottom: none; }
+    .calc-result-line.headline { padding: 20px 0 16px; }
+    .calc-result-line.headline .calc-result-label { color: var(--gold); font-weight: 600; }
+    .calc-result-line.headline .calc-result-value { font-size: 38px; color: var(--gold); }
+    .calc-result-label {
+      font-size: 13px;
+      color: rgba(250, 248, 243, 0.7);
+    }
+    .calc-result-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--paper);
+    }
+    .calc-vs {
       margin-top: 24px;
+      padding: 18px 22px;
+      background: rgba(196, 117, 51, 0.1);
+      border-left: 3px solid var(--accent-warm);
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: rgba(250,248,243, 0.85);
+      line-height: 1.55;
     }
-    .annotation {
-      padding: 14px 18px;
-      background: var(--white);
-      border-left: 3px solid var(--navy);
-      font-size: 0.65em;
+    .calc-vs strong { color: var(--paper); }
+
+    /* ── Deal section ── */
+    .deal-section { background: var(--bone); border-top: 1px solid var(--line); }
+    .deal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 56px;
     }
-    .annotation .label {
-      display: block;
-      margin-bottom: 4px;
+    .deal-tile {
+      background: var(--paper);
+      padding: 32px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .deal-tile:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -15px rgba(14,18,24,0.12);
+      border-color: var(--line-strong);
+    }
+    .deal-tile-key {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .deal-tile h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--ink);
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+    .deal-tile p {
+      font-size: 14px;
+      color: var(--ink-mute);
+      line-height: 1.6;
+      margin: 0;
     }
 
-    /* Make page progress thinner */
-    .reveal .progress { height: 2px; background: rgba(255,255,255,0.1); }
-    .reveal .progress span { background: var(--blue-gray); }
+    /* ── Onboarding stepper ── */
+    .onboarding-section { background: var(--paper); border-top: 1px solid var(--line); }
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 56px;
+      position: relative;
+    }
+    .stepper::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: 8%;
+      right: 8%;
+      height: 2px;
+      background: var(--line);
+      z-index: 0;
+    }
+    .step {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .step-marker {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--ink);
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+    .step-period {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 8px;
+    }
+    .step h5 {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 0 0 6px;
+      letter-spacing: 0;
+    }
+    .step p {
+      font-size: 13px;
+      color: var(--ink-mute);
+      margin: 0;
+      line-height: 1.5;
+    }
+    @media (max-width: 760px) {
+      .stepper { grid-template-columns: 1fr 1fr; }
+      .stepper::before { display: none; }
+    }
 
-    /* Print styles */
-    @media print {
-      .reveal section { page-break-after: always; }
+    /* ── CTA ── */
+    .cta-section {
+      background:
+        radial-gradient(ellipse 90% 80% at 50% 0%, rgba(183,139,58,0.15), transparent 60%),
+        var(--ink);
+      color: var(--paper);
+      text-align: center;
+      padding: 140px 0;
+      border-top: 1px solid var(--line);
+    }
+    .cta-section h2 {
+      color: var(--paper);
+      max-width: 760px;
+      margin: 0 auto 24px;
+    }
+    .cta-section h2 em {
+      background: linear-gradient(120deg, var(--gold), var(--accent-warm));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .cta-section p {
+      font-size: 19px;
+      color: rgba(250,248,243, 0.75);
+      max-width: 580px;
+      margin: 0 auto 48px;
+    }
+    .cta-button {
+      background: var(--gold);
+      color: var(--ink);
+      padding: 20px 40px;
+      border-radius: 10px;
+      font-size: 17px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px -15px rgba(183, 139, 58, 0.5);
+      opacity: 1;
+    }
+    .cta-contact {
+      margin-top: 40px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      color: rgba(250,248,243, 0.6);
+    }
+    .cta-contact strong { color: var(--gold); font-weight: 600; }
+
+    /* ── Footer ── */
+    .footer {
+      background: var(--ink);
+      color: rgba(250,248,243,0.5);
+      padding: 32px 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.05em;
+    }
+    .footer .container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* ── Animations ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; }
+      .hd-comp-bar-fill-demo { transition: none; transform: scaleX(var(--w, 1)); }
     }
   </style>
 </head>
 <body>
 
-<div class="reveal">
-  <div class="slides">
+<nav class="topnav" id="topnav">
+  <div class="topnav-inner">
+    <div class="nav-brand">
+      McMullen Properties
+      <small>BPB Licensing · Bayside Pavers</small>
+    </div>
+    <div class="nav-links">
+      <a href="#problem">The problem</a>
+      <a href="#proof">Proof</a>
+      <a href="#math">The math</a>
+      <a href="#deal">The deal</a>
+      <a href="#cta" class="nav-cta">Schedule walkthrough →</a>
+    </div>
+  </div>
+</nav>
 
-    <!-- ════════════════ SLIDE 1 — TITLE ════════════════ -->
-    <section class="hero center">
-      <span class="label">McMullen Properties · May 2026</span>
-      <h1 style="margin-top: 0.4em;">Bayside Proposal Builder</h1>
-      <p class="big-quote" style="text-align: center; margin: 0.6em auto 0;">
-        A sales platform built for Bayside designers,<br>
-        <em>by a Bayside designer.</em>
+<!-- ════════════ HERO ════════════ -->
+<section class="hero">
+  <div class="container hero-content">
+    <span class="eyebrow">A licensing proposal · May 2026</span>
+    <h1>Your designers shouldn't have to <em>guess</em><br>when a homeowner is ready to buy.</h1>
+    <p class="hero-sub">
+      BPB is the sales platform I've built and used on Bayside deals for the last year. It makes homeowner intent visible — in real time, on every deal — so Bayside's design team closes more of what they're already working on.
+    </p>
+
+    <div class="hero-stats">
+      <div>
+        <strong class="hero-stat-num" data-count-to="53">0</strong>
+        <span class="hero-stat-label">Engagement events</span>
+      </div>
+      <div>
+        <strong class="hero-stat-num" data-count-to="13">0</strong>
+        <span class="hero-stat-label">Distinct sessions</span>
+      </div>
+      <div>
+        <strong class="hero-stat-num" data-count-to="10">0</strong>
+        <span class="hero-stat-label">Active days</span>
+      </div>
+      <div>
+        <strong class="hero-stat-num">$54K</strong>
+        <span class="hero-stat-label">Open contract</span>
+      </div>
+      <p class="hero-stat-context">
+        <strong>One active deal in Bayside's pipeline, right now.</strong> Numbers above are what BPB has captured on it.
       </p>
-      <aside class="notes">
-        Thanks for the time. I want to walk through something I've built — a sales platform I've been using personally on Bayside deals for the last year, that I think every Bayside designer should be using. By the end I'll have a specific proposal for how we license it. Should take about 25 minutes.
-      </aside>
-      <div class="footer-brand">
-        <span>McMullen Properties LLC</span>
-        <span>Licensing Proposal · BPB</span>
+    </div>
+
+    <div class="hero-cta-row">
+      <a href="#proof" class="btn-primary">See how it works ↓</a>
+      <a href="#deal" class="btn-ghost">Skip to the deal →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ PROBLEM ════════════ -->
+<section id="problem" class="problem-section">
+  <div class="container">
+    <span class="eyebrow reveal">The pattern</span>
+    <h2 class="reveal">Right now, Bayside's design team is <em>flying blind</em> after every proposal goes out.</h2>
+    <p class="reveal" style="font-size: 19px; color: var(--ink-mute); max-width: 720px; margin-bottom: 32px;">
+      Every designer runs their own follow-up playbook. The craft is strong. The system underneath the craft is inconsistent — and that's where deals leak.
+    </p>
+
+    <div class="problem-grid">
+      <div class="problem-card reveal">
+        <h4>Designer-by-designer formats</h4>
+        <p>Emailed PDFs, paper printouts, phone-only conversations. Two homeowners shopping with two Bayside designers get two different experiences.</p>
       </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 2 — THE PROBLEM ════════════════ -->
-    <section class="body">
-      <span class="label">The problem</span>
-      <h2>Every Bayside designer runs<br>their own sales process.</h2>
-      <p class="subtitle" style="margin-bottom: 1.5em;">And it's costing us deals.</p>
-      <ul>
-        <li>Each designer's proposal format is different — emailed PDFs, paper printouts, phone-only conversations</li>
-        <li>No visibility once the proposal goes out the door</li>
-        <li>Follow-up timing is guessed, not informed</li>
-        <li>Substitutions and questions live in scattered channels — texts, emails, voicemails</li>
-        <li>Leadership sees closed deals at month-end. Stalled deals go silent</li>
-      </ul>
-      <p style="margin-top: 1.5em; font-size: 0.85em; color: var(--navy); font-weight: 600;">
-        Deals don't usually die because Bayside lost a price war.<br>
-        They die because the homeowner went quiet and no one knew when to re-engage.
-      </p>
-      <aside class="notes">
-        Bayside has a strong design team. The CRAFT is there. But the SYSTEM underneath the craft is inconsistent designer-to-designer. Each designer figures out their own way to follow up, their own format, their own cadence. Two homeowners shopping with two Bayside designers get two completely different experiences.
-
-        The most expensive part of this isn't aesthetic. It's: deals don't usually die because Bayside lost a price war. They die because the homeowner went quiet and no one knew when to re-engage at the right moment. That's the problem I built BPB to solve.
-      </aside>
-      <div class="footer-brand">
-        <span>2 / 15</span>
-        <span>The Problem</span>
+      <div class="problem-card reveal">
+        <h4>Zero visibility after sending</h4>
+        <p>Once the proposal goes out, designers can't see if it was opened, re-read, shared, or forgotten about. The instrument panel is dark.</p>
       </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 3 — THE PLATFORM (1-SENTENCE FRAME) ════════════════ -->
-    <section class="body center">
-      <span class="label">The platform</span>
-      <p class="big-quote" style="text-align: center; margin: 0.6em auto;">
-        BPB makes the <em>invisible</em> visible:
-      </p>
-      <p class="big-quote" style="text-align: center; margin: 0.6em auto;">
-        homeowner <em>intent</em>, captured in real time,
-      </p>
-      <p class="big-quote" style="text-align: center; margin: 0.6em auto;">
-        so designers know <em>exactly when to act.</em>
-      </p>
-      <aside class="notes">
-        One sentence. BPB makes the invisible visible. Specifically: homeowner intent — which traditionally has to be guessed at — becomes a stream of timestamped signals the designer can actually act on. I'll show you exactly what that looks like.
-      </aside>
-      <div class="footer-brand">
-        <span>3 / 15</span>
-        <span>The Platform</span>
+      <div class="problem-card reveal">
+        <h4>Follow-up by gut feel</h4>
+        <p>"Should I call today or wait a week?" Same-hour response to engaged buyers far outperforms cold cadence. Without signal, the answer is guesswork.</p>
       </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 4 — DESIGNER VIEW (SCREENSHOT) ════════════════ -->
-    <section class="body">
-      <span class="label">What the designer sees every morning</span>
-      <h2 style="font-size: 1.7em;">Hot Deals dashboard</h2>
-      <div class="screenshot">
-        <strong>[REPLACE WITH SCREENSHOT]</strong>
-        <span>/admin/hot-deals.html — top portion showing 2-3 cards including Masood (HOT 76)</span>
-        <span class="swap-note">Capture: full-width view of cards with score badges, sparklines, and breakdown bars visible. Annotations will float over key elements.</span>
+      <div class="problem-card reveal">
+        <h4>Scattered conversations</h4>
+        <p>Substitutions in texts. Questions in voicemails. Markup in emails. None of it shared with the team. Sick day = stalled deal.</p>
       </div>
-      <div class="annotations">
-        <div class="annotation"><span class="label">Score 0-100</span>Signing likelihood, real-time, score-weighted across engagement signals</div>
-        <div class="annotation"><span class="label">7-day trend</span>Sparkline shows momentum — direction matters as much as current state</div>
+      <div class="problem-card reveal">
+        <h4>No leadership read</h4>
+        <p>You see closed deals at month-end. You never see the deals that quietly went silent. The most important pipeline question — "which deals are alive?" — has no answer.</p>
       </div>
-      <aside class="notes">
-        This is the designer's home screen. Every active proposal they've sent, ranked by how likely it is to close right now.
+    </div>
 
-        The top deal here is Masood at 1719 Yorktown — HOT 76. He's HOT because: 5 events in the last 24 hours, the deal's within the 48-hour discount window, and there's an active message thread. That's not a designer's gut feel. That's the system showing them, in real time, where to spend their attention today.
+    <div class="problem-conclusion reveal">
+      Deals don't usually die because Bayside lost a price war.<br>
+      <strong>They die because the homeowner went quiet — and no one knew when to re-engage.</strong>
+    </div>
+  </div>
+</section>
 
-        The sparkline below shows where the score has been over the last 7 days. So they see not just current state, but momentum.
-      </aside>
-      <div class="footer-brand">
-        <span>4 / 15</span>
-        <span>Designer View</span>
-      </div>
-    </section>
+<!-- ════════════ SOLUTION HEADLINE ════════════ -->
+<section class="solution-headline-section">
+  <div class="container">
+    <h2 class="reveal">BPB makes the <em>invisible</em> visible.</h2>
+    <p class="reveal">Every page view, return visit, click, message, substitution request — captured. Scored. Surfaced to the designer at exactly the right moment.</p>
+  </div>
+</section>
 
-    <!-- ════════════════ SLIDE 5 — HOMEOWNER VIEW (SCREENSHOT) ════════════════ -->
-    <section class="body">
-      <span class="label">What the homeowner sees</span>
-      <h2 style="font-size: 1.7em;">One link. Interactive proposal.</h2>
-      <div class="screenshot">
-        <strong>[REPLACE WITH SCREENSHOT]</strong>
-        <span>/p/1719-yorktown-rd in incognito — top of page with hero drawing and region legend visible</span>
-        <span class="swap-note">Capture in a clean browser window, mobile-frame optional but desktop view works fine.</span>
-      </div>
-      <div class="annotations">
-        <div class="annotation"><span class="label">Site plan</span>Click any region to drill into materials, pricing, scope</div>
-        <div class="annotation"><span class="label">In-portal Q&A</span>Homeowner asks the designer questions without sending an email</div>
-      </div>
-      <aside class="notes">
-        This is what the homeowner gets. One link. Mobile-friendly. Branded. They can review at their own pace.
+<!-- ════════════ LIVE HOT DEALS CARD DEMO ════════════ -->
+<section id="proof" class="product-demo">
+  <div class="container">
+    <span class="eyebrow reveal">What the designer sees every morning</span>
+    <h2 class="reveal">The Hot Deals dashboard, live in BPB right now.</h2>
+    <p class="reveal" style="font-size: 18px; color: var(--ink-mute); max-width: 680px;">
+      Every active proposal a designer has out, ranked by current signing likelihood. The top deal below is from your real pipeline.
+    </p>
 
-        Every interaction they have here — opening the page, clicking a region, asking a question, requesting a material substitution — becomes one of those events the designer sees on the dashboard you just looked at.
+    <div class="demo-frame reveal">
+      <div class="frame-dots"><span></span><span></span><span></span></div>
+      <div class="frame-url">portal-baysidepavers.com/admin/hot-deals.html</div>
 
-        Critically: questions and substitutions stay IN the portal. No email back-and-forth. No lost threads. If a designer is out sick, the next person in the War Room can pick up the conversation.
-      </aside>
-      <div class="footer-brand">
-        <span>5 / 15</span>
-        <span>Homeowner View</span>
-      </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 6 — PROOF (ELISA CASE STUDY) ════════════════ -->
-    <section class="hero">
-      <span class="label">Proof point — real data, today</span>
-      <h2 style="margin-bottom: 0.4em;">17610 John Telfer Dr</h2>
-      <p class="subtitle" style="margin-bottom: 1em;">Elisa Johnson · $54,000 active proposal</p>
-      <div class="two-col" style="margin-top: 28px;">
-        <div>
-          <div class="stat-grid" style="grid-template-columns: 1fr 1fr; margin: 0;">
-            <div class="stat">
-              <div class="stat-num">53</div>
-              <div class="stat-label">Engagement events</div>
+      <div class="demo-content">
+        <article class="hd-card-demo" id="hotDealsDemo">
+          <div class="hd-rank-demo">#1</div>
+          <div>
+            <div class="hd-score-row-demo">
+              <span class="hd-score-badge-demo">HOT 76</span>
+              <span class="hd-status-demo">SENT · LIVE PIPELINE</span>
             </div>
-            <div class="stat">
-              <div class="stat-num">13</div>
-              <div class="stat-label">Distinct sessions</div>
+            <h3 class="hd-name-demo">Masood Delfarah</h3>
+            <p class="hd-addr-demo">1719 Yorktown Rd. <strong>· $41,562</strong></p>
+            <div class="hd-signal-demo">5 events in last 24h · discount expires in 31h</div>
+
+            <div class="hd-trend-demo">
+              <span class="hd-trend-label-demo">7-day trend</span>
+              <svg width="240" height="36" viewBox="0 0 240 36" preserveAspectRatio="none" style="flex:1; max-width:240px;">
+                <defs>
+                  <linearGradient id="sparkGrad" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#c4392e" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#c4392e" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M3 32 L40 30 L80 28 L120 22 L160 14 L200 10 L237 6 L237 33 L3 33 Z" fill="url(#sparkGrad)"/>
+                <path d="M3 32 L40 30 L80 28 L120 22 L160 14 L200 10 L237 6" stroke="#c4392e" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+                <circle cx="237" cy="6" r="3" fill="#c4392e"/>
+              </svg>
+              <span class="mono" style="color: var(--accent); font-weight:700; font-size: 13px;">↑ +56</span>
             </div>
-            <div class="stat">
-              <div class="stat-num">10</div>
-              <div class="stat-label">Days active (of 13)</div>
+
+            <div class="hd-stats-demo">
+              <div><strong>5</strong> events 24h</div>
+              <div><strong>5</strong> events 7d</div>
+              <div><strong>2</strong> sessions</div>
+              <div><strong>1</strong> message</div>
+              <div>Last: <strong>just now</strong></div>
             </div>
-            <div class="stat">
-              <div class="stat-num">$54K</div>
-              <div class="stat-label">Contract value</div>
+
+            <div class="hd-breakdown-demo">
+              <div class="hd-comp-demo">Engagement<span>100</span>
+                <div class="hd-comp-bar-demo"><div class="hd-comp-bar-fill-demo" style="--w: 1"></div></div>
+              </div>
+              <div class="hd-comp-demo">Recency<span>80</span>
+                <div class="hd-comp-bar-demo"><div class="hd-comp-bar-fill-demo" style="--w: 0.8"></div></div>
+              </div>
+              <div class="hd-comp-demo">Urgency<span>60</span>
+                <div class="hd-comp-bar-demo"><div class="hd-comp-bar-fill-demo" style="--w: 0.6"></div></div>
+              </div>
+              <div class="hd-comp-demo">Intent<span>60</span>
+                <div class="hd-comp-bar-demo"><div class="hd-comp-bar-fill-demo" style="--w: 0.6"></div></div>
+              </div>
             </div>
           </div>
-        </div>
-        <div>
-          <p style="font-size: 0.78em; line-height: 1.55;">
-            <strong style="color: var(--blue-gray);">Without BPB,</strong>
-            this deal looks like every other open quote. A name on a follow-up list. A guess about when to call.
-          </p>
-          <p style="font-size: 0.78em; line-height: 1.55; margin-top: 1em;">
-            <strong style="color: var(--white);">With BPB,</strong>
-            the platform knows: she's returned to the proposal on 10 different days over 2 weeks. She is not a tire-kicker. She is a serious buyer.
-          </p>
-          <p style="font-size: 0.78em; line-height: 1.55; margin-top: 1em; font-weight: 600;">
-            The designer working this deal knows exactly when she's engaged — and can act in the moment instead of guessing it.
-          </p>
-        </div>
+          <a class="hd-cta-demo">Open War Room →</a>
+        </article>
       </div>
-      <aside class="notes">
-        Here's the proof point. This is a real active deal in the platform today.
+    </div>
 
-        Without BPB, a designer would have sent this proposal, made a couple of follow-up calls, and waited. Maybe closed it, maybe lost it.
-
-        With BPB, the platform has captured 53 timestamped engagement events from Elisa. 13 distinct browser sessions. She's been back on 10 different days over the last two weeks. That's not aspirational data — it's literal events in the database right now.
-
-        The designer knows, in their inbox every morning, exactly where this deal stands. When Elisa comes back tonight, an alert fires tomorrow morning. When she goes quiet for 5 days, a cooldown alert fires with re-engagement message templates.
-
-        This is the kind of signal Bayside's whole design team should have on every deal.
-      </aside>
-      <div class="footer-brand">
-        <span>6 / 15</span>
-        <span>Proof — Elisa Johnson case</span>
+    <div class="demo-callouts">
+      <div class="callout reveal">
+        <div class="callout-num">01 · The score</div>
+        <strong>HOT 76 isn't a guess.</strong>
+        <p>Weighted from real engagement signals — events in last 24h/7d, recency, proximity to discount window, intent indicators like messages and substitutions.</p>
       </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 7 — LEADERSHIP VIEW (SCREENSHOT) ════════════════ -->
-    <section class="body">
-      <span class="label">What Bayside leadership sees</span>
-      <h2 style="font-size: 1.7em;">Pipeline Dashboard — one screen, real time</h2>
-      <div class="screenshot">
-        <strong>[REPLACE WITH SCREENSHOT]</strong>
-        <span>/admin/dashboard.html — KPI cards at top, designer leaderboard at bottom</span>
-        <span class="swap-note">Capture full page or 2 screenshots stitched if the leaderboard is below the fold.</span>
+      <div class="callout reveal">
+        <div class="callout-num">02 · The signal</div>
+        <strong>"5 events in last 24h"</strong>
+        <p>Tells the designer exactly why this deal is hot today — not yesterday, not in general. Today. Plain language. Actionable.</p>
       </div>
-      <div class="annotations">
-        <div class="annotation"><span class="label">Value at risk</span>$62K signal-weighted expected revenue from $198K gross pipeline — a more honest pipeline number</div>
-        <div class="annotation"><span class="label">Per-designer leaderboard</span>Sent, signed, conversion rate, week-over-week deltas across the whole team</div>
+      <div class="callout reveal">
+        <div class="callout-num">03 · The trend</div>
+        <strong>↑ +56 over 7 days</strong>
+        <p>Momentum, not just position. A deal at 76 trending up is different from a deal at 76 trending down. The sparkline shows direction.</p>
       </div>
-      <aside class="notes">
-        This is what you and Bayside leadership see. One screen, the whole pipeline.
-
-        Top: KPI cards. Active pipeline value. Signal-weighted value-at-risk — this is unique to BPB. If every active proposal converts at its current score-implied probability, this is what would close. It's a more honest pipeline number than raw gross.
-
-        Middle: state transitions across the whole team. Last 7 days of deals that went HOT, deals that cooled off. As a sales manager, this tells you where to direct your coaching attention.
-
-        Bottom: per-designer leaderboard with week-over-week deltas. You'd see, at a glance, which designers are accelerating and which need help.
-      </aside>
-      <div class="footer-brand">
-        <span>7 / 15</span>
-        <span>Leadership View</span>
+      <div class="callout reveal">
+        <div class="callout-num">04 · The action</div>
+        <strong>One click to reply.</strong>
+        <p>Open War Room jumps straight into the conversation with this homeowner. No CRM hunt, no email thread search. Designer acts in the moment.</p>
       </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 8 — FEATURES AT A GLANCE ════════════════ -->
-    <section class="bone">
-      <span class="label">What's live today</span>
-      <h2 style="font-size: 1.7em;">A mature platform, not a prototype</h2>
-      <div class="feature-grid">
-        <div class="feature-col">
-          <h4>Proposal Workflow</h4>
-          <ul>
-            <li>Proposal Editor</li>
-            <li>Branded homeowner portal</li>
-            <li>Drawings + clickable regions</li>
-            <li>Material substitutions</li>
-            <li>Redesign requests</li>
-            <li>E-signature</li>
-          </ul>
-        </div>
-        <div class="feature-col">
-          <h4>Engagement Intelligence</h4>
-          <ul>
-            <li>Real-time event tracking</li>
-            <li>Hot Deals dashboard</li>
-            <li>Pipeline dashboard</li>
-            <li>Score-based ranking</li>
-            <li>7-day trend sparklines</li>
-            <li>Per-designer leaderboard</li>
-          </ul>
-        </div>
-        <div class="feature-col">
-          <h4>Automated Outreach</h4>
-          <ul>
-            <li>HOT crossing alerts</li>
-            <li>Cooldown alerts</li>
-            <li>Daily Hot Deals digest</li>
-            <li>Weekly Master Summary</li>
-            <li>Stalled-deal alerts</li>
-            <li>Auto-archive of stale deals</li>
-          </ul>
-        </div>
-      </div>
-      <aside class="notes">
-        This is what's already in the platform — not vision, not roadmap, but shipped.
-
-        Left column: how designers build proposals and how homeowners experience them.
-        Middle: the intelligence layer — scoring, ranking, dashboards.
-        Right: the automated outreach — the system literally emails designers when something needs attention.
-
-        I won't read all of it. The takeaway is: this is a mature platform. Not a demo, not a prototype.
-      </aside>
-      <div class="footer-brand">
-        <span>8 / 15</span>
-        <span>Features</span>
-      </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 9 — ROADMAP ════════════════ -->
-    <section class="body">
-      <span class="label">Where the platform is going</span>
-      <h2 style="font-size: 1.7em;">Next 6 months of platform investment</h2>
-      <div class="timeline">
-        <div class="timeline-stop">
-          <div class="timeline-dot">NOW</div>
-          <div class="timeline-period">May–June</div>
-          <div class="timeline-label">Mobile-optimized homeowner viewer</div>
-        </div>
-        <div class="timeline-stop">
-          <div class="timeline-dot">Q2</div>
-          <div class="timeline-period">June–July</div>
-          <div class="timeline-label">Section-level engagement intelligence</div>
-        </div>
-        <div class="timeline-stop">
-          <div class="timeline-dot">Q3</div>
-          <div class="timeline-period">August–September</div>
-          <div class="timeline-label">SMS notifications + AI-suggested replies</div>
-        </div>
-        <div class="timeline-stop">
-          <div class="timeline-dot">Q4</div>
-          <div class="timeline-period">October–November</div>
-          <div class="timeline-label">Integrated kickoff scheduling</div>
-        </div>
-      </div>
-      <p style="margin-top: 40px; font-size: 0.75em; color: var(--charcoal); opacity: 0.7; max-width: 80%;">
-        None of this is contractual — Bayside doesn't pay for promises. But this is what's shipping next, and Bayside as the founding licensee shapes the priority.
-      </p>
-      <aside class="notes">
-        Here's the next 6 months of development. None of this is contractual — Bayside doesn't pay for promises. But it's what I'm shipping next, and it all compounds on what's already there.
-
-        The next big one is section-level engagement. Right now we know Elisa came back 10 times. Next month, we'll know WHICH SECTIONS she lingered on — the materials, the pricing, the timeline. That's a different level of insight.
-      </aside>
-      <div class="footer-brand">
-        <span>9 / 15</span>
-        <span>Roadmap</span>
-      </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 10 — THE DEAL (HEADLINE) ════════════════ -->
-    <section class="hero center">
-      <span class="label">The deal</span>
-      <h1 style="font-size: 4.5em; margin: 0.3em auto 0.2em; line-height: 1;">1%</h1>
-      <p class="big-quote" style="text-align: center; margin: 0.4em auto;">
-        of contract value
-      </p>
-      <p style="color: var(--blue-gray); font-size: 0.85em; max-width: 80%; margin: 1.2em auto;">
-        on deals closed after being published in BPB.
-      </p>
-      <p style="color: var(--white); font-size: 0.7em; max-width: 75%; margin: 0.6em auto; opacity: 0.85;">
-        No fixed fees. No minimums in year one. Bayside pays nothing until they close.
-      </p>
-      <aside class="notes">
-        Here's the structure. 1% of contract value on each deal that closes after being published in BPB. That's it. No SaaS subscription. No per-seat fees. No setup fees. No minimums for the first six months.
-
-        If Bayside doesn't close any deals via BPB, Bayside pays nothing. The risk is asymmetric — you pay for results, not for hope.
-      </aside>
-      <div class="footer-brand">
-        <span>10 / 15</span>
-        <span>The Deal</span>
-      </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 11 — DEAL MECHANICS ════════════════ -->
-    <section class="body">
-      <span class="label">How the deal works</span>
-      <h2 style="font-size: 1.6em;">Two sides, aligned incentives</h2>
-      <div class="deal-cols">
-        <div class="deal-col">
-          <h4>What McMullen does</h4>
-          <ul>
-            <li>Provides and maintains the platform</li>
-            <li>Provides 30-min training for each designer</li>
-            <li>Invoices monthly for closed deals</li>
-            <li>Provides full attribution reports</li>
-            <li>Supports designers with 4-hour SLA</li>
-            <li>Builds new platform features</li>
-          </ul>
-        </div>
-        <div class="deal-col">
-          <h4>What Bayside does</h4>
-          <ul>
-            <li>Uses BPB for proposals</li>
-            <li>Requires new designers to certify</li>
-            <li>Pays monthly invoices Net-15</li>
-            <li>May allocate 50% of 1% to designer of record</li>
-            <li>Reports closed deals in the platform</li>
-            <li>Owns all their homeowner and deal data</li>
-          </ul>
-        </div>
-      </div>
-      <p style="margin-top: 30px; font-size: 0.7em; color: var(--charcoal); opacity: 0.75; max-width: 88%;">
-        The designer split is entirely Bayside's call. Pass all of it, half of it, or none of it — McMullen's fee is calculated on the gross contract value either way.
-      </p>
-      <aside class="notes">
-        Two columns. McMullen runs the platform, provides training, invoices monthly with full attribution data. Bayside uses it for proposals, requires new hires to certify, and pays after close.
-
-        One important option: Bayside can pass up to half of the 1% directly to the designer who did the work. So if you split it 50/50, the designer earns 0.5% on every closed BPB deal — a meaningful comp bump that incentivizes them to actually use the system.
-
-        The split is entirely Bayside's call. You could keep all of it, or pass none of it, or do something in between. McMullen doesn't care about that part.
-      </aside>
-      <div class="footer-brand">
-        <span>11 / 15</span>
-        <span>Deal Mechanics</span>
-      </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 12 — ROI MATH ════════════════ -->
-    <section class="bone">
-      <span class="label">What this actually costs</span>
-      <h2 style="font-size: 1.6em;">The economics, concretely</h2>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Scenario</th>
-            <th>Per $50K deal</th>
-            <th>Annual at 50 deals</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Bayside keeps full 1%</td>
-            <td class="mono">$500</td>
-            <td class="mono">$25,000</td>
-          </tr>
-          <tr>
-            <td>Bayside splits 50/50 with designer</td>
-            <td class="mono">$250</td>
-            <td class="mono">$12,500</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <table style="margin-top: 24px;">
-        <thead>
-          <tr>
-            <th>Industry comparison (5-designer team)</th>
-            <th>Annual cost</th>
-            <th>Paid even if zero deals close?</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Salesforce Sales Cloud Professional</td>
-            <td class="mono">$6,000</td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>HubSpot Sales Hub Professional</td>
-            <td class="mono">$6,000</td>
-            <td>Yes</td>
-          </tr>
-          <tr style="background: rgba(93, 126, 105, 0.08);">
-            <td><strong>BPB at 50 deals/yr (with split)</strong></td>
-            <td class="mono"><strong>$12,500</strong></td>
-            <td><strong>No — pays only on close</strong></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p style="margin-top: 28px; font-size: 0.75em; color: var(--navy); font-weight: 600;">
-        Bottom line: 0.5% of pipeline revenue, paid only when deals close.<br>
-        Any single recovered deal — one that would have gone silent without BPB — pays for the platform many times over.
-      </p>
-      <aside class="notes">
-        Concrete math. On a $50K Bayside install, the 1% fee is $500 — or $250 if you split 50/50 with the designer.
-
-        For comparison: per-user SaaS platforms like Salesforce or HubSpot would run Bayside six grand a year for 5 designers, paid whether or not you close any deals. BPB at 50 deals a year — which would be a strong year — would be $12,500 with the designer split, but every dollar of that is paid AFTER you've already collected the revenue.
-
-        Bottom line: this works out to 0.5% of pipeline revenue, and only the pipeline revenue that actually closes. The 'cost' of the platform pays for itself with any single recovered deal that would have otherwise gone silent.
-      </aside>
-      <div class="footer-brand">
-        <span>12 / 15</span>
-        <span>ROI Math</span>
-      </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 13 — ONBOARDING PLAN ════════════════ -->
-    <section class="body">
-      <span class="label">What the first 60 days look like</span>
-      <h2 style="font-size: 1.6em;">Onboarding plan</h2>
-      <div class="timeline">
-        <div class="timeline-stop">
-          <div class="timeline-dot">W1</div>
-          <div class="timeline-period">Week 1</div>
-          <div class="timeline-label">Sign · 1-hour kickoff · Adriana & Tim certified</div>
-        </div>
-        <div class="timeline-stop">
-          <div class="timeline-dot">W2-4</div>
-          <div class="timeline-period">Weeks 2–4</div>
-          <div class="timeline-label">Cohort 1: 2–3 designers certified · First BPB proposals published</div>
-        </div>
-        <div class="timeline-stop">
-          <div class="timeline-dot">M2</div>
-          <div class="timeline-period">Month 2</div>
-          <div class="timeline-label">Cohort 2: remaining designers certified · Mandatory cert policy in effect</div>
-        </div>
-        <div class="timeline-stop">
-          <div class="timeline-dot">M3+</div>
-          <div class="timeline-period">Month 3+</div>
-          <div class="timeline-label">Monthly office hours · Quarterly review with leadership</div>
-        </div>
-      </div>
-      <p style="margin-top: 40px; font-size: 0.78em; color: var(--charcoal); max-width: 85%;">
-        Designers don't have to use BPB from day one — they earn into it. New hires after the start date complete certification before publishing their first proposal.
-      </p>
-      <aside class="notes">
-        60-day onboarding plan. Week one: sign, kick off, Adriana and I activate. Weeks 2-4: we onboard 2-3 more designers. Month two: everyone else. Month three and beyond: monthly 30-minute office hours where any designer can ask questions, and a quarterly business review with Bayside leadership.
-
-        Designers don't have to use BPB from day one — they earn into it. But every new hire after the start date completes certification before publishing their first proposal.
-      </aside>
-      <div class="footer-brand">
-        <span>13 / 15</span>
-        <span>Onboarding</span>
-      </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 14 — NEXT STEPS / CTA ════════════════ -->
-    <section class="hero">
-      <span class="label">Next steps</span>
-      <h2 style="margin-bottom: 0.6em;">Three things from here</h2>
-      <ol class="next-steps">
-        <li>Bayside reviews this proposal and the licensing agreement</li>
-        <li>We schedule a deeper live walkthrough — 1 hour</li>
-        <li>We sign and start onboarding within 7 days</li>
-      </ol>
-      <p style="margin-top: 50px; text-align: center; font-size: 0.7em; color: var(--blue-gray);">
-        Tim McMullen · McMullen Properties LLC<br>
-        <strong style="color: var(--white);">tim@mcmullen.properties</strong> · 415-691-9272
-      </p>
-      <aside class="notes">
-        Three things from here. One: take this document and the licensing agreement back to whoever needs to review it. Spouse, accountant, ops lead, whoever. Two: schedule an hour where I can do a deeper walkthrough and we can redline the deal terms. Three: sign and start onboarding within a week.
-
-        Happy to take questions.
-      </aside>
-      <div class="footer-brand">
-        <span>14 / 15</span>
-        <span>Next Steps</span>
-      </div>
-    </section>
-
-    <!-- ════════════════ SLIDE 15 — Q&A ════════════════ -->
-    <section class="hero center">
-      <h1 style="font-size: 4em; margin: 0.4em auto;">Questions?</h1>
-      <p style="color: var(--blue-gray); font-size: 0.7em; max-width: 60%; margin: 1.5em auto;">
-        Press <strong style="color: var(--white); font-family: 'JetBrains Mono', monospace;">S</strong> in the deck to show speaker notes ·
-        <strong style="color: var(--white); font-family: 'JetBrains Mono', monospace;">F</strong> for fullscreen ·
-        <strong style="color: var(--white); font-family: 'JetBrains Mono', monospace;">ESC</strong> for slide overview
-      </p>
-      <aside class="notes">
-        Q&A. Likely questions you should be ready for — see the separate Q&A prep doc (the cheat sheet I built last turn).
-      </aside>
-      <div class="footer-brand">
-        <span>15 / 15</span>
-        <span>Q&A</span>
-      </div>
-    </section>
-
+    </div>
   </div>
-</div>
+</section>
 
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<!-- ════════════ ELISA TIMELINE ════════════ -->
+<section class="elisa-section">
+  <div class="container">
+    <div class="elisa-header reveal">
+      <span class="eyebrow">A real deal in your pipeline · right now</span>
+      <h2>17610 John Telfer Dr</h2>
+      <p style="font-size: 18px; color: var(--ink-mute);">Elisa Johnson · $54,000 active proposal. Here's the engagement BPB has captured over the past two weeks.</p>
+    </div>
+
+    <div class="elisa-meta-row reveal">
+      <div class="meta-item meta-value"><strong>$54,000</strong><span>Open contract</span></div>
+      <div class="meta-item"><strong>53</strong><span>Total events</span></div>
+      <div class="meta-item"><strong>13</strong><span>Distinct sessions</span></div>
+      <div class="meta-item"><strong>10/13</strong><span>Active days</span></div>
+      <div class="meta-item"><strong>3</strong><span>Proposal versions</span></div>
+    </div>
+
+    <div class="timeline-container reveal">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 22px;">
+        <h4 style="font-family: 'Inter'; font-size: 14px; font-weight: 600; margin: 0; letter-spacing: 0; color: var(--ink);">Sessions over time</h4>
+        <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--ash); letter-spacing: 0.05em;">HOVER ANY DOT</span>
+      </div>
+
+      <div class="timeline-svg-wrap">
+        <svg class="timeline-svg" viewBox="0 0 1000 160" preserveAspectRatio="none" id="timelineSvg">
+          <g class="timeline-grid">
+            <line x1="0" y1="40" x2="1000" y2="40"/>
+            <line x1="0" y1="80" x2="1000" y2="80"/>
+            <line x1="0" y1="120" x2="1000" y2="120"/>
+          </g>
+          <g class="timeline-axis">
+            <text x="0" y="156">Day 1</text>
+            <text x="240" y="156">Day 4</text>
+            <text x="480" y="156">Day 7</text>
+            <text x="720" y="156">Day 10</text>
+            <text x="960" y="156" text-anchor="end">Day 13</text>
+          </g>
+
+          <!-- Session dots: 13 sessions across 13 days, irregular -->
+          <!-- Day 1 (first view) -->
+          <circle class="session-dot" cx="40"  cy="100" r="6" fill="#5d7e69" data-day="1"  data-events="3" data-detail="First open · 3 events · 4 min on page"/>
+          <!-- Day 2 -->
+          <circle class="session-dot" cx="112" cy="80"  r="6" fill="#5d7e69" data-day="2"  data-events="5" data-detail="Return visit · 5 events · viewed materials section"/>
+          <!-- Day 3 -->
+          <circle class="session-dot" cx="184" cy="70"  r="6" fill="#5d7e69" data-day="3"  data-events="6" data-detail="Third visit · 6 events · dwelled on pricing"/>
+          <!-- Day 4 -->
+          <circle class="session-dot" cx="256" cy="90"  r="6" fill="#5d7e69" data-day="4"  data-events="3" data-detail="Brief check-in · 3 events"/>
+          <!-- Day 5 -->
+          <circle class="session-dot" cx="328" cy="60"  r="6" fill="#5d7e69" data-day="5"  data-events="8" data-detail="Most engaged session · 8 events · multiple sections viewed"/>
+          <!-- Day 6 -->
+          <circle class="session-dot" cx="400" cy="75"  r="6" fill="#5d7e69" data-day="6"  data-events="6" data-detail="Continued review · 6 events"/>
+          <!-- Day 7 -->
+          <circle class="session-dot" cx="472" cy="85"  r="6" fill="#5d7e69" data-day="7"  data-events="4" data-detail="Mid-window return · 4 events"/>
+          <!-- Day 8 -->
+          <circle class="session-dot" cx="544" cy="95"  r="6" fill="#5d7e69" data-day="8"  data-events="3" data-detail="Quick recheck · 3 events"/>
+          <!-- Day 9 -->
+          <circle class="session-dot" cx="616" cy="78"  r="6" fill="#5d7e69" data-day="9"  data-events="5" data-detail="Return after gap · 5 events"/>
+          <!-- Day 10 (silent day, no dot) -->
+          <!-- Day 11 -->
+          <circle class="session-dot" cx="760" cy="92"  r="6" fill="#5d7e69" data-day="11" data-events="3" data-detail="Re-engagement · 3 events"/>
+          <!-- Day 12 -->
+          <circle class="session-dot" cx="832" cy="68"  r="6" fill="#c47533" data-day="12" data-events="4" data-detail="Second-to-last visit · 4 events · materials revisited"/>
+          <!-- Day 13 -->
+          <circle class="session-dot" cx="904" cy="58"  r="7" fill="#c4392e" data-day="13" data-events="3" data-detail="Most recent · 3 events · ranked HOT in dashboard"/>
+        </svg>
+        <div class="session-tooltip" id="timelineTooltip"></div>
+      </div>
+
+      <div class="timeline-legend">
+        <div><strong>13 sessions</strong> across 13 days</div>
+        <div>•  <strong>10 of 13 days</strong> with activity</div>
+        <div>•  <strong>3 days silent</strong> (designer re-engagement worked)</div>
+        <div>•  <strong>Dot size & color</strong> = recency + heat</div>
+      </div>
+    </div>
+
+    <div class="interp reveal">
+      <p>
+        <strong>Without BPB</strong>, this deal looks like every other open quote in the funnel. A name. An address. A guess about whether Elisa is still interested.
+      </p>
+      <p>
+        <strong>With BPB</strong>, the platform knows she's returned ten times in two weeks. She's not a tire-kicker. She's a serious buyer working through a real decision. The designer assigned to this deal can act on that, instead of waiting for her to call them.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ LEADERSHIP VIEW ════════════ -->
+<section class="leadership-section">
+  <div class="container">
+    <span class="eyebrow reveal">What Bayside leadership sees</span>
+    <h2 class="reveal">The pipeline, in one screen. Real time.</h2>
+    <p class="reveal" style="font-size: 18px; color: var(--ink-mute); max-width: 720px;">
+      Active pipeline value, signal-weighted expected revenue, per-designer leaderboard, recent state transitions — without opening a spreadsheet.
+    </p>
+
+    <div class="kpi-grid-demo">
+      <div class="kpi-card-demo reveal">
+        <div class="kpi-label">Active Pipeline</div>
+        <div class="kpi-value">$198K</div>
+        <div class="kpi-sub"><strong>4</strong> open proposals</div>
+      </div>
+      <div class="kpi-card-demo reveal">
+        <div class="kpi-label">Value at Risk</div>
+        <div class="kpi-value">$62K</div>
+        <div class="kpi-sub">Score-weighted expected close</div>
+      </div>
+      <div class="kpi-card-demo reveal">
+        <div class="kpi-label">Conversion Rate</div>
+        <div class="kpi-value">—</div>
+        <div class="kpi-sub">Will populate once Bayside is live</div>
+      </div>
+      <div class="kpi-card-demo reveal">
+        <div class="kpi-label">Avg Time-to-Sign</div>
+        <div class="kpi-value">—</div>
+        <div class="kpi-sub">Will populate once Bayside is live</div>
+      </div>
+    </div>
+
+    <p class="reveal" style="margin-top: 36px; font-size: 14px; color: var(--ash); font-style: italic;">
+      Each metric is calculated and refreshed in real time from the platform's own pipeline data. Pipeline shown above is from the current BPB beta — Bayside's numbers will populate within days of going live.
+    </p>
+  </div>
+</section>
+
+<!-- ════════════ CALCULATOR ════════════ -->
+<section id="math" class="calc-section">
+  <div class="container">
+    <span class="eyebrow reveal" style="color: var(--gold);">The math, interactively</span>
+    <h2 class="reveal">Play with the numbers. <em>This is what BPB costs Bayside.</em></h2>
+    <p class="reveal">Drag the sliders. The fee structure adjusts in real time. The 1% applies only to deals that close after being published in BPB — no fixed costs, no per-seat fees.</p>
+
+    <div class="calc-grid">
+      <div class="calc-controls reveal">
+        <div class="calc-control">
+          <div class="calc-label">
+            <span>Closed deals per year via BPB</span>
+            <span class="calc-label-value" id="dealsLabel">50</span>
+          </div>
+          <input type="range" id="dealsSlider" min="10" max="200" value="50" step="5">
+        </div>
+        <div class="calc-control">
+          <div class="calc-label">
+            <span>Average deal size</span>
+            <span class="calc-label-value" id="dealSizeLabel">$50,000</span>
+          </div>
+          <input type="range" id="dealSizeSlider" min="20000" max="150000" value="50000" step="5000">
+        </div>
+        <div class="calc-control">
+          <div class="calc-label">
+            <span>Designer split %</span>
+            <span class="calc-label-value" id="splitLabel">50%</span>
+          </div>
+          <input type="range" id="splitSlider" min="0" max="100" value="50" step="10">
+        </div>
+      </div>
+
+      <div class="calc-results reveal">
+        <div class="calc-result-line headline">
+          <span class="calc-result-label">Total annual fee to McMullen</span>
+          <span class="calc-result-value mono" id="totalFee">$25,000</span>
+        </div>
+        <div class="calc-result-line">
+          <span class="calc-result-label">Bayside's share (after split)</span>
+          <span class="calc-result-value mono" id="baysideShare">$12,500</span>
+        </div>
+        <div class="calc-result-line">
+          <span class="calc-result-label">Designer cohort's share</span>
+          <span class="calc-result-value mono" id="designerShare">$12,500</span>
+        </div>
+        <div class="calc-result-line">
+          <span class="calc-result-label">Per-deal cost to Bayside</span>
+          <span class="calc-result-value mono" id="perDealCost">$250</span>
+        </div>
+        <div class="calc-result-line">
+          <span class="calc-result-label">As % of pipeline revenue</span>
+          <span class="calc-result-value mono" id="pctRevenue">0.50%</span>
+        </div>
+        <div class="calc-vs">
+          <strong>For comparison:</strong> HubSpot Sales Pro for 5 designers runs ~$6,000/yr <em>fixed</em>, paid whether or not anything closes. BPB is pure performance — if zero deals close, Bayside pays $0.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ DEAL ════════════ -->
+<section id="deal" class="deal-section">
+  <div class="container">
+    <span class="eyebrow reveal">The deal · plain language</span>
+    <h2 class="reveal">Aligned incentives. No fine print.</h2>
+
+    <div class="deal-grid">
+      <div class="deal-tile reveal">
+        <div class="deal-tile-key">01 · The fee</div>
+        <h4>1% of contract value</h4>
+        <p>Applied only to deals that close after being published in BPB and engaged by the homeowner. The where-they-sign (in-portal, DocuSign, paper) doesn't matter.</p>
+      </div>
+      <div class="deal-tile reveal">
+        <div class="deal-tile-key">02 · No fixed costs</div>
+        <h4>Zero minimum in year one</h4>
+        <p>No setup fees. No per-seat charges. No monthly minimums for the first six months. If Bayside closes zero deals via BPB, Bayside pays $0.</p>
+      </div>
+      <div class="deal-tile reveal">
+        <div class="deal-tile-key">03 · The designer split</div>
+        <h4>Up to 50% to the designer</h4>
+        <p>Bayside may pass up to half of the 1% directly to the designer of record. Creates real comp upside on every closed BPB deal. Split structure is Bayside's call.</p>
+      </div>
+      <div class="deal-tile reveal">
+        <div class="deal-tile-key">04 · Training</div>
+        <h4>30 minutes to certify</h4>
+        <p>Designers complete a short video course + quiz to earn the split. New hires after the start date certify before publishing their first proposal.</p>
+      </div>
+      <div class="deal-tile reveal">
+        <div class="deal-tile-key">05 · The term</div>
+        <h4>12 months, auto-renewing</h4>
+        <p>60 days' notice to non-renew. Either side can exit clean at the end of any term. Bayside has 90 days post-termination to export all data.</p>
+      </div>
+      <div class="deal-tile reveal">
+        <div class="deal-tile-key">06 · The data</div>
+        <h4>Bayside owns it all</h4>
+        <p>All homeowner and deal data is Bayside's property. Exportable any time. McMullen retains only anonymized aggregate rights for product improvement.</p>
+      </div>
+      <div class="deal-tile reveal">
+        <div class="deal-tile-key">07 · Continuity</div>
+        <h4>Code escrow available</h4>
+        <p>Optional escrow agreement so if McMullen Properties ever winds down, Bayside ends up owning the platform. Mitigates the fair concern about key-person risk.</p>
+      </div>
+      <div class="deal-tile reveal">
+        <div class="deal-tile-key">08 · Support</div>
+        <h4>4-hour business-day SLA</h4>
+        <p>Direct line to Tim McMullen. Monthly designer office-hours call. Quarterly business review with Bayside leadership.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ ONBOARDING ════════════ -->
+<section class="onboarding-section">
+  <div class="container">
+    <span class="eyebrow reveal">What the first 60 days look like</span>
+    <h2 class="reveal">A phased rollout. No big-bang risk.</h2>
+
+    <div class="stepper">
+      <div class="step reveal">
+        <div class="step-marker">W1</div>
+        <div class="step-period">Week 1</div>
+        <h5>Sign + Kickoff</h5>
+        <p>1-hour kickoff call. Adriana & Tim activate as Cohort 0.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-marker">W2-4</div>
+        <div class="step-period">Weeks 2 – 4</div>
+        <h5>Cohort 1</h5>
+        <p>2–3 designers certified. First BPB proposals published. Real engagement data starts flowing.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-marker">M2</div>
+        <div class="step-period">Month 2</div>
+        <h5>Cohort 2</h5>
+        <p>Remaining designers certified. New-hire certification policy goes live.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-marker">M3+</div>
+        <div class="step-period">Month 3+</div>
+        <h5>Steady state</h5>
+        <p>Monthly designer office-hours. Quarterly leadership business review. Roadmap requests in flight.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ CTA ════════════ -->
+<section id="cta" class="cta-section">
+  <div class="container">
+    <h2>Let's get on the <em>same page.</em></h2>
+    <p>30 minutes. I'll walk through the live platform, answer the hard questions, and leave you with the documents to take to legal.</p>
+    <a class="cta-button" href="mailto:tim@mcmullen.properties?subject=BPB%20Licensing%20-%20Walkthrough">
+      Schedule the walkthrough →
+    </a>
+    <div class="cta-contact">
+      <strong>Tim McMullen</strong> · tim@mcmullen.properties · 415-691-9272
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <span>McMullen Properties LLC · DRE #02016832</span>
+    <span>BPB v3.x · Updated May 2026</span>
+  </div>
+</footer>
+
 <script>
-  Reveal.initialize({
-    hash: true,
-    controls: true,
-    progress: true,
-    history: true,
-    center: false,
-    transition: 'fade',
-    transitionSpeed: 'default',
-    backgroundTransition: 'fade',
-    width: 1280,
-    height: 800,
-    margin: 0,
-    minScale: 0.4,
-    maxScale: 1.8,
-    plugins: [ RevealNotes ]
-  });
+  // Sticky nav border on scroll
+  const topnav = document.getElementById('topnav');
+  window.addEventListener('scroll', () => {
+    topnav.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  // Reveal-on-scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -80px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Hero counter animation
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = parseInt(el.dataset.countTo, 10);
+      if (isNaN(target)) return;
+      const duration = 1400;
+      const start = performance.now();
+      const tick = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(eased * target);
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+      counterObserver.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('[data-count-to]').forEach(el => counterObserver.observe(el));
+
+  // Animate Hot Deals breakdown bars when in view
+  const cardObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.querySelectorAll('.hd-comp-bar-fill-demo').forEach(b => b.classList.add('animate'));
+      cardObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.4 });
+  const hd = document.getElementById('hotDealsDemo');
+  if (hd) cardObserver.observe(hd);
+
+  // Timeline interactivity
+  const tooltip = document.getElementById('timelineTooltip');
+  const timelineSvg = document.getElementById('timelineSvg');
+  if (timelineSvg && tooltip) {
+    document.querySelectorAll('.session-dot').forEach(dot => {
+      dot.addEventListener('mouseenter', (e) => {
+        const detail = dot.dataset.detail;
+        const day = dot.dataset.day;
+        const events = dot.dataset.events;
+        tooltip.innerHTML = `<strong style="color:#b78b3a">Day ${day}</strong> · ${events} events<br><span style="opacity:0.85">${detail}</span>`;
+        const svgRect = timelineSvg.getBoundingClientRect();
+        const wrapRect = timelineSvg.parentElement.getBoundingClientRect();
+        const dotRect = dot.getBoundingClientRect();
+        const left = dotRect.left - wrapRect.left + dotRect.width / 2;
+        const top = dotRect.top - wrapRect.top;
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+        tooltip.classList.add('visible');
+      });
+      dot.addEventListener('mouseleave', () => {
+        tooltip.classList.remove('visible');
+      });
+    });
+  }
+
+  // Calculator
+  const dealsSlider = document.getElementById('dealsSlider');
+  const dealSizeSlider = document.getElementById('dealSizeSlider');
+  const splitSlider = document.getElementById('splitSlider');
+  const fmt = (n) => '$' + Math.round(n).toLocaleString('en-US');
+  const pctFmt = (n) => n.toFixed(2) + '%';
+
+  function updateCalc() {
+    const deals = parseInt(dealsSlider.value, 10);
+    const dealSize = parseInt(dealSizeSlider.value, 10);
+    const splitPct = parseInt(splitSlider.value, 10);
+    const pipelineRevenue = deals * dealSize;
+    const totalFee = pipelineRevenue * 0.01;
+    const designerShare = totalFee * (splitPct / 100);
+    const baysideShare = totalFee - designerShare;
+    const perDealCost = totalFee / deals;
+    const pctOfRevenue = (baysideShare / pipelineRevenue) * 100;
+
+    document.getElementById('dealsLabel').textContent = deals;
+    document.getElementById('dealSizeLabel').textContent = fmt(dealSize);
+    document.getElementById('splitLabel').textContent = splitPct + '%';
+    document.getElementById('totalFee').textContent = fmt(totalFee);
+    document.getElementById('baysideShare').textContent = fmt(baysideShare);
+    document.getElementById('designerShare').textContent = fmt(designerShare);
+    document.getElementById('perDealCost').textContent = fmt(perDealCost);
+    document.getElementById('pctRevenue').textContent = pctFmt(pctOfRevenue);
+  }
+  [dealsSlider, dealSizeSlider, splitSlider].forEach(s => s.addEventListener('input', updateCalc));
+  updateCalc();
 </script>
 </body>
 </html>
