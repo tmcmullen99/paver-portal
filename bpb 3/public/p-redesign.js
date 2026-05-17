@@ -1,44 +1,34 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// /p-redesign.js — Phase 6 Sprint 2 + Sprint 14C.11 (client redesign autonomy)
+// /p-redesign.js — Phase 6 + Sprint 14C.11 + Phase 16 (unified customize editor)
 //
-// Loaded by p-customize.js when the customize feature is enabled (i.e., the
-// caller is the authenticated homeowner of this proposal). Adds three entry
-// points to the proposal page:
+// Loaded by p-customize.js when the customize feature is enabled (authenticated
+// homeowner of this proposal). Adds THREE entry points to the proposal page:
 //
-//   1. Floating CTA at bottom-right with three buttons:
-//        - "Suggest changes"   → markup overlay (draw/photo/note)
-//        - "Reshape my areas"  → polygon-vertex-drag overlay (sprint 14C.11)
-//        - "Print for markup"  → @media print rules
+//   1. "Resize · swap · price" — Phase 16 unified inline editor. Combines
+//      polygon-vertex drag (geometry), material swap (visual + estimated $),
+//      and live $ readout per region. Single "Send to designer" submits both
+//      kinds of change in parallel to /api/submit-redesign AND
+//      /api/submit-substitutions. THIS IS THE PITCH-PAGE MOAT EXPERIENCE.
 //
-//   2. "Suggest changes" → fullscreen overlay with:
-//        - Site map image as backdrop
-//        - SVG drawing layer (pencil, 3 colors, undo, clear)
-//        - Photo upload alternative (canvas-converted to JPEG for HEIC robustness)
-//        - Note textarea
-//        - Submit → POST /api/submit-redesign
+//   2. "Suggest changes" — original markup overlay (draw / photo / note).
+//      Unchanged from Sprint 14C.13 — kept as fallback for asks that aren't
+//      pure geometry or material swap.
 //
-//   3. "Reshape my areas" → fullscreen overlay with:
-//        - Same site map backdrop
-//        - All region polygons rendered draggable (vertex handles)
-//        - Live sqft / lnft readout per region (Shoelace formula scaled
-//          by original area_sqft from the published legend)
-//        - Per-region reset + global reset
-//        - Submit → POST /api/submit-redesign with modified_polygons FormData
+//   3. "Print for markup" — @media print rules. Unchanged from 14C.13.
 //
-//   4. "Print for markup" → window.print() with @media print rules that
-//      hide everything except the site map area
-//
-// Strokes are stored as {color, points:[{x,y}]} relative to the site map's
-// natural pixel dimensions. On submit they're serialized to a clean SVG
-// string that the admin queue renders directly via dangerouslySetInnerHTML
-// equivalent (innerHTML of a sanitized container).
-//
-// Reshape data is stored as fractional 0..1 polygon coords in a self-
-// contained diff (original + modified + areas) so the designer review
-// is stable even if proposal_regions is later edited.
-//
-// HEIC handling: createImageBitmap(file) → canvas → toBlob('image/jpeg').
-// Safari handles HEIC natively at the createImageBitmap step.
+// Phase 16 details:
+//   - On overlay open, refetch /api/proposal-customize-data to populate
+//     reshape.swapCandidates (kept self-contained — p-customize.js needs no
+//     changes to support this module).
+//   - SVG <pattern> per region, filled with the active material's swatch
+//     image (same technique as the pitch-bayside moat demo).
+//   - Pricing derived from DOM: read the .bpc-bid-reader-row elements
+//     p-customize.js created, fuzzy-match section names → region names,
+//     compute baseline $/sqft per region, scale linearly with sqft delta.
+//     Final pricing is always the designer's call — UI labels it "Estimate".
+//   - Material swap updates the polygon pattern fill + the price readout;
+//     when submitted, the changes flow to /api/submit-substitutions and
+//     show up in the designer's queue as a normal substitution request.
 // ═══════════════════════════════════════════════════════════════════════════
 
 (function () {
@@ -47,50 +37,60 @@
   if (window.__bpcRedesignLoaded) return;
   window.__bpcRedesignLoaded = true;
 
-  const API_REDESIGN = '/api/submit-redesign';
+  const API_REDESIGN      = '/api/submit-redesign';
+  const API_SUBSTITUTIONS = '/api/submit-substitutions';
+  const API_CUSTOMIZE     = '/api/proposal-customize-data';
 
-  // Sprint 14C.11 — region color palette mirrors publish.js
-  // REGION_LEGEND_COLORS so the colors a homeowner sees on their proposal
-  // page match what they see in the reshape overlay. Used for the legend
-  // dot, polygon stroke/fill, region selector chips, and the diff
-  // visualization on the designer side. If publish.js changes its
-  // palette, update both.
+  // Region color palette — mirrors publish.js REGION_LEGEND_COLORS so the
+  // colors the homeowner sees on the proposal page match what they see
+  // in the unified editor. Keep both lists in sync if either changes.
   const RESHAPE_PALETTE = [
     '#5d7e69', '#3b82f6', '#f59e0b', '#a855f7', '#ec4899',
     '#14b8a6', '#f97316', '#06b6d4', '#84cc16', '#ef4444',
   ];
 
-  // Drawing state
+  // ── Drawing state (Suggest-changes overlay, unchanged) ───────────────
   const draw = {
-    strokes: [],          // [{color, points:[{x,y}]}]
+    strokes: [],
     currentColor: '#dc2626',
-    currentStroke: null,  // active stroke during pointerdown→up
+    currentStroke: null,
     isDrawing: false,
   };
 
-  // Sprint 14C.11 — reshape state. Built lazily when the user opens the
-  // reshape overlay; reset on close. Shape:
-  //   regions: [{
+  // ── Reshape state (Phase 16 — extended with materials + pricing) ─────
+  //
+  // regions[i] shape:
+  //   {
   //     id, name, color,
-  //     original_polygon: [{x,y}],   // fractional 0..1, pristine, never mutated
-  //     modified_polygon: [{x,y}],   // fractional 0..1, mutated as user drags
-  //     original_area_sqft, original_area_lnft,
-  //   }]
+  //     original_polygon, modified_polygon,             ← Sprint 14C.11
+  //     original_area_sqft, original_area_lnft,         ← Sprint 14C.11
+  //     // Phase 16:
+  //     current_material:           { product_name, color, swatch_url, category, manufacturer } | null,
+  //     proposal_region_material_id: uuid | null,
+  //     pending_material:           same shape as current_material | null,
+  //     pending_material_id:        uuid | null,
+  //     original_subtotal:          number,   // from DOM section subtotal (0 if no match)
+  //     unit_price_sqft:            number,   // original_subtotal / original_area_sqft (fallback: project avg)
+  //   }
   const reshape = {
     regions: [],
-    selectedIdx: 0,         // which region is currently "active" (vertices visible)
+    swapCandidates: {},      // category → [{ id, product_name, color, manufacturer, swatch_url }, ...]
+    selectedIdx: 0,
     isDragging: false,
     dragRegionIdx: -1,
     dragVertexIdx: -1,
     backdropW: 0,
     backdropH: 0,
     backdropUrl: '',
+    projectTotal: 0,         // original project total (from .bpc-bid-total-amount or summed)
+    projectOrigSqft: 0,      // sum of original sqft across all regions
+    customizeFetched: false, // becomes true after the async hydration completes
+    customizeFailed: false,  // becomes true if hydration errors out (graceful degrade)
   };
 
-  // Photo upload state
-  let pickedPhoto = null; // { blob, previewUrl } or null
+  let pickedPhoto = null;
 
-  // Refs to overlay elements (built lazily on first open)
+  // Original overlay refs (Suggest-changes)
   let overlayEl = null;
   let svgEl = null;
   let canvasBgEl = null;
@@ -101,17 +101,19 @@
   let submitStatusEl = null;
   let printNotesAreaEl = null;
 
-  // Sprint 14C.11 — reshape overlay refs (separate DOM tree from markup
-  // overlay so the two can't collide; only one open at a time anyway).
-  let reshapeOverlayEl   = null;
-  let reshapeStageSvgEl  = null;     // the SVG containing backdrop image + draggable polygons
-  let reshapeBackdropEl  = null;     // <img class="bpc-reshape-stage-bg"> — sibling of reshapeStageSvgEl, sets the wrap's intrinsic dimensions
-  let reshapeRegionsGEl  = null;     // <g> holding all region polygons
-  let reshapeHandlesGEl  = null;     // <g> holding vertex-drag handles for selectedIdx
-  let reshapeReadoutEl   = null;     // legend showing live areas per region
-  let reshapeNoteEl      = null;     // optional note textarea
-  let reshapeSubmitBtnEl = null;
-  let reshapeStatusEl    = null;
+  // Reshape overlay refs (Phase 16 — added picker, price readout, defs)
+  let reshapeOverlayEl       = null;
+  let reshapeStageSvgEl      = null;
+  let reshapeBackdropEl      = null;
+  let reshapeRegionsGEl      = null;
+  let reshapeHandlesGEl      = null;
+  let reshapeDefsEl          = null;   // <defs> holds one <pattern> per region for material fills
+  let reshapeReadoutEl       = null;
+  let reshapeNoteEl          = null;
+  let reshapeSubmitBtnEl     = null;
+  let reshapeStatusEl        = null;
+  let reshapeMaterialPickerEl = null;
+  let reshapePriceTotalEl    = null;
 
   // ── Helpers ──────────────────────────────────────────────────────────
   function escapeHtml(s) {
@@ -140,45 +142,23 @@
     return m ? decodeURIComponent(m[1]) : null;
   }
 
-  /**
-   * Find the site map backdrop image URL + natural dimensions from the
-   * existing publish.js DOM.
-   *
-   * publish.js emits this structure:
-   *   <div class="pub-site-plan-map">           ← wrapper DIV (NOT an SVG)
-   *     <div class="pub-drawing-frame">
-   *       <div class="pub-drawing-overlay-wrap">
-   *         <img class="pub-drawing-overlay-img" src="…">     ← backdrop
-   *         <svg class="pub-drawing-overlay-svg" viewBox="…"> ← polygons
-   *           <polygon class="pub-drawing-region" data-region-id="…"/>
-   *         </svg>
-   *       </div>
-   *     </div>
-   *   </div>
-   *
-   * We read the viewBox from the inner SVG (.pub-drawing-overlay-svg) and
-   * the backdrop URL from the sibling <img.pub-drawing-overlay-img>.
-   * (Earlier versions of this helper queried `.pub-site-plan-map` as if it
-   * were an SVG and looked for an SVG <image> child — that returns nothing
-   * on the current publish.js output, which silently broke both the
-   * Suggest-changes overlay and the Reshape overlay.)
-   */
+  function fmtMoney(n) {
+    if (!Number.isFinite(n)) return '—';
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
   function getSiteMapInfo() {
     const svgEl = document.querySelector('.pub-drawing-overlay-svg');
     if (!svgEl) return null;
-
     let width = 0, height = 0;
     const vb = svgEl.getAttribute('viewBox');
     if (vb) {
       const parts = vb.split(/\s+/).map(Number);
       if (parts.length === 4) { width = parts[2]; height = parts[3]; }
     }
-
     const imgEl = document.querySelector('.pub-drawing-overlay-img');
     let url = '';
     if (imgEl) {
-      // Prefer the resolved .src (absolute URL) over the raw attribute,
-      // which may be relative depending on how the snapshot was rendered.
       url = imgEl.src || imgEl.getAttribute('src') || '';
       width  = parseFloat(imgEl.getAttribute('width'))  || width;
       height = parseFloat(imgEl.getAttribute('height')) || height;
@@ -200,7 +180,8 @@
       pointer-events: auto;
     }
     .bpc-redesign-fab-btn,
-    .bpc-redesign-fab-btn--secondary {
+    .bpc-redesign-fab-btn--secondary,
+    .bpc-redesign-fab-btn--reshape {
       font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: 13px;
       font-weight: 600;
@@ -213,11 +194,16 @@
       transition: transform 0.08s, background 0.12s;
       white-space: nowrap;
     }
-    .bpc-redesign-fab-btn {
+    .bpc-redesign-fab-btn--reshape {
       background: #5d7e69;
       color: #fff;
     }
-    .bpc-redesign-fab-btn:hover { background: #4a6554; }
+    .bpc-redesign-fab-btn--reshape:hover { background: #4a6554; }
+    .bpc-redesign-fab-btn {
+      background: #dad7c5;
+      color: #353535;
+    }
+    .bpc-redesign-fab-btn:hover { background: #cdc7ae; }
     .bpc-redesign-fab-btn--secondary {
       background: #fff;
       color: #5d7e69;
@@ -225,9 +211,10 @@
     }
     .bpc-redesign-fab-btn--secondary:hover { background: #faf8f3; }
     .bpc-redesign-fab-btn:active,
-    .bpc-redesign-fab-btn--secondary:active { transform: scale(0.97); }
+    .bpc-redesign-fab-btn--secondary:active,
+    .bpc-redesign-fab-btn--reshape:active { transform: scale(0.97); }
 
-    /* Overlay */
+    /* Suggest-changes overlay (unchanged) */
     .bpc-redesign-overlay {
       position: fixed; inset: 0;
       background: rgba(20, 22, 24, 0.92);
@@ -265,7 +252,6 @@
       line-height: 1;
     }
     .bpc-redesign-overlay-close:hover { background: rgba(255,255,255,0.12); }
-
     .bpc-redesign-overlay-body {
       flex: 1;
       overflow: auto;
@@ -275,7 +261,6 @@
       align-items: center;
       gap: 12px;
     }
-
     .bpc-redesign-canvas-wrap {
       position: relative;
       max-width: 100%;
@@ -301,8 +286,6 @@
       cursor: crosshair;
       touch-action: none;
     }
-
-    /* Toolbar */
     .bpc-redesign-toolbar {
       flex-shrink: 0;
       display: flex;
@@ -355,8 +338,6 @@
     }
     .bpc-redesign-tool-text:hover { background: #e7e3d6; }
     .bpc-redesign-photo-input { display: none; }
-
-    /* Photo preview */
     .bpc-redesign-photo-preview {
       position: relative;
       max-width: 280px;
@@ -382,8 +363,6 @@
       font-size: 14px;
       line-height: 1;
     }
-
-    /* Footer with note + submit */
     .bpc-redesign-overlay-footer {
       flex-shrink: 0;
       padding: 12px 16px;
@@ -441,36 +420,12 @@
     .bpc-redesign-submit-status--error { color: #b85450; }
     .bpc-redesign-submit-status--success { color: #5d7e69; font-weight: 600; }
 
-    /* Print rules — hide everything except site map area.
-       Sprint 14C.13 — REWRITE. The earlier rules targeted .pub-page,
-       .pub-section--map, and .pub-cover, none of which exist in the
-       current publish.js output (the actual classes are .pub-hero for
-       the cover and .pub-drawing for the site map section). The result
-       was a print that hid EVERYTHING including the site map, leaving
-       only the notes area on a blank page. New rules:
-       • Top-level body children: keep only .pub-drawing (site map +
-         legend) and the appended .bpc-redesign-print-notes; hide
-         everything else (cover, scope, materials, CTA, account-footer,
-         lightbox, sign modal, FAB, our overlays).
-       • Inside .pub-drawing: collapse the customize feature's
-         .bpc-twocol back to single-column and hide the detail card on
-         the right + the materials grid below + any other customize
-         decorations.
-       • The notes area appears immediately after the site map because
-         everything between them is removed from the print flow.
-       The body.bpc-redesign-printing class is added by handlePrint()
-       only when the user clicks our Print FAB; a regular Cmd+P from
-       the browser still prints the whole page normally. */
-    .bpc-redesign-print-notes {
-      display: none;
-    }
+    /* Print rules (unchanged from 14C.13) */
+    .bpc-redesign-print-notes { display: none; }
     @media print {
       body.bpc-redesign-printing > *:not(.pub-drawing):not(.bpc-redesign-print-notes):not(script):not(style) {
         display: none !important;
       }
-      /* Customize feature wraps the site map + a detail card in a
-         CSS-grid .bpc-twocol; in print, switch to single column so the
-         site map gets full width once the right column is hidden. */
       body.bpc-redesign-printing .bpc-twocol {
         display: block !important;
         grid-template-columns: 1fr !important;
@@ -485,10 +440,6 @@
       body.bpc-redesign-printing .bpc-reshape-overlay {
         display: none !important;
       }
-      /* Make sure the site map section itself shows even though its
-         parent is being aggressively hidden by the catch-all above —
-         the section IS .pub-drawing so it's already exempt, but be
-         explicit for any nested duplicates. */
       body.bpc-redesign-printing .pub-drawing,
       body.bpc-redesign-printing .pub-drawing-inner,
       body.bpc-redesign-printing .pub-site-plan-map,
@@ -505,8 +456,6 @@
       body.bpc-redesign-printing .pub-region-legend-meta {
         display: revert !important;
       }
-      /* Force colored region overlays to actually print (most browsers
-         strip backgrounds + colors by default). */
       body.bpc-redesign-printing .pub-drawing-overlay-svg,
       body.bpc-redesign-printing .pub-drawing-region,
       body.bpc-redesign-printing .pub-region-legend-dot {
@@ -518,7 +467,6 @@
         margin: 24px;
         border-top: 1px solid #888;
         padding-top: 16px;
-        page-break-before: auto;
       }
       body.bpc-redesign-printing .bpc-redesign-print-notes h3 {
         font-family: 'Onest', sans-serif;
@@ -541,30 +489,8 @@
     }
 
     /* ════════════════════════════════════════════════════════════════
-       Sprint 14C.11 — reshape overlay
-       Separate DOM tree from the markup overlay so styles don't collide.
-       Reuses the same overlay/header/footer scaffolding visually but
-       with a different toolbar (region chips, area readout) and no
-       drawing tools.
+       Reshape overlay (Sprint 14C.11 + Phase 16)
        ════════════════════════════════════════════════════════════════ */
-    .bpc-redesign-fab-btn--reshape {
-      font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.01em;
-      padding: 11px 18px;
-      border-radius: 24px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(53, 53, 53, 0.18);
-      transition: transform 0.08s, background 0.12s;
-      white-space: nowrap;
-      background: #dad7c5;
-      color: #353535;
-    }
-    .bpc-redesign-fab-btn--reshape:hover { background: #cdc7ae; }
-    .bpc-redesign-fab-btn--reshape:active { transform: scale(0.97); }
-
     .bpc-reshape-overlay {
       position: fixed; inset: 0;
       background: rgba(20, 22, 24, 0.94);
@@ -614,16 +540,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
 
-    /* Hint banner shown on first open. The flow is non-obvious for
-       people who've never seen polygon-edit UIs, so spelling it out
-       up front avoids the "what am I supposed to do?" stall.
-       Sprint 14C.15 — reduced to a single tight line so the stage
-       gets more vertical real estate; the in-header subtitle already
-       carries the core "drag the dots" hint, this is the secondary
-       reinforcement. */
     .bpc-reshape-hint {
       max-width: 680px;
       width: 100%;
@@ -639,9 +558,6 @@
     }
     .bpc-reshape-hint strong { color: #1f2125; font-weight: 600; }
 
-    /* Region selector chip row — one chip per region, color-matched
-       to the legend dots on the published page. Selected chip has a
-       contrasted ring; unselected chips fade to .72 opacity. */
     .bpc-reshape-chips {
       display: flex;
       flex-wrap: wrap;
@@ -676,37 +592,173 @@
       border-radius: 50%;
       flex-shrink: 0;
     }
+    .bpc-reshape-chip-pending {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #b78b3a;
+      margin-left: 2px;
+    }
 
-    /* The stage — backdrop + draggable polygons + vertex handles. Sized
-       to fit within the available viewport while keeping a sensible
-       max-height. touch-action:none on the SVG so vertex drag doesn't
-       trigger page scroll on mobile.
-       Sprint 14C.15 — sizing strategy now mirrors the Suggest-changes
-       overlay: an HTML <img class="bpc-reshape-stage-bg"> establishes
-       the wrap's intrinsic dimensions, and the SVG floats over it with
-       position:absolute. The previous design used SVG <image> as the
-       backdrop, which doesn't give the parent <svg> any intrinsic
-       sizing in a flex column — the wrap collapsed to 0 height and the
-       polygon overlay was effectively invisible. Using an <img> as the
-       sizer is the same trick already proven to work in the markup
-       overlay; reusing it here keeps the two paths consistent. */
+    /* Phase 16 — material picker for the selected region */
+    .bpc-reshape-mat-picker {
+      max-width: 760px;
+      width: 100%;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .bpc-reshape-mat-current {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #f1efe6;
+    }
+    .bpc-reshape-mat-current-thumb {
+      width: 44px; height: 44px;
+      border-radius: 6px;
+      background-size: cover;
+      background-position: center;
+      flex-shrink: 0;
+      background-color: #f4f1e8;
+      border: 1px solid #eae6d6;
+    }
+    .bpc-reshape-mat-current-info { flex: 1; min-width: 0; }
+    .bpc-reshape-mat-current-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #5d7e69;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .bpc-reshape-mat-current-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: #353535;
+      line-height: 1.2;
+    }
+    .bpc-reshape-mat-current-meta {
+      font-size: 12px;
+      color: #777;
+      margin-top: 2px;
+    }
+    .bpc-reshape-mat-pending-arrow {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 8px;
+      background: rgba(183,139,58,0.14);
+      color: #b78b3a;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .bpc-reshape-mat-cands-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+      font-weight: 700;
+    }
+    .bpc-reshape-mat-cands {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+      gap: 8px;
+    }
+    .bpc-reshape-mat-swatch {
+      background: #fff;
+      border: 2px solid rgba(0,0,0,0.07);
+      border-radius: 8px;
+      padding: 6px;
+      cursor: pointer;
+      transition: all 0.12s;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      text-align: left;
+      font-family: inherit;
+    }
+    .bpc-reshape-mat-swatch:hover {
+      border-color: rgba(93,126,105,0.4);
+      transform: translateY(-1px);
+    }
+    .bpc-reshape-mat-swatch--active {
+      border-color: #5d7e69;
+      background: #f4f8f5;
+      box-shadow: 0 2px 8px rgba(93,126,105,0.18);
+    }
+    .bpc-reshape-mat-swatch--current { opacity: 0.55; pointer-events: none; }
+    .bpc-reshape-mat-swatch-img {
+      width: 36px; height: 36px;
+      border-radius: 5px;
+      background-size: cover;
+      background-position: center;
+      flex-shrink: 0;
+      background-color: #f4f1e8;
+      border: 1px solid #eae6d6;
+    }
+    .bpc-reshape-mat-swatch-info { flex: 1; min-width: 0; }
+    .bpc-reshape-mat-swatch-name {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #353535;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .bpc-reshape-mat-swatch-color {
+      font-size: 10.5px;
+      color: #888;
+      margin-top: 1px;
+    }
+    .bpc-reshape-mat-undo {
+      background: transparent;
+      border: 1px solid #5d7e69;
+      color: #5d7e69;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .bpc-reshape-mat-undo:hover { background: #f0f4f1; }
+    .bpc-reshape-mat-empty,
+    .bpc-reshape-mat-loading {
+      font-size: 12px;
+      color: #999;
+      padding: 6px 0;
+      text-align: center;
+    }
+
     .bpc-reshape-stage-wrap {
       position: relative;
       max-width: 100%;
-      max-height: calc(100vh - 380px);
+      max-height: calc(100vh - 460px);
       background: #fff;
       box-shadow: 0 4px 24px rgba(0,0,0,0.28);
       border-radius: 8px;
       overflow: hidden;
-      /* shrink-wrap to the IMG's natural box so the SVG overlay has
-         identical dimensions to align with. */
       display: inline-block;
       line-height: 0;
     }
     .bpc-reshape-stage-bg {
       display: block;
       max-width: 100%;
-      max-height: calc(100vh - 380px);
+      max-height: calc(100vh - 460px);
       pointer-events: none;
       user-select: none;
       -webkit-user-select: none;
@@ -725,21 +777,15 @@
       cursor: pointer;
       transition: opacity 0.12s, stroke-width 0.12s;
     }
-    .bpc-reshape-region-poly--selected {
-      /* Bumped stroke so the active region pops; same color stays */
-    }
     .bpc-reshape-vertex-handle {
       cursor: grab;
       transition: r 0.08s;
     }
-    .bpc-reshape-vertex-handle:hover { /* sized in JS to support mobile */ }
     .bpc-reshape-vertex-handle--dragging { cursor: grabbing; }
 
-    /* Legend / readout column on the right of the stage on wide screens,
-       below it on narrow. Each row is a region with its name + sqft and
-       lnft delta vs the original. Updates live during drag. */
+    /* Phase 16 — region readout now includes price column */
     .bpc-reshape-readout {
-      max-width: 680px;
+      max-width: 760px;
       width: 100%;
       background: #fff;
       border-radius: 8px;
@@ -748,7 +794,7 @@
     }
     .bpc-reshape-readout-row {
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: auto 1fr auto auto;
       gap: 10px;
       align-items: center;
       padding: 10px 14px;
@@ -780,9 +826,27 @@
       color: #70726f;
       font-variant-numeric: tabular-nums;
       text-align: right;
+      min-width: 48px;
     }
     .bpc-reshape-readout-delta.is-up   { color: #2e7d4f; }
     .bpc-reshape-readout-delta.is-down { color: #b85450; }
+    .bpc-reshape-readout-price {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #b78b3a;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      min-width: 78px;
+    }
+    .bpc-reshape-readout-price-empty { color: #ccc; font-weight: 500; }
+    .bpc-reshape-readout-row-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      padding-top: 4px;
+    }
     .bpc-reshape-readout-reset {
       background: transparent;
       border: 1px solid #e4e4df;
@@ -793,13 +857,49 @@
       padding: 4px 10px;
       border-radius: 999px;
       cursor: pointer;
-      margin-left: 6px;
     }
     .bpc-reshape-readout-reset:hover { background: #faf8f3; border-color: #58595b; }
     .bpc-reshape-readout-reset:disabled {
       opacity: 0.4;
       cursor: not-allowed;
       background: transparent;
+    }
+    /* Phase 16 — project-total footer row */
+    .bpc-reshape-readout-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 12px 14px;
+      background: #faf8f3;
+      border-top: 2px solid #5d7e69;
+      font-size: 13px;
+    }
+    .bpc-reshape-readout-total-label {
+      color: #353535;
+      font-weight: 600;
+    }
+    .bpc-reshape-readout-total-label small {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      color: #888;
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+    .bpc-reshape-readout-total-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: #b78b3a;
+      font-variant-numeric: tabular-nums;
+    }
+    .bpc-reshape-readout-total-value-baseline {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: #888;
+      margin-left: 8px;
+      text-decoration: line-through;
     }
 
     .bpc-reshape-toolbar-row {
@@ -829,7 +929,6 @@
       background: #f4f4ef;
     }
 
-    /* Footer — same scaffolding as the markup overlay. */
     .bpc-reshape-footer {
       flex-shrink: 0;
       padding: 12px 16px;
@@ -902,23 +1001,21 @@
     const fab = document.createElement('div');
     fab.id = 'bpcRedesignFab';
     fab.className = 'bpc-redesign-fab';
-    // Sprint 14C.11 — third button "Reshape my areas" sits between
-    // Suggest changes (the primary action) and Print for markup (the
-    // fallback). Reshape is the most actionable modality — it produces
-    // explicit sqft deltas the designer can reprice from — so it's
-    // visually heavier than the Print fallback but lighter than the
-    // primary "Suggest changes".
+    // Phase 16 — primary action is now the unified editor. Order matters:
+    // the most-actionable button sits at the top of the stack closest to
+    // the thumb, the markup fallback sits below, print fallback at the
+    // bottom.
     fab.innerHTML =
-      '<button type="button" class="bpc-redesign-fab-btn" data-action="suggest">✏️ Suggest changes</button>' +
-      '<button type="button" class="bpc-redesign-fab-btn--reshape" data-action="reshape">✥ Reshape my areas</button>' +
+      '<button type="button" class="bpc-redesign-fab-btn--reshape" data-action="reshape">✥ Resize · swap · price</button>' +
+      '<button type="button" class="bpc-redesign-fab-btn" data-action="suggest">✏️ Suggest other changes</button>' +
       '<button type="button" class="bpc-redesign-fab-btn--secondary" data-action="print">🖨 Print for markup</button>';
     document.body.appendChild(fab);
-    fab.querySelector('[data-action="suggest"]').addEventListener('click', openOverlay);
     fab.querySelector('[data-action="reshape"]').addEventListener('click', openReshapeOverlay);
+    fab.querySelector('[data-action="suggest"]').addEventListener('click', openOverlay);
     fab.querySelector('[data-action="print"]').addEventListener('click', handlePrint);
   }
 
-  // ── Print mode ────────────────────────────────────────────────────────
+  // ── Print mode (unchanged) ────────────────────────────────────────────
   function ensurePrintNotesArea() {
     if (document.getElementById('bpcRedesignPrintNotes')) return;
     const notes = document.createElement('div');
@@ -933,34 +1030,24 @@
 
   function handlePrint() {
     ensurePrintNotesArea();
-    // Sprint 14C.13 — "Opens up site map": scroll the page to the .pub-drawing
-    // section before opening the print dialog. The print itself is governed
-    // by @media print rules in our STYLES block; this scroll is purely
-    // perceptual continuity so the user sees what's about to print rather
-    // than the cover or scope-of-work that they happened to be on. Smooth
-    // scroll feels more polished than instant; the longer setTimeout below
-    // gives the scroll time to start before window.print() blocks the thread.
     const drawingSection = document.querySelector('.pub-drawing');
     if (drawingSection && drawingSection.scrollIntoView) {
       try {
         drawingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } catch (_) {
-        // Safari < 15 doesn't support options arg — fall back to the
-        // boolean form (instant scroll, still works).
         drawingSection.scrollIntoView(true);
       }
     }
     document.body.classList.add('bpc-redesign-printing');
-    // 350ms — long enough for the smooth scroll to visibly start, short
-    // enough that the user doesn't feel lag between click and dialog.
     setTimeout(() => {
       window.print();
-      // Clean up shortly after the print dialog closes (or is dismissed)
       setTimeout(() => document.body.classList.remove('bpc-redesign-printing'), 800);
     }, 350);
   }
 
-  // ── Overlay ───────────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════
+  // SUGGEST-CHANGES OVERLAY (drawing/photo/note) — unchanged from 14C.13
+  // ════════════════════════════════════════════════════════════════════
   function openOverlay() {
     if (overlayEl) return;
     const info = getSiteMapInfo();
@@ -968,8 +1055,6 @@
       alert('Could not find your site map. Please refresh and try again.');
       return;
     }
-
-    // Reset state
     draw.strokes = [];
     draw.currentColor = '#dc2626';
     draw.currentStroke = null;
@@ -980,11 +1065,9 @@
     overlayEl.className = 'bpc-redesign-overlay';
     overlayEl.setAttribute('role', 'dialog');
     overlayEl.setAttribute('aria-modal', 'true');
-
     overlayEl.innerHTML = renderOverlayHtml(info);
     document.body.appendChild(overlayEl);
 
-    // Wire references
     canvasBgEl = overlayEl.querySelector('.bpc-redesign-canvas-bg');
     svgEl = overlayEl.querySelector('.bpc-redesign-canvas');
     toolbarEl = overlayEl.querySelector('.bpc-redesign-toolbar');
@@ -993,12 +1076,10 @@
     submitBtnEl = overlayEl.querySelector('.bpc-redesign-submit-btn');
     submitStatusEl = overlayEl.querySelector('.bpc-redesign-submit-status');
 
-    // Set SVG viewBox to image natural dimensions (or 1000×750 fallback)
     const w = info.width || 1000;
     const h = info.height || 750;
     svgEl.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
 
-    // Wire handlers
     overlayEl.querySelector('.bpc-redesign-overlay-close').addEventListener('click', closeOverlay);
     document.addEventListener('keydown', onEscClose);
 
@@ -1020,7 +1101,6 @@
     submitBtnEl.addEventListener('click', submitRedesign);
     noteTextareaEl.addEventListener('input', updateSubmitButton);
 
-    // Drawing pointer events
     svgEl.addEventListener('pointerdown', onPointerDown);
     svgEl.addEventListener('pointermove', onPointerMove);
     svgEl.addEventListener('pointerup', onPointerUp);
@@ -1032,7 +1112,7 @@
   function renderOverlayHtml(info) {
     return (
       '<div class="bpc-redesign-overlay-header">' +
-        '<h2>Suggest design changes</h2>' +
+        '<h2>Suggest other changes</h2>' +
         '<button type="button" class="bpc-redesign-overlay-close" aria-label="Close">✕</button>' +
       '</div>' +
       '<div class="bpc-redesign-overlay-body">' +
@@ -1068,7 +1148,6 @@
 
   function closeOverlay() {
     if (!overlayEl) return;
-    // Confirm if there's unsaved work
     const hasWork = draw.strokes.length > 0 || pickedPhoto || (noteTextareaEl && noteTextareaEl.value.trim());
     if (hasWork && !confirm('Discard your design change request?')) return;
     overlayEl.remove();
@@ -1079,10 +1158,8 @@
     draw.strokes = [];
     draw.currentStroke = null;
   }
-
   function onEscClose(e) { if (e.key === 'Escape') closeOverlay(); }
 
-  // ── Drawing ───────────────────────────────────────────────────────────
   function svgPointFromEvent(e) {
     const rect = svgEl.getBoundingClientRect();
     const vb = svgEl.viewBox.baseVal;
@@ -1090,17 +1167,10 @@
     const y = ((e.clientY - rect.top) / rect.height) * vb.height;
     return { x: Math.round(x), y: Math.round(y) };
   }
-
   function onPointerDown(e) {
-    if (pickedPhoto) {
-      // Photo and digital markup are mutually exclusive
-      alert('You\'ve attached a photo. Remove it first to draw on the site map.');
-      return;
-    }
+    if (pickedPhoto) { alert('You\'ve attached a photo. Remove it first to draw on the site map.'); return; }
     e.preventDefault();
-    if (svgEl.setPointerCapture) {
-      try { svgEl.setPointerCapture(e.pointerId); } catch (_) {}
-    }
+    if (svgEl.setPointerCapture) { try { svgEl.setPointerCapture(e.pointerId); } catch (_) {} }
     draw.isDrawing = true;
     const p = svgPointFromEvent(e);
     draw.currentStroke = { color: draw.currentColor, points: [p] };
@@ -1113,7 +1183,6 @@
     e.preventDefault();
     const p = svgPointFromEvent(e);
     const prev = draw.currentStroke.points[draw.currentStroke.points.length - 1];
-    // Throttle: only add if moved at least 2 SVG units
     const dx = p.x - prev.x, dy = p.y - prev.y;
     if (dx * dx + dy * dy < 4) return;
     draw.currentStroke.points.push(p);
@@ -1122,14 +1191,10 @@
   function onPointerUp(e) {
     if (!draw.isDrawing) return;
     draw.isDrawing = false;
-    // Drop strokes with only 1 point (taps) — they're not visible anyway
-    if (draw.currentStroke && draw.currentStroke.points.length < 2) {
-      draw.strokes.pop();
-    }
+    if (draw.currentStroke && draw.currentStroke.points.length < 2) draw.strokes.pop();
     draw.currentStroke = null;
     redrawStrokes();
   }
-
   function redrawStrokes() {
     if (!svgEl) return;
     const vb = svgEl.viewBox.baseVal;
@@ -1141,36 +1206,23 @@
     }).join('');
     svgEl.innerHTML = parts;
   }
-
   function undoStroke() {
     if (draw.strokes.length === 0) return;
-    draw.strokes.pop();
-    redrawStrokes();
-    updateSubmitButton();
+    draw.strokes.pop(); redrawStrokes(); updateSubmitButton();
   }
-
   function clearStrokes() {
     if (draw.strokes.length === 0) return;
     if (!confirm('Clear all your drawing?')) return;
-    draw.strokes = [];
-    draw.currentStroke = null;
-    redrawStrokes();
-    updateSubmitButton();
+    draw.strokes = []; draw.currentStroke = null; redrawStrokes(); updateSubmitButton();
   }
-
-  // ── Photo upload (with HEIC handling via canvas) ──────────────────────
   async function onPhotoPicked(e) {
     const file = e.target.files && e.target.files[0];
-    e.target.value = ''; // allow re-pick same file later
+    e.target.value = '';
     if (!file) return;
-    if (file.size > 15 * 1024 * 1024) {
-      alert('Photo too large (>15MB). Try a smaller one.');
-      return;
-    }
+    if (file.size > 15 * 1024 * 1024) { alert('Photo too large (>15MB). Try a smaller one.'); return; }
     if (draw.strokes.length > 0) {
       if (!confirm('Replace your digital drawing with this photo?')) return;
-      draw.strokes = [];
-      redrawStrokes();
+      draw.strokes = []; redrawStrokes();
     }
     submitStatusEl.textContent = 'Processing photo…';
     try {
@@ -1187,12 +1239,6 @@
       submitStatusEl.classList.add('bpc-redesign-submit-status--error');
     }
   }
-
-  /**
-   * Resize file → canvas → JPEG blob. Uses createImageBitmap which handles
-   * HEIC natively on Safari. Max long edge defaults to 1800px so uploaded
-   * photos stay under 1MB after JPEG-85% compression.
-   */
   async function resizeAndConvertToJpeg(file, maxEdge) {
     const bitmap = await createImageBitmap(file);
     const ratio = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
@@ -1201,18 +1247,15 @@
     const canvas = document.createElement('canvas');
     canvas.width = w; canvas.height = h;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
     ctx.drawImage(bitmap, 0, 0, w, h);
     bitmap.close && bitmap.close();
     return new Promise((resolve, reject) => {
       canvas.toBlob((blob) => {
-        if (blob) resolve(blob);
-        else reject(new Error('Could not encode image'));
+        if (blob) resolve(blob); else reject(new Error('Could not encode image'));
       }, 'image/jpeg', 0.85);
     });
   }
-
   function clearPhoto() {
     if (pickedPhoto && pickedPhoto.previewUrl) URL.revokeObjectURL(pickedPhoto.previewUrl);
     pickedPhoto = null;
@@ -1220,21 +1263,17 @@
     photoPreviewEl.querySelector('img').src = '';
     updateSubmitButton();
   }
-
-  // ── Submit ────────────────────────────────────────────────────────────
   function updateSubmitButton() {
     if (!submitBtnEl) return;
     const hasContent = draw.strokes.length > 0 || pickedPhoto || (noteTextareaEl && noteTextareaEl.value.trim().length > 0);
     submitBtnEl.disabled = !hasContent;
     if (submitStatusEl && submitStatusEl.classList.contains('bpc-redesign-submit-status--error')) {
-      // Clear stale errors when user makes new progress
       if (hasContent) {
         submitStatusEl.textContent = '';
         submitStatusEl.classList.remove('bpc-redesign-submit-status--error');
       }
     }
   }
-
   async function submitRedesign() {
     const slug = getSlugFromPath();
     const token = getAuthToken();
@@ -1247,7 +1286,6 @@
     submitBtnEl.textContent = 'Sending…';
     submitStatusEl.textContent = '';
     submitStatusEl.classList.remove('bpc-redesign-submit-status--error', 'bpc-redesign-submit-status--success');
-
     try {
       const info = getSiteMapInfo();
       const fd = new FormData();
@@ -1257,13 +1295,8 @@
       if (info && info.url) fd.append('site_map_url', info.url);
       if (info && info.width) fd.append('site_map_width', String(info.width));
       if (info && info.height) fd.append('site_map_height', String(info.height));
-      if (draw.strokes.length > 0) {
-        fd.append('markup_svg', serializeStrokesToSvg(info));
-      }
-      if (pickedPhoto && pickedPhoto.blob) {
-        fd.append('photo', pickedPhoto.blob, 'markup.jpg');
-      }
-
+      if (draw.strokes.length > 0) fd.append('markup_svg', serializeStrokesToSvg(info));
+      if (pickedPhoto && pickedPhoto.blob) fd.append('photo', pickedPhoto.blob, 'markup.jpg');
       const resp = await fetch(API_REDESIGN, {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + token },
@@ -1277,24 +1310,18 @@
         submitBtnEl.textContent = 'Send to designer';
         return;
       }
-
-      // Success — show inline confirmation, close on next click
       submitBtnEl.textContent = 'Sent ✓';
       submitStatusEl.textContent = result.email_sent
         ? 'Sent to your designer. They\'ll review and follow up.'
         : 'Submitted. Your designer will see this in the queue.';
       submitStatusEl.classList.add('bpc-redesign-submit-status--success');
-
-      // Auto-close after 2.5s
       setTimeout(() => {
-        // Force-clear so confirm() doesn't fire on close
         draw.strokes = [];
         if (pickedPhoto && pickedPhoto.previewUrl) URL.revokeObjectURL(pickedPhoto.previewUrl);
         pickedPhoto = null;
         if (noteTextareaEl) noteTextareaEl.value = '';
         closeOverlay();
       }, 2500);
-
     } catch (err) {
       submitStatusEl.textContent = 'Network error: ' + (err && err.message || 'unknown');
       submitStatusEl.classList.add('bpc-redesign-submit-status--error');
@@ -1302,7 +1329,6 @@
       submitBtnEl.textContent = 'Send to designer';
     }
   }
-
   function serializeStrokesToSvg(info) {
     const w = (info && info.width) || 1000;
     const h = (info && info.height) || 750;
@@ -1312,60 +1338,38 @@
       .map((s) => {
         const d = s.points.map(p => p.x + ',' + p.y).join(' ');
         return '<polyline points="' + d + '" stroke="' + s.color + '" fill="none" stroke-width="' + strokeWidth + '" stroke-linecap="round" stroke-linejoin="round"/>';
-      })
-      .join('');
+      }).join('');
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '">' + polylines + '</svg>';
   }
 
   // ════════════════════════════════════════════════════════════════════
-  // Sprint 14C.11 — RESHAPE MODE
-  // Polygon-vertex-drag overlay. Lets the homeowner physically resize
-  // the regions on their published proposal by dragging vertices, with
-  // live sqft/lnft readouts. Submits a self-contained diff (original +
-  // modified polygons + areas) to the same /api/submit-redesign endpoint.
+  // RESHAPE OVERLAY — Phase 16 unified editor
+  // (polygon geometry + material swap + live $ readout)
   // ════════════════════════════════════════════════════════════════════
 
-  // Parse "660 sqft · 180 lnft" (or "660 sqft", "180 lnft", or empty)
-  // into a {sqft, lnft} pair. Numbers may include thousands separators
-  // and decimals. Used to read the original area off the legend rows
-  // publish.js renders alongside each polygon.
   function parseAreaFromMetaText(text) {
     if (!text) return { sqft: 0, lnft: 0 };
     const sqftMatch = text.match(/([\d,]+(?:\.\d+)?)\s*sqft/i);
     const lnftMatch = text.match(/([\d,]+(?:\.\d+)?)\s*lnft/i);
     const sqft = sqftMatch ? parseFloat(sqftMatch[1].replace(/,/g, '')) : 0;
     const lnft = lnftMatch ? parseFloat(lnftMatch[1].replace(/,/g, '')) : 0;
-    return {
-      sqft: Number.isFinite(sqft) ? sqft : 0,
-      lnft: Number.isFinite(lnft) ? lnft : 0,
-    };
+    return { sqft: Number.isFinite(sqft) ? sqft : 0, lnft: Number.isFinite(lnft) ? lnft : 0 };
   }
 
-  // Convert publish.js's SVG `points="x,y x,y ..."` string back into
-  // fractional 0..1 coordinates (publish.js multiplied by W/H to write
-  // them out, so we divide here to invert).
   function parsePolygonPoints(svgPoints, W, H) {
     if (!svgPoints || !W || !H) return [];
     return svgPoints.trim().split(/\s+/).map((pair) => {
       const [xs, ys] = pair.split(',');
-      const x = parseFloat(xs);
-      const y = parseFloat(ys);
+      const x = parseFloat(xs), y = parseFloat(ys);
       if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
       return { x: x / W, y: y / H };
     }).filter(Boolean);
   }
 
-  // Read the published proposal's regions from the DOM. publish.js
-  // emits the structure documented on getSiteMapInfo above:
-  //   <div class="pub-site-plan-map">                  (wrapper DIV)
-  //     …<svg class="pub-drawing-overlay-svg" viewBox="0 0 W H">
-  //         <polygon class="pub-drawing-region" data-region-id="…"/>
-  //         <a aria-label="Region N"><polygon …/></a>   (anchored variant)
-  //       </svg>
-  //   </div>
-  // and a corresponding `.pub-region-legend-row[data-region-id]` carrying
-  // the human label + area meta. We tie those together here so the reshape
-  // overlay has a self-contained view of what to manipulate.
+  function cssEscape(s) {
+    return String(s).replace(/[^a-zA-Z0-9_-]/g, (c) => '\\' + c);
+  }
+
   function readPublishedRegionsFromDom() {
     const svg = document.querySelector('.pub-drawing-overlay-svg');
     if (!svg) return null;
@@ -1373,120 +1377,78 @@
     if (!vbAttr) return null;
     const [, , vbW, vbH] = vbAttr.split(/\s+/).map(Number);
     if (!Number.isFinite(vbW) || !Number.isFinite(vbH) || vbW <= 0 || vbH <= 0) return null;
-
-    // Backdrop is a sibling <img class="pub-drawing-overlay-img">, not an
-    // SVG <image> child. Query it directly off the document.
     const imageEl = document.querySelector('.pub-drawing-overlay-img');
-    const backdropUrl = imageEl
-      ? (imageEl.src || imageEl.getAttribute('src') || '')
-      : '';
+    const backdropUrl = imageEl ? (imageEl.src || imageEl.getAttribute('src') || '') : '';
 
     const regions = [];
     svg.querySelectorAll('polygon[data-region-id]').forEach((poly, idx) => {
       const id = poly.getAttribute('data-region-id');
       if (!id) return;
-      // Name lives on the polygon itself (static regions) or on the
-      // wrapping <a> (anchored regions).
       const ariaSelf = poly.getAttribute('aria-label');
       const ariaAnchor = poly.parentNode && poly.parentNode.getAttribute
-        ? poly.parentNode.getAttribute('aria-label')
-        : null;
+        ? poly.parentNode.getAttribute('aria-label') : null;
       const name = ariaSelf || ariaAnchor || ('Region ' + (idx + 1));
-
       const polygon = parsePolygonPoints(poly.getAttribute('points'), vbW, vbH);
-      if (polygon.length < 3) return; // degenerate, skip
-
-      // Read the matching legend row to extract sqft / lnft.
+      if (polygon.length < 3) return;
       const legendRow = document.querySelector(
         '.pub-region-legend-row[data-region-id="' + cssEscape(id) + '"]'
       );
       const metaText = legendRow
         ? (legendRow.querySelector('.pub-region-legend-meta')
-            ? legendRow.querySelector('.pub-region-legend-meta').textContent
-            : '')
+            ? legendRow.querySelector('.pub-region-legend-meta').textContent : '')
         : '';
       const { sqft, lnft } = parseAreaFromMetaText(metaText);
-
       regions.push({
-        id,
-        name,
+        id, name,
         color: RESHAPE_PALETTE[idx % RESHAPE_PALETTE.length],
-        // Deep-copy the polygon so original_polygon stays pristine
-        // even if modified_polygon is mutated later.
         original_polygon: polygon.map(p => ({ x: p.x, y: p.y })),
         modified_polygon: polygon.map(p => ({ x: p.x, y: p.y })),
         original_area_sqft: sqft,
         original_area_lnft: lnft,
+        // Phase 16 fields — populated async after customize-data fetch
+        current_material: null,
+        proposal_region_material_id: null,
+        pending_material: null,
+        pending_material_id: null,
+        original_subtotal: 0,
+        unit_price_sqft: 0,
       });
     });
-
-    return {
-      regions,
-      backdropW: vbW,
-      backdropH: vbH,
-      backdropUrl,
-    };
+    return { regions, backdropW: vbW, backdropH: vbH, backdropUrl };
   }
 
-  // Minimal CSS.escape() shim. Covers the characters that show up in
-  // UUIDs (digits + a-f + dashes), which is what data-region-id holds.
-  // Avoids pulling in a polyfill for a one-off attribute selector.
-  function cssEscape(s) {
-    return String(s).replace(/[^a-zA-Z0-9_-]/g, (c) => '\\' + c);
-  }
-
-  // Shoelace formula — signed area of a simple polygon in fractional
-  // units². Magnitude is what we care about, sign reflects winding order.
   function shoelaceArea(polygon) {
     if (!polygon || polygon.length < 3) return 0;
     let sum = 0;
     for (let i = 0; i < polygon.length; i++) {
-      const a = polygon[i];
-      const b = polygon[(i + 1) % polygon.length];
+      const a = polygon[i], b = polygon[(i + 1) % polygon.length];
       sum += a.x * b.y - b.x * a.y;
     }
     return Math.abs(sum) / 2;
   }
-
-  // Sum of edge lengths in fractional units. Used for linear-footage
-  // scaling — perimeter scales linearly with linear footage.
   function shoelacePerimeter(polygon) {
     if (!polygon || polygon.length < 2) return 0;
     let perim = 0;
     for (let i = 0; i < polygon.length; i++) {
-      const a = polygon[i];
-      const b = polygon[(i + 1) % polygon.length];
+      const a = polygon[i], b = polygon[(i + 1) % polygon.length];
       perim += Math.hypot(b.x - a.x, b.y - a.y);
     }
     return perim;
   }
-
-  // Compute the modified region's sqft from the polygon ratio. The
-  // original_area_sqft was set at proposal-publish time using the
-  // designer's calibrated px-to-feet scale; we anchor to that and
-  // assume the px²-to-sqft conversion is constant across the backdrop
-  // (true for orthogonal site plans; close-enough for perspective
-  // backdrops since the homeowner is shaping intent, not surveying).
   function computeModifiedSqft(region) {
     const origArea = shoelaceArea(region.original_polygon);
     if (origArea < 1e-9) return region.original_area_sqft || 0;
     const newArea = shoelaceArea(region.modified_polygon);
     return Math.round((region.original_area_sqft || 0) * (newArea / origArea));
   }
-
   function computeModifiedLnft(region) {
     const origPerim = shoelacePerimeter(region.original_polygon);
     if (origPerim < 1e-9) return region.original_area_lnft || 0;
     const newPerim = shoelacePerimeter(region.modified_polygon);
     return Math.round((region.original_area_lnft || 0) * (newPerim / origPerim));
   }
-
-  // Polygon-was-modified test using a small epsilon. Floating-point
-  // round-trip from publish.js → DOM → re-parse can shift coords by
-  // ~1e-15, so strict equality would falsely report no-changes.
   function regionWasModified(region) {
-    const a = region.original_polygon;
-    const b = region.modified_polygon;
+    const a = region.original_polygon, b = region.modified_polygon;
     if (!a || !b || a.length !== b.length) return true;
     const EPS = 1e-4;
     for (let i = 0; i < a.length; i++) {
@@ -1494,6 +1456,104 @@
       if (Math.abs(a[i].y - b[i].y) > EPS) return true;
     }
     return false;
+  }
+  function regionMaterialChanged(region) {
+    return !!region.pending_material_id;
+  }
+  function regionHasAnyChange(region) {
+    return regionWasModified(region) || regionMaterialChanged(region);
+  }
+
+  // Phase 16 — compute baseline pricing from p-customize.js's bid reader.
+  // Strategy: fuzzy-match section names (from .bpc-bid-reader-row-name) to
+  // region names. If matched, region's section subtotal becomes its
+  // baseline; $/sqft = subtotal / original_sqft. Unmatched regions fall
+  // back to project_total / total_sqft (uniform average).
+  function computeBaselinePricing(regions) {
+    const out = {
+      projectTotal: 0,
+      projectOrigSqft: 0,
+      projectAvgPerSqft: 0,
+    };
+    // Sum total sqft across regions (used for fallback uniform pricing)
+    out.projectOrigSqft = regions.reduce((s, r) => s + (r.original_area_sqft || 0), 0);
+
+    // Read project total — first from bid reader's total card, then fall
+    // back to summing visible scope-item amounts.
+    const totalEl = document.querySelector('.bpc-bid-total-amount');
+    if (totalEl) {
+      const n = parseFloat((totalEl.textContent || '').replace(/[^0-9.\-]/g, ''));
+      if (Number.isFinite(n) && n > 0) out.projectTotal = n;
+    }
+    if (out.projectTotal === 0) {
+      // Bid reader hasn't run yet (or proposal has no scope) — sum any
+      // visible scope-item amounts as best-effort.
+      let sum = 0;
+      document.querySelectorAll('.pub-scope-item-amount, .bpc-bid-reader-row-amount').forEach((el) => {
+        const n = parseFloat((el.textContent || '').replace(/[^0-9.\-]/g, ''));
+        if (Number.isFinite(n)) sum += n;
+      });
+      out.projectTotal = sum;
+    }
+    if (out.projectOrigSqft > 0) {
+      out.projectAvgPerSqft = out.projectTotal / out.projectOrigSqft;
+    }
+
+    // Build a list of bid-reader rows we can match against
+    const rows = Array.from(document.querySelectorAll('.bpc-bid-reader-row'));
+    const norm = (s) => String(s || '').toLowerCase()
+      .replace(/[\u2014\u2013\u2018\u2019.,:;!?]/g, '')
+      .replace(/\s+/g, ' ').trim();
+
+    regions.forEach((r) => {
+      const regNorm = norm(r.name);
+      if (!regNorm) {
+        r.unit_price_sqft = out.projectAvgPerSqft;
+        return;
+      }
+      // Find first row whose normalized name contains the region name
+      // (or vice versa, since sections often have longer descriptive titles).
+      let matchedRow = null;
+      for (const row of rows) {
+        const nameEl = row.querySelector('.bpc-bid-reader-row-name');
+        if (!nameEl) continue;
+        const rowNorm = norm(nameEl.textContent);
+        if (!rowNorm) continue;
+        if (rowNorm.includes(regNorm) || regNorm.includes(rowNorm)) {
+          matchedRow = row;
+          break;
+        }
+      }
+      if (matchedRow) {
+        const amtEl = matchedRow.querySelector('.bpc-bid-reader-row-amount');
+        const amt = amtEl ? parseFloat((amtEl.textContent || '').replace(/[^0-9.\-]/g, '')) : 0;
+        if (Number.isFinite(amt) && amt > 0) {
+          r.original_subtotal = amt;
+          if (r.original_area_sqft > 0) {
+            r.unit_price_sqft = amt / r.original_area_sqft;
+            return;
+          }
+        }
+      }
+      // Fallback — uniform project average per sqft
+      r.original_subtotal = (r.original_area_sqft || 0) * out.projectAvgPerSqft;
+      r.unit_price_sqft = out.projectAvgPerSqft;
+    });
+
+    return out;
+  }
+
+  // Per-region estimated total at current geometry. Material swap does
+  // NOT adjust per-region $ today (material unit costs aren't in the
+  // catalog — see Phase 2 note at top). The estimate is geometry-driven.
+  function computeRegionEstimate(region) {
+    const sqft = computeModifiedSqft(region);
+    if (region.unit_price_sqft > 0) return sqft * region.unit_price_sqft;
+    return region.original_subtotal || 0;
+  }
+
+  function computeProjectEstimate() {
+    return reshape.regions.reduce((s, r) => s + computeRegionEstimate(r), 0);
   }
 
   // ── Open / close ─────────────────────────────────────────────────────
@@ -1503,16 +1563,14 @@
     const data = readPublishedRegionsFromDom();
     if (!info || !info.url || !data || data.regions.length === 0) {
       alert(
-        'Could not find any regions to reshape. ' +
+        'Could not find any regions to edit. ' +
         'Please refresh the page or use "Suggest changes" to send a markup or photo instead.'
       );
       return;
     }
 
-    // Hydrate state. Use info.url for the snapshot since it'll match
-    // what the markup-mode submission uses, keeping admin queue
-    // rendering consistent across modalities.
     reshape.regions = data.regions;
+    reshape.swapCandidates = {};
     reshape.selectedIdx = 0;
     reshape.isDragging = false;
     reshape.dragRegionIdx = -1;
@@ -1520,7 +1578,15 @@
     reshape.backdropW = data.backdropW;
     reshape.backdropH = data.backdropH;
     reshape.backdropUrl = info.url || data.backdropUrl;
+    reshape.customizeFetched = false;
+    reshape.customizeFailed = false;
 
+    // Phase 16 — compute pricing baseline from DOM (synchronous, no API needed)
+    const pricing = computeBaselinePricing(reshape.regions);
+    reshape.projectTotal = pricing.projectTotal;
+    reshape.projectOrigSqft = pricing.projectOrigSqft;
+
+    // Build overlay DOM up front so geometry editing works immediately
     reshapeOverlayEl = document.createElement('div');
     reshapeOverlayEl.className = 'bpc-reshape-overlay';
     reshapeOverlayEl.setAttribute('role', 'dialog');
@@ -1528,33 +1594,24 @@
     reshapeOverlayEl.innerHTML = renderReshapeOverlayHtml();
     document.body.appendChild(reshapeOverlayEl);
 
-    // Wire references. Sprint 14C.15 — backdrop is now an HTML <img>
-    // sibling of the SVG (under .bpc-reshape-stage-wrap), not an SVG
-    // <image> child of the SVG. The <img> establishes the wrap's
-    // intrinsic dimensions; the SVG overlays absolutely on top.
     const stageWrap    = reshapeOverlayEl.querySelector('.bpc-reshape-stage-wrap');
     reshapeStageSvgEl  = stageWrap.querySelector('.bpc-reshape-stage-svg');
     reshapeBackdropEl  = stageWrap.querySelector('.bpc-reshape-stage-bg');
+    reshapeDefsEl      = reshapeStageSvgEl.querySelector('defs');
     reshapeRegionsGEl  = reshapeStageSvgEl.querySelector('.bpc-reshape-regions-g');
     reshapeHandlesGEl  = reshapeStageSvgEl.querySelector('.bpc-reshape-handles-g');
     reshapeReadoutEl   = reshapeOverlayEl.querySelector('.bpc-reshape-readout');
+    reshapeMaterialPickerEl = reshapeOverlayEl.querySelector('.bpc-reshape-mat-picker');
     reshapeNoteEl      = reshapeOverlayEl.querySelector('.bpc-reshape-note');
     reshapeSubmitBtnEl = reshapeOverlayEl.querySelector('.bpc-reshape-submit-btn');
     reshapeStatusEl    = reshapeOverlayEl.querySelector('.bpc-reshape-status');
 
-    // Backdrop + viewBox. The IMG sets natural width/height (and thus
-    // wrap height), the SVG matches via inset:0 + 100%/100% in CSS.
-    // preserveAspectRatio="none" on the SVG means polygon fractional
-    // coords map directly to the SVG's bounding rect — no letterbox
-    // math needed in pointer translation.
     reshapeBackdropEl.src = reshape.backdropUrl;
     reshapeStageSvgEl.setAttribute('viewBox', '0 0 ' + reshape.backdropW + ' ' + reshape.backdropH);
 
-    // Wire close + ESC
     reshapeOverlayEl.querySelector('.bpc-reshape-close').addEventListener('click', closeReshapeOverlay);
     document.addEventListener('keydown', onReshapeEscClose);
 
-    // Wire region chips (delegate)
     reshapeOverlayEl.querySelector('.bpc-reshape-chips').addEventListener('click', (e) => {
       const btn = e.target.closest('[data-region-idx]');
       if (!btn) return;
@@ -1562,20 +1619,24 @@
       if (Number.isFinite(idx)) selectReshapeRegion(idx);
     });
 
-    // Wire toolbar
     reshapeOverlayEl.querySelector('[data-action="reset-region"]').addEventListener('click', () => {
       resetReshapeRegion(reshape.selectedIdx);
     });
     reshapeOverlayEl.querySelector('[data-action="reset-all"]').addEventListener('click', resetAllReshape);
 
-    // Wire submit + note
     reshapeSubmitBtnEl.addEventListener('click', submitReshape);
     reshapeNoteEl.addEventListener('input', updateReshapeSubmitButton);
 
-    // Render initial state
     redrawReshapeStage();
     updateReshapeReadout();
+    renderMaterialPicker();
     updateReshapeSubmitButton();
+
+    // Phase 16 — fetch materials data in the background. Overlay is
+    // already open and geometry editing is fully functional; materials
+    // populate when fetch resolves. If it fails, picker shows a
+    // friendly "geometry only" message.
+    fetchCustomizeAndHydrate();
   }
 
   function renderReshapeOverlayHtml() {
@@ -1590,32 +1651,36 @@
     return (
       '<div class="bpc-reshape-header">' +
         '<div>' +
-          '<h2>Reshape your areas</h2>' +
-          '<div class="bpc-reshape-header-sub">Drag the dots on each area\'s edges to resize it. Sizes update live.</div>' +
+          '<h2>Resize · swap · price</h2>' +
+          '<div class="bpc-reshape-header-sub">Drag the dots to reshape · tap a swatch to swap material · estimate updates live.</div>' +
         '</div>' +
         '<button type="button" class="bpc-reshape-close" aria-label="Close">✕</button>' +
       '</div>' +
       '<div class="bpc-reshape-body">' +
         '<div class="bpc-reshape-hint">' +
-          '<strong>Tip:</strong> Pick an area, drag a colored dot, then hit <em>Send to designer</em> when sizes look right.' +
+          '<strong>Tip:</strong> Pick an area, drag a dot to resize, tap a swatch to swap material, then <em>Send to designer</em> when you\'re happy.' +
         '</div>' +
         '<div class="bpc-reshape-chips">' + chips + '</div>' +
+        '<div class="bpc-reshape-mat-picker">' +
+          '<div class="bpc-reshape-mat-loading">Loading materials…</div>' +
+        '</div>' +
         '<div class="bpc-reshape-stage-wrap">' +
           '<img class="bpc-reshape-stage-bg" alt="Site map">' +
           '<svg class="bpc-reshape-stage-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">' +
+            '<defs></defs>' +
             '<g class="bpc-reshape-regions-g"></g>' +
             '<g class="bpc-reshape-handles-g"></g>' +
           '</svg>' +
         '</div>' +
         '<div class="bpc-reshape-toolbar-row">' +
           '<button type="button" class="bpc-reshape-tool-text" data-action="reset-region">↺ Reset this area</button>' +
-          '<button type="button" class="bpc-reshape-tool-text" data-action="reset-all">↺↺ Reset all areas</button>' +
+          '<button type="button" class="bpc-reshape-tool-text" data-action="reset-all">↺↺ Reset all</button>' +
         '</div>' +
         '<div class="bpc-reshape-readout"></div>' +
       '</div>' +
       '<div class="bpc-reshape-footer">' +
         '<div class="bpc-reshape-footer-row">' +
-          '<textarea class="bpc-reshape-note" placeholder="Optional note for your designer (e.g., \'I\'d like the patio bigger so a 6-person dining table fits\')."></textarea>' +
+          '<textarea class="bpc-reshape-note" placeholder="Optional note for your designer (e.g., \'Bigger patio for a 6-person dining table, swap Origins 12 for Catalina Grana\')."></textarea>' +
           '<button type="button" class="bpc-reshape-submit-btn" disabled>Send to designer</button>' +
         '</div>' +
         '<div class="bpc-reshape-status"></div>' +
@@ -1625,47 +1690,224 @@
 
   function closeReshapeOverlay() {
     if (!reshapeOverlayEl) return;
-    const hasChanges = reshape.regions.some(regionWasModified)
+    const hasChanges = reshape.regions.some(regionHasAnyChange)
       || (reshapeNoteEl && reshapeNoteEl.value.trim());
-    if (hasChanges && !confirm('Discard your reshape request?')) return;
+    if (hasChanges && !confirm('Discard your changes?')) return;
     reshapeOverlayEl.remove();
-    reshapeOverlayEl   = null;
-    reshapeStageSvgEl  = null;
-    reshapeBackdropEl  = null;
-    reshapeRegionsGEl  = null;
-    reshapeHandlesGEl  = null;
-    reshapeReadoutEl   = null;
-    reshapeNoteEl      = null;
-    reshapeSubmitBtnEl = null;
-    reshapeStatusEl    = null;
+    reshapeOverlayEl       = null;
+    reshapeStageSvgEl      = null;
+    reshapeBackdropEl      = null;
+    reshapeDefsEl          = null;
+    reshapeRegionsGEl      = null;
+    reshapeHandlesGEl      = null;
+    reshapeReadoutEl       = null;
+    reshapeMaterialPickerEl = null;
+    reshapeNoteEl          = null;
+    reshapeSubmitBtnEl     = null;
+    reshapeStatusEl        = null;
     reshape.regions = [];
+    reshape.swapCandidates = {};
     reshape.isDragging = false;
     document.removeEventListener('keydown', onReshapeEscClose);
   }
 
   function onReshapeEscClose(e) { if (e.key === 'Escape') closeReshapeOverlay(); }
 
+  // ── Phase 16 — async customize-data hydration ────────────────────────
+  async function fetchCustomizeAndHydrate() {
+    const slug = getSlugFromPath();
+    const token = getAuthToken();
+    if (!slug || !token) {
+      reshape.customizeFailed = true;
+      renderMaterialPicker();
+      return;
+    }
+    try {
+      const r = await fetch(API_CUSTOMIZE + '?slug=' + encodeURIComponent(slug), {
+        headers: { Authorization: 'Bearer ' + token },
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const data = await r.json();
+      if (!reshapeOverlayEl) return; // overlay was closed before fetch resolved
+
+      // Map region_id → first proposal_region_material row (display_order=0)
+      const rmByRegion = new Map();
+      (data.region_materials || []).forEach((rm) => {
+        if (!rmByRegion.has(rm.region_id)) rmByRegion.set(rm.region_id, rm);
+      });
+      reshape.regions.forEach((r) => {
+        const rm = rmByRegion.get(r.id);
+        if (rm) {
+          r.current_material = rm.current;
+          r.proposal_region_material_id = rm.id;
+        }
+      });
+      reshape.swapCandidates = data.swap_candidates_by_category || {};
+      reshape.customizeFetched = true;
+
+      redrawReshapeStage();          // re-render polygons with material patterns
+      renderMaterialPicker();         // populate the picker
+      updateReshapeReadout();         // refresh prices (no change but harmless)
+    } catch (e) {
+      reshape.customizeFailed = true;
+      renderMaterialPicker();
+    }
+  }
+
   // ── Selection ────────────────────────────────────────────────────────
   function selectReshapeRegion(idx) {
     if (idx < 0 || idx >= reshape.regions.length) return;
     reshape.selectedIdx = idx;
-    // Update chip styles
     reshapeOverlayEl.querySelectorAll('.bpc-reshape-chip').forEach((chip) => {
       const i = parseInt(chip.getAttribute('data-region-idx'), 10);
       chip.classList.toggle('bpc-reshape-chip--active', i === idx);
     });
     redrawReshapeStage();
     updateReshapeReadout();
+    renderMaterialPicker();
   }
 
-  // ── Stage rendering ──────────────────────────────────────────────────
+  // ── Phase 16 — material picker rendering ─────────────────────────────
+  function renderMaterialPicker() {
+    if (!reshapeMaterialPickerEl) return;
+    const region = reshape.regions[reshape.selectedIdx];
+    if (!region) {
+      reshapeMaterialPickerEl.innerHTML = '';
+      return;
+    }
+    if (reshape.customizeFailed) {
+      reshapeMaterialPickerEl.innerHTML = '<div class="bpc-reshape-mat-empty">Materials unavailable — geometry-only mode. Submit will still send shape changes to your designer.</div>';
+      return;
+    }
+    if (!reshape.customizeFetched) {
+      reshapeMaterialPickerEl.innerHTML = '<div class="bpc-reshape-mat-loading">Loading materials…</div>';
+      return;
+    }
+    if (!region.current_material) {
+      reshapeMaterialPickerEl.innerHTML = '<div class="bpc-reshape-mat-empty">No swappable material assigned to <strong>' + escapeHtml(region.name) + '</strong>.</div>';
+      return;
+    }
+
+    const cm = region.current_material;
+    const category = cm.category;
+    const cands = (category && reshape.swapCandidates[category]) || [];
+    const currentMatId = cm.material_id;
+
+    const currentSwatch = cm.swatch_url
+      ? 'background-image:url(\'' + escapeHtml(cm.swatch_url) + '\');'
+      : '';
+    const pendingPill = region.pending_material
+      ? '<span class="bpc-reshape-mat-pending-arrow">→ ' + escapeHtml(region.pending_material.product_name || 'New') + (region.pending_material.color ? ' / ' + escapeHtml(region.pending_material.color) : '') + ' pending</span>'
+      : '';
+    const undoBtn = region.pending_material
+      ? '<button type="button" class="bpc-reshape-mat-undo" data-action="undo-material">Undo swap</button>'
+      : '';
+
+    const candsHtml = cands.length === 0
+      ? '<div class="bpc-reshape-mat-empty">No alternatives in the catalog yet for this category.</div>'
+      : '<div class="bpc-reshape-mat-cands">' + cands.map((c) => {
+          const isCurrent = c.id === currentMatId;
+          const isPending = region.pending_material_id === c.id;
+          const cls = 'bpc-reshape-mat-swatch'
+            + (isCurrent ? ' bpc-reshape-mat-swatch--current' : '')
+            + (isPending ? ' bpc-reshape-mat-swatch--active' : '');
+          const img = c.swatch_url
+            ? 'background-image:url(\'' + escapeHtml(c.swatch_url) + '\');'
+            : '';
+          return '<button type="button" class="' + cls + '" data-mat-id="' + escapeHtml(c.id) + '">' +
+            '<span class="bpc-reshape-mat-swatch-img" style="' + img + '"></span>' +
+            '<span class="bpc-reshape-mat-swatch-info">' +
+              '<span class="bpc-reshape-mat-swatch-name">' + escapeHtml(c.product_name || 'Material') + '</span>' +
+              (c.color ? '<span class="bpc-reshape-mat-swatch-color">' + escapeHtml(c.color) + '</span>' : '') +
+            '</span>' +
+          '</button>';
+        }).join('') + '</div>';
+
+    reshapeMaterialPickerEl.innerHTML =
+      '<div class="bpc-reshape-mat-current">' +
+        '<span class="bpc-reshape-mat-current-thumb" style="' + currentSwatch + '"></span>' +
+        '<div class="bpc-reshape-mat-current-info">' +
+          '<div class="bpc-reshape-mat-current-label">' + escapeHtml(region.name) + ' · currently</div>' +
+          '<div class="bpc-reshape-mat-current-name">' + escapeHtml(cm.product_name || 'Material') +
+            (cm.color ? ' <span style="color:#888;font-weight:500;"> · ' + escapeHtml(cm.color) + '</span>' : '') +
+            pendingPill +
+          '</div>' +
+          (cm.manufacturer ? '<div class="bpc-reshape-mat-current-meta">' + escapeHtml(cm.manufacturer) + '</div>' : '') +
+        '</div>' +
+        undoBtn +
+      '</div>' +
+      '<div class="bpc-reshape-mat-cands-label">Swap to:</div>' +
+      candsHtml;
+
+    // Wire candidate clicks
+    reshapeMaterialPickerEl.querySelectorAll('.bpc-reshape-mat-swatch:not(.bpc-reshape-mat-swatch--current)').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const matId = btn.getAttribute('data-mat-id');
+        applyMaterialSwap(reshape.selectedIdx, matId);
+      });
+    });
+    // Wire undo
+    const undo = reshapeMaterialPickerEl.querySelector('[data-action="undo-material"]');
+    if (undo) {
+      undo.addEventListener('click', () => clearMaterialSwap(reshape.selectedIdx));
+    }
+  }
+
+  function applyMaterialSwap(regionIdx, matId) {
+    const region = reshape.regions[regionIdx];
+    if (!region || !region.current_material) return;
+    const category = region.current_material.category;
+    const cands = (category && reshape.swapCandidates[category]) || [];
+    const target = cands.find((c) => c.id === matId);
+    if (!target) return;
+    // No-op if user tapped the same material that's already pending or
+    // tapped the current material (current is pointer-events:none anyway).
+    if (region.pending_material_id === matId) return;
+    region.pending_material = target;
+    region.pending_material_id = matId;
+    redrawReshapeStage();   // repaint polygon with new pattern
+    renderMaterialPicker(); // refresh swatch active state + undo button
+    updateReshapeReadout(); // refresh pending indicator on the region row
+    updateReshapeSubmitButton();
+  }
+
+  function clearMaterialSwap(regionIdx) {
+    const region = reshape.regions[regionIdx];
+    if (!region) return;
+    region.pending_material = null;
+    region.pending_material_id = null;
+    redrawReshapeStage();
+    renderMaterialPicker();
+    updateReshapeReadout();
+    updateReshapeSubmitButton();
+  }
+
+  // ── Stage rendering (Phase 16 — adds material pattern fills) ──────────
   function redrawReshapeStage() {
-    if (!reshapeRegionsGEl || !reshapeHandlesGEl) return;
+    if (!reshapeRegionsGEl || !reshapeHandlesGEl || !reshapeDefsEl) return;
     const W = reshape.backdropW;
     const H = reshape.backdropH;
 
-    // Polygons: render every region (so the homeowner sees the whole
-    // site at once), with the selected one stroked thicker.
+    // Build <defs> with one <pattern> per region whose effective material
+    // (pending if set, else current) has a swatch_url. Pattern tile size
+    // is ~6% of backdrop width — small enough to read as a paver pattern,
+    // big enough to be recognizable.
+    const patternSize = Math.max(32, Math.round(W * 0.055));
+    let defsHtml = '';
+    reshape.regions.forEach((r, idx) => {
+      const effective = r.pending_material || r.current_material;
+      if (!effective || !effective.swatch_url) return;
+      defsHtml +=
+        '<pattern id="bpc-reshape-mat-' + idx + '"' +
+          ' patternUnits="userSpaceOnUse" width="' + patternSize + '" height="' + patternSize + '">' +
+          '<image href="' + escapeHtml(effective.swatch_url) + '"' +
+            ' x="0" y="0" width="' + patternSize + '" height="' + patternSize + '"' +
+            ' preserveAspectRatio="xMidYMid slice"/>' +
+        '</pattern>';
+    });
+    reshapeDefsEl.innerHTML = defsHtml;
+
+    // Polygons
     let polysHtml = '';
     reshape.regions.forEach((r, idx) => {
       const points = r.modified_polygon
@@ -1673,10 +1915,19 @@
         .join(' ');
       const isSel = idx === reshape.selectedIdx;
       const sw = isSel ? Math.max(3, Math.round(W * 0.0026)) : Math.max(2, Math.round(W * 0.0016));
+      const effective = r.pending_material || r.current_material;
+      const hasPattern = !!(effective && effective.swatch_url);
+      // Fill: material pattern at ~0.85 opacity for selected, ~0.55 for
+      // others. If no pattern available (catalog not loaded yet or no
+      // material assigned), fall back to translucent region color.
+      const fill = hasPattern ? 'url(#bpc-reshape-mat-' + idx + ')' : r.color;
+      const fillOp = hasPattern
+        ? (isSel ? '0.88' : '0.55')
+        : (isSel ? '0.32' : '0.18');
       polysHtml +=
-        '<polygon class="bpc-reshape-region-poly' + (isSel ? ' bpc-reshape-region-poly--selected' : '') + '"' +
+        '<polygon class="bpc-reshape-region-poly"' +
           ' points="' + points + '"' +
-          ' fill="' + r.color + '" fill-opacity="' + (isSel ? '0.32' : '0.18') + '"' +
+          ' fill="' + fill + '" fill-opacity="' + fillOp + '"' +
           ' stroke="' + r.color + '" stroke-width="' + sw + '"' +
           ' stroke-linejoin="round"' +
           ' data-region-idx="' + idx + '"' +
@@ -1684,32 +1935,23 @@
     });
     reshapeRegionsGEl.innerHTML = polysHtml;
 
-    // Wire region-poly clicks to select
     reshapeRegionsGEl.querySelectorAll('polygon').forEach((poly) => {
       poly.addEventListener('pointerdown', (e) => {
         if (reshape.isDragging) return;
         const idx = parseInt(poly.getAttribute('data-region-idx'), 10);
         if (Number.isFinite(idx) && idx !== reshape.selectedIdx) {
-          // Don't preventDefault — let the browser process the pointer
-          // event normally; we just update selection.
           selectReshapeRegion(idx);
         }
       });
     });
 
-    // Vertex handles: only on the selected region.
+    // Vertex handles on the selected region only
     const sel = reshape.regions[reshape.selectedIdx];
-    if (!sel) {
-      reshapeHandlesGEl.innerHTML = '';
-      return;
-    }
-    // Handle radius scales with backdrop and bumps up on coarse pointers
-    // (touch). Empirically 22+px tap target is reliable for fingertip drag.
+    if (!sel) { reshapeHandlesGEl.innerHTML = ''; return; }
     const touchish = matchMedia && matchMedia('(pointer: coarse)').matches;
     const handleR = touchish
       ? Math.max(20, Math.round(W * 0.022))
       : Math.max(12, Math.round(W * 0.014));
-
     let handlesHtml = '';
     sel.modified_polygon.forEach((p, vIdx) => {
       const cx = (p.x * W).toFixed(1);
@@ -1722,53 +1964,74 @@
           '/>';
     });
     reshapeHandlesGEl.innerHTML = handlesHtml;
-
-    // Wire vertex pointer events
     reshapeHandlesGEl.querySelectorAll('circle').forEach((handle) => {
       handle.addEventListener('pointerdown', onVertexPointerDown);
     });
   }
 
+  // ── Readout (Phase 16 — adds per-region $ + project-total footer) ─────
   function updateReshapeReadout() {
     if (!reshapeReadoutEl) return;
-    const html = reshape.regions.map((r, idx) => {
+    const rows = reshape.regions.map((r, idx) => {
       const newSqft = computeModifiedSqft(r);
       const newLnft = computeModifiedLnft(r);
       const dSqft = newSqft - (r.original_area_sqft || 0);
       const dPctSqft = (r.original_area_sqft || 0) > 0
-        ? Math.round((dSqft / r.original_area_sqft) * 100)
-        : 0;
+        ? Math.round((dSqft / r.original_area_sqft) * 100) : 0;
       const cls = dSqft > 0 ? 'is-up' : (dSqft < 0 ? 'is-down' : '');
       const isSel = idx === reshape.selectedIdx;
-      const isModified = regionWasModified(r);
+      const isModified = regionHasAnyChange(r);
+
       const sqftMeta = (r.original_area_sqft || 0) > 0
         ? Number(r.original_area_sqft).toLocaleString('en-US') + ' sqft → ' + newSqft.toLocaleString('en-US') + ' sqft'
         : 'No square footage';
       const lnftMeta = (r.original_area_lnft || 0) > 0
         ? Number(r.original_area_lnft).toLocaleString('en-US') + ' lnft → ' + newLnft.toLocaleString('en-US') + ' lnft'
         : '';
+      const matPending = r.pending_material
+        ? '<span style="color:#b78b3a;font-weight:600;"> · material swap pending</span>'
+        : '';
       const deltaLabel = (r.original_area_sqft || 0) > 0
         ? (dSqft > 0 ? '+' : '') + dPctSqft + '%'
         : '—';
+      const estimate = computeRegionEstimate(r);
+      const priceHtml = estimate > 0
+        ? '<div class="bpc-reshape-readout-price">' + fmtMoney(estimate) + '</div>'
+        : '<div class="bpc-reshape-readout-price bpc-reshape-readout-price-empty">—</div>';
 
       return (
         '<div class="bpc-reshape-readout-row ' + (isSel ? 'is-selected' : '') + '" data-region-idx="' + idx + '">' +
           '<span class="bpc-reshape-readout-dot" style="background:' + r.color + ';"></span>' +
           '<div>' +
             '<div class="bpc-reshape-readout-name">' + escapeHtml(r.name) + '</div>' +
-            '<div class="bpc-reshape-readout-meta">' + escapeHtml(sqftMeta) + (lnftMeta ? ' · ' + escapeHtml(lnftMeta) : '') + '</div>' +
+            '<div class="bpc-reshape-readout-meta">' + escapeHtml(sqftMeta) + (lnftMeta ? ' · ' + escapeHtml(lnftMeta) : '') + matPending + '</div>' +
           '</div>' +
-          '<div>' +
-            '<span class="bpc-reshape-readout-delta ' + cls + '">' + deltaLabel + '</span>' +
+          '<span class="bpc-reshape-readout-delta ' + cls + '">' + deltaLabel + '</span>' +
+          priceHtml +
+          '<div class="bpc-reshape-readout-row-actions">' +
             '<button type="button" class="bpc-reshape-readout-reset" data-region-idx="' + idx + '"' +
               (isModified ? '' : ' disabled') + '>Reset</button>' +
           '</div>' +
         '</div>'
       );
     }).join('');
-    reshapeReadoutEl.innerHTML = html;
 
-    // Wire row clicks → select region; reset buttons → reset that region
+    const projectEstimate = computeProjectEstimate();
+    const baseline = reshape.projectTotal;
+    const totalHtml = projectEstimate > 0
+      ? '<div class="bpc-reshape-readout-total">' +
+          '<div class="bpc-reshape-readout-total-label">Estimated project total<small>Final pricing confirmed by your designer</small></div>' +
+          '<div>' +
+            '<span class="bpc-reshape-readout-total-value">' + fmtMoney(projectEstimate) + '</span>' +
+            (baseline > 0 && Math.abs(projectEstimate - baseline) > 50
+              ? '<span class="bpc-reshape-readout-total-value-baseline">' + fmtMoney(baseline) + '</span>'
+              : '') +
+          '</div>' +
+        '</div>'
+      : '';
+
+    reshapeReadoutEl.innerHTML = rows + totalHtml;
+
     reshapeReadoutEl.querySelectorAll('.bpc-reshape-readout-row').forEach((row) => {
       row.addEventListener('click', (e) => {
         if (e.target.closest('button')) return;
@@ -1785,97 +2048,68 @@
     });
   }
 
-  // ── Vertex drag ──────────────────────────────────────────────────────
+  // ── Vertex drag (unchanged from 14C.15) ──────────────────────────────
   function svgPointFromEventReshape(e) {
     const rect = reshapeStageSvgEl.getBoundingClientRect();
-    const W = reshape.backdropW;
-    const H = reshape.backdropH;
-    // Sprint 14C.15 — preserveAspectRatio="none" on the stage SVG means
-    // the viewBox stretches to fill the SVG element's bounding rect
-    // exactly. No letterboxing, so the math is just a linear mapping
-    // from rect-local pixel coords to viewBox units. The IMG sibling
-    // sets the wrap's aspect ratio, so the SVG never has different
-    // aspect ratio from the viewBox in practice — meaning even with
-    // "none" stretching, there's no visible distortion.
-    const localX = e.clientX - rect.left;
-    const localY = e.clientY - rect.top;
+    const W = reshape.backdropW, H = reshape.backdropH;
+    const localX = e.clientX - rect.left, localY = e.clientY - rect.top;
     return {
       x: Math.max(0, Math.min(W, (localX / rect.width) * W)),
       y: Math.max(0, Math.min(H, (localY / rect.height) * H)),
     };
   }
-
   function onVertexPointerDown(e) {
     const handle = e.currentTarget;
     const vIdx = parseInt(handle.getAttribute('data-vertex-idx'), 10);
     if (!Number.isFinite(vIdx)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if (handle.setPointerCapture) {
-      try { handle.setPointerCapture(e.pointerId); } catch (_) {}
-    }
+    e.preventDefault(); e.stopPropagation();
+    if (handle.setPointerCapture) { try { handle.setPointerCapture(e.pointerId); } catch (_) {} }
     handle.classList.add('bpc-reshape-vertex-handle--dragging');
     reshape.isDragging = true;
     reshape.dragRegionIdx = reshape.selectedIdx;
     reshape.dragVertexIdx = vIdx;
-
     handle.addEventListener('pointermove', onVertexPointerMove);
-    handle.addEventListener('pointerup',   onVertexPointerUp);
+    handle.addEventListener('pointerup', onVertexPointerUp);
     handle.addEventListener('pointercancel', onVertexPointerUp);
     handle.addEventListener('lostpointercapture', onVertexPointerUp);
   }
-
   function onVertexPointerMove(e) {
     if (!reshape.isDragging) return;
     e.preventDefault();
     const region = reshape.regions[reshape.dragRegionIdx];
     if (!region) return;
     const px = svgPointFromEventReshape(e);
-    const W = reshape.backdropW;
-    const H = reshape.backdropH;
-    const fx = px.x / W;
-    const fy = px.y / H;
+    const W = reshape.backdropW, H = reshape.backdropH;
     region.modified_polygon[reshape.dragVertexIdx] = {
-      x: Math.max(0, Math.min(1, fx)),
-      y: Math.max(0, Math.min(1, fy)),
+      x: Math.max(0, Math.min(1, px.x / W)),
+      y: Math.max(0, Math.min(1, px.y / H)),
     };
-
-    // Cheap update — move the polygon points + the dragged handle
-    // directly without rebuilding the whole stage. Saves a lot of GC.
     const polyEl = reshapeRegionsGEl.querySelector(
       'polygon[data-region-idx="' + reshape.dragRegionIdx + '"]'
     );
     if (polyEl) {
       const points = region.modified_polygon
-        .map(p => (p.x * W).toFixed(1) + ',' + (p.y * H).toFixed(1))
-        .join(' ');
+        .map(p => (p.x * W).toFixed(1) + ',' + (p.y * H).toFixed(1)).join(' ');
       polyEl.setAttribute('points', points);
     }
     const handle = e.currentTarget;
     handle.setAttribute('cx', (region.modified_polygon[reshape.dragVertexIdx].x * W).toFixed(1));
     handle.setAttribute('cy', (region.modified_polygon[reshape.dragVertexIdx].y * H).toFixed(1));
-
     updateReshapeReadout();
   }
-
   function onVertexPointerUp(e) {
     if (!reshape.isDragging) return;
     reshape.isDragging = false;
     const handle = e.currentTarget;
-    if (handle && handle.classList) {
-      handle.classList.remove('bpc-reshape-vertex-handle--dragging');
-    }
-    if (handle && handle.releasePointerCapture) {
-      try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
-    }
+    if (handle && handle.classList) handle.classList.remove('bpc-reshape-vertex-handle--dragging');
+    if (handle && handle.releasePointerCapture) { try { handle.releasePointerCapture(e.pointerId); } catch (_) {} }
     if (handle) {
       handle.removeEventListener('pointermove', onVertexPointerMove);
-      handle.removeEventListener('pointerup',   onVertexPointerUp);
+      handle.removeEventListener('pointerup', onVertexPointerUp);
       handle.removeEventListener('pointercancel', onVertexPointerUp);
       handle.removeEventListener('lostpointercapture', onVertexPointerUp);
     }
-    reshape.dragRegionIdx = -1;
-    reshape.dragVertexIdx = -1;
+    reshape.dragRegionIdx = -1; reshape.dragVertexIdx = -1;
     updateReshapeSubmitButton();
   }
 
@@ -1883,32 +2117,37 @@
   function resetReshapeRegion(idx) {
     const r = reshape.regions[idx];
     if (!r) return;
-    if (!regionWasModified(r)) return;
+    if (!regionHasAnyChange(r)) return;
     r.modified_polygon = r.original_polygon.map(p => ({ x: p.x, y: p.y }));
+    r.pending_material = null;
+    r.pending_material_id = null;
     redrawReshapeStage();
     updateReshapeReadout();
+    renderMaterialPicker();
     updateReshapeSubmitButton();
   }
-
   function resetAllReshape() {
-    const anyModified = reshape.regions.some(regionWasModified);
-    if (!anyModified) return;
-    if (!confirm('Reset all areas back to their original sizes?')) return;
+    const anyChanged = reshape.regions.some(regionHasAnyChange);
+    if (!anyChanged) return;
+    if (!confirm('Reset all areas and material swaps?')) return;
     reshape.regions.forEach((r) => {
       r.modified_polygon = r.original_polygon.map(p => ({ x: p.x, y: p.y }));
+      r.pending_material = null;
+      r.pending_material_id = null;
     });
     redrawReshapeStage();
     updateReshapeReadout();
+    renderMaterialPicker();
     updateReshapeSubmitButton();
   }
 
-  // ── Submit ───────────────────────────────────────────────────────────
+  // ── Submit (Phase 16 — parallel POSTs to redesign + substitutions) ───
   function updateReshapeSubmitButton() {
     if (!reshapeSubmitBtnEl) return;
-    const anyModified = reshape.regions.some(regionWasModified);
-    reshapeSubmitBtnEl.disabled = !anyModified;
+    const anyChanged = reshape.regions.some(regionHasAnyChange);
+    reshapeSubmitBtnEl.disabled = !anyChanged;
     if (reshapeStatusEl && reshapeStatusEl.classList.contains('bpc-reshape-status--error')) {
-      if (anyModified) {
+      if (anyChanged) {
         reshapeStatusEl.textContent = '';
         reshapeStatusEl.classList.remove('bpc-reshape-status--error');
       }
@@ -1923,6 +2162,10 @@
       reshapeStatusEl.classList.add('bpc-reshape-status--error');
       return;
     }
+
+    const note = (reshapeNoteEl.value || '').trim();
+
+    // Partition pending changes
     const modifiedRegions = reshape.regions
       .filter(regionWasModified)
       .map((r) => ({
@@ -1936,8 +2179,17 @@
         original_area_lnft: r.original_area_lnft || 0,
         modified_area_lnft: computeModifiedLnft(r),
       }));
-    if (modifiedRegions.length === 0) {
-      reshapeStatusEl.textContent = 'Drag a vertex to resize at least one area before submitting.';
+
+    const materialChanges = reshape.regions
+      .filter(regionMaterialChanged)
+      .filter((r) => r.proposal_region_material_id)
+      .map((r) => ({
+        proposal_region_material_id: r.proposal_region_material_id,
+        replacement_material_id: r.pending_material_id,
+      }));
+
+    if (modifiedRegions.length === 0 && materialChanges.length === 0) {
+      reshapeStatusEl.textContent = 'Drag a vertex or tap a material swatch to make a change first.';
       reshapeStatusEl.classList.add('bpc-reshape-status--error');
       return;
     }
@@ -1947,40 +2199,84 @@
     reshapeStatusEl.textContent = '';
     reshapeStatusEl.classList.remove('bpc-reshape-status--error', 'bpc-reshape-status--success');
 
-    try {
+    // Build the two parallel submissions. Either or both may be skipped
+    // if there's nothing in that category.
+    const tasks = [];
+    if (modifiedRegions.length > 0) {
       const fd = new FormData();
       fd.append('slug', slug);
       fd.append('modified_polygons', JSON.stringify(modifiedRegions));
-      const note = (reshapeNoteEl.value || '').trim();
       if (note) fd.append('homeowner_note', note);
       if (reshape.backdropUrl) fd.append('site_map_url', reshape.backdropUrl);
-      if (reshape.backdropW)   fd.append('site_map_width',  String(reshape.backdropW));
-      if (reshape.backdropH)   fd.append('site_map_height', String(reshape.backdropH));
+      if (reshape.backdropW) fd.append('site_map_width', String(reshape.backdropW));
+      if (reshape.backdropH) fd.append('site_map_height', String(reshape.backdropH));
+      tasks.push(
+        fetch(API_REDESIGN, {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token },
+          body: fd,
+        }).then(async (r) => ({
+          kind: 'redesign',
+          ok: r.ok,
+          status: r.status,
+          json: await r.json().catch(() => ({})),
+        }))
+      );
+    }
+    if (materialChanges.length > 0) {
+      tasks.push(
+        fetch(API_SUBSTITUTIONS, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
+          },
+          body: JSON.stringify({
+            slug,
+            homeowner_note: note || null,
+            items: materialChanges,
+          }),
+        }).then(async (r) => ({
+          kind: 'substitutions',
+          ok: r.ok,
+          status: r.status,
+          json: await r.json().catch(() => ({})),
+        }))
+      );
+    }
 
-      const resp = await fetch(API_REDESIGN, {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + token },
-        body: fd,
-      });
-      const result = await resp.json().catch(() => ({}));
-      if (!resp.ok) {
-        reshapeStatusEl.textContent = 'Could not send: ' + (result.error || ('HTTP ' + resp.status));
+    try {
+      const results = await Promise.all(tasks);
+      const failures = results.filter((r) => !r.ok);
+      if (failures.length > 0) {
+        const msgs = failures.map((f) =>
+          (f.kind === 'redesign' ? 'Shape changes: ' : 'Material swaps: ') +
+          (f.json && f.json.error ? f.json.error : ('HTTP ' + f.status))
+        );
+        reshapeStatusEl.textContent = 'Some changes failed — ' + msgs.join(' · ');
         reshapeStatusEl.classList.add('bpc-reshape-status--error');
         reshapeSubmitBtnEl.disabled = false;
         reshapeSubmitBtnEl.textContent = 'Send to designer';
         return;
       }
 
+      // Build a friendly success message
+      const parts = [];
+      if (modifiedRegions.length > 0) parts.push(modifiedRegions.length + ' shape change' + (modifiedRegions.length === 1 ? '' : 's'));
+      if (materialChanges.length > 0) parts.push(materialChanges.length + ' material swap' + (materialChanges.length === 1 ? '' : 's'));
+      const emailSent = results.some((r) => r.json && r.json.email_sent);
       reshapeSubmitBtnEl.textContent = 'Sent ✓';
-      reshapeStatusEl.textContent = result.email_sent
-        ? 'Sent to your designer. They\'ll review your requested sizes and follow up.'
-        : 'Submitted. Your designer will see this in the queue.';
+      reshapeStatusEl.textContent =
+        parts.join(' + ') + ' submitted' +
+        (emailSent ? ' — your designer has been emailed.' : ' to your designer\'s queue.');
       reshapeStatusEl.classList.add('bpc-reshape-status--success');
 
-      // Auto-close. Pre-clear so confirm() doesn't fire on close.
+      // Auto-close. Pre-clear so confirm() doesn't fire.
       setTimeout(() => {
         reshape.regions.forEach((r) => {
           r.modified_polygon = r.original_polygon.map(p => ({ x: p.x, y: p.y }));
+          r.pending_material = null;
+          r.pending_material_id = null;
         });
         if (reshapeNoteEl) reshapeNoteEl.value = '';
         closeReshapeOverlay();
@@ -1999,7 +2295,6 @@
     injectStyles();
     renderFab();
   }
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
