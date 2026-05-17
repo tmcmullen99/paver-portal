@@ -71,32 +71,40 @@ if (timelineSvg && tooltip) {
   });
 }
 
-// Pricing calculator
+// Pricing calculator — per-deal-first framing (rebuilt 2026-05-17)
 const dealsSlider = document.getElementById('dealsSlider');
 const dealSizeSlider = document.getElementById('dealSizeSlider');
 const splitSlider = document.getElementById('splitSlider');
 const fmt = (n) => '$' + Math.round(n).toLocaleString('en-US');
-const pctFmt = (n) => n.toFixed(2) + '%';
 
 function updateCalc() {
   const deals = parseInt(dealsSlider.value, 10);
   const dealSize = parseInt(dealSizeSlider.value, 10);
   const splitPct = parseInt(splitSlider.value, 10);
-  const pipelineRevenue = deals * dealSize;
-  const totalFee = pipelineRevenue * 0.01;
-  const designerShare = totalFee * (splitPct / 100);
-  const baysideShare = totalFee - designerShare;
-  const perDealCost = totalFee / deals;
-  const pctOfRevenue = (baysideShare / pipelineRevenue) * 100;
 
+  // Per-deal economics (the headline)
+  const feePerDeal = dealSize * 0.01;
+  const designerSharePerDeal = feePerDeal * (splitPct / 100);
+  const platformSharePerDeal = feePerDeal - designerSharePerDeal;
+
+  // Annual context
+  const annualFee = feePerDeal * deals;
+  const netCostToBayside = platformSharePerDeal * deals;
+
+  // Update slider labels
   document.getElementById('dealsLabel').textContent = deals;
   document.getElementById('dealSizeLabel').textContent = fmt(dealSize);
   document.getElementById('splitLabel').textContent = splitPct + '%';
-  document.getElementById('totalFee').textContent = fmt(totalFee);
-  document.getElementById('baysideShare').textContent = fmt(baysideShare);
-  document.getElementById('designerShare').textContent = fmt(designerShare);
-  document.getElementById('perDealCost').textContent = fmt(perDealCost);
-  document.getElementById('pctRevenue').textContent = pctFmt(pctOfRevenue);
+
+  // Update headline + breakdown
+  document.getElementById('feePerDeal').textContent = fmt(feePerDeal);
+  document.getElementById('feeContext').textContent = '1% of a ' + fmt(dealSize) + ' deal';
+  document.getElementById('designerSharePerDeal').textContent = fmt(designerSharePerDeal);
+  document.getElementById('platformSharePerDeal').textContent = fmt(platformSharePerDeal);
+
+  // Update volume context
+  document.getElementById('annualFee').textContent = fmt(annualFee);
+  document.getElementById('netCostToBayside').textContent = fmt(netCostToBayside);
 }
 if (dealsSlider && dealSizeSlider && splitSlider) {
   [dealsSlider, dealSizeSlider, splitSlider].forEach(s => s.addEventListener('input', updateCalc));
@@ -116,7 +124,6 @@ function fmtHours(h) {
 }
 
 function closeRateAt(hours) {
-  // Anchor 28% at 1h, 8% at 7d, smooth exponential dropoff with 7% floor
   return Math.max(0.07, 0.22 * Math.exp(-0.018 * hours) + 0.06);
 }
 
