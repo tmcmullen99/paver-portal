@@ -733,26 +733,46 @@
 
 <section id="math" class="calc-section">
   <div class="container">
-    <span class="eyebrow reveal" style="color:var(--gold);">The cost side, interactively</span>
-    <h2 class="reveal">Now what does it cost? <em>Play with the numbers.</em></h2>
-    <p class="reveal">The Bayside Portal fee is <strong style="color:var(--gold);">1% of each closed deal</strong> — that's $500 on a $50,000 job. No fixed costs, no per-seat fees, no subscriptions. Compare against the conversion lift number above.</p>
+    <span class="eyebrow reveal" style="color:var(--gold);">The cost and the upside · interactively</span>
+    <h2 class="reveal">What does it cost? <em>And what does it earn?</em></h2>
+    <p class="reveal">The Bayside Portal fee is just <strong style="color:var(--gold);">1% of each closed deal</strong> — $500 on a $50,000 project. The real story is the revenue lift from same-hour notifications, live material swaps, and customer self-service editing. Drag the sliders.</p>
     <div class="calc-grid">
       <div class="calc-controls reveal">
-        <div class="calc-control"><div class="calc-label"><span>Closed deals per year via Portal</span><span class="calc-label-value" id="dealsLabel">50</span></div><input type="range" id="dealsSlider" min="10" max="200" value="50" step="5"></div>
-        <div class="calc-control"><div class="calc-label"><span>Average deal size</span><span class="calc-label-value" id="dealSizeLabel">$50,000</span></div><input type="range" id="dealSizeSlider" min="20000" max="150000" value="50000" step="5000"></div>
-        <div class="calc-control"><div class="calc-label"><span>Designer split %</span><span class="calc-label-value" id="splitLabel">50%</span></div><input type="range" id="splitSlider" min="0" max="100" value="50" step="10"></div>
+        <div class="calc-control"><div class="calc-label"><span>Projects sent per year</span><span class="calc-label-value" id="projectsLabel">100</span></div><input type="range" id="projectsSlider" min="20" max="300" value="100" step="10"></div>
+        <div class="calc-control"><div class="calc-label"><span>Average project size</span><span class="calc-label-value" id="projectSizeLabel">$50,000</span></div><input type="range" id="projectSizeSlider" min="20000" max="150000" value="50000" step="5000"></div>
+        <div class="calc-control"><div class="calc-label"><span>Closing rate lift from Portal</span><span class="calc-label-value" id="liftLabel">+10 pts</span></div><input type="range" id="liftSlider" min="0" max="20" value="10" step="1"></div>
       </div>
       <div class="calc-results reveal">
-        <div style="text-align:center;padding:8px 0 28px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:14px;">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:12px;">Bayside Portal fee · per closed deal</div>
-          <div class="mono" id="feePerDeal" style="font-size:64px;font-weight:700;color:var(--gold);line-height:1;letter-spacing:-0.02em;">$500</div>
-          <div id="feeContext" style="font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:rgba(250,248,243,0.7);margin-top:14px;">1% of a $50,000 deal</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:4px 0 22px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:18px;">
+          <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.04);border-radius:8px;">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,248,243,0.55);font-weight:600;margin-bottom:8px;">Project</div>
+            <div class="mono" id="projectValue" style="font-size:22px;font-weight:700;color:#faf8f3;line-height:1;">$50,000</div>
+          </div>
+          <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.04);border-radius:8px;">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,248,243,0.55);font-weight:600;margin-bottom:8px;">Designer 10%</div>
+            <div class="mono" id="designerCommission" style="font-size:22px;font-weight:700;color:#faf8f3;line-height:1;">$5,000</div>
+          </div>
+          <div style="text-align:center;padding:14px 8px;background:rgba(183,139,58,0.12);border-radius:8px;border:1px solid rgba(183,139,58,0.35);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#b78b3a;font-weight:700;margin-bottom:8px;">Portal 1%</div>
+            <div class="mono" id="portalFee" style="font-size:22px;font-weight:700;color:#b78b3a;line-height:1;">$500</div>
+          </div>
         </div>
-        <div class="calc-result-line"><span class="calc-result-label">Designer's share (50% split)</span><span class="calc-result-value mono" id="designerSharePerDeal">$250</span></div>
-        <div class="calc-result-line"><span class="calc-result-label">Platform's share (per deal)</span><span class="calc-result-value mono" id="platformSharePerDeal">$250</span></div>
-        <div class="calc-result-line" style="opacity:0.75;padding-top:18px;border-top:1px dashed rgba(255,255,255,0.1);margin-top:8px;"><span class="calc-result-label">Volume context · 50 deals/yr</span><span class="calc-result-value mono" id="annualFee">$25,000</span></div>
-        <div class="calc-result-line" style="opacity:0.75;"><span class="calc-result-label">Net cost after designer split</span><span class="calc-result-value mono" id="netCostToBayside">$12,500</span></div>
-        <div class="calc-vs"><strong>For comparison:</strong> HubSpot Sales Pro for 8 designers runs ~$9,600/yr <em>fixed</em>, paid whether or not anything closes. Bayside Portal is pure performance — if zero deals close, Bayside pays $0.</div>
+
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#b78b3a;font-weight:700;margin-bottom:14px;text-align:center;">Annual impact · <span id="projectsContext">100</span> projects/yr</div>
+
+        <div class="calc-result-line"><span class="calc-result-label">Baseline (25% close rate)</span><span class="calc-result-value mono" id="baselineRevenue">$1.25M</span></div>
+        <div class="calc-result-line"><span class="calc-result-label">With Portal (<span id="liftedRateLabel">35%</span> close rate)</span><span class="calc-result-value mono" id="liftedRevenue">$1.75M</span></div>
+
+        <div style="padding-top:8px;border-top:1px dashed rgba(255,255,255,0.18);margin-top:14px;">
+          <div style="display:flex;flex-direction:column;align-items:center;padding:18px 0 14px;">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(250,248,243,0.6);margin-bottom:10px;">Incremental revenue / year</div>
+            <div class="mono" id="pricingIncRevenue" style="font-size:46px;font-weight:700;color:#b78b3a;line-height:1;letter-spacing:-0.02em;">$500K</div>
+          </div>
+          <div class="calc-result-line" style="opacity:0.8;"><span class="calc-result-label">Total Portal fees / year</span><span class="calc-result-value mono" id="totalPortalFees">$17,500</span></div>
+          <div class="calc-result-line headline final" style="margin-top:6px;"><span class="calc-result-label" style="color:#b78b3a;">Return on Portal cost</span><span class="calc-result-value mono" id="portalROI" style="color:#b78b3a;font-size:26px;">28.6×</span></div>
+        </div>
+
+        <div class="calc-vs"><strong>How the math works.</strong> Baseline closing rate is assumed at 25% — drag the lift slider to your own estimate of how much Portal's same-hour notifications and homeowner self-service editing will move that needle. The 1% fee applies only to closed deals: if zero close, Bayside pays $0. (For reference: HubSpot Sales Pro for 8 designers runs ~$9,600/yr <em>fixed</em>, paid whether or not anything closes.)</div>
       </div>
     </div>
   </div>
