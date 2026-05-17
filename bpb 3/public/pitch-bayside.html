@@ -32,7 +32,7 @@
   <div class="container hero-content">
     <span class="eyebrow">A licensing proposal · May 2026</span>
     <h1>Your designers shouldn't have to <em>guess</em><br>when a homeowner is ready to buy.</h1>
-    <p class="hero-sub">Bayside Portal is the sales platform I've built and used on Bayside deals for the last year. It makes homeowner intent visible — in real time, on every deal — so Bayside's design team closes more of what they're already working on.</p>
+    <p class="hero-sub">Bayside Portal is the sales platform Tim McMullen has built and used on Bayside deals for the last year. It makes homeowner intent visible — in real time, on every deal — so Bayside's design team closes more of what they're already working on.</p>
     <div class="hero-stats">
       <div><strong class="hero-stat-num" data-count-to="53">0</strong><span class="hero-stat-label">Engagement events</span></div>
       <div><strong class="hero-stat-num" data-count-to="13">0</strong><span class="hero-stat-label">Distinct sessions</span></div>
@@ -80,15 +80,15 @@
     </p>
 
     <div style="margin-top:72px;">
-      <span class="eyebrow reveal">01 · The Site Map tool</span>
+      <span class="eyebrow reveal">01 · The Site Map tool · live data from a real Bayside deal</span>
       <h3 class="reveal" style="font-family:'Playfair Display';font-size:30px;margin-bottom:14px;">Click two points. Set the distance. The whole map is now to scale.</h3>
       <p class="reveal" style="font-size:15px;color:var(--ink-mute);max-width:680px;margin-bottom:36px;">
-        Designers upload an aerial photo, mark a known distance (driveway width, property edge, anything measurable), and Bayside Portal locks the scale for the entire project. Every region drawn after that returns real square footage — not estimated, not pencil-and-paper, not "looks about 500 sq ft."
+        Designers upload an aerial photo, mark a known distance (driveway width, property edge, anything measurable), and Bayside Portal locks the scale for the entire project. Every region drawn after that returns real square footage — calibrated to the property, not estimated from a phone screen.
       </p>
 
       <div class="demo-frame reveal">
         <div class="frame-dots"><span></span><span></span><span></span></div>
-        <div class="frame-url">portal-baysidepavers.com/editor?id=site-map</div>
+        <div class="frame-url">portal-baysidepavers.com/editor?id=a57a7fa7 · 1719 Yorktown Rd, Cupertino</div>
 
         <div class="site-map-mock">
           <div class="sm-workflow">
@@ -98,88 +98,60 @@
           </div>
 
           <div class="sm-canvas">
-            <svg viewBox="0 0 800 420" preserveAspectRatio="xMidYMid meet" class="site-map-svg">
-              <defs>
-                <linearGradient id="groundGrad" x1="0" x2="1" y1="0" y2="1">
-                  <stop offset="0%" stop-color="#d4c5a3"/>
-                  <stop offset="100%" stop-color="#bba787"/>
-                </linearGradient>
-                <pattern id="grassPat" width="14" height="14" patternUnits="userSpaceOnUse">
-                  <rect width="14" height="14" fill="#9aab7a"/>
-                  <circle cx="3" cy="3" r="0.8" fill="#7d8f5f"/>
-                  <circle cx="10" cy="8" r="0.8" fill="#7d8f5f"/>
-                  <circle cx="5" cy="11" r="0.8" fill="#7d8f5f"/>
-                </pattern>
-                <filter id="dropshadow">
-                  <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-                  <feOffset dx="1" dy="2"/>
-                  <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-                </filter>
-              </defs>
-              <rect width="800" height="420" fill="url(#groundGrad)"/>
-              <rect x="0" y="40" width="800" height="380" fill="url(#grassPat)"/>
-              <rect x="60" y="120" width="240" height="200" fill="#7a6555" stroke="#4a3d30" stroke-width="2.5"/>
-              <line x1="60" y1="155" x2="300" y2="155" stroke="#4a3d30" stroke-width="2"/>
-              <text x="180" y="225" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="rgba(255,255,255,0.5)" letter-spacing="0.2em">HOUSE</text>
-              <rect x="300" y="180" width="240" height="60" fill="#8b8175" stroke="#5e5447" stroke-width="1.5"/>
-              <line x1="305" y1="210" x2="535" y2="210" stroke="#c4392e" stroke-width="2.5" stroke-dasharray="8 4"/>
-              <circle cx="305" cy="210" r="9" fill="#c4392e" stroke="white" stroke-width="2.5" filter="url(#dropshadow)"/>
-              <text x="305" y="214" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="white" font-weight="700">A</text>
-              <circle cx="535" cy="210" r="9" fill="#c4392e" stroke="white" stroke-width="2.5" filter="url(#dropshadow)"/>
-              <text x="535" y="214" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="white" font-weight="700">B</text>
-              <g transform="translate(380,156)" filter="url(#dropshadow)">
-                <rect width="110" height="28" rx="4" fill="#0e1218" stroke="#c4392e" stroke-width="1.5"/>
-                <text x="55" y="18" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#ffd28a" font-weight="700">A→B = 24 ft</text>
-              </g>
-              <polygon points="320,260 540,260 560,360 300,360" fill="rgba(196,117,51,0.62)" stroke="#a05822" stroke-width="2"/>
-              <text x="430" y="313" text-anchor="middle" font-family="JetBrains Mono" font-size="14" fill="white" font-weight="700">540 sq ft</text>
-              <text x="430" y="330" text-anchor="middle" font-family="Inter" font-size="10" fill="rgba(255,255,255,0.85)">Main Paver Area</text>
-              <polygon points="580,270 720,270 720,360 580,360" fill="rgba(183,139,58,0.62)" stroke="#8e6928" stroke-width="2"/>
-              <text x="650" y="313" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="white" font-weight="700">280 sq ft</text>
-              <text x="650" y="330" text-anchor="middle" font-family="Inter" font-size="10" fill="rgba(255,255,255,0.85)">Pergola</text>
-              <polygon points="40,360 200,360 200,400 40,400" fill="rgba(93,126,105,0.62)" stroke="#3f5a47" stroke-width="2"/>
-              <text x="120" y="385" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="white" font-weight="700">132 sq ft</text>
-              <g transform="translate(750,70)" filter="url(#dropshadow)">
-                <circle r="18" fill="white" stroke="#4a3d30" stroke-width="2"/>
-                <text y="-4" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#0e1218" font-weight="700">N</text>
-                <polygon points="0,-12 -4,-6 4,-6" fill="#0e1218"/>
-                <line x1="0" y1="-6" x2="0" y2="10" stroke="#0e1218" stroke-width="1.2"/>
-              </g>
-            </svg>
+            <div style="position:relative;width:100%;aspect-ratio:1562/1140;line-height:0;background:#c5b58e;">
+              <img src="https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/site-plans/a57a7fa7-44e3-422b-a4ea-646119a085e8/backdrop.png?v=1778889768314" alt="1719 Yorktown Rd site plan backdrop" style="width:100%;height:100%;display:block;object-fit:cover;">
+              <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 1562 1140" preserveAspectRatio="xMidYMid meet">
+                <polygon points="1024,520 1022,548 1058,548 1324,479 1322,407 1390,407 1404,529 1076,615 1087,687 636,809 639,589 763,587 766,519 1022,521 1022,546" fill="rgba(93,126,105,0.55)" stroke="#5d7e69" stroke-width="3.5"/>
+                <polygon points="549,833 549,703 228,703 222,813 257,813 245,845 274,887 324,879 336,865 370,890 544,839" fill="rgba(74,118,168,0.55)" stroke="#4a76a8" stroke-width="3.5"/>
+                <polygon points="206,855 209,813 249,812 243,858 287,884 323,864 358,876 321,914 263,914 222,891 203,855" fill="rgba(196,117,51,0.6)" stroke="#c47533" stroke-width="3.5"/>
+                <polygon points="1391,405 1406,530 1083,615 1088,687 636,812 650,586 621,589 622,700 559,700 555,833 350,896 295,914 212,887 203,803 229,685 278,691 303,48 237,43 145,974 1446,619 1432,401 1391,405" fill="rgba(155,135,197,0.4)" stroke="#9b87c5" stroke-width="3"/>
+                <line x1="121" y1="1000" x2="1450" y2="632" stroke="#c4392e" stroke-width="4" stroke-dasharray="14 8" opacity="0.9"/>
+                <circle cx="121" cy="1000" r="14" fill="#c4392e" stroke="white" stroke-width="3"/>
+                <text x="121" y="1005" text-anchor="middle" font-family="JetBrains Mono" font-size="14" fill="white" font-weight="700">A</text>
+                <circle cx="1450" cy="632" r="14" fill="#c4392e" stroke="white" stroke-width="3"/>
+                <text x="1450" y="637" text-anchor="middle" font-family="JetBrains Mono" font-size="14" fill="white" font-weight="700">B</text>
+              </svg>
+            </div>
           </div>
 
           <div class="sm-lock-bar">
             <span class="sm-lock-icon">🔒</span>
             <strong>Scale locked</strong>
-            <span class="sm-lock-detail">A → B reference = 24 ft · 1 ft = 9.6 px</span>
+            <span class="sm-lock-detail">A → B reference = 80 ft · 17.25 px/ft · calibrated 2026-05-16</span>
             <span class="sm-lock-status">Verified by designer</span>
           </div>
 
           <div class="sm-regions-list">
-            <div class="sm-rgn-header">Regions measured this session</div>
-            <div class="sm-region-row">
-              <span class="sm-rgn-color" style="background:#c47533;"></span>
-              <span class="sm-rgn-name">Main Paver Area</span>
-              <span class="sm-rgn-area mono">540 sq ft</span>
-              <span class="sm-rgn-cost mono">$7,668</span>
-            </div>
-            <div class="sm-region-row">
-              <span class="sm-rgn-color" style="background:#b78b3a;"></span>
-              <span class="sm-rgn-name">Pergola Paver Area</span>
-              <span class="sm-rgn-area mono">280 sq ft</span>
-              <span class="sm-rgn-cost mono">$4,704</span>
-            </div>
+            <div class="sm-rgn-header">Regions measured · 1719 Yorktown Rd</div>
             <div class="sm-region-row">
               <span class="sm-rgn-color" style="background:#5d7e69;"></span>
-              <span class="sm-rgn-name">Front Path</span>
-              <span class="sm-rgn-area mono">132 sq ft</span>
-              <span class="sm-rgn-cost mono">$1,874</span>
+              <span class="sm-rgn-name">Main Paver Area</span>
+              <span class="sm-rgn-area mono">398 sqft</span>
+              <span class="sm-rgn-cost mono">160 lnft</span>
+            </div>
+            <div class="sm-region-row">
+              <span class="sm-rgn-color" style="background:#4a76a8;"></span>
+              <span class="sm-rgn-name">Off-Bedroom Patio</span>
+              <span class="sm-rgn-area mono">180 sqft</span>
+              <span class="sm-rgn-cost mono">64 lnft</span>
+            </div>
+            <div class="sm-region-row">
+              <span class="sm-rgn-color" style="background:#c47533;"></span>
+              <span class="sm-rgn-name">Seating Wall</span>
+              <span class="sm-rgn-area mono">26 sqft</span>
+              <span class="sm-rgn-cost mono">12.98 lnft</span>
+            </div>
+            <div class="sm-region-row">
+              <span class="sm-rgn-color" style="background:#9b87c5;"></span>
+              <span class="sm-rgn-name">Decorative Rock</span>
+              <span class="sm-rgn-area mono">700 sqft</span>
+              <span class="sm-rgn-cost mono">—</span>
             </div>
             <div class="sm-region-row sm-rgn-total">
               <span></span>
-              <span class="sm-rgn-name">Total</span>
-              <span class="sm-rgn-area mono">952 sq ft</span>
-              <span class="sm-rgn-cost mono"><strong>$14,246</strong></span>
+              <span class="sm-rgn-name">Total measured scope</span>
+              <span class="sm-rgn-area mono">1,304 sqft</span>
+              <span class="sm-rgn-cost mono"><strong>$41,562</strong></span>
             </div>
           </div>
         </div>
@@ -187,9 +159,9 @@
 
       <div class="demo-callouts">
         <div class="callout reveal"><div class="callout-num">01 · Upload</div><strong>Any aerial works</strong><p>Google Earth, Apple Maps, or a measurement service screenshot. Drop in the image, the tool handles the rest.</p></div>
-        <div class="callout reveal"><div class="callout-num">02 · Lock the scale</div><strong>One known distance</strong><p>Click two points on a known feature — driveway width, property line, fence span — and enter the real distance. The scale stays locked for the project.</p></div>
+        <div class="callout reveal"><div class="callout-num">02 · Lock the scale</div><strong>One known distance</strong><p>Click two points on a known feature — driveway, fence span, property line. On this proposal, the calibration is 80 ft. One-time setup, then the scale stays locked.</p></div>
         <div class="callout reveal"><div class="callout-num">03 · Draw regions</div><strong>Geometry does the math</strong><p>Every polygon drawn returns square footage automatically. The designer never types a number; pricing follows from the measurement.</p></div>
-        <div class="callout reveal"><div class="callout-num">04 · The accuracy gain</div><strong>±2% vs eyeballing</strong><p>Estimating 540 sq ft vs measuring 540 sq ft on a $14/sq ft paver = a $76 line-item difference. Multiplied by every region across every proposal — real margin recovery.</p></div>
+        <div class="callout reveal"><div class="callout-num">04 · The accuracy gain</div><strong>±2% vs eyeballing</strong><p>Estimating 398 sqft vs measuring 398 sqft on a $14/sqft paver = a $56 line-item swing. Multiplied by every region across every proposal — real margin recovery.</p></div>
       </div>
     </div>
 
@@ -208,22 +180,22 @@
           <div class="cat-toolbar">
             <div class="cat-search-box">
               <span class="cat-search-icon">⌕</span>
-              <span class="cat-search-placeholder">Search 247 materials...</span>
+              <span class="cat-search-placeholder">Search 275 materials...</span>
             </div>
             <button class="cat-add-btn">+ Add Material</button>
           </div>
           <div class="cat-filter-row">
-            <span class="cat-filter active">All · 247</span>
-            <span class="cat-filter">Belgard · 142</span>
-            <span class="cat-filter">Calstone · 64</span>
-            <span class="cat-filter">Techo-Bloc · 41</span>
-            <span class="cat-filter">Walls</span>
+            <span class="cat-filter active">All · 275</span>
+            <span class="cat-filter">Belgard · 266</span>
+            <span class="cat-filter">MSI · 3</span>
+            <span class="cat-filter">Trex · 2</span>
             <span class="cat-filter">Pavers</span>
+            <span class="cat-filter">Walls</span>
             <span class="cat-filter">Accessories</span>
           </div>
           <div class="catalog-grid">
             <div class="cat-card">
-              <div class="cat-swatch" style="background:linear-gradient(135deg,#8a7860 0%,#6e5f4b 50%,#5a4d3d 100%);"></div>
+              <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/2f59ac36-3424-463d-a7ab-45bfd9a2bb07.png?v=1776891712228');background-size:cover;background-position:center;"></div>
               <div class="cat-card-body">
                 <div class="cat-mfr">BELGARD</div>
                 <div class="cat-name">Catalina Grana</div>
@@ -232,7 +204,7 @@
               </div>
             </div>
             <div class="cat-card">
-              <div class="cat-swatch" style="background:linear-gradient(135deg,#c5b69a 0%,#a89679 50%,#8a7560 100%);"></div>
+              <div class="cat-swatch" style="background-image:url('https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69e6d07a0f0b40b42237987d_Screenshot%202026-04-20%20at%206.18.47%E2%80%AFPM.png');background-size:cover;background-position:center;"></div>
               <div class="cat-card-body">
                 <div class="cat-mfr">BELGARD</div>
                 <div class="cat-name">Origins 12</div>
@@ -241,51 +213,51 @@
               </div>
             </div>
             <div class="cat-card">
-              <div class="cat-swatch" style="background:linear-gradient(135deg,#b8a070 0%,#9a8458 50%,#7a6740 100%);"></div>
+              <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/9fb28476-7595-4a48-bff1-38aa1003b199.png?v=1777588866294');background-size:cover;background-position:center;"></div>
               <div class="cat-card-body">
                 <div class="cat-mfr">BELGARD</div>
-                <div class="cat-name">Mega-Bergerac</div>
-                <div class="cat-detail">Sahara Blend · 60mm</div>
-                <div class="cat-price-row"><span class="cat-price mono">$13.40</span><span class="cat-unit">/ sq ft</span></div>
-              </div>
-            </div>
-            <div class="cat-card">
-              <div class="cat-swatch" style="background:linear-gradient(135deg,#5a5550 0%,#403d38 50%,#2c2925 100%);"></div>
-              <div class="cat-card-body">
-                <div class="cat-mfr">CALSTONE</div>
-                <div class="cat-name">Holland Stone</div>
-                <div class="cat-detail">Charcoal · 60mm</div>
+                <div class="cat-name">Cambridge Cobble</div>
+                <div class="cat-detail">Midnight · 60mm</div>
                 <div class="cat-price-row"><span class="cat-price mono">$9.80</span><span class="cat-unit">/ sq ft</span></div>
               </div>
             </div>
             <div class="cat-card">
-              <div class="cat-swatch" style="background:linear-gradient(135deg,#d0b890 0%,#b09872 50%,#907858 100%);"></div>
+              <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/86859f5e-9c68-49ef-9546-096aacfd28ff.png?v=1777588763725');background-size:cover;background-position:center;"></div>
               <div class="cat-card-body">
-                <div class="cat-mfr">CALSTONE</div>
-                <div class="cat-name">Antique Cobble</div>
-                <div class="cat-detail">Sandstone · 60mm</div>
+                <div class="cat-mfr">BELGARD</div>
+                <div class="cat-name">Belgian Cobble</div>
+                <div class="cat-detail">Bourbon · 60mm</div>
+                <div class="cat-price-row"><span class="cat-price mono">$10.40</span><span class="cat-unit">/ sq ft</span></div>
+              </div>
+            </div>
+            <div class="cat-card">
+              <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/d211002c-dca3-45fe-8b1f-cafd09697e88.jpg?v=1777588702174');background-size:cover;background-position:center;"></div>
+              <div class="cat-card-body">
+                <div class="cat-mfr">BELGARD</div>
+                <div class="cat-name">Avalon Slate</div>
+                <div class="cat-detail">Toscana · 60mm</div>
                 <div class="cat-price-row"><span class="cat-price mono">$11.60</span><span class="cat-unit">/ sq ft</span></div>
               </div>
             </div>
             <div class="cat-card">
-              <div class="cat-swatch" style="background:linear-gradient(135deg,#6e7580 0%,#525a65 50%,#3a4049 100%);"></div>
+              <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/d9974b59-5b82-4cda-b4cc-3ae58436275b.png?v=1777588800564');background-size:cover;background-position:center;"></div>
               <div class="cat-card-body">
-                <div class="cat-mfr">TECHO-BLOC</div>
-                <div class="cat-name">Mista</div>
-                <div class="cat-detail">Greyed Nickel · 60mm</div>
-                <div class="cat-price-row"><span class="cat-price mono">$18.20</span><span class="cat-unit">/ sq ft</span></div>
+                <div class="cat-mfr">BELGARD</div>
+                <div class="cat-name">Brooklyn</div>
+                <div class="cat-detail">Bourbon · 60mm</div>
+                <div class="cat-price-row"><span class="cat-price mono">$9.20</span><span class="cat-unit">/ sq ft</span></div>
               </div>
             </div>
           </div>
           <div class="cat-footer">
-            <span><strong>247 materials</strong> · 8 manufacturers · last sync 2h ago</span>
+            <span><strong>275 materials</strong> · 7 manufacturers · last sync 2h ago</span>
             <span><strong>Pricing version 14</strong> · published Mon May 16</span>
           </div>
         </div>
       </div>
 
       <div class="demo-callouts">
-        <div class="callout reveal"><div class="callout-num">01 · The catalog</div><strong>247 materials, one place</strong><p>Belgard, Calstone, Techo-Bloc, accessories. Manufacturer, color, dimensions, and per-unit pricing — all centralized, all searchable.</p></div>
+        <div class="callout reveal"><div class="callout-num">01 · The catalog</div><strong>275 materials, one place</strong><p>Belgard's full lineup plus accessories from MSI, Trex, and others. Manufacturer, color, dimensions, and per-unit pricing — all centralized, all searchable.</p></div>
         <div class="callout reveal"><div class="callout-num">02 · Adding new materials</div><strong>30 seconds, end to end</strong><p>Drag a swatch image. Type manufacturer + product + dimension + price. Hit save. The material is immediately available to every designer.</p></div>
         <div class="callout reveal"><div class="callout-num">03 · Pricing syncs</div><strong>Update once, propagate everywhere</strong><p>Update a price in the catalog and every in-flight draft proposal sees the new number. No more "I quoted the old price by mistake."</p></div>
         <div class="callout reveal"><div class="callout-num">04 · Designer selection</div><strong>Pick from a list, not memory</strong><p>When building a proposal, designers select from the catalog. Swatch, specs, manufacturer, color, price — all auto-filled. Zero typing, zero pricing drift.</p></div>
@@ -348,12 +320,12 @@
           </div>
           <p class="region-detail-desc">540 sq ft of permeable hardscape with custom soldier-course border. Pattern: 70/30 herringbone. Recommended materials below — click any swatch for specs, or request a substitution.</p>
           <div class="material-row">
-            <div class="material-swatch" style="background:linear-gradient(135deg,#8a7860 0%,#6e5f4b 50%,#5a4d3d 100%);"></div>
+            <div class="material-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/2f59ac36-3424-463d-a7ab-45bfd9a2bb07.png?v=1776891712228');background-size:cover;background-position:center;"></div>
             <div class="material-info"><div class="material-mfr">Belgard · Pavers</div><div class="material-name">Catalina Grana</div><div class="material-color">Scandina Gray · 60mm</div></div>
             <div class="material-actions"><button class="primary">View specs</button><button>Substitute</button></div>
           </div>
           <div class="material-row">
-            <div class="material-swatch" style="background:linear-gradient(135deg,#c5b69a 0%,#a89679 50%,#8a7560 100%);"></div>
+            <div class="material-swatch" style="background-image:url('https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69e6d07a0f0b40b42237987d_Screenshot%202026-04-20%20at%206.18.47%E2%80%AFPM.png');background-size:cover;background-position:center;"></div>
             <div class="material-info"><div class="material-mfr">Belgard · Pavers</div><div class="material-name">Origins 12</div><div class="material-color">Ashwood · 80mm border course</div></div>
             <div class="material-actions"><button class="primary">View specs</button><button>Substitute</button></div>
           </div>
@@ -469,10 +441,10 @@
             <div class="msg-substitution">
               <div class="msg-sub-label">Substitution requested</div>
               <div class="msg-sub-line">
-                <div class="msg-sub-swatch" style="background:linear-gradient(135deg,#c5b69a,#8a7560);"></div>
+                <div class="msg-sub-swatch" style="background-image:url('https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69e6d07a0f0b40b42237987d_Screenshot%202026-04-20%20at%206.18.47%E2%80%AFPM.png');background-size:cover;background-position:center;"></div>
                 <span><strong>Origins 12 / Ashwood</strong></span>
                 <span class="msg-sub-arrow">→</span>
-                <div class="msg-sub-swatch" style="background:linear-gradient(135deg,#6a5d4d,#4a4035);"></div>
+                <div class="msg-sub-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/2f59ac36-3424-463d-a7ab-45bfd9a2bb07.png?v=1776891712228');background-size:cover;background-position:center;"></div>
                 <span><strong>Catalina Grana / Scandina Gray</strong></span>
               </div>
             </div>
@@ -666,7 +638,7 @@
               <li class="transition-event signed"><span class="te-text"><strong>Patricia Wong</strong> signed · $44K <span style="color:var(--ash);font-size:11px;">· Marty</span></span><span class="te-time">YESTERDAY</span></li>
               <li class="transition-event up"><span class="te-text"><strong>Elisa Johnson</strong> → WARM <span style="color:var(--ash);font-size:11px;">· Tim</span></span><span class="te-time">2D AGO</span></li>
               <li class="transition-event down"><span class="te-text"><strong>Roberto Chen</strong> cooled (76 → 14) <span style="color:var(--ash);font-size:11px;">· Mike</span></span><span class="te-time">3D AGO</span></li>
-              <li class="transition-event up"><span class="te-text"><strong>LI Ho</strong> sent first message <span style="color:var(--ash);font-size:11px;">· Tim</span></span><span class="te-time">4D AGO</span></li>
+<li class="transition-event up"><span class="te-text"><strong>LI Ho</strong> sent first message <span style="color:var(--ash);font-size:11px;">· Tim</span></span><span class="te-time">4D AGO</span></li>
               <li class="transition-event signed"><span class="te-text"><strong>James Park</strong> signed · $61K <span style="color:var(--ash);font-size:11px;">· Adriana</span></span><span class="te-time">5D AGO</span></li>
               <li class="transition-event up"><span class="te-text"><strong>Daniel Reyes</strong> → WARM <span style="color:var(--ash);font-size:11px;">· Rick</span></span><span class="te-time">6D AGO</span></li>
             </ul>
@@ -681,7 +653,7 @@
   <div class="container">
     <span class="eyebrow reveal" style="color:var(--gold);">The cost side, interactively</span>
     <h2 class="reveal">Now what does it cost? <em>Play with the numbers.</em></h2>
-    <p class="reveal">The 1% applies only to deals that close after being published in Bayside Portal — no fixed costs, no per-seat fees. Compare against the conversion lift number above.</p>
+    <p class="reveal">The Bayside Portal fee is <strong style="color:var(--gold);">1% of each closed deal</strong> — that's $500 on a $50,000 job. No fixed costs, no per-seat fees, no subscriptions. Compare against the conversion lift number above.</p>
     <div class="calc-grid">
       <div class="calc-controls reveal">
         <div class="calc-control"><div class="calc-label"><span>Closed deals per year via Portal</span><span class="calc-label-value" id="dealsLabel">50</span></div><input type="range" id="dealsSlider" min="10" max="200" value="50" step="5"></div>
@@ -689,11 +661,15 @@
         <div class="calc-control"><div class="calc-label"><span>Designer split %</span><span class="calc-label-value" id="splitLabel">50%</span></div><input type="range" id="splitSlider" min="0" max="100" value="50" step="10"></div>
       </div>
       <div class="calc-results reveal">
-        <div class="calc-result-line headline"><span class="calc-result-label">Total annual fee to McMullen</span><span class="calc-result-value mono" id="totalFee">$25,000</span></div>
-        <div class="calc-result-line"><span class="calc-result-label">Bayside's share (after split)</span><span class="calc-result-value mono" id="baysideShare">$12,500</span></div>
-        <div class="calc-result-line"><span class="calc-result-label">Designer cohort's share</span><span class="calc-result-value mono" id="designerShare">$12,500</span></div>
-        <div class="calc-result-line"><span class="calc-result-label">Per-deal cost to Bayside</span><span class="calc-result-value mono" id="perDealCost">$250</span></div>
-        <div class="calc-result-line"><span class="calc-result-label">As % of pipeline revenue</span><span class="calc-result-value mono" id="pctRevenue">0.50%</span></div>
+        <div style="text-align:center;padding:8px 0 28px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:14px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:12px;">Bayside Portal fee · per closed deal</div>
+          <div class="mono" id="feePerDeal" style="font-size:64px;font-weight:700;color:var(--gold);line-height:1;letter-spacing:-0.02em;">$500</div>
+          <div id="feeContext" style="font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:rgba(250,248,243,0.7);margin-top:14px;">1% of a $50,000 deal</div>
+        </div>
+        <div class="calc-result-line"><span class="calc-result-label">Designer's share (50% split)</span><span class="calc-result-value mono" id="designerSharePerDeal">$250</span></div>
+        <div class="calc-result-line"><span class="calc-result-label">Platform's share (per deal)</span><span class="calc-result-value mono" id="platformSharePerDeal">$250</span></div>
+        <div class="calc-result-line" style="opacity:0.75;padding-top:18px;border-top:1px dashed rgba(255,255,255,0.1);margin-top:8px;"><span class="calc-result-label">Volume context · 50 deals/yr</span><span class="calc-result-value mono" id="annualFee">$25,000</span></div>
+        <div class="calc-result-line" style="opacity:0.75;"><span class="calc-result-label">Net cost after designer split</span><span class="calc-result-value mono" id="netCostToBayside">$12,500</span></div>
         <div class="calc-vs"><strong>For comparison:</strong> HubSpot Sales Pro for 8 designers runs ~$9,600/yr <em>fixed</em>, paid whether or not anything closes. Bayside Portal is pure performance — if zero deals close, Bayside pays $0.</div>
       </div>
     </div>
@@ -710,7 +686,7 @@
       <div class="deal-tile reveal"><div class="deal-tile-key">03 · The designer split</div><h4>Up to 50% to the designer</h4><p>Bayside may pass up to half of the 1% directly to the designer of record. Creates real comp upside on every closed Portal deal. Split structure is Bayside's call.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">04 · Training</div><h4>30 minutes to certify</h4><p>Designers complete a short video course + quiz to earn the split. New hires after the start date certify before publishing their first proposal.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">05 · The term</div><h4>12 months, auto-renewing</h4><p>60 days' notice to non-renew. Either side can exit clean at the end of any term. Bayside has 90 days post-termination to export all data.</p></div>
-      <div class="deal-tile reveal"><div class="deal-tile-key">06 · The data</div><h4>Bayside owns it all</h4><p>All homeowner and deal data is Bayside's property. Exportable any time. McMullen retains only anonymized aggregate rights for product improvement.</p></div>
+      <div class="deal-tile reveal"><div class="deal-tile-key">06 · The data</div><h4>Bayside owns it all</h4><p>All homeowner and deal data is Bayside's property. Exportable any time. McMullen Properties retains only anonymized aggregate rights for product improvement.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">07 · Continuity</div><h4>Code escrow available</h4><p>Optional escrow agreement so if McMullen Properties ever winds down, Bayside ends up owning the Portal source. Mitigates the fair concern about key-person risk.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">08 · Support</div><h4>4-hour business-day SLA</h4><p>Direct line to Tim McMullen. Monthly designer office-hours call. Quarterly business review with Bayside leadership.</p></div>
     </div>
@@ -722,7 +698,7 @@
     <span class="eyebrow reveal">What the first 60 days look like</span>
     <h2 class="reveal">A phased rollout. No big-bang risk.</h2>
     <div class="stepper">
-      <div class="step reveal"><div class="step-marker">W1</div><div class="step-period">Week 1</div><h5>Sign + Kickoff</h5><p>1-hour kickoff call. Adriana & Tim activate as Cohort 0.</p></div>
+      <div class="step reveal"><div class="step-marker">W1</div><div class="step-period">Week 1</div><h5>Sign + Kickoff</h5><p>1-hour kickoff call. Adriana & Tim McMullen activate as Cohort 0.</p></div>
       <div class="step reveal"><div class="step-marker">W2-4</div><div class="step-period">Weeks 2 – 4</div><h5>Cohort 1</h5><p>2–3 designers certified. First Portal proposals published. Real engagement data starts flowing.</p></div>
       <div class="step reveal"><div class="step-marker">M2</div><div class="step-period">Month 2</div><h5>Cohort 2</h5><p>Remaining designers certified. New-hire certification policy goes live.</p></div>
       <div class="step reveal"><div class="step-marker">M3+</div><div class="step-period">Month 3+</div><h5>Steady state</h5><p>Monthly designer office-hours. Quarterly leadership business review. Roadmap requests in flight.</p></div>
@@ -733,7 +709,7 @@
 <section id="cta" class="cta-section">
   <div class="container">
     <h2>Let's get on the <em>same page.</em></h2>
-    <p>30 minutes. I'll walk through the live Portal, answer the hard questions, and leave you with the documents to take to legal.</p>
+    <p>30 minutes. Tim will walk through the live Portal, answer the hard questions, and leave you with the documents to take to legal.</p>
     <a class="cta-button" href="mailto:tim@mcmullen.properties?subject=Bayside%20Portal%20Licensing%20-%20Walkthrough">Schedule the walkthrough →</a>
     <div class="cta-contact"><strong>Tim McMullen</strong> · tim@mcmullen.properties · 415-691-9272</div>
   </div>
