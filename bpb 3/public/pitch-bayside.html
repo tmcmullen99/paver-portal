@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="pitch-bayside.css">
   <style>
+    /* Moat demo styles (unchanged) */
     .moat-demo{background:#faf8f3;border-radius:16px;padding:28px;margin:40px 0 28px;box-shadow:0 24px 64px rgba(0,0,0,0.35);color:#0e1218}
     .moat-demo-header{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:14px;flex-wrap:wrap}
     .moat-demo-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#5d7e69;font-weight:700;margin-bottom:6px}
@@ -42,6 +43,72 @@
     .moat-demo-captions{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:8px;color:rgba(250,248,243,0.78)}
     .moat-caption{font-size:13px;line-height:1.55}
     .moat-caption strong{color:#b78b3a;font-weight:600;display:block;margin-bottom:3px;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+
+    /* Live proposal cards (NEW) */
+    .live-proposals-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:36px 0 56px}
+    .lp-card{display:flex;flex-direction:column;background:#faf8f3;border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;box-shadow:0 4px 18px rgba(0,0,0,0.06);transition:transform 0.18s ease,box-shadow 0.18s ease;border:1px solid rgba(0,0,0,0.05)}
+    .lp-card:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(0,0,0,0.12)}
+    .lp-card-thumb{position:relative;aspect-ratio:16/10;background:#c5b58e;background-size:cover;background-position:center}
+    .lp-card-thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,0.45) 100%)}
+    .lp-card-badge{position:absolute;top:12px;left:12px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:5px 10px;border-radius:14px;background:rgba(255,255,255,0.94);color:#0e1218;z-index:2}
+    .lp-card-badge.hot{background:#c4392e;color:#fff}
+    .lp-card-badge.sent{background:#5d7e69;color:#fff}
+    .lp-card-badge.draft{background:#b78b3a;color:#fff}
+    .lp-card-amount{position:absolute;bottom:12px;right:14px;font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.5);z-index:2;letter-spacing:-0.01em}
+    .lp-card-body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:8px}
+    .lp-card-mfr{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#5d7e69;font-weight:700}
+    .lp-card-addr{font-family:'Playfair Display',serif;font-size:21px;font-weight:600;color:#0e1218;line-height:1.2;margin:0}
+    .lp-card-client{font-size:13px;color:rgba(14,18,24,0.6);margin-bottom:6px}
+    .lp-card-stats{display:flex;gap:10px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(14,18,24,0.55);padding-top:10px;border-top:1px solid rgba(0,0,0,0.06)}
+    .lp-card-stats strong{color:#0e1218;font-weight:700}
+    .lp-card-open{margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#5d7e69}
+    .lp-card:hover .lp-card-open{color:#4a6655}
+    .lp-card-open::after{content:"→";transition:transform 0.18s ease}
+    .lp-card:hover .lp-card-open::after{transform:translateX(3px)}
+
+    /* Functional notifications (NEW · inside war room section) */
+    .fn-notif-wrap{margin:48px 0 0;padding:36px 0 0;border-top:1px solid rgba(255,255,255,0.08)}
+    .fn-notif-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#b78b3a;font-weight:600;margin-bottom:14px;text-align:center}
+    .fn-notif-heading{font-family:'Playfair Display',serif;font-size:30px;text-align:center;color:#faf8f3;line-height:1.15;margin:0 0 14px}
+    .fn-notif-heading em{color:#b78b3a;font-style:italic}
+    .fn-notif-sub{font-size:16px;color:rgba(250,248,243,0.7);text-align:center;max-width:680px;margin:0 auto 36px;line-height:1.6}
+    .fn-notif-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+    .fn-notif-col-head{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,248,243,0.55);font-weight:700;margin-bottom:12px;padding-left:6px}
+    .fn-notif-card{background:rgba(250,248,243,0.96);color:#0e1218;border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 8px 22px rgba(0,0,0,0.18)}
+    .fn-notif-icon{flex-shrink:0;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;background:#e8eee9}
+    .fn-notif-icon.warn{background:#fff4d4}
+    .fn-notif-icon.urgent{background:#fce8e6}
+    .fn-notif-body{flex:1;min-width:0}
+    .fn-notif-title{font-weight:700;font-size:13px;line-height:1.3;color:#0e1218;margin-bottom:3px}
+    .fn-notif-text{font-size:12px;color:rgba(14,18,24,0.65);line-height:1.5}
+    .fn-notif-action{display:inline-block;margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:#5d7e69;font-weight:700}
+
+    /* Admin tool grid (NEW · for Growing Admin section) */
+    .admin-mock{background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;overflow:hidden}
+    .admin-mock-bar{background:#0e1218;color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+    .admin-mock-brand{font-family:'Playfair Display',serif;font-size:15px;font-weight:600}
+    .admin-mock-brand span{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.16em;color:rgba(255,255,255,0.55);margin-left:8px}
+    .admin-mock-user{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.55);display:flex;align-items:center;gap:10px}
+    .admin-mock-user .pill{background:#0e1218;border:1px solid rgba(255,255,255,0.18);color:#fff;padding:3px 8px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:0.06em}
+    .admin-mock-nav{background:#f6f4ec;padding:12px 22px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(14,18,24,0.6);display:flex;gap:18px;flex-wrap:wrap;border-bottom:1px solid rgba(0,0,0,0.06)}
+    .admin-mock-nav span{cursor:default}
+    .admin-mock-nav .active{color:#0e1218;font-weight:700;border-bottom:2px solid #5d7e69;padding-bottom:8px;margin-bottom:-13px}
+    .admin-mock-body{padding:28px 26px}
+    .admin-mock-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(14,18,24,0.5);margin-bottom:8px}
+    .admin-mock-h{font-family:'Playfair Display',serif;font-size:26px;color:#0e1218;line-height:1.2;margin:0 0 10px}
+    .admin-mock-intro{color:rgba(14,18,24,0.6);font-size:13px;max-width:600px;margin:0 0 28px}
+    .admin-tools-group{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(14,18,24,0.5);margin:24px 0 14px;font-weight:700}
+    .admin-tools-group span{font-weight:400;margin-left:10px;letter-spacing:0.04em;text-transform:none;color:rgba(14,18,24,0.4)}
+    .admin-tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    .admin-tool-card{border:1px solid rgba(0,0,0,0.07);border-radius:10px;padding:16px 16px 14px;background:#fff;display:flex;flex-direction:column;gap:6px}
+    .admin-tool-card.phase2{background:#fafafa;border-style:dashed;border-color:rgba(93,126,105,0.35);position:relative}
+    .admin-tool-card.phase2::before{content:"PHASE 2";position:absolute;top:10px;right:12px;background:#5d7e69;color:#fff;padding:2px 7px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.12em;font-weight:700}
+    .admin-tool-head{display:flex;align-items:center;gap:10px}
+    .admin-tool-ico{width:30px;height:30px;border-radius:7px;background:#e8eee9;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+    .admin-tool-card.phase2 .admin-tool-ico{background:rgba(93,126,105,0.15)}
+    .admin-tool-name{font-size:13px;font-weight:700;color:#0e1218}
+    .admin-tool-desc{font-size:11px;line-height:1.5;color:rgba(14,18,24,0.6);margin:0}
+
     @media (max-width:640px){
       .moat-demo{padding:18px}
       .moat-demo-footer{flex-direction:column;align-items:stretch}
@@ -60,7 +127,8 @@
     <div class="nav-links">
       <a href="#problem">The problem</a>
       <a href="#features">Features</a>
-      <a href="#notifications">Notifications</a>
+      <a href="#growing">Growing admin</a>
+      <a href="#phase2">Phase 2</a>
       <a href="#math">The math</a>
       <a href="#deal">The deal</a>
       <a href="#cta" class="nav-cta">Schedule walkthrough →</a>
@@ -116,11 +184,11 @@
     <span class="eyebrow reveal">Before the proposal goes out · the designer's creation flow</span>
     <h2 class="reveal">Accurate pricing starts at the <em>measurement.</em></h2>
     <p class="reveal" style="font-size:18px;color:var(--ink-mute);max-width:740px;">
-      Every proposal published through Bayside Portal is built on two foundations: a scaled site map and a centralized material catalog. Both eliminate the eyeballing and price-guessing that quietly leak margin out of every job.
+      Every proposal published through Bayside Portal is built on a scaled site map and a centralized material catalog. Both eliminate the eyeballing and price-guessing that quietly leak margin out of every job.
     </p>
 
     <div style="margin-top:72px;">
-      <span class="eyebrow reveal">01 · The Site Map tool · live data from a real Bayside deal</span>
+      <span class="eyebrow reveal">The Site Map tool · live data from a real Bayside deal</span>
       <h3 class="reveal" style="font-family:'Playfair Display';font-size:30px;margin-bottom:14px;">Click two points. Set the distance. The whole map is now to scale.</h3>
       <p class="reveal" style="font-size:15px;color:var(--ink-mute);max-width:680px;margin-bottom:36px;">
         Designers upload an aerial photo, mark a known distance (driveway width, property edge, anything measurable), and Bayside Portal locks the scale for the entire project. Every region drawn after that returns real square footage — calibrated to the property, not estimated from a phone screen.
@@ -129,14 +197,12 @@
       <div class="demo-frame reveal">
         <div class="frame-dots"><span></span><span></span><span></span></div>
         <div class="frame-url">portal-baysidepavers.com/editor?id=a57a7fa7 · 1719 Yorktown Rd, Cupertino</div>
-
         <div class="site-map-mock">
           <div class="sm-workflow">
             <div class="sm-step done"><div class="sm-step-num">✓</div><div class="sm-step-label">Upload site photo</div></div>
             <div class="sm-step done"><div class="sm-step-num">✓</div><div class="sm-step-label">Set distance scale</div></div>
             <div class="sm-step active"><div class="sm-step-num">3</div><div class="sm-step-label">Draw regions</div></div>
           </div>
-
           <div class="sm-canvas">
             <div style="position:relative;width:100%;aspect-ratio:1562/1140;line-height:0;background:#c5b58e;">
               <img src="https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/site-plans/a57a7fa7-44e3-422b-a4ea-646119a085e8/backdrop.png?v=1778889768314" alt="1719 Yorktown Rd site plan backdrop" style="width:100%;height:100%;display:block;object-fit:cover;">
@@ -153,53 +219,25 @@
               </svg>
             </div>
           </div>
-
           <div class="sm-lock-bar">
-            <span class="sm-lock-icon">🔒</span>
-            <strong>Scale locked</strong>
+            <span class="sm-lock-icon">🔒</span><strong>Scale locked</strong>
             <span class="sm-lock-detail">A → B reference = 80 ft · 17.25 px/ft · calibrated 2026-05-16</span>
             <span class="sm-lock-status">Verified by designer</span>
           </div>
-
           <div class="sm-regions-list">
             <div class="sm-rgn-header">Regions measured · 1719 Yorktown Rd</div>
-            <div class="sm-region-row">
-              <span class="sm-rgn-color" style="background:#5d7e69;"></span>
-              <span class="sm-rgn-name">Main Paver Area</span>
-              <span class="sm-rgn-area mono">398 sqft</span>
-              <span class="sm-rgn-cost mono">160 lnft</span>
-            </div>
-            <div class="sm-region-row">
-              <span class="sm-rgn-color" style="background:#4a76a8;"></span>
-              <span class="sm-rgn-name">Off-Bedroom Patio</span>
-              <span class="sm-rgn-area mono">180 sqft</span>
-              <span class="sm-rgn-cost mono">64 lnft</span>
-            </div>
-            <div class="sm-region-row">
-              <span class="sm-rgn-color" style="background:#c47533;"></span>
-              <span class="sm-rgn-name">Seating Wall</span>
-              <span class="sm-rgn-area mono">26 sqft</span>
-              <span class="sm-rgn-cost mono">12.98 lnft</span>
-            </div>
-            <div class="sm-region-row">
-              <span class="sm-rgn-color" style="background:#9b87c5;"></span>
-              <span class="sm-rgn-name">Decorative Rock</span>
-              <span class="sm-rgn-area mono">700 sqft</span>
-              <span class="sm-rgn-cost mono">—</span>
-            </div>
-            <div class="sm-region-row sm-rgn-total">
-              <span></span>
-              <span class="sm-rgn-name">Total measured scope</span>
-              <span class="sm-rgn-area mono">1,304 sqft</span>
-              <span class="sm-rgn-cost mono"><strong>$41,562</strong></span>
-            </div>
+            <div class="sm-region-row"><span class="sm-rgn-color" style="background:#5d7e69;"></span><span class="sm-rgn-name">Main Paver Area</span><span class="sm-rgn-area mono">398 sqft</span><span class="sm-rgn-cost mono">160 lnft</span></div>
+            <div class="sm-region-row"><span class="sm-rgn-color" style="background:#4a76a8;"></span><span class="sm-rgn-name">Off-Bedroom Patio</span><span class="sm-rgn-area mono">180 sqft</span><span class="sm-rgn-cost mono">64 lnft</span></div>
+            <div class="sm-region-row"><span class="sm-rgn-color" style="background:#c47533;"></span><span class="sm-rgn-name">Seating Wall</span><span class="sm-rgn-area mono">26 sqft</span><span class="sm-rgn-cost mono">12.98 lnft</span></div>
+            <div class="sm-region-row"><span class="sm-rgn-color" style="background:#9b87c5;"></span><span class="sm-rgn-name">Decorative Rock</span><span class="sm-rgn-area mono">700 sqft</span><span class="sm-rgn-cost mono">—</span></div>
+            <div class="sm-region-row sm-rgn-total"><span></span><span class="sm-rgn-name">Total measured scope</span><span class="sm-rgn-area mono">1,304 sqft</span><span class="sm-rgn-cost mono"><strong>$41,562</strong></span></div>
           </div>
         </div>
       </div>
 
       <div class="demo-callouts">
         <div class="callout reveal"><div class="callout-num">01 · Upload</div><strong>Any aerial works</strong><p>Google Earth, Apple Maps, or a measurement service screenshot. Drop in the image, the tool handles the rest.</p></div>
-        <div class="callout reveal"><div class="callout-num">02 · Lock the scale</div><strong>One known distance</strong><p>Click two points on a known feature — driveway, fence span, property line. On this proposal, the calibration is 80 ft. One-time setup, then the scale stays locked.</p></div>
+        <div class="callout reveal"><div class="callout-num">02 · Lock the scale</div><strong>One known distance</strong><p>Click two points on a known feature — driveway, fence span, property line. On this proposal, calibration is 80 ft. One-time setup, then the scale stays locked.</p></div>
         <div class="callout reveal"><div class="callout-num">03 · Draw regions</div><strong>Geometry does the math</strong><p>Every polygon drawn returns square footage automatically. The designer never types a number; pricing follows from the measurement.</p></div>
         <div class="callout reveal"><div class="callout-num">04 · The accuracy gain</div><strong>±2% vs eyeballing</strong><p>Estimating 398 sqft vs measuring 398 sqft on a $14/sqft paver = a $56 line-item swing. Multiplied by every region across every proposal — real margin recovery.</p></div>
       </div>
@@ -214,7 +252,7 @@
           <div style="background:#ffffff;border-radius:10px;padding:28px 24px;border:1px solid rgba(0,0,0,0.06);">
             <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px;">01 · By hand</div>
             <h4 style="font-family:'Playfair Display',serif;font-size:21px;margin:0 0 10px;color:var(--ink);line-height:1.25;">Pencil on paper.</h4>
-            <p style="font-size:14px;color:var(--ink-mute);line-height:1.6;margin:0;">Sketch the project the way you always have — graph paper, scale ruler, hand annotations, the works. Photograph the finished plan, upload, and the Portal builds on top of your drawing.</p>
+            <p style="font-size:14px;color:var(--ink-mute);line-height:1.6;margin:0;">Sketch the project the way you always have — graph paper, scale ruler, hand annotations. Photograph the finished plan, upload, and the Portal builds on top of your drawing.</p>
           </div>
           <div style="background:#ffffff;border-radius:10px;padding:28px 24px;border:1px solid rgba(0,0,0,0.06);">
             <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px;">02 · In CAD</div>
@@ -224,7 +262,7 @@
           <div style="background:#ffffff;border-radius:10px;padding:28px 24px;border:1px solid rgba(0,0,0,0.06);">
             <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px;">03 · From above</div>
             <h4 style="font-family:'Playfair Display',serif;font-size:21px;margin:0 0 10px;color:var(--ink);line-height:1.25;">Aerial photo, no drawing needed.</h4>
-            <p style="font-size:14px;color:var(--ink-mute);line-height:1.6;margin:0;">When the homeowner just wants regions measured and priced — no creative deliverable yet — pull a Google Earth screenshot and draw regions straight on the satellite view.</p>
+            <p style="font-size:14px;color:var(--ink-mute);line-height:1.6;margin:0;">When the homeowner just wants regions measured and priced, pull a Google Earth screenshot and draw regions straight on the satellite view.</p>
           </div>
         </div>
         <div style="text-align:center;margin-top:32px;padding-top:28px;border-top:1px solid rgba(0,0,0,0.08);">
@@ -236,7 +274,7 @@
         <div style="text-align:center;max-width:780px;margin:0 auto 24px;">
           <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#b78b3a;font-weight:600;margin-bottom:14px;">The moat · the part no other contractor offers</div>
           <h3 style="font-family:'Playfair Display',serif;font-size:38px;line-height:1.1;margin:0 0 18px;color:#faf8f3;">Then you hand the homeowner <em style="color:#b78b3a;">the same tool.</em></h3>
-          <p style="font-size:17px;color:rgba(250,248,243,0.78);line-height:1.6;margin:0;">Every Bayside Portal proposal ships with a live editing mode the homeowner can open from their own browser. They drag patio edges. They swap materials. The line items recalculate as they move — no designer in the loop. When the homeowner is satisfied, one tap sends the new spec back to the designer for official re-pricing.</p>
+          <p style="font-size:17px;color:rgba(250,248,243,0.78);line-height:1.6;margin:0;">Every Bayside Portal proposal ships with a live editing mode the homeowner can open from their own browser. They drag patio edges. They swap materials. Line items recalculate as they move — no designer in the loop. When the homeowner is satisfied, one tap sends the new spec back to the designer for official re-pricing.</p>
         </div>
 
         <div class="moat-demo" id="moatDemo">
@@ -245,10 +283,7 @@
               <div class="moat-demo-eyebrow">Try it yourself · this is the real homeowner view</div>
               <h4 class="moat-demo-title">Resize the patio · swap the material · watch the price update</h4>
             </div>
-            <div class="moat-pending-badge" id="moatPendingBadge">
-              <span class="moat-pending-pulse"></span>
-              <span id="moatPendingText">pending</span>
-            </div>
+            <div class="moat-pending-badge" id="moatPendingBadge"><span class="moat-pending-pulse"></span><span id="moatPendingText">pending</span></div>
           </div>
           <div class="moat-demo-instruction">Drag any white dot to reshape the region · tap a material below to swap it · area + section total update live</div>
           <div class="moat-demo-canvas">
@@ -277,47 +312,26 @@
           <div class="moat-demo-materials" id="moatMaterials">
             <div class="moat-mat-swatch active" data-name="Catalina Grana" data-color="Scandina Gray" data-price="14.20" data-img="https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/2f59ac36-3424-463d-a7ab-45bfd9a2bb07.png?v=1776891712228">
               <div class="moat-mat-img" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/2f59ac36-3424-463d-a7ab-45bfd9a2bb07.png?v=1776891712228');"></div>
-              <div class="moat-mat-info">
-                <div class="moat-mat-name">Catalina Grana</div>
-                <div class="moat-mat-meta">Scandina Gray · $14.20/sf</div>
-              </div>
+              <div class="moat-mat-info"><div class="moat-mat-name">Catalina Grana</div><div class="moat-mat-meta">Scandina Gray · $14.20/sf</div></div>
             </div>
             <div class="moat-mat-swatch" data-name="Origins 12" data-color="Ashwood" data-price="16.80" data-img="https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69e6d07a0f0b40b42237987d_Screenshot%202026-04-20%20at%206.18.47%E2%80%AFPM.png">
               <div class="moat-mat-img" style="background-image:url('https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69e6d07a0f0b40b42237987d_Screenshot%202026-04-20%20at%206.18.47%E2%80%AFPM.png');"></div>
-              <div class="moat-mat-info">
-                <div class="moat-mat-name">Origins 12</div>
-                <div class="moat-mat-meta">Ashwood · $16.80/sf</div>
-              </div>
+              <div class="moat-mat-info"><div class="moat-mat-name">Origins 12</div><div class="moat-mat-meta">Ashwood · $16.80/sf</div></div>
             </div>
             <div class="moat-mat-swatch" data-name="Cambridge Cobble" data-color="Midnight" data-price="9.80" data-img="https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/9fb28476-7595-4a48-bff1-38aa1003b199.png?v=1777588866294">
               <div class="moat-mat-img" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/9fb28476-7595-4a48-bff1-38aa1003b199.png?v=1777588866294');"></div>
-              <div class="moat-mat-info">
-                <div class="moat-mat-name">Cambridge Cobble</div>
-                <div class="moat-mat-meta">Midnight · $9.80/sf</div>
-              </div>
+              <div class="moat-mat-info"><div class="moat-mat-name">Cambridge Cobble</div><div class="moat-mat-meta">Midnight · $9.80/sf</div></div>
             </div>
             <div class="moat-mat-swatch" data-name="Belgian Cobble" data-color="Bourbon" data-price="10.40" data-img="https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/86859f5e-9c68-49ef-9546-096aacfd28ff.png?v=1777588763725">
               <div class="moat-mat-img" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/86859f5e-9c68-49ef-9546-096aacfd28ff.png?v=1777588763725');"></div>
-              <div class="moat-mat-info">
-                <div class="moat-mat-name">Belgian Cobble</div>
-                <div class="moat-mat-meta">Bourbon · $10.40/sf</div>
-              </div>
+              <div class="moat-mat-info"><div class="moat-mat-name">Belgian Cobble</div><div class="moat-mat-meta">Bourbon · $10.40/sf</div></div>
             </div>
           </div>
           <div class="moat-demo-footer">
             <div class="moat-demo-readout">
-              <div>
-                <div class="moat-readout-label">Region area</div>
-                <div class="moat-readout-value"><span id="moatArea">406</span> sqft</div>
-              </div>
-              <div>
-                <div class="moat-readout-label">Material</div>
-                <div class="moat-readout-value" id="moatMaterialDisplay">Catalina Grana</div>
-              </div>
-              <div>
-                <div class="moat-readout-label">Section total</div>
-                <div class="moat-readout-value gold" id="moatTotal">$5,765</div>
-              </div>
+              <div><div class="moat-readout-label">Region area</div><div class="moat-readout-value"><span id="moatArea">406</span> sqft</div></div>
+              <div><div class="moat-readout-label">Material</div><div class="moat-readout-value" id="moatMaterialDisplay">Catalina Grana</div></div>
+              <div><div class="moat-readout-label">Section total</div><div class="moat-readout-value gold" id="moatTotal">$5,765</div></div>
             </div>
             <button class="moat-demo-cta" id="moatSubmitBtn">Send to designer →</button>
           </div>
@@ -326,37 +340,10 @@
         <div class="moat-demo-captions">
           <div class="moat-caption"><strong>01 · Drag to resize</strong>The homeowner pulls a region edge. Square footage and the line-item dollar amount update as they drag. They see exactly what an extra 50 sqft costs — no waiting on a quote.</div>
           <div class="moat-caption"><strong>02 · Swap materials live</strong>Tap a swatch. The whole region repaints with the new material — pricing included. The homeowner makes the trade-off themselves, at their kitchen table.</div>
-          <div class="moat-caption"><strong>03 · Submit for re-pricing</strong>One tap submits everything back to the designer with all changes flagged. Designer reviews, confirms the official quote, sends back. Days of back-and-forth collapse into one round trip.</div>
-        </div>
-
-        <div style="margin-top:44px;padding-top:32px;border-top:1px solid rgba(183,139,58,0.2);">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;">
-            <div style="display:flex;gap:14px;align-items:flex-start;">
-              <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:rgba(183,139,58,0.18);color:#b78b3a;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:13px;font-weight:700;margin-top:2px;">+</div>
-              <div>
-                <h5 style="font-size:14px;font-weight:600;margin:0 0 6px;color:#faf8f3;">Hundreds of hours back</h5>
-                <p style="font-size:13px;color:rgba(250,248,243,0.65);line-height:1.55;margin:0;">"What's the price if we go bigger?" texts disappear. The homeowner already knows — and they showed up with the answer.</p>
-              </div>
-            </div>
-            <div style="display:flex;gap:14px;align-items:flex-start;">
-              <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:rgba(183,139,58,0.18);color:#b78b3a;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:13px;font-weight:700;margin-top:2px;">−</div>
-              <div>
-                <h5 style="font-size:14px;font-weight:600;margin:0 0 6px;color:#faf8f3;">No more designer burnout</h5>
-                <p style="font-size:13px;color:rgba(250,248,243,0.65);line-height:1.55;margin:0;">No requoting the same job 8 times. No price arithmetic on a phone at 9 PM. Designers spend time on design, not on re-doing math.</p>
-              </div>
-            </div>
-            <div style="display:flex;gap:14px;align-items:flex-start;">
-              <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:rgba(183,139,58,0.18);color:#b78b3a;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:13px;font-weight:700;margin-top:2px;">↑</div>
-              <div>
-                <h5 style="font-size:14px;font-weight:600;margin:0 0 6px;color:#faf8f3;">Peak engagement at signing</h5>
-                <p style="font-size:13px;color:rgba(250,248,243,0.65);line-height:1.55;margin:0;">Homeowners who've shaped their own proposal are emotionally invested. They show up to the closing already half-sold.</p>
-              </div>
-            </div>
-          </div>
+          <div class="moat-caption"><strong>03 · Submit for re-pricing</strong>One tap submits everything back to the designer with all changes flagged. Designer reviews, confirms the official quote, sends back.</div>
         </div>
         <div style="text-align:center;margin-top:40px;padding-top:32px;border-top:1px solid rgba(183,139,58,0.2);">
           <p style="font-family:'Playfair Display',serif;font-size:24px;font-style:italic;color:#faf8f3;max-width:640px;margin:0 auto;line-height:1.4;">Giving the homeowner the wheel is a feature <strong style="font-style:normal;color:#b78b3a;">no other contractor offers.</strong></p>
-          <p style="font-family:'Playfair Display',serif;font-size:20px;font-style:italic;color:rgba(250,248,243,0.85);margin:18px 0 0;">And engaged clients <strong style="font-style:normal;color:#b78b3a;">close deals.</strong></p>
         </div>
       </div>
 
@@ -364,232 +351,29 @@
         <div style="text-align:center;max-width:740px;margin:0 auto 40px;">
           <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:14px;">For the homeowners who'd rather hold a pencil</div>
           <h3 style="font-family:'Playfair Display',serif;font-size:38px;line-height:1.1;margin:0 0 18px;color:var(--ink);">Print. <em style="color:var(--accent);">Mark up.</em> Send back.</h3>
-          <p style="font-size:17px;color:var(--ink-mute);line-height:1.6;margin:0;">Some homeowners don't want to drag dots on a screen. A 72-year-old in Cupertino with a fountain pen and a clipboard wants to sit at the kitchen table with paper. The Portal handles that too — one click on their dashboard downloads a printable, branded PDF with every rendering on its own page and a generous notes column for handwritten markup.</p>
+          <p style="font-size:17px;color:var(--ink-mute);line-height:1.6;margin:0;">Some homeowners don't want to drag dots on a screen. A 72-year-old in Cupertino with a fountain pen wants to sit at the kitchen table with paper. The Portal handles that too — one click on their dashboard downloads a printable, branded PDF with every rendering on its own page and a generous notes column for handwritten markup.</p>
         </div>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-bottom:44px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;">
           <div style="background:#ffffff;border-radius:10px;padding:28px 24px;border:1px solid rgba(0,0,0,0.06);">
             <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px;">01 · Download</div>
             <h4 style="font-family:'Playfair Display',serif;font-size:21px;margin:0 0 10px;color:var(--ink);line-height:1.25;">One click on the dashboard.</h4>
-            <p style="font-size:14px;color:var(--ink-mute);line-height:1.6;margin:0;">Big button labeled <strong>"📥 Markup PDF"</strong> sits on every proposal card. Click → save → done. No app to install, no swatches to learn, no login dance.</p>
+            <p style="font-size:14px;color:var(--ink-mute);line-height:1.6;margin:0;">Big button labeled <strong>"📥 Markup PDF"</strong> on every proposal card. Click → save → done.</p>
           </div>
           <div style="background:#ffffff;border-radius:10px;padding:28px 24px;border:1px solid rgba(0,0,0,0.06);">
             <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px;">02 · Print and mark up</div>
-            <h4 style="font-family:'Playfair Display',serif;font-size:21px;margin:0 0 10px;color:var(--ink);line-height:1.25;">Pen, pencil, marker — whatever's in the kitchen drawer.</h4>
-            <p style="font-size:14px;color:var(--ink-mute);line-height:1.6;margin:0;">3 landscape pages, image on the left, ruled lines on the right. Designed to print clean on any home or office printer. The way homeowners have marked up plans for fifty years.</p>
+            <h4 style="font-family:'Playfair Display',serif;font-size:21px;margin:0 0 10px;color:var(--ink);line-height:1.25;">Whatever's in the kitchen drawer.</h4>
+            <p style="font-size:14px;color:var(--ink-mute);line-height:1.6;margin:0;">3 landscape pages, image on left, ruled lines on right. Designed to print clean on any printer.</p>
           </div>
           <div style="background:#ffffff;border-radius:10px;padding:28px 24px;border:1px solid rgba(0,0,0,0.06);">
             <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px;">03 · Send back</div>
-            <h4 style="font-family:'Playfair Display',serif;font-size:21px;margin:0 0 10px;color:var(--ink);line-height:1.25;">Email a photo, text it, drop it off.</h4>
-            <p style="font-size:14px;color:var(--ink-mute);line-height:1.6;margin:0;">Designer scans it, attaches to the proposal file, and the same conversation that started in pixels lands back in the Portal. Every homeowner served — without leaving anyone behind.</p>
+            <h4 style="font-family:'Playfair Display',serif;font-size:21px;margin:0 0 10px;color:var(--ink);line-height:1.25;">Email, text, drop it off.</h4>
+            <p style="font-size:14px;color:var(--ink-mute);line-height:1.6;margin:0;">Designer scans it, attaches to the file, and the conversation that started in pixels lands back in the Portal.</p>
           </div>
         </div>
-
-        <div style="background:#ffffff;border-radius:12px;padding:8px;box-shadow:0 24px 64px rgba(0,0,0,0.18);max-width:920px;margin:0 auto;">
-          <svg viewBox="0 0 1100 800" style="display:block;width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">
-            <rect width="1100" height="800" fill="#fdfcf8"/>
-
-            <rect x="0" y="0" width="1100" height="100" fill="#353535"/>
-            <text x="36" y="58" font-family="Inter, sans-serif" font-size="26" font-weight="700" fill="#5d7e69">Bayside Pavers</text>
-            <text x="36" y="76" font-family="JetBrains Mono, monospace" font-size="9" fill="#a8a8a8" letter-spacing="0.1em">hardscape company</text>
-            <text x="550" y="54" text-anchor="middle" font-family="Inter, sans-serif" font-size="28" fill="#ffffff">PROJECT SITE MAP PROPOSAL</text>
-            <text x="550" y="76" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#c8c8c8" letter-spacing="0.18em">BAYSIDE PAVERS</text>
-
-            <text x="36" y="130" font-family="Inter, sans-serif" font-size="11" fill="#666666">Client: _________________   Date: May 17, 2026   Revision #: __</text>
-            <text x="1064" y="130" text-anchor="end" font-family="Inter, sans-serif" font-size="11" fill="#5d7e69">baysidepavers.com</text>
-            <text x="36" y="148" font-family="Inter, sans-serif" font-size="10" fill="#888888">Print this page and mark up with arrows, notes, and drawings. Send back to your designer.</text>
-
-            <g transform="translate(50, 170)">
-              <rect x="0" y="0" width="540" height="560" fill="#c5b58e" stroke="#8b7d56" stroke-width="1.5"/>
-              <rect x="40" y="40" width="300" height="220" fill="#f8f5e8" stroke="#8b7d56" stroke-width="1.5"/>
-              <text x="190" y="160" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#8b7d56" letter-spacing="0.12em">HOUSE</text>
-              <rect x="40" y="280" width="380" height="180" fill="#a8a098"/>
-              <g stroke="#8c8478" stroke-width="0.5">
-                <line x1="40" y1="305" x2="420" y2="305"/>
-                <line x1="40" y1="330" x2="420" y2="330"/>
-                <line x1="40" y1="355" x2="420" y2="355"/>
-                <line x1="40" y1="380" x2="420" y2="380"/>
-                <line x1="40" y1="405" x2="420" y2="405"/>
-                <line x1="40" y1="430" x2="420" y2="430"/>
-                <line x1="40" y1="455" x2="420" y2="455"/>
-                <line x1="65" y1="280" x2="65" y2="460"/>
-                <line x1="105" y1="280" x2="105" y2="460"/>
-                <line x1="145" y1="280" x2="145" y2="460"/>
-                <line x1="185" y1="280" x2="185" y2="460"/>
-                <line x1="225" y1="280" x2="225" y2="460"/>
-                <line x1="265" y1="280" x2="265" y2="460"/>
-                <line x1="305" y1="280" x2="305" y2="460"/>
-                <line x1="345" y1="280" x2="345" y2="460"/>
-                <line x1="385" y1="280" x2="385" y2="460"/>
-              </g>
-              <rect x="180" y="320" width="180" height="100" fill="#7a9968"/>
-
-              <g stroke="#c4392e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M 480,210 Q 472,255 460,290 Q 452,315 425,330"/>
-                <path d="M 425,330 L 442,318 M 425,330 L 432,348"/>
-              </g>
-              <text x="490" y="195" font-family="Caveat, cursive" font-size="30" fill="#c4392e" font-weight="600">Bigger here!</text>
-              <text x="490" y="225" font-family="Caveat, cursive" font-size="22" fill="#c4392e">+200 sqft?</text>
-
-              <ellipse cx="270" cy="370" rx="105" ry="62" fill="none" stroke="#1d4ed8" stroke-width="3"/>
-              <text x="160" y="510" font-family="Caveat, cursive" font-size="24" fill="#1d4ed8" font-weight="600">Move turf →</text>
-              <g stroke="#1d4ed8" stroke-width="2.5" fill="none" stroke-linecap="round">
-                <path d="M 290,505 L 380,498"/>
-                <path d="M 380,498 L 370,492 M 380,498 L 370,504"/>
-              </g>
-
-              <path d="M 60,200 Q 80,205 100,200 Q 120,195 140,200 Q 160,205 180,200" stroke="#c4392e" stroke-width="2" fill="none" stroke-linecap="round"/>
-            </g>
-
-            <g transform="translate(640, 170)">
-              <text x="0" y="20" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#353535">NOTES &amp; MARKUPS</text>
-              <text x="0" y="38" font-family="Inter, sans-serif" font-size="9" fill="#888">Print this page and mark up with arrows, notes, and drawings.</text>
-              <g stroke="#dad7c5" stroke-width="0.8">
-                <line x1="0" y1="80" x2="420" y2="80"/>
-                <line x1="0" y1="115" x2="420" y2="115"/>
-                <line x1="0" y1="150" x2="420" y2="150"/>
-                <line x1="0" y1="185" x2="420" y2="185"/>
-                <line x1="0" y1="220" x2="420" y2="220"/>
-                <line x1="0" y1="255" x2="420" y2="255"/>
-                <line x1="0" y1="290" x2="420" y2="290"/>
-                <line x1="0" y1="325" x2="420" y2="325"/>
-                <line x1="0" y1="360" x2="420" y2="360"/>
-                <line x1="0" y1="395" x2="420" y2="395"/>
-                <line x1="0" y1="430" x2="420" y2="430"/>
-                <line x1="0" y1="465" x2="420" y2="465"/>
-                <line x1="0" y1="500" x2="420" y2="500"/>
-                <line x1="0" y1="535" x2="420" y2="535"/>
-                <line x1="0" y1="570" x2="420" y2="570"/>
-                <line x1="0" y1="605" x2="420" y2="605"/>
-              </g>
-              <text x="10" y="74" font-family="Caveat, cursive" font-size="26" fill="#1d4ed8" font-weight="500">- Patio bigger for 6-person table</text>
-              <text x="10" y="109" font-family="Caveat, cursive" font-size="26" fill="#1d4ed8" font-weight="500">- Try Origins 12 instead of</text>
-              <text x="10" y="144" font-family="Caveat, cursive" font-size="26" fill="#1d4ed8" font-weight="500">  Catalina Grana? Need to see</text>
-              <text x="10" y="179" font-family="Caveat, cursive" font-size="26" fill="#1d4ed8" font-weight="500">  the swatches in person.</text>
-              <text x="10" y="249" font-family="Caveat, cursive" font-size="26" fill="#c4392e" font-weight="500">- Move turf so it's not</text>
-              <text x="10" y="284" font-family="Caveat, cursive" font-size="26" fill="#c4392e" font-weight="500">  directly off the kitchen door.</text>
-              <text x="10" y="354" font-family="Caveat, cursive" font-size="26" fill="#353535" font-weight="500">- Lighting: warm white? Path</text>
-              <text x="10" y="389" font-family="Caveat, cursive" font-size="26" fill="#353535" font-weight="500">  lights every 6 feet OK.</text>
-              <text x="10" y="459" font-family="Caveat, cursive" font-size="26" fill="#353535" font-weight="500">- Start week of June 16?</text>
-            </g>
-
-            <rect x="0" y="780" width="1100" height="20" fill="#353535"/>
-            <text x="36" y="794" font-family="Inter, sans-serif" font-size="9" fill="#a8a8a8">1719 Yorktown Rd, Cupertino</text>
-            <text x="550" y="794" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#a8a8a8">Top-down site plan · page 1 of 3</text>
-            <text x="1064" y="794" text-anchor="end" font-family="Inter, sans-serif" font-size="9" fill="#a8a8a8">baysidepavers.com</text>
-          </svg>
-        </div>
-
         <div style="text-align:center;margin-top:36px;padding-top:28px;border-top:1px solid rgba(0,0,0,0.08);">
           <p style="font-family:'Playfair Display',serif;font-size:22px;font-style:italic;color:var(--ink);max-width:680px;margin:0 auto;line-height:1.5;">Same data. Same designer. Just <strong style="font-style:normal;color:var(--accent);">paper</strong> instead of <strong style="font-style:normal;color:var(--accent);">pixels.</strong></p>
-          <p style="font-size:14px;color:var(--ink-mute);max-width:560px;margin:14px auto 0;line-height:1.5;">No homeowner gets shut out because they don't trust a touchscreen. The Portal works for the 30-year-old on their phone <em>and</em> the 75-year-old at the kitchen table.</p>
         </div>
       </div>
-    </div>
-
-    <div style="margin-top:96px;">
-      <span class="eyebrow reveal">02 · The Material Catalog</span>
-      <h3 class="reveal" style="font-family:'Playfair Display';font-size:30px;margin-bottom:14px;">Real materials. Real prices. One source of truth.</h3>
-      <p class="reveal" style="font-size:15px;color:var(--ink-mute);max-width:680px;margin-bottom:36px;">
-        Every paver, wall block, and accessory Bayside installs lives in a central catalog with manufacturer, color, dimensions, and per-unit pricing. Designers select from this catalog when building proposals — no typing material names, no pricing discrepancies between designers, no "I think it was around $14 a square foot."
-      </p>
-
-      <div class="demo-frame reveal">
-        <div class="frame-dots"><span></span><span></span><span></span></div>
-        <div class="frame-url">portal-baysidepavers.com/admin/materials</div>
-
-        <div class="catalog-mock">
-          <div class="cat-toolbar">
-            <div class="cat-search-box">
-              <span class="cat-search-icon">⌕</span>
-              <span class="cat-search-placeholder">Search 275 materials...</span>
-            </div>
-            <button class="cat-add-btn">+ Add Material</button>
-          </div>
-          <div class="cat-filter-row">
-            <span class="cat-filter active">All · 275</span>
-            <span class="cat-filter">Belgard · 266</span>
-            <span class="cat-filter">MSI · 3</span>
-            <span class="cat-filter">Trex · 2</span>
-            <span class="cat-filter">Pavers</span>
-            <span class="cat-filter">Walls</span>
-            <span class="cat-filter">Accessories</span>
-          </div>
-          <div class="catalog-grid">
-            <div class="cat-card">
-              <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/2f59ac36-3424-463d-a7ab-45bfd9a2bb07.png?v=1776891712228');background-size:cover;background-position:center;"></div>
-              <div class="cat-card-body">
-                <div class="cat-mfr">BELGARD</div>
-                <div class="cat-name">Catalina Grana</div>
-                <div class="cat-detail">Scandina Gray · 60mm</div>
-                <div class="cat-price-row"><span class="cat-price mono">$14.20</span><span class="cat-unit">/ sq ft</span></div>
-              </div>
-            </div>
-            <div class="cat-card">
-              <div class="cat-swatch" style="background-image:url('https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69e6d07a0f0b40b42237987d_Screenshot%202026-04-20%20at%206.18.47%E2%80%AFPM.png');background-size:cover;background-position:center;"></div>
-              <div class="cat-card-body">
-                <div class="cat-mfr">BELGARD</div>
-                <div class="cat-name">Origins 12</div>
-                <div class="cat-detail">Ashwood · 80mm</div>
-                <div class="cat-price-row"><span class="cat-price mono">$16.80</span><span class="cat-unit">/ sq ft</span></div>
-              </div>
-            </div>
-            <div class="cat-card">
-              <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/9fb28476-7595-4a48-bff1-38aa1003b199.png?v=1777588866294');background-size:cover;background-position:center;"></div>
-              <div class="cat-card-body">
-                <div class="cat-mfr">BELGARD</div>
-                <div class="cat-name">Cambridge Cobble</div>
-                <div class="cat-detail">Midnight · 60mm</div>
-                <div class="cat-price-row"><span class="cat-price mono">$9.80</span><span class="cat-unit">/ sq ft</span></div>
-              </div>
-            </div>
-            <div class="cat-card">
-              <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/86859f5e-9c68-49ef-9546-096aacfd28ff.png?v=1777588763725');background-size:cover;background-position:center;"></div>
-              <div class="cat-card-body">
-                <div class="cat-mfr">BELGARD</div>
-                <div class="cat-name">Belgian Cobble</div>
-                <div class="cat-detail">Bourbon · 60mm</div>
-                <div class="cat-price-row"><span class="cat-price mono">$10.40</span><span class="cat-unit">/ sq ft</span></div>
-              </div>
-            </div>
-            <div class="cat-card">
-              <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/d211002c-dca3-45fe-8b1f-cafd09697e88.jpg?v=1777588702174');background-size:cover;background-position:center;"></div>
-              <div class="cat-card-body">
-                <div class="cat-mfr">BELGARD</div>
-                <div class="cat-name">Avalon Slate</div>
-                <div class="cat-detail">Toscana · 60mm</div>
-                <div class="cat-price-row"><span class="cat-price mono">$11.60</span><span class="cat-unit">/ sq ft</span></div>
-              </div>
-            </div>
-            <div class="cat-card">
-              <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/d9974b59-5b82-4cda-b4cc-3ae58436275b.png?v=1777588800564');background-size:cover;background-position:center;"></div>
-              <div class="cat-card-body">
-                <div class="cat-mfr">BELGARD</div>
-                <div class="cat-name">Brooklyn</div>
-                <div class="cat-detail">Bourbon · 60mm</div>
-                <div class="cat-price-row"><span class="cat-price mono">$9.20</span><span class="cat-unit">/ sq ft</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="cat-footer">
-            <span><strong>275 materials</strong> · 7 manufacturers · last sync 2h ago</span>
-            <span><strong>Pricing version 14</strong> · published Mon May 16</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="demo-callouts">
-        <div class="callout reveal"><div class="callout-num">01 · The catalog</div><strong>275 materials, one place</strong><p>Belgard's full lineup plus accessories from MSI, Trex, and others. Manufacturer, color, dimensions, and per-unit pricing — all centralized, all searchable.</p></div>
-        <div class="callout reveal"><div class="callout-num">02 · Adding new materials</div><strong>30 seconds, end to end</strong><p>Drag a swatch image. Type manufacturer + product + dimension + price. Hit save. The material is immediately available to every designer.</p></div>
-        <div class="callout reveal"><div class="callout-num">03 · Pricing syncs</div><strong>Update once, propagate everywhere</strong><p>Update a price in the catalog and every in-flight draft proposal sees the new number. No more "I quoted the old price by mistake."</p></div>
-        <div class="callout reveal"><div class="callout-num">04 · Designer selection</div><strong>Pick from a list, not memory</strong><p>When building a proposal, designers select from the catalog. Swatch, specs, manufacturer, color, price — all auto-filled. Zero typing, zero pricing drift.</p></div>
-      </div>
-    </div>
-
-    <div class="conclusion-block reveal" style="margin-top:80px;">
-      <p style="font-size:22px;font-family:'Playfair Display',serif;line-height:1.4;color:var(--ink);margin:0;">
-        <strong>Designers price with measurement, not estimation.</strong> Bayside Portal makes accurate pricing the path of least resistance — and accurate pricing is the foundation of trust with homeowners and margin with leadership.
-      </p>
     </div>
   </div>
 </section>
@@ -598,80 +382,286 @@
   <div class="container">
     <span class="eyebrow reveal">What your homeowner experiences</span>
     <h2 class="reveal">The public proposal page.</h2>
-    <p class="reveal" style="font-size:18px;color:var(--ink-mute);max-width:680px;">One branded link. Mobile-friendly. Every interaction tracked. The homeowner reviews, asks questions, and signs without ever leaving the page.</p>
+    <p class="reveal" style="font-size:18px;color:var(--ink-mute);max-width:680px;">One branded link. Mobile-friendly. Every interaction tracked. The homeowner reviews, asks questions, requests material swaps, and signs without ever leaving the page.</p>
+    <p class="reveal" style="font-size:14px;color:var(--ink-mute);margin-top:14px;margin-bottom:0;"><strong style="color:var(--accent);">Click any deal below to open the real published proposal.</strong> These are live homeowner-facing pages, accessible right now.</p>
+
+    <div class="live-proposals-grid reveal">
+
+      <a class="lp-card" href="https://portal-baysidepavers.com/p/17610-john-telfer-dr-2026-05-05" target="_blank" rel="noopener">
+        <div class="lp-card-thumb" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/e15b0315-bc60-439c-8efa-1d73af7809cc/2ad50e97-8177-41c2-beba-52540869abbd.jpg');">
+          <span class="lp-card-badge sent">Sent · Active</span>
+          <span class="lp-card-amount">$57,604</span>
+        </div>
+        <div class="lp-card-body">
+          <div class="lp-card-mfr">Cupertino · Elisa Johnson</div>
+          <h3 class="lp-card-addr">17610 John Telfer Dr</h3>
+          <div class="lp-card-client">3-region patio + retaining wall + lighting</div>
+          <div class="lp-card-stats">
+            <span><strong>53</strong> events</span>
+            <span><strong>13</strong> sessions</span>
+            <span><strong>10/13</strong> active days</span>
+          </div>
+          <span class="lp-card-open">Open live proposal</span>
+        </div>
+      </a>
+
+      <a class="lp-card" href="https://portal-baysidepavers.com/p/88-prospect-ave-2026-04-22-7" target="_blank" rel="noopener">
+        <div class="lp-card-thumb" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/147ff33a-d0be-4b79-8081-d49bac8114d7/8fa8fe0b-5071-4c8e-a577-2056a89119ed.jpg');">
+          <span class="lp-card-badge draft">Largest open</span>
+          <span class="lp-card-amount">$137,872</span>
+        </div>
+        <div class="lp-card-body">
+          <div class="lp-card-mfr">Los Gatos</div>
+          <h3 class="lp-card-addr">88 Prospect Ave</h3>
+          <div class="lp-card-client">Full backyard rebuild · 7 revisions to date</div>
+          <div class="lp-card-stats">
+            <span><strong>7</strong> draft versions</span>
+            <span><strong>Multi-zone</strong> scope</span>
+          </div>
+          <span class="lp-card-open">Open live proposal</span>
+        </div>
+      </a>
+
+      <a class="lp-card" href="https://portal-baysidepavers.com/p/1719-yorktown-rd" target="_blank" rel="noopener">
+        <div class="lp-card-thumb" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/a57a7fa7-44e3-422b-a4ea-646119a085e8/e1d6a83f-6a52-4abf-b3f7-1b76d28b9367.jpg');">
+          <span class="lp-card-badge hot">HOT · 76</span>
+          <span class="lp-card-amount">$41,562</span>
+        </div>
+        <div class="lp-card-body">
+          <div class="lp-card-mfr">Cupertino · Masood Delfarah</div>
+          <h3 class="lp-card-addr">1719 Yorktown Rd</h3>
+          <div class="lp-card-client">4-region paver patio + seating wall + decorative rock</div>
+          <div class="lp-card-stats">
+            <span><strong>5</strong> events 24h</span>
+            <span><strong>2</strong> sessions</span>
+            <span>Discount expires <strong>31h</strong></span>
+          </div>
+          <span class="lp-card-open">Open live proposal</span>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="demo-callouts">
+      <div class="callout reveal"><div class="callout-num">01 · One branded link</div><strong>Same URL, every device</strong><p>Homeowner gets one address — works on phone, tablet, desktop. No app install, no PDF download.</p></div>
+      <div class="callout reveal"><div class="callout-num">02 · Site map + materials</div><strong>The full proposal, scrollable</strong><p>Color-coded regions tied to the same scaled measurements the designer drew. Materials with swatches, specs, and pricing.</p></div>
+      <div class="callout reveal"><div class="callout-num">03 · Substitutions + redesigns</div><strong>Ask without emailing</strong><p>"Try Origins 12 instead?" One tap. Designer notified, request logged on the proposal record.</p></div>
+      <div class="callout reveal"><div class="callout-num">04 · The signing strip</div><strong>Time-bound discount</strong><p>Discount and deadline are real. No high-pressure copy — just the math of acting now vs. waiting.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="proposal-builder-section">
+  <div class="container">
+    <span class="eyebrow reveal">The data foundation</span>
+    <h2 class="reveal">The Material Catalog.</h2>
+    <p class="reveal" style="font-size:18px;color:var(--ink-mute);max-width:680px;margin-bottom:36px;">Every paver, wall block, and accessory Bayside installs lives in a central catalog with manufacturer, color, dimensions, and per-unit pricing. Designers select from this catalog when building proposals — no typing material names, no pricing discrepancies between designers, no "I think it was around $14 a square foot."</p>
+
     <div class="demo-frame reveal">
       <div class="frame-dots"><span></span><span></span><span></span></div>
-      <div class="frame-url">portal-baysidepavers.com/p/17610-john-telfer</div>
-      <div class="homeowner-mock">
-        <div class="hm-header">
-          <div class="hm-brand">Bayside Pavers<span>Custom Hardscape Proposal</span></div>
-          <div class="hm-project"><strong>17610 John Telfer Dr</strong>Cupertino, CA · $54,000</div>
+      <div class="frame-url">portal-baysidepavers.com/admin/materials</div>
+      <div class="catalog-mock">
+        <div class="cat-toolbar">
+          <div class="cat-search-box"><span class="cat-search-icon">⌕</span><span class="cat-search-placeholder">Search 275 materials...</span></div>
+          <button class="cat-add-btn">+ Add Material</button>
         </div>
-        <div class="hm-hero">
-          <svg class="site-plan-svg" viewBox="0 0 400 280" preserveAspectRatio="xMidYMid meet">
-            <defs><pattern id="grid" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M 16 0 L 0 0 0 16" fill="none" stroke="#e8e1d0" stroke-width="0.5"/></pattern></defs>
-            <rect width="400" height="280" fill="url(#grid)"/>
-            <rect x="20" y="20" width="360" height="240" fill="none" stroke="#8c8267" stroke-width="2" stroke-dasharray="6 3"/>
-            <rect x="120" y="80" width="160" height="80" fill="#fff7e6" stroke="#8c8267" stroke-width="1.5"/>
-            <text x="200" y="125" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8c8267" letter-spacing="0.1em">HOUSE</text>
-            <polygon points="160,160 240,160 250,200 150,200" fill="rgba(93,126,105,0.45)" stroke="#5d7e69" stroke-width="1.5"/>
-            <text x="200" y="183" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#fff" font-weight="700">A</text>
-            <polygon points="60,160 150,200 150,250 40,250" fill="rgba(196,117,51,0.45)" stroke="#c47533" stroke-width="1.5"/>
-            <text x="95" y="215" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#fff" font-weight="700">B</text>
-            <polygon points="250,200 360,200 360,250 250,250" fill="rgba(183,139,58,0.45)" stroke="#b78b3a" stroke-width="1.5"/>
-            <text x="305" y="228" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#fff" font-weight="700">C</text>
-            <polygon points="40,30 380,30 380,75 40,75" fill="rgba(74,118,168,0.35)" stroke="#4a76a8" stroke-width="1.5"/>
-            <text x="210" y="58" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#fff" font-weight="700">D</text>
-            <polygon points="160,225 240,225 240,250 160,250" fill="rgba(196,57,46,0.45)" stroke="#c4392e" stroke-width="1.5"/>
-            <text x="200" y="241" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#fff" font-weight="700">E</text>
-            <g transform="translate(355,250)"><circle r="11" fill="white" stroke="#8c8267" stroke-width="1"/><text y="-2" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#0e1218" font-weight="700">N</text><line x1="0" y1="-7" x2="0" y2="7" stroke="#0e1218" stroke-width="0.8"/></g>
-          </svg>
-          <div class="hm-legend">
-            <div class="hm-legend-title">Site Plan · 5 Regions</div>
-            <div class="region-chip"><div class="region-letter" style="background:#5d7e69;">A</div><div class="region-name">Front Path</div><div class="region-area">132 sq ft</div></div>
-            <div class="region-chip"><div class="region-letter" style="background:#c47533;">B</div><div class="region-name">Main Paver Area</div><div class="region-area">540 sq ft</div></div>
-            <div class="region-chip"><div class="region-letter" style="background:#b78b3a;">C</div><div class="region-name">Pergola Paver Area</div><div class="region-area">280 sq ft</div></div>
-            <div class="region-chip"><div class="region-letter" style="background:#4a76a8;">D</div><div class="region-name">Retaining Wall</div><div class="region-area">38 linear ft</div></div>
-            <div class="region-chip"><div class="region-letter" style="background:#c4392e;">E</div><div class="region-name">Seating Wall</div><div class="region-area">22 linear ft</div></div>
-          </div>
+        <div class="cat-filter-row">
+          <span class="cat-filter active">All · 275</span>
+          <span class="cat-filter">Belgard · 266</span>
+          <span class="cat-filter">MSI · 3</span>
+          <span class="cat-filter">Trex · 2</span>
+          <span class="cat-filter">Pavers</span>
+          <span class="cat-filter">Walls</span>
+          <span class="cat-filter">Accessories</span>
         </div>
-        <div class="hm-region-detail">
-          <div class="region-detail-head">
-            <h4><span style="background:#c47533;color:white;display:inline-flex;width:28px;height:28px;border-radius:5px;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:13px;margin-right:10px;vertical-align:middle;">B</span>Main Paver Area</h4>
-            <div class="region-price">$18,420</div>
+        <div class="catalog-grid">
+          <div class="cat-card">
+            <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/2f59ac36-3424-463d-a7ab-45bfd9a2bb07.png?v=1776891712228');background-size:cover;background-position:center;"></div>
+            <div class="cat-card-body"><div class="cat-mfr">BELGARD</div><div class="cat-name">Catalina Grana</div><div class="cat-detail">Scandina Gray · 60mm</div><div class="cat-price-row"><span class="cat-price mono">$14.20</span><span class="cat-unit">/ sq ft</span></div></div>
           </div>
-          <p class="region-detail-desc">540 sq ft of permeable hardscape with custom soldier-course border. Pattern: 70/30 herringbone. Recommended materials below — click any swatch for specs, or request a substitution.</p>
-          <div class="material-row">
-            <div class="material-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/2f59ac36-3424-463d-a7ab-45bfd9a2bb07.png?v=1776891712228');background-size:cover;background-position:center;"></div>
-            <div class="material-info"><div class="material-mfr">Belgard · Pavers</div><div class="material-name">Catalina Grana</div><div class="material-color">Scandina Gray · 60mm</div></div>
-            <div class="material-actions"><button class="primary">View specs</button><button>Substitute</button></div>
+          <div class="cat-card">
+            <div class="cat-swatch" style="background-image:url('https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69e6d07a0f0b40b42237987d_Screenshot%202026-04-20%20at%206.18.47%E2%80%AFPM.png');background-size:cover;background-position:center;"></div>
+            <div class="cat-card-body"><div class="cat-mfr">BELGARD</div><div class="cat-name">Origins 12</div><div class="cat-detail">Ashwood · 80mm</div><div class="cat-price-row"><span class="cat-price mono">$16.80</span><span class="cat-unit">/ sq ft</span></div></div>
           </div>
-          <div class="material-row">
-            <div class="material-swatch" style="background-image:url('https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69e6d07a0f0b40b42237987d_Screenshot%202026-04-20%20at%206.18.47%E2%80%AFPM.png');background-size:cover;background-position:center;"></div>
-            <div class="material-info"><div class="material-mfr">Belgard · Pavers</div><div class="material-name">Origins 12</div><div class="material-color">Ashwood · 80mm border course</div></div>
-            <div class="material-actions"><button class="primary">View specs</button><button>Substitute</button></div>
+          <div class="cat-card">
+            <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/9fb28476-7595-4a48-bff1-38aa1003b199.png?v=1777588866294');background-size:cover;background-position:center;"></div>
+            <div class="cat-card-body"><div class="cat-mfr">BELGARD</div><div class="cat-name">Cambridge Cobble</div><div class="cat-detail">Midnight · 60mm</div><div class="cat-price-row"><span class="cat-price mono">$9.80</span><span class="cat-unit">/ sq ft</span></div></div>
+          </div>
+          <div class="cat-card">
+            <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/86859f5e-9c68-49ef-9546-096aacfd28ff.png?v=1777588763725');background-size:cover;background-position:center;"></div>
+            <div class="cat-card-body"><div class="cat-mfr">BELGARD</div><div class="cat-name">Belgian Cobble</div><div class="cat-detail">Bourbon · 60mm</div><div class="cat-price-row"><span class="cat-price mono">$10.40</span><span class="cat-unit">/ sq ft</span></div></div>
+          </div>
+          <div class="cat-card">
+            <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/d211002c-dca3-45fe-8b1f-cafd09697e88.jpg?v=1777588702174');background-size:cover;background-position:center;"></div>
+            <div class="cat-card-body"><div class="cat-mfr">BELGARD</div><div class="cat-name">Avalon Slate</div><div class="cat-detail">Toscana · 60mm</div><div class="cat-price-row"><span class="cat-price mono">$11.60</span><span class="cat-unit">/ sq ft</span></div></div>
+          </div>
+          <div class="cat-card">
+            <div class="cat-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/d9974b59-5b82-4cda-b4cc-3ae58436275b.png?v=1777588800564');background-size:cover;background-position:center;"></div>
+            <div class="cat-card-body"><div class="cat-mfr">BELGARD</div><div class="cat-name">Brooklyn</div><div class="cat-detail">Bourbon · 60mm</div><div class="cat-price-row"><span class="cat-price mono">$9.20</span><span class="cat-unit">/ sq ft</span></div></div>
           </div>
         </div>
-        <div class="hm-bottom-strip">
-          <div class="signing-msg">Sign by <strong>Sun May 24</strong> to lock in your $2,160 signing discount.</div>
-          <a class="signing-cta">Sign + reserve install →</a>
+        <div class="cat-footer">
+          <span><strong>275 materials</strong> · 7 manufacturers · last sync 2h ago</span>
+          <span><strong>Pricing version 14</strong> · published Mon May 18</span>
         </div>
       </div>
     </div>
+
     <div class="demo-callouts">
-      <div class="callout reveal"><div class="callout-num">01 · The site plan</div><strong>5 regions, color-coded</strong><p>The exact regions the designer measured on the Site Map flow through to the homeowner view — same colors, same square footage, same scale.</p></div>
-      <div class="callout reveal"><div class="callout-num">02 · The materials</div><strong>Pulled from the catalog</strong><p>Swatch, spec sheet, manufacturer, color — sourced live from the Material Catalog. The price the homeowner sees is the catalog price.</p></div>
-      <div class="callout reveal"><div class="callout-num">03 · The substitution</div><strong>Ask without emailing</strong><p>"Prefer this in the lighter Origins instead?" One tap. The designer gets a notification, the request is logged.</p></div>
-      <div class="callout reveal"><div class="callout-num">04 · The signing strip</div><strong>Time-bound discount</strong><p>Discount is real, the deadline is real. No high-pressure language — just the math of acting now vs. waiting.</p></div>
+      <div class="callout reveal"><div class="callout-num">01 · The catalog</div><strong>275 materials, one place</strong><p>Belgard's full lineup plus accessories from MSI, Trex, and others. Manufacturer, color, dimensions, and per-unit pricing — all centralized, all searchable.</p></div>
+      <div class="callout reveal"><div class="callout-num">02 · Adding new materials</div><strong>30 seconds, end to end</strong><p>Drag a swatch image. Type manufacturer + product + dimension + price. Save. Available to every designer instantly.</p></div>
+      <div class="callout reveal"><div class="callout-num">03 · Pricing syncs</div><strong>Update once, propagate everywhere</strong><p>Update a price in the catalog and every in-flight draft proposal sees the new number. No more "I quoted the old price by mistake."</p></div>
+      <div class="callout reveal"><div class="callout-num">04 · Designer selection</div><strong>Pick from a list, not memory</strong><p>When building a proposal, designers select from the catalog. Swatch, specs, color, price — all auto-filled. Zero typing, zero pricing drift.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="warroom-section">
+  <div class="container">
+    <span class="eyebrow reveal">Where the designer and homeowner meet</span>
+    <h2 class="reveal">The War Room.</h2>
+    <p class="reveal" style="font-size:18px;color:var(--ink-mute);max-width:720px;">One screen with the full deal context, the homeowner's conversation, and smart suggestions for what to do next. No CRM hunt, no email-thread search, no swivel-chair work.</p>
+    <div class="demo-frame reveal">
+      <div class="frame-dots"><span></span><span></span><span></span></div>
+      <div class="frame-url">portal-baysidepavers.com/admin/war-room/masood-delfarah</div>
+      <div class="warroom-mock">
+        <aside class="wr-sidebar">
+          <div class="wr-sidebar-section"><div class="wr-score-mini">HOT · 76</div><div class="wr-name">Masood Delfarah</div><div class="wr-addr">1719 Yorktown Rd · Cupertino</div><div class="wr-amount">$41,562</div></div>
+          <div class="wr-sidebar-section">
+            <div class="wr-sidebar-title">Pipeline stats</div>
+            <ul class="wr-mini-stats"><li><span>Events 24h</span><strong>5</strong></li><li><span>Sessions</span><strong>2</strong></li><li><span>Messages</span><strong>1</strong></li><li><span>Discount expires</span><strong>31h</strong></li></ul>
+          </div>
+          <div class="wr-sidebar-section">
+            <div class="wr-sidebar-title">Recent events</div>
+            <ul class="wr-events-mini">
+              <li class="recent"><time>14m AGO</time>Sent message: pricing question</li>
+              <li class="recent"><time>22m AGO</time>Viewed proposal · 4 min</li>
+              <li><time>5h AGO</time>Viewed proposal · 7 min</li>
+              <li><time>1d AGO</time>Substitution request: Pergola Area</li>
+            </ul>
+          </div>
+        </aside>
+        <div class="wr-thread">
+          <div class="wr-thread-header"><div class="wr-avatar">M</div><div class="wr-thread-name">Masood Delfarah<span>HOMEOWNER · ACTIVE NOW</span></div></div>
+          <div class="wr-messages">
+            <div class="msg from-designer">Hi Masood — sending over your updated proposal with the Catalina Grana option. Let me know if you'd like to tweak anything.<time>2 days ago · 11:42 AM</time></div>
+            <div class="msg-substitution">
+              <div class="msg-sub-label">Substitution requested</div>
+              <div class="msg-sub-line">
+                <div class="msg-sub-swatch" style="background-image:url('https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69e6d07a0f0b40b42237987d_Screenshot%202026-04-20%20at%206.18.47%E2%80%AFPM.png');background-size:cover;background-position:center;"></div>
+                <span><strong>Origins 12 / Ashwood</strong></span><span class="msg-sub-arrow">→</span>
+                <div class="msg-sub-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/2f59ac36-3424-463d-a7ab-45bfd9a2bb07.png?v=1776891712228');background-size:cover;background-position:center;"></div>
+                <span><strong>Catalina Grana / Scandina Gray</strong></span>
+              </div>
+            </div>
+            <div class="msg from-customer">We love the darker option. Quick question — does the 60mm work for our driveway slope, or should we be looking at a thicker paver?<time>14 min ago · 11:31 AM</time></div>
+          </div>
+          <div class="wr-input"><span>Reply to Masood...</span><button>Send</button></div>
+        </div>
+        <aside class="wr-suggestions">
+          <div class="wr-sidebar-title" style="margin-bottom:14px;">Suggested next actions</div>
+          <div class="smart-card"><div class="smart-label">→ Reply now</div><div class="smart-title">Address slope question</div><div class="smart-why">Pricing-adjacent question + 14 min idle. Same-hour response 2.4× more likely to close.</div></div>
+          <div class="smart-card"><div class="smart-label">→ Send template</div><div class="smart-title">Confirm material upgrade pricing</div><div class="smart-why">Substitution to higher-grade material — confirm $360 line-item change before he asks.</div></div>
+          <div class="smart-card"><div class="smart-label">→ Schedule</div><div class="smart-title">Book site walk before Friday</div><div class="smart-why">Discount expires in 31h. Site walk on file averages +18% conversion at this score band.</div></div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="demo-callouts" style="margin-bottom:0;">
+      <div class="callout reveal"><div class="callout-num">01 · Context, left</div><strong>The whole deal at a glance</strong><p>Score, stats, recent events. The designer never has to leave this screen to know where the deal is right now.</p></div>
+      <div class="callout reveal"><div class="callout-num">02 · Conversation, center</div><strong>Threaded messages + substitutions</strong><p>Every back-and-forth lives here. Material swaps appear inline so the designer sees what's actually being asked for.</p></div>
+      <div class="callout reveal"><div class="callout-num">03 · Smart suggestions, right</div><strong>What to do now</strong><p>The platform reads the conversation and proposes the next high-leverage action. One click to send. Templates pre-filled with deal context.</p></div>
+    </div>
+
+    <div class="reveal" style="margin-top:48px;background:linear-gradient(135deg,#0e1218 0%,#1a2030 100%);border-radius:14px;padding:48px 40px;color:#faf8f3;">
+      <div class="fn-notif-eyebrow" style="margin-top:0;">The connective tissue · functional notifications, not sales pings</div>
+      <h3 class="fn-notif-heading">The platform <em>talks</em> for you — when it should, where it should.</h3>
+      <p class="fn-notif-sub">These aren't drip-campaign nudges. They're functional UI moments — the kind of in-product notifications that make software feel alive on both sides of the conversation. Same data model, two audiences, two screens.</p>
+
+      <div class="fn-notif-cols">
+        <div>
+          <div class="fn-notif-col-head">→ Homeowner-facing</div>
+          <div class="fn-notif-card">
+            <div class="fn-notif-icon">✏️</div>
+            <div class="fn-notif-body">
+              <div class="fn-notif-title">You have 1 design update left this period</div>
+              <div class="fn-notif-text">Use it to lock in a material change or resize a region — and your designer will re-price within 24 hours.</div>
+              <span class="fn-notif-action">→ Edit my proposal</span>
+            </div>
+          </div>
+          <div class="fn-notif-card">
+            <div class="fn-notif-icon">🎨</div>
+            <div class="fn-notif-body">
+              <div class="fn-notif-title">Search & switch materials</div>
+              <div class="fn-notif-text">Tap any region to see paver alternatives at your price point. Compare side-by-side, see live pricing.</div>
+              <span class="fn-notif-action">→ Browse alternatives</span>
+            </div>
+          </div>
+          <div class="fn-notif-card">
+            <div class="fn-notif-icon warn">💬</div>
+            <div class="fn-notif-body">
+              <div class="fn-notif-title">Your designer responded</div>
+              <div class="fn-notif-text">Tim has answered your question about the 60mm vs 80mm paver. Open your proposal to read the response.</div>
+              <span class="fn-notif-action">→ View reply</span>
+            </div>
+          </div>
+          <div class="fn-notif-card">
+            <div class="fn-notif-icon urgent">⏳</div>
+            <div class="fn-notif-body">
+              <div class="fn-notif-title">Signing discount expires in 31 hours</div>
+              <div class="fn-notif-text">Sign by Friday to lock in your $2,160 signing discount. Your designer can answer last questions today.</div>
+              <span class="fn-notif-action">→ Review and sign</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="fn-notif-col-head">→ Designer-facing</div>
+          <div class="fn-notif-card">
+            <div class="fn-notif-icon warn">📐</div>
+            <div class="fn-notif-body">
+              <div class="fn-notif-title">Masood submitted a redesign request</div>
+              <div class="fn-notif-text">Patio reshape + Origins 12 swap requested. New polygon adds 50 sqft. Confirm pricing and respond.</div>
+              <span class="fn-notif-action">→ Review redesign</span>
+            </div>
+          </div>
+          <div class="fn-notif-card">
+            <div class="fn-notif-icon">💬</div>
+            <div class="fn-notif-body">
+              <div class="fn-notif-title">New message from Elisa Johnson</div>
+              <div class="fn-notif-text">"Quick question — does the 60mm work for our driveway slope, or thicker paver?" 14 min idle.</div>
+              <span class="fn-notif-action">→ Reply now</span>
+            </div>
+          </div>
+          <div class="fn-notif-card">
+            <div class="fn-notif-icon urgent">📈</div>
+            <div class="fn-notif-body">
+              <div class="fn-notif-title">1719 Yorktown · 5+ views in 24h</div>
+              <div class="fn-notif-text">Engagement burst detected. Score jumped to HOT 76. Discount expires in 31h — call today recommended.</div>
+              <span class="fn-notif-action">→ Open War Room</span>
+            </div>
+          </div>
+          <div class="fn-notif-card">
+            <div class="fn-notif-icon">✅</div>
+            <div class="fn-notif-body">
+              <div class="fn-notif-title">Substitution approved by master</div>
+              <div class="fn-notif-text">Origins 12 swap confirmed at +$360. Updated proposal version published. Homeowner notified automatically.</div>
+              <span class="fn-notif-action">→ View proposal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:40px;padding-top:28px;border-top:1px solid rgba(183,139,58,0.2);">
+        <p style="font-family:'Playfair Display',serif;font-size:20px;font-style:italic;color:#faf8f3;max-width:680px;margin:0 auto;line-height:1.5;">Nine trigger types fire automatically. Push notification, SMS, email, in-app banner — <strong style="font-style:normal;color:#b78b3a;">routed to whoever needs to act.</strong></p>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="product-demo">
   <div class="container">
-    <span class="eyebrow reveal">What the designer sees every morning</span>
+    <span class="eyebrow reveal">Where leadership zooms out</span>
     <h2 class="reveal">The Hot Deals dashboard.</h2>
-    <p class="reveal" style="font-size:18px;color:var(--ink-mute);max-width:680px;">Every active proposal a designer has out, ranked by current signing likelihood. The top deal below is from your real pipeline.</p>
+    <p class="reveal" style="font-size:18px;color:var(--ink-mute);max-width:680px;">Every active proposal across the design team, ranked by current signing likelihood. The top deal below is from your real pipeline.</p>
     <div class="demo-frame reveal">
       <div class="frame-dots"><span></span><span></span><span></span></div>
       <div class="frame-url">portal-baysidepavers.com/admin/hot-deals.html</div>
@@ -692,13 +682,7 @@
             </svg>
             <span class="mono" style="color:var(--accent);font-weight:700;font-size:13px;">↑ +56</span>
           </div>
-          <div class="hd-stats-demo">
-            <div><strong>5</strong> events 24h</div>
-            <div><strong>5</strong> events 7d</div>
-            <div><strong>2</strong> sessions</div>
-            <div><strong>1</strong> message</div>
-            <div>Last: <strong>just now</strong></div>
-          </div>
+          <div class="hd-stats-demo"><div><strong>5</strong> events 24h</div><div><strong>5</strong> events 7d</div><div><strong>2</strong> sessions</div><div><strong>1</strong> message</div><div>Last: <strong>just now</strong></div></div>
           <div class="hd-breakdown-demo">
             <div class="hd-comp-demo">Engagement<span>100</span><div class="hd-comp-bar-demo"><div class="hd-comp-bar-fill-demo" style="--w:1"></div></div></div>
             <div class="hd-comp-demo">Recency<span>80</span><div class="hd-comp-bar-demo"><div class="hd-comp-bar-fill-demo" style="--w:0.8"></div></div></div>
@@ -711,160 +695,118 @@
     </div>
     <div class="demo-callouts">
       <div class="callout reveal"><div class="callout-num">01 · The score</div><strong>HOT 76 isn't a guess.</strong><p>Weighted from real engagement signals — events in last 24h/7d, recency, proximity to discount window, intent indicators like messages and substitutions.</p></div>
-      <div class="callout reveal"><div class="callout-num">02 · The signal</div><strong>"5 events in last 24h"</strong><p>Tells the designer exactly why this deal is hot today — not yesterday, not in general. Today. Plain language. Actionable.</p></div>
-      <div class="callout reveal"><div class="callout-num">03 · The trend</div><strong>↑ +56 over 7 days</strong><p>Momentum, not just position. A deal at 76 trending up is different from a deal at 76 trending down. The sparkline shows direction.</p></div>
-      <div class="callout reveal"><div class="callout-num">04 · The action</div><strong>One click to reply.</strong><p>Open War Room jumps straight into the conversation with this homeowner. No CRM hunt, no email thread search. Designer acts in the moment.</p></div>
+      <div class="callout reveal"><div class="callout-num">02 · The trend</div><strong>↑ +56 over 7 days</strong><p>Momentum, not just position. A deal at 76 trending up is different from a deal at 76 trending down. The sparkline shows direction.</p></div>
+      <div class="callout reveal"><div class="callout-num">03 · The action</div><strong>One click to the War Room</strong><p>Open War Room jumps straight into the conversation with this homeowner. No CRM hunt, no email-thread search. Designer acts in the moment.</p></div>
     </div>
   </div>
 </section>
 
-<section class="warroom-section">
+<section id="growing" class="proposal-builder-section" style="background:#fafafa;">
   <div class="container">
-    <span class="eyebrow reveal">When the designer drills in</span>
-    <h2 class="reveal">The War Room.</h2>
-    <p class="reveal" style="font-size:18px;color:var(--ink-mute);max-width:720px;">One screen with the full deal context, the homeowner's conversation, and smart suggestions for what to do next. No CRM hunt, no email-thread search, no swivel-chair work.</p>
-    <div class="demo-frame reveal">
+    <span class="eyebrow reveal">The Bayside Portal admin · already shipped, still growing</span>
+    <h2 class="reveal">One dashboard. <em>Every tool Bayside operates from.</em></h2>
+    <p class="reveal" style="font-size:18px;color:var(--ink-mute);max-width:740px;margin-bottom:36px;">This is what's live today inside Bayside Portal — fifteen tools across operations and the material catalog, all under one login. And this dashboard adds tools every sprint.</p>
+
+    <div class="demo-frame reveal" style="margin-bottom:48px;">
       <div class="frame-dots"><span></span><span></span><span></span></div>
-      <div class="frame-url">portal-baysidepavers.com/admin/war-room/masood-delfarah</div>
-      <div class="warroom-mock">
-        <aside class="wr-sidebar">
-          <div class="wr-sidebar-section">
-            <div class="wr-score-mini">HOT · 76</div>
-            <div class="wr-name">Masood Delfarah</div>
-            <div class="wr-addr">1719 Yorktown Rd · Cupertino</div>
-            <div class="wr-amount">$41,562</div>
-          </div>
-          <div class="wr-sidebar-section">
-            <div class="wr-sidebar-title">Pipeline stats</div>
-            <ul class="wr-mini-stats">
-              <li><span>Events 24h</span><strong>5</strong></li>
-              <li><span>Sessions</span><strong>2</strong></li>
-              <li><span>Messages</span><strong>1</strong></li>
-              <li><span>Discount expires</span><strong>31h</strong></li>
-            </ul>
-          </div>
-          <div class="wr-sidebar-section">
-            <div class="wr-sidebar-title">Recent events</div>
-            <ul class="wr-events-mini">
-              <li class="recent"><time>14m AGO</time>Sent message: pricing question</li>
-              <li class="recent"><time>22m AGO</time>Viewed proposal · 4 min</li>
-              <li><time>5h AGO</time>Viewed proposal · 7 min</li>
-              <li><time>1d AGO</time>Substitution request: Pergola Area</li>
-            </ul>
-          </div>
-        </aside>
-        <div class="wr-thread">
-          <div class="wr-thread-header">
-            <div class="wr-avatar">M</div>
-            <div class="wr-thread-name">Masood Delfarah<span>HOMEOWNER · ACTIVE NOW</span></div>
-          </div>
-          <div class="wr-messages">
-            <div class="msg from-designer">Hi Masood — sending over your updated proposal with the Catalina Grana option. Let me know if you'd like to tweak anything.<time>2 days ago · 11:42 AM</time></div>
-            <div class="msg-substitution">
-              <div class="msg-sub-label">Substitution requested</div>
-              <div class="msg-sub-line">
-                <div class="msg-sub-swatch" style="background-image:url('https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69e6d07a0f0b40b42237987d_Screenshot%202026-04-20%20at%206.18.47%E2%80%AFPM.png');background-size:cover;background-position:center;"></div>
-                <span><strong>Origins 12 / Ashwood</strong></span>
-                <span class="msg-sub-arrow">→</span>
-                <div class="msg-sub-swatch" style="background-image:url('https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/2f59ac36-3424-463d-a7ab-45bfd9a2bb07.png?v=1776891712228');background-size:cover;background-position:center;"></div>
-                <span><strong>Catalina Grana / Scandina Gray</strong></span>
-              </div>
-            </div>
-            <div class="msg from-customer">We love the darker option. Quick question — does the 60mm work for our driveway slope, or should we be looking at a thicker paver?<time>14 min ago · 11:31 AM</time></div>
-          </div>
-          <div class="wr-input"><span>Reply to Masood...</span><button>Send</button></div>
+      <div class="frame-url">portal-baysidepavers.com/admin/</div>
+      <div class="admin-mock">
+        <div class="admin-mock-bar">
+          <div class="admin-mock-brand">Bayside Proposal Builder <span>/ ADMIN</span></div>
+          <div class="admin-mock-user"><span class="pill">MASTER</span>tim@mcmullen.properties</div>
         </div>
-        <aside class="wr-suggestions">
-          <div class="wr-sidebar-title" style="margin-bottom:14px;">Suggested next actions</div>
-          <div class="smart-card"><div class="smart-label">→ Reply now</div><div class="smart-title">Address slope question</div><div class="smart-why">Pricing-adjacent question + 14 min idle. Same-hour response 2.4× more likely to close.</div></div>
-          <div class="smart-card"><div class="smart-label">→ Send template</div><div class="smart-title">Confirm material upgrade pricing</div><div class="smart-why">Substitution to higher-grade material — confirm $360 line-item change before he asks.</div></div>
-          <div class="smart-card"><div class="smart-label">→ Schedule</div><div class="smart-title">Book site walk before Friday</div><div class="smart-why">Discount expires in 31h. Site walk on file averages +18% conversion at this score band.</div></div>
-        </aside>
+        <div class="admin-mock-nav">
+          <span class="active">⌂ Overview</span>
+          <span>● Pipeline</span><span>🌱 Nurture</span><span>✉ Nurture templates</span><span>📣 Outreach</span>
+          <span>👤 Clients</span><span>↔ Substitutions</span><span>📐 Redesigns</span><span>+ Create homeowner</span><span>⊞ Site map</span>
+          <span>🧱 Materials</span><span>◫ Swatches</span>
+        </div>
+        <div class="admin-mock-body">
+          <div class="admin-mock-eyebrow">MASTER · ADMIN HOME</div>
+          <h3 class="admin-mock-h">Welcome, Tim.</h3>
+          <p class="admin-mock-intro">Everything in BPB. Tools tagged with <strong>M</strong> are master-only — they affect the catalog, infrastructure, or other designers' work.</p>
+
+          <div class="admin-tools-group">OPERATIONS <span>9 tools · all live</span></div>
+          <div class="admin-tools-grid">
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">●</div><div class="admin-tool-name">Pipeline</div></div><p class="admin-tool-desc">Every proposal in one place. Computed funnel stage, last activity, pending substitutions and redesigns, quick links into every other admin view.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">🌱</div><div class="admin-tool-name">Nurture</div></div><p class="admin-tool-desc">Track every client through the nurture phase pipeline. Auto-transitions on consultation, publish, and signing. Manual override.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">✉</div><div class="admin-tool-name">Nurture templates</div></div><p class="admin-tool-desc">Author the email content sent at each phase + day-offset of the nurture sequence. Markdown with merge fields, project-type filtering, scheduling.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">📣</div><div class="admin-tool-name">Outreach</div></div><p class="admin-tool-desc">Cold lead pipeline. Drafted-not-sent, sent-never-opened, and engaged-then-ghosted clients. AI-drafted re-engagement messages.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">👤</div><div class="admin-tool-name">Clients</div></div><p class="admin-tool-desc">Add, edit, and invite homeowner clients. Assign proposals, manage referrals, send login links.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">↔</div><div class="admin-tool-name">Substitutions</div></div><p class="admin-tool-desc">Review homeowner material swap requests submitted from published proposals. Approve, reject, or mark applied.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">📐</div><div class="admin-tool-name">Redesigns</div></div><p class="admin-tool-desc">Review client design change requests — markups, photos of paper markup, and notes for changes beyond material swaps.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">+</div><div class="admin-tool-name">Create homeowner</div></div><p class="admin-tool-desc">Provision a homeowner account at the design appointment so the client can log in immediately.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">⊞</div><div class="admin-tool-name">Site map</div></div><p class="admin-tool-desc">Edit interactive site-map regions and material assignments for a published proposal.</p></div>
+          </div>
+
+          <div class="admin-tools-group">MATERIAL CATALOG <span>6 tools · all live</span></div>
+          <div class="admin-tools-grid">
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">🧱</div><div class="admin-tool-name">Materials</div></div><p class="admin-tool-desc">Edit the 275-item Belgard + multi-vendor catalog. Per-material pricing, dimensions, applications, search aliases.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">◫</div><div class="admin-tool-name">Swatches (bulk)</div></div><p class="admin-tool-desc">Upload swatch images in bulk and auto-match them to existing material records by SKU or color name.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">▦</div><div class="admin-tool-name">Swatches (per material)</div></div><p class="admin-tool-desc">Per-material image gallery editor — lifestyle photos, color swatches, drag-to-reorder, primary image selection.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">📄</div><div class="admin-tool-name">Catalog PDFs</div></div><p class="admin-tool-desc">Upload manufacturer catalog PDFs. Auto-extract product pages and link to material records for spec sheets.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">💰</div><div class="admin-tool-name">Material Prices</div></div><p class="admin-tool-desc">Bulk-edit per-unit pricing across the entire catalog. Filters, search, dirty tracking, one-click save.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">📥</div><div class="admin-tool-name">Markup PDF picker</div></div><p class="admin-tool-desc">Per-proposal: curate which renderings appear in the homeowner's downloadable markup PDF. Drag-to-reorder, custom labels.</p></div>
+          </div>
+
+          <div class="admin-tools-group" style="margin-top:36px;">PHASE 2 · WHAT WE'D ADD NEXT <span>future integrations · roadmap proposal</span></div>
+          <div class="admin-tools-grid">
+            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">🔨</div><div class="admin-tool-name">JobNimbus integration</div></div><p class="admin-tool-desc">Replace the entire construction-side workflow. Crew scheduling, job costing, material orders, site photos, change orders — wired to the same proposal record.</p></div>
+            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">🎯</div><div class="admin-tool-name">HubSpot CRM</div></div><p class="admin-tool-desc">Full deal lifecycle CRM with sequences, automation, and contact enrichment. Bayside Portal becomes the front-end; HubSpot the long-term contact memory.</p></div>
+            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">🔍</div><div class="admin-tool-name">SEMRush</div></div><p class="admin-tool-desc">Track Bayside's organic ranking against every Bay Area competitor. Keyword gaps, content opportunities, backlink intelligence — surfaced in one panel.</p></div>
+            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">📊</div><div class="admin-tool-name">Google Ads + Analytics</div></div><p class="admin-tool-desc">Live attribution from ad click → proposal sent → signed deal. Spend ROI per campaign, audience, and landing page — without leaving the admin.</p></div>
+            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">✍️</div><div class="admin-tool-name">Content Creator</div></div><p class="admin-tool-desc">AI-assisted blog writer trained on Bayside's voice. Project case studies, seasonal guides, neighborhood-specific landing pages — drafted automatically, edited by you.</p></div>
+            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">📱</div><div class="admin-tool-name">Social media agent</div></div><p class="admin-tool-desc">Auto-schedule post-job photos to Instagram, Facebook, Pinterest. Pulls from completed project galleries. Optimal-time posting across all channels.</p></div>
+            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">📨</div><div class="admin-tool-name">Mailchimp</div></div><p class="admin-tool-desc">Beyond transactional email — full marketing newsletters, drip sequences for cold leads, automation triggered by Bayside Portal pipeline events.</p></div>
+            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">⭐</div><div class="admin-tool-name">Review requester</div></div><p class="admin-tool-desc">Post-install: auto-text the homeowner a tap-to-review link for Google + Yelp. Smart timing based on signed satisfaction. Negative-feedback intercept.</p></div>
+            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">+</div><div class="admin-tool-name">Whatever else</div></div><p class="admin-tool-desc">Quickbooks, DocuSign, Twilio voice, Calendly, NextDoor, anything that fits how Bayside actually operates. The platform is custom-built — we add what works.</p></div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="demo-callouts">
-      <div class="callout reveal"><div class="callout-num">01 · Context, left</div><strong>The whole deal at a glance</strong><p>Score, stats, recent events. The designer never has to leave this screen to know where the deal is right now.</p></div>
-      <div class="callout reveal"><div class="callout-num">02 · Conversation, center</div><strong>Threaded messages + substitutions</strong><p>Every back-and-forth lives here. Material swaps appear inline so the designer sees what's actually being asked for.</p></div>
-      <div class="callout reveal"><div class="callout-num">03 · Smart suggestions, right</div><strong>What to do now</strong><p>The platform reads the conversation and proposes the next high-leverage action. One click to send. Templates pre-filled with deal context.</p></div>
-    </div>
+
+    <p class="reveal" style="font-family:'Playfair Display',serif;font-size:24px;font-style:italic;color:var(--ink);text-align:center;max-width:760px;margin:0 auto;line-height:1.45;">Phase 1 ships the sales floor. <strong style="font-style:normal;color:var(--accent);">Phase 2 completes the tech stack.</strong></p>
   </div>
 </section>
 
-<section id="notifications" class="notifications-section">
+<section id="phase2" class="cta-section" style="background:linear-gradient(135deg,#0e1218 0%,#1a2030 100%);padding:96px 0;text-align:left;">
   <div class="container">
-    <span class="eyebrow reveal">The notification system · conversion rate impact</span>
-    <h2 class="reveal">When the deal is hot, your designer knows in <em>seconds.</em></h2>
-    <p class="reveal" style="font-size:19px;color:var(--ink-mute);max-width:740px;">Designers don't have to remember to check the dashboard. The platform interrupts them — with the right alert, to the right designer, at the right moment. Nine trigger types fire automatically, every day.</p>
-
-    <div class="notif-insight-card reveal">
-      <div class="insight-label">Why this matters</div>
-      <h3 class="insight-headline">Same-hour response on a homeowner question converts at <strong>2.4×</strong> the rate of next-day response.<em>And the contractor who responds first wins more than half of competitive bids.</em></h3>
-      <div class="insight-source">Sources · Harvard Business Review · InsideSales.com · MIT Lead Response Management Study</div>
+    <div style="max-width:780px;margin:0 auto;text-align:center;">
+      <span class="eyebrow" style="color:#b78b3a;">Phase 2 · the full vision</span>
+      <h2 style="font-family:'Playfair Display',serif;font-size:54px;color:#faf8f3;line-height:1.05;margin:14px 0 22px;letter-spacing:-0.015em;">Replace <em style="color:#b78b3a;">every</em> third-party tool with one custom platform built for Bayside.</h2>
+      <p style="font-size:19px;color:rgba(250,248,243,0.8);line-height:1.55;margin:0 auto 0;max-width:680px;">Phase 1 is the sales platform. It's running today. Phase 2 layers in marketing automation, content, social, reviews, and the full construction-side workflow — all under one login, all wired to the same homeowner record, all custom-built for the way Bayside Pavers actually operates.</p>
     </div>
 
-    <span class="eyebrow reveal">9 trigger types · automatic</span>
-    <div class="trigger-grid">
-      <div class="trigger-card reveal"><div class="trigger-num">[ 01 ] First view</div><h4>Homeowner just opened the proposal.</h4><p class="trigger-quote">"They're looking at it right now."</p><div class="trigger-meta"><strong>→</strong> Designer pinged within seconds of first open</div></div>
-      <div class="trigger-card reveal hot"><div class="trigger-num">[ 02 ] Engagement burst</div><h4>3+ events in the last hour.</h4><p class="trigger-quote">"Active shopping happening right now."</p><div class="trigger-meta"><strong>→</strong> Designer alerted to call within the hour</div></div>
-      <div class="trigger-card reveal"><div class="trigger-num">[ 03 ] New message</div><h4>Homeowner asked a question.</h4><p class="trigger-quote">"Don't let this sit overnight."</p><div class="trigger-meta"><strong>→</strong> Designer notified instantly · target reply &lt; 1 hr</div></div>
-      <div class="trigger-card reveal hot"><div class="trigger-num">[ 04 ] HOT crossing</div><h4>Score just crossed 70.</h4><p class="trigger-quote">"This deal is closeable today."</p><div class="trigger-meta"><strong>→</strong> Designer + leadership both notified</div></div>
-      <div class="trigger-card reveal cool"><div class="trigger-num">[ 05 ] Cooldown alert</div><h4>Was hot. Now cooling.</h4><p class="trigger-quote">"Re-engage before this dies."</p><div class="trigger-meta"><strong>→</strong> Designer pinged with re-engagement script</div></div>
-      <div class="trigger-card reveal cool"><div class="trigger-num">[ 06 ] Stalled alert</div><h4>5+ days of silence.</h4><p class="trigger-quote">"Time for a check-in."</p><div class="trigger-meta"><strong>→</strong> Designer notified with check-in playbook</div></div>
-      <div class="trigger-card reveal warm"><div class="trigger-num">[ 07 ] Substitution request</div><h4>Material swap requested.</h4><p class="trigger-quote">"Confirm pricing while it's top of mind."</p><div class="trigger-meta"><strong>→</strong> Designer + master both notified</div></div>
-      <div class="trigger-card reveal gold"><div class="trigger-num">[ 08 ] Daily digest</div><h4>Top 5 hot deals · 8 AM PT.</h4><p class="trigger-quote">"Your day starts with priorities."</p><div class="trigger-meta"><strong>→</strong> Email to every designer, every morning</div></div>
-      <div class="trigger-card reveal gold"><div class="trigger-num">[ 09 ] Weekly summary</div><h4>Pipeline movements · Mondays.</h4><p class="trigger-quote">"Coaching opportunities, visible."</p><div class="trigger-meta"><strong>→</strong> Email to Bayside leadership weekly</div></div>
-    </div>
-
-    <div class="lift-calc-wrap reveal">
-      <div class="lift-eyebrow">Interactive · conversion lift simulator</div>
-      <h3>What does faster response <em>actually mean</em> for Bayside's revenue?</h3>
-      <p>Drag the sliders. Set your team's current average response time on homeowner engagement, then see what happens when Bayside Portal notifications shrink it. The model uses industry-validated response-time-to-conversion data, calibrated for high-consideration purchases like hardscape.</p>
-      <div class="lift-grid">
-        <div class="lift-controls">
-          <div class="lift-control"><div class="lift-label-row"><span>Current avg response time</span><span class="lift-label-value" id="currentRespLabel">24 hours</span></div><input type="range" id="currentRespSlider" min="1" max="168" value="24" step="1"></div>
-          <div class="lift-control"><div class="lift-label-row"><span>Portal-enabled response time</span><span class="lift-label-value" id="bpbRespLabel">1 hour</span></div><input type="range" id="bpbRespSlider" min="1" max="24" value="1" step="1"></div>
-          <div class="lift-control"><div class="lift-label-row"><span>Open proposals per year</span><span class="lift-label-value" id="liftVolumeLabel">120</span></div><input type="range" id="liftVolumeSlider" min="20" max="500" value="120" step="10"></div>
-        </div>
-        <div class="lift-results">
-          <div class="lift-result-line"><span class="lift-result-label">Close rate · today</span><span class="lift-result-value mono" id="currentCloseRate">20%</span></div>
-          <div class="lift-result-line"><span class="lift-result-label">Close rate · with Bayside Portal</span><span class="lift-result-value mono" id="bpbCloseRate">28%</span></div>
-          <div class="lift-result-line headline"><span class="lift-result-label">Conversion lift</span><span class="lift-result-value mono" id="liftPct">+36%</span></div>
-          <div class="lift-result-line headline"><span class="lift-result-label">Incremental deals/yr</span><span class="lift-result-value mono" id="incDeals">+9</span></div>
-          <div class="lift-result-line headline final"><span class="lift-result-label">Incremental revenue/yr</span><span class="lift-result-value mono" id="incRevenue">+$450K</span></div>
-        </div>
-        <div class="lift-note"><strong>How this is modeled.</strong> Close rate as a function of response time, anchored at 28% for 1-hour response and 8% for 7+ day response — with smooth exponential dropoff between. Calibrated against published lead-response data (HBR, MIT, InsideSales) and adjusted downward for hardscape's higher consideration cycle vs B2B SaaS. Assumes $50K average deal size.</div>
+    <div style="margin-top:64px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:1100px;margin-left:auto;margin-right:auto;">
+      <div style="background:rgba(250,248,243,0.04);border:1px solid rgba(183,139,58,0.3);border-radius:14px;padding:32px 28px;text-align:left;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:#5d7e69;font-weight:700;margin-bottom:12px;">PILLAR 01 · TODAY</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:24px;color:#faf8f3;margin:0 0 12px;line-height:1.2;">Sales <span style="color:#5d7e69;">✓ live</span></h3>
+        <p style="font-size:14px;color:rgba(250,248,243,0.7);line-height:1.6;margin:0;">Proposal builder, homeowner self-edit, hot deals scoring, war room, automated notifications, designer pipeline, leadership dashboard. Running today.</p>
+      </div>
+      <div style="background:rgba(250,248,243,0.04);border:1px dashed rgba(183,139,58,0.35);border-radius:14px;padding:32px 28px;text-align:left;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:#b78b3a;font-weight:700;margin-bottom:12px;">PILLAR 02 · PHASE 2</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:24px;color:#faf8f3;margin:0 0 12px;line-height:1.2;">Marketing</h3>
+        <p style="font-size:14px;color:rgba(250,248,243,0.7);line-height:1.6;margin:0;">SEMRush-class SEO intelligence. Google Ads + Analytics attribution. AI content creator. Social media autopilot. Mailchimp-class email. Review acquisition. All in one panel.</p>
+      </div>
+      <div style="background:rgba(250,248,243,0.04);border:1px dashed rgba(183,139,58,0.35);border-radius:14px;padding:32px 28px;text-align:left;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:#b78b3a;font-weight:700;margin-bottom:12px;">PILLAR 03 · PHASE 2</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:24px;color:#faf8f3;margin:0 0 12px;line-height:1.2;">Construction</h3>
+        <p style="font-size:14px;color:rgba(250,248,243,0.7);line-height:1.6;margin:0;">JobNimbus-class job management. Crew scheduling, change orders, site photo capture, material ordering, completion sign-off — all wired to the same proposal that started it.</p>
       </div>
     </div>
 
-    <div style="margin-top:80px;">
-      <span class="eyebrow reveal">Trigger #08 in practice · the morning digest</span>
-      <h3 class="reveal" style="font-family:'Playfair Display';font-size:28px;margin-bottom:16px;">8 AM PT, every weekday — straight to the designer's inbox.</h3>
-      <p class="reveal" style="font-size:15px;color:var(--ink-mute);max-width:640px;margin-bottom:36px;">Top 5 hottest deals, ranked, with sparkline trend and one-click links. Total skim time: 20 seconds. Just one of the nine notification types — but the one designers see every morning before they open the platform.</p>
-      <div class="email-mock reveal">
-        <div class="email-header">
-          <div class="email-meta-line"><span><strong>FROM</strong> Bayside Portal &lt;digests@portal-baysidepavers.com&gt;</span></div>
-          <div class="email-meta-line"><span><strong>TO</strong> marty@baysidepavers.com</span><span><strong>WED MAY 16 · 8:00 AM PT</strong></span></div>
-          <div class="email-subject">Your top 5 hot deals · 11 events overnight</div>
-        </div>
-        <div class="email-body">
-          <div class="email-greeting"><strong>Good morning, Marty.</strong> Five deals worth your attention today, ranked by current heat. Tap any to open the War Room.</div>
-          <ol class="digest-rank-list">
-            <li class="digest-row"><div class="digest-rank">#1</div><div class="digest-client"><div><span class="digest-client-name">Masood Delfarah</span><span class="digest-client-meta">1719 Yorktown · $41,562</span></div><div><span class="digest-score-pill digest-score-hot">HOT 76</span></div></div><div class="digest-spark"><svg width="80" height="22" viewBox="0 0 80 22"><path d="M2 18 L18 17 L34 15 L50 9 L66 5 L78 3" stroke="#c4392e" stroke-width="1.5" fill="none"/></svg></div><a class="digest-action">Open →</a></li>
-            <li class="digest-row"><div class="digest-rank">#2</div><div class="digest-client"><div><span class="digest-client-name">Elisa Johnson</span><span class="digest-client-meta">17610 John Telfer · $54,000</span></div><div><span class="digest-score-pill digest-score-warm">WARM 35</span></div></div><div class="digest-spark"><svg width="80" height="22" viewBox="0 0 80 22"><path d="M2 8 L18 10 L34 6 L50 12 L66 8 L78 9" stroke="#c47533" stroke-width="1.5" fill="none"/></svg></div><a class="digest-action">Open →</a></li>
-            <li class="digest-row"><div class="digest-rank">#3</div><div class="digest-client"><div><span class="digest-client-name">Parag Thakore</span><span class="digest-client-meta">88 Prospect Ave · $76,200</span></div><div><span class="digest-score-pill digest-score-warming">WARMING 22</span></div></div><div class="digest-spark"><svg width="80" height="22" viewBox="0 0 80 22"><path d="M2 17 L18 15 L34 13 L50 14 L66 10 L78 8" stroke="#b78b3a" stroke-width="1.5" fill="none"/></svg></div><a class="digest-action">Open →</a></li>
-            <li class="digest-row"><div class="digest-rank">#4</div><div class="digest-client"><div><span class="digest-client-name">LI Ho</span><span class="digest-client-meta">1488 Tolteca Dr · $53,000</span></div><div><span class="digest-score-pill digest-score-warming">WARMING 18</span></div></div><div class="digest-spark"><svg width="80" height="22" viewBox="0 0 80 22"><path d="M2 11 L18 13 L34 10 L50 11 L66 9 L78 10" stroke="#b78b3a" stroke-width="1.5" fill="none"/></svg></div><a class="digest-action">Open →</a></li>
-            <li class="digest-row"><div class="digest-rank">#5</div><div class="digest-client"><div><span class="digest-client-name">Roberto Chen</span><span class="digest-client-meta">3402 Forest Knoll · $32,800</span></div><div><span class="digest-score-pill digest-score-warming">WARMING 14</span></div></div><div class="digest-spark"><svg width="80" height="22" viewBox="0 0 80 22"><path d="M2 16 L18 14 L34 13 L50 11 L66 12 L78 11" stroke="#b78b3a" stroke-width="1.5" fill="none"/></svg></div><a class="digest-action">Open →</a></li>
-          </ol>
-          <div class="email-footer"><strong>5 deals shown</strong> · 11 events overnight · Updated 8:00 AM PT</div>
-        </div>
+    <div style="margin-top:56px;max-width:780px;margin-left:auto;margin-right:auto;background:rgba(183,139,58,0.08);border:1px solid rgba(183,139,58,0.35);border-radius:14px;padding:36px 36px 32px;text-align:center;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:#b78b3a;font-weight:700;margin-bottom:10px;">PHASE 2 PRICING</div>
+      <h3 style="font-family:'Playfair Display',serif;font-size:42px;color:#faf8f3;margin:0 0 8px;line-height:1.05;letter-spacing:-0.01em;">2% of contract value</h3>
+      <p style="font-size:14px;color:rgba(250,248,243,0.65);max-width:540px;margin:0 auto 24px;line-height:1.55;">Up from the Phase 1 rate of 1%. Replaces a stack of third-party SaaS subscriptions Bayside is currently paying for separately (JobNimbus + HubSpot + SEMRush + Mailchimp + ad agency overhead). Net spend likely lower; integration value not comparable.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;text-align:left;margin-top:24px;">
+        <div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;color:rgba(250,248,243,0.5);margin-bottom:6px;">CUSTOM-BUILT</div><div style="font-size:14px;color:#faf8f3;line-height:1.4;">For Bayside, not a generic SaaS bent into shape.</div></div>
+        <div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;color:rgba(250,248,243,0.5);margin-bottom:6px;">ONE LOGIN</div><div style="font-size:14px;color:#faf8f3;line-height:1.4;">Every tool, every workflow, under one admin.</div></div>
+        <div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;color:rgba(250,248,243,0.5);margin-bottom:6px;">IP BUYOUT · YEAR 3+</div><div style="font-size:14px;color:#faf8f3;line-height:1.4;">After 3 years, Bayside may purchase the source outright. Terms TBD at the table.</div></div>
       </div>
     </div>
 
-    <div class="demo-callouts" style="margin-top:56px;">
-      <div class="callout reveal"><div class="callout-num">The science</div><strong>Speed-to-respond is the single biggest controllable lever.</strong><p>Across industries, fastest-responding vendor wins ~50% of competitive bids. Hardscape isn't immune to this.</p></div>
-      <div class="callout reveal"><div class="callout-num">The mechanism</div><strong>9 trigger types fire automatically.</strong><p>From "homeowner just opened" to "5+ days silent" — every meaningful signal becomes a timely ping.</p></div>
-      <div class="callout reveal"><div class="callout-num">The economics</div><strong>At Bayside's volume, ~$450K incremental revenue.</strong><p>Based on the default sliders. Net of the 1% Bayside Portal fee, that's a 36× return on platform cost.</p></div>
-    </div>
+    <p style="text-align:center;font-family:'Playfair Display',serif;font-size:22px;font-style:italic;color:rgba(250,248,243,0.85);max-width:680px;margin:48px auto 0;line-height:1.45;">Phase 2 isn't on the table today — Phase 1 is. <strong style="font-style:normal;color:#b78b3a;">But it's where this is going.</strong></p>
   </div>
 </section>
 
@@ -873,7 +815,7 @@
     <div class="elisa-header reveal">
       <span class="eyebrow">A real deal in your pipeline · right now</span>
       <h2>17610 John Telfer Dr</h2>
-      <p style="font-size:18px;color:var(--ink-mute);">Elisa Johnson · $54,000 active proposal. Here's the engagement Bayside Portal has captured over the past two weeks.</p>
+      <p style="font-size:18px;color:var(--ink-mute);">Elisa Johnson · $54,000 open proposal. Here's the engagement Bayside Portal has captured over the past two weeks.</p>
     </div>
     <div class="elisa-meta-row reveal">
       <div class="meta-item meta-value"><strong>$54,000</strong><span>Open contract</span></div>
@@ -906,12 +848,7 @@
         </svg>
         <div class="session-tooltip" id="timelineTooltip"></div>
       </div>
-      <div class="timeline-legend">
-        <div><strong>13 sessions</strong> across 13 days</div>
-        <div>·  <strong>10 of 13 days</strong> with activity</div>
-        <div>·  <strong>3 days silent</strong> (designer re-engagement worked)</div>
-        <div>·  <strong>Dot size & color</strong> = recency + heat</div>
-      </div>
+      <div class="timeline-legend"><div><strong>13 sessions</strong> across 13 days</div><div>· <strong>10 of 13 days</strong> with activity</div><div>· <strong>3 days silent</strong> (designer re-engagement worked)</div><div>· <strong>Dot size & color</strong> = recency + heat</div></div>
     </div>
     <div class="interp reveal">
       <p><strong>Without Bayside Portal</strong>, this deal looks like every other open quote in the funnel. A name. An address. A guess about whether Elisa is still interested.</p>
@@ -948,8 +885,6 @@
                 <tr><td class="lb-name">Mike</td><td class="lb-active">4</td><td class="lb-value">$74K</td><td class="lb-delta flat">→ 0</td></tr>
                 <tr><td class="lb-name">Alex</td><td class="lb-active">2</td><td class="lb-value">$62K</td><td class="lb-delta up">↑ +$8K</td></tr>
                 <tr><td class="lb-name">Kris</td><td class="lb-active">3</td><td class="lb-value">$54K</td><td class="lb-delta down">↓ -$12K</td></tr>
-                <tr><td class="lb-name">Rick</td><td class="lb-active">2</td><td class="lb-value">$48K</td><td class="lb-delta up">↑ +$15K</td></tr>
-                <tr><td class="lb-name">Calvin</td><td class="lb-active">1</td><td class="lb-value">$32K</td><td class="lb-delta down">↓ -$6K</td></tr>
               </tbody>
             </table>
           </div>
@@ -962,7 +897,6 @@
               <li class="transition-event down"><span class="te-text"><strong>Roberto Chen</strong> cooled (76 → 14) <span style="color:var(--ash);font-size:11px;">· Mike</span></span><span class="te-time">3D AGO</span></li>
               <li class="transition-event up"><span class="te-text"><strong>LI Ho</strong> sent first message <span style="color:var(--ash);font-size:11px;">· Tim</span></span><span class="te-time">4D AGO</span></li>
               <li class="transition-event signed"><span class="te-text"><strong>James Park</strong> signed · $61K <span style="color:var(--ash);font-size:11px;">· Adriana</span></span><span class="te-time">5D AGO</span></li>
-              <li class="transition-event up"><span class="te-text"><strong>Daniel Reyes</strong> → WARM <span style="color:var(--ash);font-size:11px;">· Rick</span></span><span class="te-time">6D AGO</span></li>
             </ul>
           </div>
         </div>
@@ -973,9 +907,9 @@
 
 <section id="math" class="calc-section">
   <div class="container">
-    <span class="eyebrow reveal" style="color:var(--gold);">The cost and the upside · interactively</span>
+    <span class="eyebrow reveal" style="color:var(--gold);">Phase 1 economics · interactively</span>
     <h2 class="reveal">What does it cost? <em>And what does it earn?</em></h2>
-    <p class="reveal">The Bayside Portal fee is just <strong style="color:var(--gold);">1% of each closed deal</strong> — $500 on a $50,000 project. The real story is the revenue lift from same-hour notifications, live material swaps, and customer self-service editing. Drag the sliders.</p>
+    <p class="reveal">The Phase 1 Bayside Portal fee is just <strong style="color:var(--gold);">1% of each closed deal</strong> — $500 on a $50,000 project. The real story is the revenue lift from same-hour notifications, live material swaps, and customer self-service editing. Drag the sliders.</p>
     <div class="calc-grid">
       <div class="calc-controls reveal">
         <div class="calc-control"><div class="calc-label"><span>Projects sent per year</span><span class="calc-label-value" id="projectsLabel">100</span></div><input type="range" id="projectsSlider" min="20" max="300" value="100" step="10"></div>
@@ -997,12 +931,9 @@
             <div class="mono" id="portalFee" style="font-size:22px;font-weight:700;color:#b78b3a;line-height:1;">$500</div>
           </div>
         </div>
-
         <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#b78b3a;font-weight:700;margin-bottom:14px;text-align:center;">Annual impact · <span id="projectsContext">100</span> projects/yr</div>
-
         <div class="calc-result-line"><span class="calc-result-label">Baseline (25% close rate)</span><span class="calc-result-value mono" id="baselineRevenue">$1.25M</span></div>
         <div class="calc-result-line"><span class="calc-result-label">With Portal (<span id="liftedRateLabel">35%</span> close rate)</span><span class="calc-result-value mono" id="liftedRevenue">$1.75M</span></div>
-
         <div style="padding-top:8px;border-top:1px dashed rgba(255,255,255,0.18);margin-top:14px;">
           <div style="display:flex;flex-direction:column;align-items:center;padding:18px 0 14px;">
             <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(250,248,243,0.6);margin-bottom:10px;">Incremental revenue / year</div>
@@ -1011,8 +942,7 @@
           <div class="calc-result-line" style="opacity:0.8;"><span class="calc-result-label">Total Portal fees / year</span><span class="calc-result-value mono" id="totalPortalFees">$17,500</span></div>
           <div class="calc-result-line headline final" style="margin-top:6px;"><span class="calc-result-label" style="color:#b78b3a;">Return on Portal cost</span><span class="calc-result-value mono" id="portalROI" style="color:#b78b3a;font-size:26px;">28.6×</span></div>
         </div>
-
-        <div class="calc-vs"><strong>How the math works.</strong> Baseline closing rate is assumed at 25% — drag the lift slider to your own estimate of how much Portal's same-hour notifications and homeowner self-service editing will move that needle. The 1% fee applies only to closed deals: if zero close, Bayside pays $0. (For reference: HubSpot Sales Pro for 8 designers runs ~$9,600/yr <em>fixed</em>, paid whether or not anything closes.)</div>
+        <div class="calc-vs"><strong>How the math works.</strong> Baseline closing rate is assumed at 25%. The lift slider models how much same-hour notifications and homeowner self-service move that needle. The 1% Phase 1 fee applies only to closed deals: if zero close, Bayside pays $0.</div>
       </div>
     </div>
   </div>
@@ -1023,13 +953,13 @@
     <span class="eyebrow reveal">The deal · plain language</span>
     <h2 class="reveal">Aligned incentives. No fine print.</h2>
     <div class="deal-grid">
-      <div class="deal-tile reveal"><div class="deal-tile-key">01 · The fee</div><h4>1% of contract value</h4><p>Applied only to deals that close after being published in Bayside Portal and engaged by the homeowner. Where they sign (in-portal, DocuSign, paper) doesn't matter.</p></div>
+      <div class="deal-tile reveal"><div class="deal-tile-key">01 · The fee</div><h4>1% of contract value</h4><p>Phase 1 today: <strong>1%</strong> of every deal that closes through Bayside Portal. Phase 2 (the full tech-stack vision): <strong>2%</strong> when we agree to expand scope. Either way, fee only applies to closed deals.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">02 · No fixed costs</div><h4>Zero minimum in year one</h4><p>No setup fees. No per-seat charges. No monthly minimums for the first six months. If Bayside closes zero deals via the Portal, Bayside pays $0.</p></div>
-      <div class="deal-tile reveal"><div class="deal-tile-key">03 · The designer split</div><h4>Up to 50% to the designer</h4><p>Bayside may pass up to half of the 1% directly to the designer of record. Creates real comp upside on every closed Portal deal. Split structure is Bayside's call.</p></div>
+      <div class="deal-tile reveal"><div class="deal-tile-key">03 · The designer split</div><h4>Up to 50% to the designer</h4><p>Bayside may pass up to half of the Phase 1 fee directly to the designer of record. Creates real comp upside on every closed Portal deal. Split structure is Bayside's call.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">04 · Training</div><h4>30 minutes to certify</h4><p>Designers complete a short video course + quiz to earn the split. New hires after the start date certify before publishing their first proposal.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">05 · The term</div><h4>12 months, auto-renewing</h4><p>60 days' notice to non-renew. Either side can exit clean at the end of any term. Bayside has 90 days post-termination to export all data.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">06 · The data</div><h4>Bayside owns it all</h4><p>All homeowner and deal data is Bayside's property. Exportable any time. McMullen Properties retains only anonymized aggregate rights for product improvement.</p></div>
-      <div class="deal-tile reveal"><div class="deal-tile-key">07 · Continuity</div><h4>Code escrow available</h4><p>Optional escrow agreement so if McMullen Properties ever winds down, Bayside ends up owning the Portal source. Mitigates the fair concern about key-person risk.</p></div>
+      <div class="deal-tile reveal"><div class="deal-tile-key">07 · IP buyout</div><h4>Source available at year 3</h4><p>After 36 months under contract (Phase 1 or Phase 2), Bayside has the option to buy out the Portal's source code outright. Terms TBD — we'll structure it fairly when we get there. Code escrow available from day 1.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">08 · Support</div><h4>4-hour business-day SLA</h4><p>Direct line to Tim McMullen. Monthly designer office-hours call. Quarterly business review with Bayside leadership.</p></div>
     </div>
   </div>
@@ -1040,10 +970,10 @@
     <span class="eyebrow reveal">What the first 60 days look like</span>
     <h2 class="reveal">A phased rollout. No big-bang risk.</h2>
     <div class="stepper">
-      <div class="step reveal"><div class="step-marker">W1</div><div class="step-period">Week 1</div><h5>Sign + Kickoff</h5><p>1-hour kickoff call. Adriana & Tim McMullen activate as Cohort 0.</p></div>
+      <div class="step reveal"><div class="step-marker">W1</div><div class="step-period">Week 1</div><h5>Sign + Kickoff</h5><p>1-hour kickoff call. Adriana & Tim McMullen activate as Cohort 0. Phase 1 scope locked.</p></div>
       <div class="step reveal"><div class="step-marker">W2-4</div><div class="step-period">Weeks 2 – 4</div><h5>Cohort 1</h5><p>2–3 designers certified. First Portal proposals published. Real engagement data starts flowing.</p></div>
       <div class="step reveal"><div class="step-marker">M2</div><div class="step-period">Month 2</div><h5>Cohort 2</h5><p>Remaining designers certified. New-hire certification policy goes live.</p></div>
-      <div class="step reveal"><div class="step-marker">M3+</div><div class="step-period">Month 3+</div><h5>Steady state</h5><p>Monthly designer office-hours. Quarterly leadership business review. Roadmap requests in flight.</p></div>
+      <div class="step reveal"><div class="step-marker">M3+</div><div class="step-period">Month 3+</div><h5>Steady state · Phase 2 conversation</h5><p>Monthly designer office-hours. Quarterly leadership business review. Phase 2 roadmap reviewed when Phase 1 is humming.</p></div>
     </div>
   </div>
 </section>
