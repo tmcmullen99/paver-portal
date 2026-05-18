@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="pitch-bayside.css">
   <style>
-    /* Moat demo styles (unchanged) */
     .moat-demo{background:#faf8f3;border-radius:16px;padding:28px;margin:40px 0 28px;box-shadow:0 24px 64px rgba(0,0,0,0.35);color:#0e1218}
     .moat-demo-header{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:14px;flex-wrap:wrap}
     .moat-demo-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#5d7e69;font-weight:700;margin-bottom:6px}
@@ -44,7 +43,6 @@
     .moat-caption{font-size:13px;line-height:1.55}
     .moat-caption strong{color:#b78b3a;font-weight:600;display:block;margin-bottom:3px;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
 
-    /* Live proposal cards (NEW) */
     .live-proposals-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:36px 0 56px}
     .lp-card{display:flex;flex-direction:column;background:#faf8f3;border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;box-shadow:0 4px 18px rgba(0,0,0,0.06);transition:transform 0.18s ease,box-shadow 0.18s ease;border:1px solid rgba(0,0,0,0.05)}
     .lp-card:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(0,0,0,0.12)}
@@ -66,7 +64,6 @@
     .lp-card-open::after{content:"→";transition:transform 0.18s ease}
     .lp-card:hover .lp-card-open::after{transform:translateX(3px)}
 
-    /* Functional notifications (NEW · inside war room section) */
     .fn-notif-wrap{margin:48px 0 0;padding:36px 0 0;border-top:1px solid rgba(255,255,255,0.08)}
     .fn-notif-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#b78b3a;font-weight:600;margin-bottom:14px;text-align:center}
     .fn-notif-heading{font-family:'Playfair Display',serif;font-size:30px;text-align:center;color:#faf8f3;line-height:1.15;margin:0 0 14px}
@@ -83,7 +80,6 @@
     .fn-notif-text{font-size:12px;color:rgba(14,18,24,0.65);line-height:1.5}
     .fn-notif-action{display:inline-block;margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:#5d7e69;font-weight:700}
 
-    /* Admin tool grid (NEW · for Growing Admin section) */
     .admin-mock{background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;overflow:hidden}
     .admin-mock-bar{background:#0e1218;color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
     .admin-mock-brand{font-family:'Playfair Display',serif;font-size:15px;font-weight:600}
@@ -101,11 +97,8 @@
     .admin-tools-group span{font-weight:400;margin-left:10px;letter-spacing:0.04em;text-transform:none;color:rgba(14,18,24,0.4)}
     .admin-tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
     .admin-tool-card{border:1px solid rgba(0,0,0,0.07);border-radius:10px;padding:16px 16px 14px;background:#fff;display:flex;flex-direction:column;gap:6px}
-    .admin-tool-card.phase2{background:#fafafa;border-style:dashed;border-color:rgba(93,126,105,0.35);position:relative}
-    .admin-tool-card.phase2::before{content:"PHASE 2";position:absolute;top:10px;right:12px;background:#5d7e69;color:#fff;padding:2px 7px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.12em;font-weight:700}
     .admin-tool-head{display:flex;align-items:center;gap:10px}
     .admin-tool-ico{width:30px;height:30px;border-radius:7px;background:#e8eee9;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-    .admin-tool-card.phase2 .admin-tool-ico{background:rgba(93,126,105,0.15)}
     .admin-tool-name{font-size:13px;font-weight:700;color:#0e1218}
     .admin-tool-desc{font-size:11px;line-height:1.5;color:rgba(14,18,24,0.6);margin:0}
 
@@ -127,8 +120,7 @@
     <div class="nav-links">
       <a href="#problem">The problem</a>
       <a href="#features">Features</a>
-      <a href="#growing">Growing admin</a>
-      <a href="#phase2">Phase 2</a>
+      <a href="#growing">Admin dashboard</a>
       <a href="#math">The math</a>
       <a href="#deal">The deal</a>
       <a href="#cta" class="nav-cta">Schedule walkthrough →</a>
@@ -703,9 +695,9 @@
 
 <section id="growing" class="proposal-builder-section" style="background:#fafafa;">
   <div class="container">
-    <span class="eyebrow reveal">The Bayside Portal admin · already shipped, still growing</span>
-    <h2 class="reveal">One dashboard. <em>Every tool Bayside operates from.</em></h2>
-    <p class="reveal" style="font-size:18px;color:var(--ink-mute);max-width:740px;margin-bottom:36px;">This is what's live today inside Bayside Portal — fifteen tools across operations and the material catalog, all under one login. And this dashboard adds tools every sprint.</p>
+    <span class="eyebrow reveal">The Bayside Portal admin · everything Bayside operates from</span>
+    <h2 class="reveal">One dashboard. <em>Fifteen tools.</em> All custom-built.</h2>
+    <p class="reveal" style="font-size:18px;color:var(--ink-mute);max-width:740px;margin-bottom:36px;">This is what's live today inside Bayside Portal — fifteen tools across operations and the material catalog, all under one login, all wired to the same database of homeowners, proposals, materials, and engagement signals. No SaaS stack to glue together. No tab-switching between vendors. One place, built from scratch for the way Bayside Pavers operates.</p>
 
     <div class="demo-frame reveal" style="margin-bottom:48px;">
       <div class="frame-dots"><span></span><span></span><span></span></div>
@@ -729,7 +721,7 @@
           <div class="admin-tools-group">OPERATIONS <span>9 tools · all live</span></div>
           <div class="admin-tools-grid">
             <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">●</div><div class="admin-tool-name">Pipeline</div></div><p class="admin-tool-desc">Every proposal in one place. Computed funnel stage, last activity, pending substitutions and redesigns, quick links into every other admin view.</p></div>
-            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">🌱</div><div class="admin-tool-name">Nurture</div></div><p class="admin-tool-desc">Track every client through the nurture phase pipeline. Auto-transitions on consultation, publish, and signing. Manual override.</p></div>
+            <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">🌱</div><div class="admin-tool-name">Nurture</div></div><p class="admin-tool-desc">Track every client through the nurture phase pipeline. Auto-transitions on consultation, publish, and signing. Manual override for paused or opted-out clients.</p></div>
             <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">✉</div><div class="admin-tool-name">Nurture templates</div></div><p class="admin-tool-desc">Author the email content sent at each phase + day-offset of the nurture sequence. Markdown with merge fields, project-type filtering, scheduling.</p></div>
             <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">📣</div><div class="admin-tool-name">Outreach</div></div><p class="admin-tool-desc">Cold lead pipeline. Drafted-not-sent, sent-never-opened, and engaged-then-ghosted clients. AI-drafted re-engagement messages.</p></div>
             <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">👤</div><div class="admin-tool-name">Clients</div></div><p class="admin-tool-desc">Add, edit, and invite homeowner clients. Assign proposals, manage referrals, send login links.</p></div>
@@ -748,65 +740,11 @@
             <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">💰</div><div class="admin-tool-name">Material Prices</div></div><p class="admin-tool-desc">Bulk-edit per-unit pricing across the entire catalog. Filters, search, dirty tracking, one-click save.</p></div>
             <div class="admin-tool-card"><div class="admin-tool-head"><div class="admin-tool-ico">📥</div><div class="admin-tool-name">Markup PDF picker</div></div><p class="admin-tool-desc">Per-proposal: curate which renderings appear in the homeowner's downloadable markup PDF. Drag-to-reorder, custom labels.</p></div>
           </div>
-
-          <div class="admin-tools-group" style="margin-top:36px;">PHASE 2 · WHAT WE'D ADD NEXT <span>future integrations · roadmap proposal</span></div>
-          <div class="admin-tools-grid">
-            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">🔨</div><div class="admin-tool-name">JobNimbus integration</div></div><p class="admin-tool-desc">Replace the entire construction-side workflow. Crew scheduling, job costing, material orders, site photos, change orders — wired to the same proposal record.</p></div>
-            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">🎯</div><div class="admin-tool-name">HubSpot CRM</div></div><p class="admin-tool-desc">Full deal lifecycle CRM with sequences, automation, and contact enrichment. Bayside Portal becomes the front-end; HubSpot the long-term contact memory.</p></div>
-            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">🔍</div><div class="admin-tool-name">SEMRush</div></div><p class="admin-tool-desc">Track Bayside's organic ranking against every Bay Area competitor. Keyword gaps, content opportunities, backlink intelligence — surfaced in one panel.</p></div>
-            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">📊</div><div class="admin-tool-name">Google Ads + Analytics</div></div><p class="admin-tool-desc">Live attribution from ad click → proposal sent → signed deal. Spend ROI per campaign, audience, and landing page — without leaving the admin.</p></div>
-            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">✍️</div><div class="admin-tool-name">Content Creator</div></div><p class="admin-tool-desc">AI-assisted blog writer trained on Bayside's voice. Project case studies, seasonal guides, neighborhood-specific landing pages — drafted automatically, edited by you.</p></div>
-            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">📱</div><div class="admin-tool-name">Social media agent</div></div><p class="admin-tool-desc">Auto-schedule post-job photos to Instagram, Facebook, Pinterest. Pulls from completed project galleries. Optimal-time posting across all channels.</p></div>
-            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">📨</div><div class="admin-tool-name">Mailchimp</div></div><p class="admin-tool-desc">Beyond transactional email — full marketing newsletters, drip sequences for cold leads, automation triggered by Bayside Portal pipeline events.</p></div>
-            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">⭐</div><div class="admin-tool-name">Review requester</div></div><p class="admin-tool-desc">Post-install: auto-text the homeowner a tap-to-review link for Google + Yelp. Smart timing based on signed satisfaction. Negative-feedback intercept.</p></div>
-            <div class="admin-tool-card phase2"><div class="admin-tool-head"><div class="admin-tool-ico">+</div><div class="admin-tool-name">Whatever else</div></div><p class="admin-tool-desc">Quickbooks, DocuSign, Twilio voice, Calendly, NextDoor, anything that fits how Bayside actually operates. The platform is custom-built — we add what works.</p></div>
-          </div>
         </div>
       </div>
     </div>
 
-    <p class="reveal" style="font-family:'Playfair Display',serif;font-size:24px;font-style:italic;color:var(--ink);text-align:center;max-width:760px;margin:0 auto;line-height:1.45;">Phase 1 ships the sales floor. <strong style="font-style:normal;color:var(--accent);">Phase 2 completes the tech stack.</strong></p>
-  </div>
-</section>
-
-<section id="phase2" class="cta-section" style="background:linear-gradient(135deg,#0e1218 0%,#1a2030 100%);padding:96px 0;text-align:left;">
-  <div class="container">
-    <div style="max-width:780px;margin:0 auto;text-align:center;">
-      <span class="eyebrow" style="color:#b78b3a;">Phase 2 · the full vision</span>
-      <h2 style="font-family:'Playfair Display',serif;font-size:54px;color:#faf8f3;line-height:1.05;margin:14px 0 22px;letter-spacing:-0.015em;">Replace <em style="color:#b78b3a;">every</em> third-party tool with one custom platform built for Bayside.</h2>
-      <p style="font-size:19px;color:rgba(250,248,243,0.8);line-height:1.55;margin:0 auto 0;max-width:680px;">Phase 1 is the sales platform. It's running today. Phase 2 layers in marketing automation, content, social, reviews, and the full construction-side workflow — all under one login, all wired to the same homeowner record, all custom-built for the way Bayside Pavers actually operates.</p>
-    </div>
-
-    <div style="margin-top:64px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:1100px;margin-left:auto;margin-right:auto;">
-      <div style="background:rgba(250,248,243,0.04);border:1px solid rgba(183,139,58,0.3);border-radius:14px;padding:32px 28px;text-align:left;">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:#5d7e69;font-weight:700;margin-bottom:12px;">PILLAR 01 · TODAY</div>
-        <h3 style="font-family:'Playfair Display',serif;font-size:24px;color:#faf8f3;margin:0 0 12px;line-height:1.2;">Sales <span style="color:#5d7e69;">✓ live</span></h3>
-        <p style="font-size:14px;color:rgba(250,248,243,0.7);line-height:1.6;margin:0;">Proposal builder, homeowner self-edit, hot deals scoring, war room, automated notifications, designer pipeline, leadership dashboard. Running today.</p>
-      </div>
-      <div style="background:rgba(250,248,243,0.04);border:1px dashed rgba(183,139,58,0.35);border-radius:14px;padding:32px 28px;text-align:left;">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:#b78b3a;font-weight:700;margin-bottom:12px;">PILLAR 02 · PHASE 2</div>
-        <h3 style="font-family:'Playfair Display',serif;font-size:24px;color:#faf8f3;margin:0 0 12px;line-height:1.2;">Marketing</h3>
-        <p style="font-size:14px;color:rgba(250,248,243,0.7);line-height:1.6;margin:0;">SEMRush-class SEO intelligence. Google Ads + Analytics attribution. AI content creator. Social media autopilot. Mailchimp-class email. Review acquisition. All in one panel.</p>
-      </div>
-      <div style="background:rgba(250,248,243,0.04);border:1px dashed rgba(183,139,58,0.35);border-radius:14px;padding:32px 28px;text-align:left;">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:#b78b3a;font-weight:700;margin-bottom:12px;">PILLAR 03 · PHASE 2</div>
-        <h3 style="font-family:'Playfair Display',serif;font-size:24px;color:#faf8f3;margin:0 0 12px;line-height:1.2;">Construction</h3>
-        <p style="font-size:14px;color:rgba(250,248,243,0.7);line-height:1.6;margin:0;">JobNimbus-class job management. Crew scheduling, change orders, site photo capture, material ordering, completion sign-off — all wired to the same proposal that started it.</p>
-      </div>
-    </div>
-
-    <div style="margin-top:56px;max-width:780px;margin-left:auto;margin-right:auto;background:rgba(183,139,58,0.08);border:1px solid rgba(183,139,58,0.35);border-radius:14px;padding:36px 36px 32px;text-align:center;">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:#b78b3a;font-weight:700;margin-bottom:10px;">PHASE 2 PRICING</div>
-      <h3 style="font-family:'Playfair Display',serif;font-size:42px;color:#faf8f3;margin:0 0 8px;line-height:1.05;letter-spacing:-0.01em;">2% of contract value</h3>
-      <p style="font-size:14px;color:rgba(250,248,243,0.65);max-width:540px;margin:0 auto 24px;line-height:1.55;">Up from the Phase 1 rate of 1%. Replaces a stack of third-party SaaS subscriptions Bayside is currently paying for separately (JobNimbus + HubSpot + SEMRush + Mailchimp + ad agency overhead). Net spend likely lower; integration value not comparable.</p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;text-align:left;margin-top:24px;">
-        <div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;color:rgba(250,248,243,0.5);margin-bottom:6px;">CUSTOM-BUILT</div><div style="font-size:14px;color:#faf8f3;line-height:1.4;">For Bayside, not a generic SaaS bent into shape.</div></div>
-        <div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;color:rgba(250,248,243,0.5);margin-bottom:6px;">ONE LOGIN</div><div style="font-size:14px;color:#faf8f3;line-height:1.4;">Every tool, every workflow, under one admin.</div></div>
-        <div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;color:rgba(250,248,243,0.5);margin-bottom:6px;">IP BUYOUT · YEAR 3+</div><div style="font-size:14px;color:#faf8f3;line-height:1.4;">After 3 years, Bayside may purchase the source outright. Terms TBD at the table.</div></div>
-      </div>
-    </div>
-
-    <p style="text-align:center;font-family:'Playfair Display',serif;font-size:22px;font-style:italic;color:rgba(250,248,243,0.85);max-width:680px;margin:48px auto 0;line-height:1.45;">Phase 2 isn't on the table today — Phase 1 is. <strong style="font-style:normal;color:#b78b3a;">But it's where this is going.</strong></p>
+    <p class="reveal" style="font-family:'Playfair Display',serif;font-size:24px;font-style:italic;color:var(--ink);text-align:center;max-width:780px;margin:0 auto;line-height:1.45;">Every tool a designer or admin needs to run a deal — under one login, in one database, built from scratch for how Bayside operates. <strong style="font-style:normal;color:var(--accent);">And the dashboard adds new tools every sprint.</strong></p>
   </div>
 </section>
 
@@ -907,9 +845,9 @@
 
 <section id="math" class="calc-section">
   <div class="container">
-    <span class="eyebrow reveal" style="color:var(--gold);">Phase 1 economics · interactively</span>
+    <span class="eyebrow reveal" style="color:var(--gold);">The cost and the upside · interactively</span>
     <h2 class="reveal">What does it cost? <em>And what does it earn?</em></h2>
-    <p class="reveal">The Phase 1 Bayside Portal fee is just <strong style="color:var(--gold);">1% of each closed deal</strong> — $500 on a $50,000 project. The real story is the revenue lift from same-hour notifications, live material swaps, and customer self-service editing. Drag the sliders.</p>
+    <p class="reveal">The Bayside Portal fee is just <strong style="color:var(--gold);">1% of each closed deal</strong> — $500 on a $50,000 project. The real story is the revenue lift from same-hour notifications, live material swaps, and customer self-service editing. Drag the sliders.</p>
     <div class="calc-grid">
       <div class="calc-controls reveal">
         <div class="calc-control"><div class="calc-label"><span>Projects sent per year</span><span class="calc-label-value" id="projectsLabel">100</span></div><input type="range" id="projectsSlider" min="20" max="300" value="100" step="10"></div>
@@ -942,7 +880,7 @@
           <div class="calc-result-line" style="opacity:0.8;"><span class="calc-result-label">Total Portal fees / year</span><span class="calc-result-value mono" id="totalPortalFees">$17,500</span></div>
           <div class="calc-result-line headline final" style="margin-top:6px;"><span class="calc-result-label" style="color:#b78b3a;">Return on Portal cost</span><span class="calc-result-value mono" id="portalROI" style="color:#b78b3a;font-size:26px;">28.6×</span></div>
         </div>
-        <div class="calc-vs"><strong>How the math works.</strong> Baseline closing rate is assumed at 25%. The lift slider models how much same-hour notifications and homeowner self-service move that needle. The 1% Phase 1 fee applies only to closed deals: if zero close, Bayside pays $0.</div>
+        <div class="calc-vs"><strong>How the math works.</strong> Baseline closing rate is assumed at 25%. The lift slider models how much same-hour notifications and homeowner self-service move that needle. The 1% fee applies only to closed deals: if zero close, Bayside pays $0.</div>
       </div>
     </div>
   </div>
@@ -953,13 +891,13 @@
     <span class="eyebrow reveal">The deal · plain language</span>
     <h2 class="reveal">Aligned incentives. No fine print.</h2>
     <div class="deal-grid">
-      <div class="deal-tile reveal"><div class="deal-tile-key">01 · The fee</div><h4>1% of contract value</h4><p>Phase 1 today: <strong>1%</strong> of every deal that closes through Bayside Portal. Phase 2 (the full tech-stack vision): <strong>2%</strong> when we agree to expand scope. Either way, fee only applies to closed deals.</p></div>
+      <div class="deal-tile reveal"><div class="deal-tile-key">01 · The fee</div><h4>1% of contract value</h4><p>Applied only to deals that close after being published in Bayside Portal and engaged by the homeowner. Where they sign (in-portal, DocuSign, paper) doesn't matter.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">02 · No fixed costs</div><h4>Zero minimum in year one</h4><p>No setup fees. No per-seat charges. No monthly minimums for the first six months. If Bayside closes zero deals via the Portal, Bayside pays $0.</p></div>
-      <div class="deal-tile reveal"><div class="deal-tile-key">03 · The designer split</div><h4>Up to 50% to the designer</h4><p>Bayside may pass up to half of the Phase 1 fee directly to the designer of record. Creates real comp upside on every closed Portal deal. Split structure is Bayside's call.</p></div>
+      <div class="deal-tile reveal"><div class="deal-tile-key">03 · The designer split</div><h4>Up to 50% to the designer</h4><p>Bayside may pass up to half of the 1% directly to the designer of record. Creates real comp upside on every closed Portal deal. Split structure is Bayside's call.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">04 · Training</div><h4>30 minutes to certify</h4><p>Designers complete a short video course + quiz to earn the split. New hires after the start date certify before publishing their first proposal.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">05 · The term</div><h4>12 months, auto-renewing</h4><p>60 days' notice to non-renew. Either side can exit clean at the end of any term. Bayside has 90 days post-termination to export all data.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">06 · The data</div><h4>Bayside owns it all</h4><p>All homeowner and deal data is Bayside's property. Exportable any time. McMullen Properties retains only anonymized aggregate rights for product improvement.</p></div>
-      <div class="deal-tile reveal"><div class="deal-tile-key">07 · IP buyout</div><h4>Source available at year 3</h4><p>After 36 months under contract (Phase 1 or Phase 2), Bayside has the option to buy out the Portal's source code outright. Terms TBD — we'll structure it fairly when we get there. Code escrow available from day 1.</p></div>
+      <div class="deal-tile reveal"><div class="deal-tile-key">07 · Continuity</div><h4>Code escrow available</h4><p>Optional escrow agreement so if McMullen Properties ever winds down, Bayside ends up owning the Portal source. Mitigates the fair concern about key-person risk.</p></div>
       <div class="deal-tile reveal"><div class="deal-tile-key">08 · Support</div><h4>4-hour business-day SLA</h4><p>Direct line to Tim McMullen. Monthly designer office-hours call. Quarterly business review with Bayside leadership.</p></div>
     </div>
   </div>
@@ -970,10 +908,10 @@
     <span class="eyebrow reveal">What the first 60 days look like</span>
     <h2 class="reveal">A phased rollout. No big-bang risk.</h2>
     <div class="stepper">
-      <div class="step reveal"><div class="step-marker">W1</div><div class="step-period">Week 1</div><h5>Sign + Kickoff</h5><p>1-hour kickoff call. Adriana & Tim McMullen activate as Cohort 0. Phase 1 scope locked.</p></div>
+      <div class="step reveal"><div class="step-marker">W1</div><div class="step-period">Week 1</div><h5>Sign + Kickoff</h5><p>1-hour kickoff call. Adriana & Tim McMullen activate as Cohort 0.</p></div>
       <div class="step reveal"><div class="step-marker">W2-4</div><div class="step-period">Weeks 2 – 4</div><h5>Cohort 1</h5><p>2–3 designers certified. First Portal proposals published. Real engagement data starts flowing.</p></div>
       <div class="step reveal"><div class="step-marker">M2</div><div class="step-period">Month 2</div><h5>Cohort 2</h5><p>Remaining designers certified. New-hire certification policy goes live.</p></div>
-      <div class="step reveal"><div class="step-marker">M3+</div><div class="step-period">Month 3+</div><h5>Steady state · Phase 2 conversation</h5><p>Monthly designer office-hours. Quarterly leadership business review. Phase 2 roadmap reviewed when Phase 1 is humming.</p></div>
+      <div class="step reveal"><div class="step-marker">M3+</div><div class="step-period">Month 3+</div><h5>Steady state</h5><p>Monthly designer office-hours. Quarterly leadership business review. Roadmap requests in flight.</p></div>
     </div>
   </div>
 </section>
