@@ -765,6 +765,7 @@
         : '';
 
       const headerActions = [];
+      headerActions.push(`<a class="conv-header-btn" href="/admin/client.html?id=${esc(c.id)}">👤 Client profile</a>`);
       if (proposalUrl) headerActions.push(`<a class="conv-header-btn" href="${esc(proposalUrl)}" target="_blank" rel="noopener">View public proposal</a>`);
       if (editorUrl)   headerActions.push(`<a class="conv-header-btn" href="${esc(editorUrl)}" target="_blank" rel="noopener">Open editor</a>`);
 
