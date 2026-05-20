@@ -1,28 +1,40 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// /admin/admin-shell.js — Sprint 14B
+// /admin/admin-shell.js — Sprint 7
 //
 // The master admin shell. Renders:
-//   1. The role badge + email in the topbar
-//   2. The tab strip (filtered by role)
-//   3. The landing-page tile grid (only when on /admin/ itself, not nested
-//      pages — those swap in their own content)
+//   1. The role badge + email in the topbar (existing)
+//   2. The LEFT-SIDE NAVIGATION (new — was a top tab strip pre-Sprint-7)
+//   3. The landing-page tile grid (existing, only on /admin/ root)
+//   4. A mobile hamburger toggle injected into the topbar
+//   5. Live notification dots on sidebar items, polled from /api/admin-inbox
 //
-// Sprint 14B: added master-only Nurture templates tab to the 'operations'
-// group, immediately after Nurture, for the new template-authoring page.
-// (Sprint 14A added Nurture; Sprint 12 added Outreach.)
-// Operations tab order: Pipeline → Nurture → Nurture templates (M) →
-// Outreach → Clients → Substitutions → Redesigns → Create homeowner → Site map.
+// Sprint 7 changes from 14B:
+//   • TABS unchanged in shape — 3 new entries added (Inbox, Material prices,
+//     Resend invite) for tools shipped in Sprints 5/6.
+//   • renderTabs() → renderSidebar() — vertical layout, grouped, with
+//     section headers (using existing GROUPS metadata) instead of a single
+//     flat strip.
+//   • Hamburger button injected dynamically into the topbar — preserves all
+//     existing admin-page HTML, no per-page edits needed.
+//   • Background polling of /api/admin-inbox every 60 seconds paints
+//     notification dots on Inbox, Substitutions, Redesigns, Clients, and
+//     Resend invite sidebar items.
 //
 // Adding a future admin tool:
-//   1. Add an entry to TABS below
-//   2. Done. The tab appears for users with the right role, and a tile shows
-//      up on the landing grid.
+//   1. Add an entry to TABS below.
+//   2. Done. The item appears for users with the right role, gets a sidebar
+//      slot in the right group, and gets a tile on the landing grid.
+//
+// To add notification-dot wiring for a new item:
+//   1. Give the TAB entry a `notifKey` matching an admin_inbox_state()
+//      category name (e.g. 'pending_substitutions').
+//   2. The dot count will populate automatically.
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { requireDesigner, signOut } from '/js/auth-util.js';
 
 const TABS = [
-  // Landing
+  // ── Landing ─────────────────────────────────────────────────────────────
   {
     id: 'overview',
     label: 'Overview',
@@ -34,7 +46,17 @@ const TABS = [
     hideFromLanding: true,
   },
 
-  // Operations — Pipeline first; it's the daily command center
+  // ── Operations — daily client work ──────────────────────────────────────
+  {
+    id: 'inbox',
+    label: 'Inbox',
+    href: '/admin/inbox.html',
+    role: 'designer',
+    group: 'operations',
+    icon: '📥',
+    description: 'Unified view of everything needing attention right now: lock-ins, unread messages, pending substitutions and redesigns, cold deals, and clients pending account activation.',
+    notifKey: '__inbox_total',
+  },
   {
     id: 'pipeline',
     label: 'Pipeline',
@@ -79,6 +101,17 @@ const TABS = [
     group: 'operations',
     icon: '👤',
     description: 'Add, edit, and invite homeowner clients. Assign proposals, manage referrals, send login links.',
+    notifKey: 'clients_pending_activation',
+  },
+  {
+    id: 'resend-invite',
+    label: 'Resend invite',
+    href: '/admin/resend-invite.html',
+    role: 'designer',
+    group: 'operations',
+    icon: '🔓',
+    description: 'Send a fresh Bayside Portal magic-link invite to any client by email or UUID. Lifeline for clients who never set up their account — kills Yorktown-style silent failures.',
+    notifKey: 'clients_pending_activation',
   },
   {
     id: 'substitutions',
@@ -88,6 +121,7 @@ const TABS = [
     group: 'operations',
     icon: '↺',
     description: 'Review homeowner material swap requests submitted from published proposals. Approve, reject, or mark applied.',
+    notifKey: 'pending_substitutions',
   },
   {
     id: 'client-redesigns',
@@ -97,6 +131,7 @@ const TABS = [
     group: 'operations',
     icon: '✏',
     description: 'Review client design change requests — markups, photos of paper markup, and notes for changes beyond material swaps.',
+    notifKey: 'pending_redesigns',
   },
   {
     id: 'create-homeowner',
@@ -117,7 +152,7 @@ const TABS = [
     description: 'Edit interactive site-map regions and material assignments for a published proposal.',
   },
 
-  // Catalog
+  // ── Catalog ─────────────────────────────────────────────────────────────
   {
     id: 'materials',
     label: 'Materials',
@@ -126,6 +161,15 @@ const TABS = [
     group: 'catalog',
     icon: '◧',
     description: 'Browse, edit, or add materials in the central catalog. Used for swap candidates on every proposal.',
+  },
+  {
+    id: 'material-prices',
+    label: 'Material prices',
+    href: '/admin/material-prices.html',
+    role: 'designer',
+    group: 'catalog',
+    icon: '$',
+    description: 'Set per-square-foot or per-unit prices for materials so the inline editor and homeowner-facing redesigns can show real numbers.',
   },
   {
     id: 'swatches-bulk',
@@ -173,7 +217,7 @@ const TABS = [
     description: 'Refresh the Belgard materials catalog from the manufacturer. Master-only — high blast radius.',
   },
 
-  // Team
+  // ── Team ────────────────────────────────────────────────────────────────
   {
     id: 'designers',
     label: 'Designers',
@@ -184,7 +228,7 @@ const TABS = [
     description: 'List, edit, deactivate, and invite designer/master accounts. Promote or demote roles.',
   },
 
-  // Analytics
+  // ── Analytics ───────────────────────────────────────────────────────────
   {
     id: 'events',
     label: 'Events',
@@ -204,7 +248,7 @@ const TABS = [
     description: 'Get pinged when homeowners view your proposals. Manage first-view emails, daily digest, and quiet hours.',
   },
 
-  // Tools
+  // ── Tools & maintenance ────────────────────────────────────────────────
   {
     id: 'install-guide',
     label: 'Install guide',
@@ -235,12 +279,15 @@ const TABS = [
 ];
 
 const GROUPS = [
-  { id: 'operations', label: 'Operations',         desc: 'Day-to-day client management.' },
-  { id: 'catalog',    label: 'Material catalog',   desc: 'The library of materials, swatches, and install PDFs that powers every proposal.' },
-  { id: 'team',       label: 'Team',               desc: 'Staff account management. Master-only.' },
-  { id: 'analytics',  label: 'Analytics',          desc: 'Engagement and conversion data from published proposals.' },
-  { id: 'tools',      label: 'Tools & maintenance',desc: 'Less-frequent utilities. Most are master-only.' },
+  { id: 'operations', label: 'Operations',          desc: 'Day-to-day client management.' },
+  { id: 'catalog',    label: 'Material catalog',    desc: 'The library of materials, swatches, and install PDFs that powers every proposal.' },
+  { id: 'team',       label: 'Team',                desc: 'Staff account management. Master-only.' },
+  { id: 'analytics',  label: 'Analytics',           desc: 'Engagement and conversion data from published proposals.' },
+  { id: 'tools',      label: 'Tools & maintenance', desc: 'Less-frequent utilities. Most are master-only.' },
 ];
+
+// Polling interval for notification-dot refresh.
+const NOTIF_POLL_INTERVAL_MS = 60000;
 
 (async function init() {
   const auth = await requireDesigner();
@@ -249,49 +296,160 @@ const GROUPS = [
   const { user, profile } = auth;
   const isMaster = profile.role === 'master';
 
+  injectSidebarBackdrop();
+  injectHamburger();
+  syncTopbarHeight();
+  window.addEventListener('resize', syncTopbarHeight);
+
   renderTopbar(user, profile, isMaster);
-  renderTabs(isMaster);
+  renderSidebar(isMaster);
   renderLanding(profile, isMaster);
 
   document.getElementById('ashSignOutBtn').addEventListener('click', signOut);
+
+  // Notification dots — best-effort, silent failure
+  fetchAndPaintNotifications();
+  setInterval(fetchAndPaintNotifications, NOTIF_POLL_INTERVAL_MS);
 })();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Sidebar chrome — hamburger, backdrop, dynamic topbar height
+// ═══════════════════════════════════════════════════════════════════════════
+
+function injectHamburger() {
+  const inner = document.querySelector('.ash-topbar-inner');
+  if (!inner || inner.querySelector('.ash-sidebar-toggle')) return;
+
+  const brand = inner.querySelector('.ash-brand');
+  if (!brand) return;
+
+  // Create a wrapper for [hamburger + brand] so the existing
+  // justify-content: space-between still pushes ash-topbar-right to the edge.
+  const leftGroup = document.createElement('div');
+  leftGroup.className = 'ash-topbar-left';
+
+  const btn = document.createElement('button');
+  btn.className = 'ash-sidebar-toggle';
+  btn.id = 'ashSidebarToggle';
+  btn.type = 'button';
+  btn.setAttribute('aria-label', 'Toggle navigation');
+  btn.innerHTML = '<span aria-hidden="true">☰</span>';
+  btn.addEventListener('click', toggleSidebar);
+
+  leftGroup.appendChild(btn);
+  leftGroup.appendChild(brand);
+  inner.insertBefore(leftGroup, inner.firstChild);
+}
+
+function injectSidebarBackdrop() {
+  if (document.querySelector('.ash-sidebar-backdrop')) return;
+  const bd = document.createElement('div');
+  bd.className = 'ash-sidebar-backdrop';
+  bd.addEventListener('click', closeSidebar);
+  document.body.appendChild(bd);
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('ashTabs');
+  if (!sidebar) return;
+  const open = sidebar.classList.toggle('is-open');
+  document.body.classList.toggle('ash-sidebar-open', open);
+}
+
+function closeSidebar() {
+  const sidebar = document.getElementById('ashTabs');
+  if (sidebar) sidebar.classList.remove('is-open');
+  document.body.classList.remove('ash-sidebar-open');
+}
+
+function syncTopbarHeight() {
+  const topbar = document.querySelector('.ash-topbar');
+  if (!topbar) return;
+  const h = topbar.offsetHeight;
+  if (h > 0) {
+    document.documentElement.style.setProperty('--ash-topbar-height', h + 'px');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Topbar
+// ═══════════════════════════════════════════════════════════════════════════
 
 function renderTopbar(user, profile, isMaster) {
   const badge = document.getElementById('ashRoleBadge');
-  badge.textContent = isMaster ? 'Master' : 'Designer';
-  badge.classList.remove('is-loading');
-  badge.classList.add(isMaster ? 'is-master' : 'is-designer');
+  if (badge) {
+    badge.textContent = isMaster ? 'Master' : 'Designer';
+    badge.classList.remove('is-loading');
+    badge.classList.add(isMaster ? 'is-master' : 'is-designer');
+  }
 
   const emailEl = document.getElementById('ashUserEmail');
-  emailEl.textContent = profile.email || user.email || '';
+  if (emailEl) emailEl.textContent = profile.email || user.email || '';
 }
 
-function renderTabs(isMaster) {
+// ═══════════════════════════════════════════════════════════════════════════
+// Sidebar — vertical, grouped by GROUPS metadata
+// ═══════════════════════════════════════════════════════════════════════════
+
+function renderSidebar(isMaster) {
   const wrap = document.getElementById('ashTabs');
   if (!wrap) return;
 
   const visible = TABS.filter(t => isMaster || t.role === 'designer');
-
-  const here = window.location.pathname.replace(/\/$/, '/');
-  const activeId = (visible.find(t => normalizePath(t.href) === normalizePath(here)) || {}).id;
+  const here = normalizePath(window.location.pathname);
+  const activeId = (visible.find(t => normalizePath(t.href) === here) || {}).id;
 
   const inner = document.createElement('div');
   inner.className = 'ash-tabs-inner';
 
-  visible.forEach(t => {
-    const a = document.createElement('a');
-    a.className = 'ash-tab' + (t.id === activeId ? ' is-active' : '');
-    a.href = t.href;
-    a.innerHTML = `
-      <span class="ash-tab-icon">${escapeHtml(t.icon || '')}</span>
-      <span>${escapeHtml(t.label)}</span>
-      ${t.role === 'master' ? '<span class="ash-tab-master-flag">M</span>' : ''}
-    `;
-    inner.appendChild(a);
+  // Render the Overview entry first as a top-level item (no group header)
+  const overview = visible.find(t => t.group === 'main');
+  if (overview) {
+    const topSection = document.createElement('div');
+    topSection.className = 'ash-sidebar-section';
+    topSection.appendChild(renderSidebarItem(overview, activeId));
+    inner.appendChild(topSection);
+  }
+
+  GROUPS.forEach(g => {
+    const itemsInGroup = visible.filter(t => t.group === g.id);
+    if (itemsInGroup.length === 0) return;
+
+    const section = document.createElement('div');
+    section.className = 'ash-sidebar-section';
+
+    const title = document.createElement('div');
+    title.className = 'ash-sidebar-section-title';
+    title.textContent = g.label;
+    section.appendChild(title);
+
+    itemsInGroup.forEach(t => section.appendChild(renderSidebarItem(t, activeId)));
+    inner.appendChild(section);
   });
 
   wrap.innerHTML = '';
   wrap.appendChild(inner);
+}
+
+function renderSidebarItem(t, activeId) {
+  const a = document.createElement('a');
+  a.className = 'ash-tab' + (t.id === activeId ? ' is-active' : '');
+  a.href = t.href;
+  a.setAttribute('data-tab-id', t.id);
+  a.innerHTML = `
+    <span class="ash-tab-icon">${escapeHtml(t.icon || '·')}</span>
+    <span class="ash-tab-label">${escapeHtml(t.label)}</span>
+    <span class="ash-tab-dot" data-dot aria-hidden="true"></span>
+    ${t.role === 'master' ? '<span class="ash-tab-master-flag">M</span>' : ''}
+  `;
+  // Close mobile sidebar on tap so the user lands on the new page without
+  // the sidebar still covering the content.
+  a.addEventListener('click', () => {
+    if (window.matchMedia('(max-width: 900px)').matches) {
+      setTimeout(closeSidebar, 50);
+    }
+  });
+  return a;
 }
 
 function normalizePath(p) {
@@ -301,6 +459,69 @@ function normalizePath(p) {
   s = s.replace(/\/index\.html$/, '/');
   return s;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Notification dots — poll /api/admin-inbox, paint counts onto sidebar items
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function fetchAndPaintNotifications() {
+  try {
+    const resp = await fetch('/api/admin-inbox', { cache: 'no-store' });
+    if (!resp.ok) {
+      // Silent — dots are best-effort; user still has the inbox page itself.
+      return;
+    }
+    const data = await resp.json();
+    paintNotifDots(data);
+  } catch (e) {
+    // Silent fail. The shell continues to work without dots.
+  }
+}
+
+function paintNotifDots(d) {
+  if (!d || typeof d !== 'object') return;
+
+  // Special category: total of all attention-needing items, shown on Inbox.
+  const totalAttention =
+      (Array.isArray(d.unread_inbound)              ? d.unread_inbound.length              : 0)
+    + (Array.isArray(d.pending_substitutions)       ? d.pending_substitutions.length       : 0)
+    + (Array.isArray(d.pending_redesigns)           ? d.pending_redesigns.length           : 0)
+    + (Array.isArray(d.open_signature_intents)      ? d.open_signature_intents.length      : 0)
+    + (Array.isArray(d.clients_pending_activation)  ? d.clients_pending_activation.length  : 0);
+
+  const counts = {
+    '__inbox_total':              totalAttention,
+    'unread_inbound':             (d.unread_inbound             || []).length,
+    'pending_substitutions':      (d.pending_substitutions      || []).length,
+    'pending_redesigns':          (d.pending_redesigns          || []).length,
+    'open_signature_intents':     (d.open_signature_intents     || []).length,
+    'clients_pending_activation': (d.clients_pending_activation || []).length,
+    'cold_deals':                 (d.cold_deals                 || []).length,
+    'hot_today':                  (d.hot_today                  || []).length,
+  };
+
+  // For each TAB entry with a notifKey, paint the dot.
+  TABS.forEach(t => {
+    if (!t.notifKey) return;
+    const el = document.querySelector(`.ash-tab[data-tab-id="${t.id}"]`);
+    if (!el) return;
+    const dot = el.querySelector('[data-dot]');
+    if (!dot) return;
+
+    const n = counts[t.notifKey] || 0;
+    if (n > 0) {
+      dot.textContent = n > 99 ? '99+' : String(n);
+      dot.classList.add('is-visible');
+    } else {
+      dot.textContent = '';
+      dot.classList.remove('is-visible');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Landing tile grid — only rendered when on /admin/ root
+// ═══════════════════════════════════════════════════════════════════════════
 
 function renderLanding(profile, isMaster) {
   const landing = document.getElementById('ashLanding');
@@ -313,17 +534,20 @@ function renderLanding(profile, isMaster) {
   }
 
   const eyebrow = document.getElementById('ashIntroEyebrow');
-  const title = document.getElementById('ashIntroTitle');
-  const lede = document.getElementById('ashIntroLede');
+  const title   = document.getElementById('ashIntroTitle');
+  const lede    = document.getElementById('ashIntroLede');
 
   const greeting = profile.display_name ? profile.display_name.split(' ')[0] : 'there';
-  eyebrow.textContent = isMaster ? 'Master · Admin home' : 'Designer · Admin home';
-  title.textContent = `Welcome, ${greeting}.`;
-  lede.textContent = isMaster
-    ? 'Everything in BPB. Tools tagged with M are master-only — they affect the catalog, infrastructure, or other designers\' work.'
-    : 'Tools you use day-to-day. A few admin utilities aren\'t shown here because they\'re reserved for master access.';
+  if (eyebrow) eyebrow.textContent = isMaster ? 'Master · Admin home' : 'Designer · Admin home';
+  if (title)   title.textContent   = `Welcome, ${greeting}.`;
+  if (lede) {
+    lede.textContent = isMaster
+      ? 'Everything in BPB. Tools tagged with M are master-only — they affect the catalog, infrastructure, or other designers\' work.'
+      : 'Tools you use day-to-day. A few admin utilities aren\'t shown here because they\'re reserved for master access.';
+  }
 
   const groupsWrap = document.getElementById('ashTileGroups');
+  if (!groupsWrap) return;
   groupsWrap.innerHTML = '';
 
   GROUPS.forEach(g => {
@@ -365,6 +589,10 @@ function renderTile(t) {
     </a>
   `;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Utilities
+// ═══════════════════════════════════════════════════════════════════════════
 
 function escapeHtml(str) {
   if (str == null) return '';
