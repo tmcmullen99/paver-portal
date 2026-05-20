@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unsubscribed · Bayside Pavers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; padding:0; background:#faf8f3; font-family:'Onest',system-ui,sans-serif; color:#353535; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .uns-card { background:#fff; border:1px solid #e8e8e3; border-radius:14px; padding:36px 40px; max-width:480px; box-shadow:0 8px 24px rgba(0,0,0,0.04); }
+    .uns-eyebrow { font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:#5d7e69; font-weight:700; margin-bottom:10px; }
+    .uns-title { font-size:24px; font-weight:600; color:#1a1f2e; margin:0 0 14px; letter-spacing:-0.005em; }
+    .uns-body { font-size:15px; color:#353535; line-height:1.6; margin:0 0 18px; }
+    .uns-sig { font-size:14px; color:#777; margin-top:24px; padding-top:18px; border-top:1px solid #e8e8e3; }
+    .uns-sig strong { color:#353535; }
+    .uns-status-error .uns-title { color:#c0392b; }
+  </style>
+</head>
+<body>
+  <div class="uns-card" id="card">
+    <div class="uns-eyebrow">BAYSIDE PAVERS</div>
+    <h1 class="uns-title" id="title">You're unsubscribed.</h1>
+    <p class="uns-body" id="body">You'll no longer receive proposal check-in emails from us. Your active proposal stays live — nothing changes about your project, just the follow-up messages stop.</p>
+    <p class="uns-body" id="extra"></p>
+    <div class="uns-sig">
+      Want back in, or have a question? Reply to any previous email or write directly:<br>
+      <strong>tim@mcmullen.properties</strong> · Tim McMullen · Bayside Pavers
+    </div>
+  </div>
+  <script>
+    (function () {
+      const params = new URLSearchParams(location.search);
+      const status = params.get('status');
+      const name   = params.get('name');
+      const card   = document.getElementById('card');
+      const title  = document.getElementById('title');
+      const body   = document.getElementById('body');
+      const extra  = document.getElementById('extra');
+
+      if (status === 'ok') {
+        if (name) title.textContent = `You're unsubscribed, ${name}.`;
+        return;
+      }
+      if (status === 'invalid') {
+        card.classList.add('uns-status-error');
+        title.textContent = 'Link not recognized';
+        body.textContent  = 'That unsubscribe link looks malformed. If you meant to opt out, just reply to any email from us with "STOP" and we\'ll handle it manually.';
+        extra.textContent = '';
+        return;
+      }
+      if (status === 'error') {
+        card.classList.add('uns-status-error');
+        title.textContent = 'Something went wrong';
+        body.textContent  = 'We couldn\'t process that opt-out request automatically. Reply "STOP" to any email and we\'ll take you off the list manually.';
+        extra.textContent = '';
+      }
+    })();
+  </script>
+</body>
+</html>
