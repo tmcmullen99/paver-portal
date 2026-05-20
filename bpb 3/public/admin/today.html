@@ -357,6 +357,7 @@
 <script type="module" src="/admin/admin-shell.js"></script>
 <script type="module">
   import { requireDesigner } from '/js/auth-util.js';
+  import { openQuickNoteModal } from '/admin/notes-modal.js';
 
   const auth = await requireDesigner();
   if (auth) {
@@ -497,6 +498,7 @@
           </div>
           <div class="tod-row-actions">
             <a class="tod-btn" href="/admin/client.html?id=${esc(it.client_id)}">👤 Profile</a>
+            <button class="tod-btn" data-action="quick-note" data-client-id="${esc(it.client_id)}" data-client-name="${esc(it.client_name || 'client')}">📝 Note</button>
             <a class="tod-btn is-primary" href="/admin/conversations.html?client_id=${esc(it.client_id)}">Open thread →</a>
           </div>
         </div>
@@ -657,6 +659,23 @@
     }
 
     $('#todRefreshBtn').addEventListener('click', loadToday);
+
+    // Sprint 14 — quick-note button delegation
+    document.body.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action="quick-note"]');
+      if (!btn) return;
+      e.preventDefault();
+      const clientId   = btn.getAttribute('data-client-id');
+      const clientName = btn.getAttribute('data-client-name') || 'Client';
+      if (!clientId) return;
+      openQuickNoteModal({
+        clientId,
+        clientName,
+        createdBy: auth.user.id,
+        onSaved: () => loadToday(),
+      });
+    });
+
     loadToday();
     setInterval(() => loadToday(), REFRESH_MS);
   }
