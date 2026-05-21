@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your account · Bayside Pavers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bp-green:    #5d7e69;
+    --bp-green-dk: #4a6554;
+    --bp-green-soft: #e8eee9;
+    --bp-charcoal: #353535;
+    --bp-tan:      #dad7c5;
+    --bp-cream:    #faf8f3;
+    --bp-bg:       #f4f4ef;
+    --bp-card:     #ffffff;
+    --bp-border:   #e4e4df;
+    --bp-text:     #1f2125;
+    --bp-muted:    #70726f;
+    --bp-err:      #b91c1c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--bp-text);
+    background: var(--bp-bg);
+    line-height: 1.5; font-size: 15px;
+  }
+  a { color: var(--bp-green-dk); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* App shell */
+  .v2-app { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .v2-sidebar {
+    width: 240px; flex-shrink: 0;
+    background: #fff;
+    border-right: 1px solid var(--bp-border);
+    display: flex; flex-direction: column;
+    padding: 22px 0 16px;
+    position: sticky; top: 0; height: 100vh;
+    overflow-y: auto;
+  }
+  .v2-brand { padding: 0 18px 22px; border-bottom: 1px solid var(--bp-border); display: flex; flex-direction: column; gap: 4px; }
+  .v2-brand img { height: 30px; width: auto; display: block; }
+  .v2-brand-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--bp-muted); margin-top: 6px; }
+  .v2-nav { flex: 1; padding: 18px 0; display: flex; flex-direction: column; gap: 16px; }
+  .v2-nav-group { display: flex; flex-direction: column; }
+  .v2-nav-group-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--bp-muted);
+    padding: 0 18px 6px;
+  }
+  .v2-nav-btn {
+    background: none; border: none;
+    font-family: inherit; font-size: 13px; font-weight: 500;
+    color: var(--bp-text);
+    text-align: left;
+    padding: 9px 18px 9px 26px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    position: relative;
+    transition: background .12s, color .12s;
+  }
+  .v2-nav-btn::before {
+    content: ''; position: absolute; left: 18px; top: 50%;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--bp-muted); transform: translateY(-50%);
+    transition: background .12s;
+  }
+  .v2-nav-btn:hover { background: var(--bp-cream); color: var(--bp-charcoal); }
+  .v2-nav-btn.is-active {
+    background: var(--bp-green-soft);
+    color: var(--bp-green-dk);
+    font-weight: 600;
+  }
+  .v2-nav-btn.is-active::before { background: var(--bp-green); }
+  .v2-nav-badge {
+    margin-left: auto;
+    background: var(--bp-cream);
+    color: var(--bp-muted);
+    font-size: 10px; font-weight: 700;
+    padding: 1px 7px; border-radius: 999px;
+  }
+  .v2-nav-btn.is-active .v2-nav-badge { background: var(--bp-green); color: #fff; }
+
+  .v2-user {
+    border-top: 1px solid var(--bp-border);
+    padding: 14px 18px 0;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .v2-user-name { font-size: 13px; font-weight: 600; color: var(--bp-text); }
+  .v2-user-email { font-size: 11px; color: var(--bp-muted); }
+  .v2-signout {
+    background: transparent;
+    border: 1px solid var(--bp-border);
+    color: var(--bp-charcoal);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+    margin-top: 4px;
+  }
+  .v2-signout:hover { background: var(--bp-text); color: #fff; border-color: var(--bp-text); }
+
+  /* Main */
+  .v2-main { flex: 1; min-width: 0; padding: 32px 40px 80px; max-width: 1200px; }
+  .v2-pane { display: none; }
+  .v2-pane.is-active { display: block; }
+
+  .v2-pane-eyebrow {
+    font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; font-weight: 700;
+    color: var(--bp-muted);
+    margin-bottom: 6px;
+  }
+  .v2-pane h1 {
+    font-size: 28px; font-weight: 600;
+    color: var(--bp-text);
+    letter-spacing: -0.014em;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .v2-pane-lede {
+    font-size: 14px; color: var(--bp-muted);
+    line-height: 1.6; max-width: 640px;
+    margin-bottom: 28px;
+  }
+
+  /* Hero (overview) */
+  .v2-hero {
+    background: linear-gradient(135deg, var(--bp-green) 0%, var(--bp-green-dk) 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 32px 36px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 12px 32px rgba(93, 126, 105, 0.18);
+  }
+  .v2-hero-greet { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.72); font-weight: 600; margin-bottom: 6px; }
+  .v2-hero h2 { font-size: 24px; font-weight: 600; letter-spacing: -0.012em; margin-bottom: 8px; }
+  .v2-hero p { font-size: 14px; color: rgba(255,255,255,0.84); line-height: 1.55; max-width: 620px; }
+  .v2-hero-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #fff; color: var(--bp-green-dk);
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+    text-decoration: none;
+    margin-top: 16px;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .v2-hero-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,0.16); text-decoration: none; }
+
+  /* Stat cards */
+  .v2-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .v2-stat {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .v2-stat-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--bp-muted); font-weight: 700; margin-bottom: 8px; }
+  .v2-stat-val { font-size: 22px; font-weight: 600; color: var(--bp-text); letter-spacing: -0.012em; }
+  .v2-stat-sub { font-size: 12px; color: var(--bp-muted); margin-top: 4px; }
+
+  /* Action cards */
+  .v2-actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .v2-action {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    text-decoration: none;
+    color: inherit;
+    display: flex; flex-direction: column; gap: 6px;
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+  }
+  .v2-action:hover { border-color: var(--bp-green); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(93,126,105,0.10); text-decoration: none; }
+  .v2-action-title { font-size: 13px; font-weight: 600; color: var(--bp-text); display: flex; align-items: center; gap: 6px; }
+  .v2-action-desc { font-size: 12px; color: var(--bp-muted); line-height: 1.5; }
+  .v2-action-icon { font-size: 16px; }
+
+  /* Proposal cards */
+  .v2-prop-card {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .v2-prop-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .v2-prop-head-info { flex: 1; min-width: 200px; }
+  .v2-prop-addr { font-size: 17px; font-weight: 600; color: var(--bp-text); line-height: 1.3; margin-bottom: 2px; }
+  .v2-prop-meta { font-size: 12px; color: var(--bp-muted); }
+  .v2-prop-total { font-size: 24px; font-weight: 600; color: var(--bp-green-dk); letter-spacing: -0.012em; white-space: nowrap; }
+  .v2-prop-status {
+    display: inline-block; padding: 3px 10px;
+    border-radius: 999px; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .v2-prop-status.draft { background: var(--bp-cream); color: var(--bp-muted); }
+  .v2-prop-status.sent  { background: #eaf2ec; color: var(--bp-green-dk); }
+  .v2-prop-status.signed { background: var(--bp-green); color: #fff; }
+  .v2-prop-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .v2-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 12px; font-weight: 600;
+    text-decoration: none;
+    cursor: pointer; font-family: inherit;
+    border: 1px solid transparent;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .v2-btn-primary { background: var(--bp-green); color: #fff; }
+  .v2-btn-primary:hover { background: var(--bp-green-dk); text-decoration: none; }
+  .v2-btn-ghost { background: #fff; color: var(--bp-charcoal); border-color: var(--bp-border); }
+  .v2-btn-ghost:hover { background: var(--bp-cream); border-color: var(--bp-green); color: var(--bp-green-dk); text-decoration: none; }
+  .v2-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Empty states */
+  .v2-empty {
+    background: #fff;
+    border: 1px dashed var(--bp-border);
+    border-radius: 12px;
+    padding: 38px 28px;
+    text-align: center;
+    color: var(--bp-muted);
+  }
+  .v2-empty-icon { font-size: 36px; margin-bottom: 12px; color: var(--bp-green); opacity: 0.6; }
+  .v2-empty h3 { font-size: 16px; font-weight: 600; color: var(--bp-text); margin-bottom: 6px; }
+  .v2-empty p { font-size: 13px; line-height: 1.6; max-width: 420px; margin: 0 auto 18px; }
+
+  .v2-loading { text-align: center; padding: 36px; color: var(--bp-muted); font-size: 13px; }
+  .v2-error-msg { background: #fef2f2; color: var(--bp-err); border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 18px; }
+
+  /* Quality standards accordions */
+  .ho-qs-card { background: #fff; border: 1px solid var(--bp-border); border-radius: 12px; overflow: hidden; margin-bottom: 10px; transition: border-color .15s; }
+  .ho-qs-card:hover { border-color: var(--bp-green); }
+  .ho-qs-card[open] { border-color: var(--bp-green); }
+  .ho-qs-summary { list-style: none; cursor: pointer; padding: 18px 22px; display: flex; align-items: center; gap: 14px; user-select: none; }
+  .ho-qs-summary::-webkit-details-marker { display: none; }
+  .ho-qs-num { flex-shrink: 0; width: 32px; height: 32px; border-radius: 8px; background: var(--bp-green-soft); color: var(--bp-green-dk); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; }
+  .ho-qs-card[open] .ho-qs-num { background: var(--bp-green); color: #fff; }
+  .ho-qs-title-wrap { flex: 1; min-width: 0; }
+  .ho-qs-title { font-size: 15px; font-weight: 600; color: var(--bp-text); line-height: 1.3; }
+  .ho-qs-tagline { font-size: 12px; color: var(--bp-muted); margin-top: 2px; }
+  .ho-qs-arrow { flex-shrink: 0; color: var(--bp-muted); font-size: 18px; transition: transform .2s; }
+  .ho-qs-card[open] .ho-qs-arrow { transform: rotate(90deg); color: var(--bp-green-dk); }
+  .ho-qs-body { padding: 0 22px 22px; font-size: 14px; line-height: 1.7; color: var(--bp-charcoal); }
+  .ho-qs-body p { margin-bottom: 12px; }
+  .ho-qs-body p:last-child { margin-bottom: 0; }
+  .ho-qs-warranty-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 9px 16px; background: var(--bp-green); color: #fff; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none; transition: background .15s, transform .15s; }
+  .ho-qs-warranty-cta:hover { background: var(--bp-green-dk); transform: translateY(-1px); text-decoration: none; }
+
+  /* Refer & earn */
+  .v2-credit-card { background: #fff; border: 1px solid var(--bp-border); border-radius: 12px; padding: 26px 28px; max-width: 540px; margin-bottom: 24px; }
+  .v2-credit-eyebrow { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--bp-muted); font-weight: 600; margin-bottom: 10px; }
+  .v2-credit-amount { font-size: 32px; font-weight: 600; color: var(--bp-green-dk); letter-spacing: -0.018em; margin-bottom: 4px; }
+  .v2-credit-cap { font-size: 13px; color: var(--bp-muted); margin-bottom: 16px; }
+  .v2-credit-bar { background: var(--bp-cream); border-radius: 999px; height: 8px; overflow: hidden; margin-bottom: 16px; }
+  .v2-credit-bar-fill { background: linear-gradient(90deg, var(--bp-green) 0%, var(--bp-green-dk) 100%); height: 100%; border-radius: 999px; transition: width .4s ease; }
+  .v2-credit-desc { font-size: 13px; line-height: 1.55; color: var(--bp-charcoal); margin-bottom: 18px; }
+
+  /* Schedule pane */
+  .v2-schedule-card {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    max-width: 540px;
+  }
+  .v2-schedule-card h2 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+  .v2-schedule-card p { font-size: 14px; color: var(--bp-muted); margin-bottom: 18px; }
+
+  /* Mobile */
+  @media (max-width: 760px) {
+    .v2-app { flex-direction: column; }
+    .v2-sidebar { width: 100%; height: auto; position: relative; padding: 16px 0; }
+    .v2-nav { padding: 12px 0; }
+    .v2-main { padding: 24px 16px 60px; }
+    .v2-pane h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="v2-app">
+
+  <aside class="v2-sidebar">
+    <div class="v2-brand">
+      <img src="https://baysidepavers.com/wp-content/uploads/2023/03/baysidepavers-logo-light-scaled.png" alt="Bayside Pavers">
+      <div class="v2-brand-tag">Your Account</div>
+    </div>
+
+    <nav class="v2-nav" id="v2-nav">
+      <div class="v2-nav-group">
+        <div class="v2-nav-group-label">Your Project</div>
+        <button type="button" class="v2-nav-btn is-active" data-pane="overview">Overview</button>
+        <button type="button" class="v2-nav-btn" data-pane="proposal">Proposal<span class="v2-nav-badge" id="v2-prop-badge"></span></button>
+        <button type="button" class="v2-nav-btn" data-pane="war-room">War room</button>
+      </div>
+      <div class="v2-nav-group">
+        <div class="v2-nav-group-label">Actions</div>
+        <button type="button" class="v2-nav-btn" data-pane="print">Print to mark up</button>
+        <button type="button" class="v2-nav-btn" data-pane="schedule">Schedule a call</button>
+      </div>
+      <div class="v2-nav-group">
+        <div class="v2-nav-group-label">Library</div>
+        <button type="button" class="v2-nav-btn" data-pane="how-we-install">How we install</button>
+        <button type="button" class="v2-nav-btn" data-pane="materials">Materials catalog</button>
+      </div>
+      <div class="v2-nav-group">
+        <div class="v2-nav-group-label">Earn</div>
+        <button type="button" class="v2-nav-btn" data-pane="refer">Refer &amp; earn</button>
+      </div>
+    </nav>
+
+    <div class="v2-user">
+      <div class="v2-user-name" id="v2-user-name">…</div>
+      <div class="v2-user-email" id="v2-user-email"></div>
+      <button type="button" class="v2-signout" id="v2-signout">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="v2-main">
+
+    <div id="v2-error-banner" class="v2-error-msg" style="display:none;"></div>
+
+    <!-- Pane · Overview -->
+    <section class="v2-pane is-active" data-pane="overview">
+      <div class="v2-pane-eyebrow">Overview</div>
+      <h1 id="v2-overview-greeting">Welcome</h1>
+      <p class="v2-pane-lede">Your project lives here. Below is your most recent proposal, your quick actions, and links to everything else.</p>
+
+      <div class="v2-hero">
+        <div class="v2-hero-greet">Next step</div>
+        <h2 id="v2-hero-title">Loading…</h2>
+        <p id="v2-hero-body">We'll pull your latest proposal and current status here.</p>
+        <a class="v2-hero-cta" id="v2-hero-cta" href="#" target="_blank" rel="noopener" style="display:none;">📅 Schedule a free design appointment</a>
+      </div>
+
+      <div class="v2-grid" id="v2-overview-stats"></div>
+
+      <div class="v2-actions">
+        <a class="v2-action" href="#" data-jump-pane="proposal">
+          <div class="v2-action-title"><span class="v2-action-icon">📋</span> Your proposal</div>
+          <div class="v2-action-desc">Full bid, line items, materials, and timeline.</div>
+        </a>
+        <a class="v2-action" href="#" data-jump-pane="war-room">
+          <div class="v2-action-title"><span class="v2-action-icon">💬</span> War room</div>
+          <div class="v2-action-desc">Direct line to your designer — chat, photos, requests.</div>
+        </a>
+        <a class="v2-action" href="#" data-jump-pane="print">
+          <div class="v2-action-title"><span class="v2-action-icon">🖨️</span> Print to mark up</div>
+          <div class="v2-action-desc">Print your plan, sketch changes by hand, send back.</div>
+        </a>
+        <a class="v2-action" href="#" data-jump-pane="schedule">
+          <div class="v2-action-title"><span class="v2-action-icon">📅</span> Schedule a call</div>
+          <div class="v2-action-desc">Pick a time with your designer.</div>
+        </a>
+        <a class="v2-action" href="#" data-jump-pane="how-we-install">
+          <div class="v2-action-title"><span class="v2-action-icon">📚</span> How we install</div>
+          <div class="v2-action-desc">5-phase process, videos, catalogs by project type.</div>
+        </a>
+        <a class="v2-action" href="#" data-jump-pane="refer">
+          <div class="v2-action-title"><span class="v2-action-icon">🎁</span> Refer &amp; earn</div>
+          <div class="v2-action-desc">$500 off for you and a neighbor.</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Pane · Proposal -->
+    <section class="v2-pane" data-pane="proposal">
+      <div class="v2-pane-eyebrow">Your project plan</div>
+      <h1>Proposals</h1>
+      <p class="v2-pane-lede">Your full Bayside proposal — totals, line items, materials, schedule. Use the buttons on each card to request a redesign, swap materials, or print to mark up.</p>
+      <div id="v2-prop-area"><div class="v2-loading">Loading your proposals…</div></div>
+    </section>
+
+    <!-- Pane · War room -->
+    <section class="v2-pane" data-pane="war-room">
+      <div class="v2-pane-eyebrow">War room</div>
+      <h1>Direct line to your designer</h1>
+      <p class="v2-pane-lede">Questions, requests, photos, or just a quick check-in — your designer responds within one business day.</p>
+      <div id="ho-chat-section"></div>
+    </section>
+
+    <!-- Pane · Print -->
+    <section class="v2-pane" data-pane="print">
+      <div class="v2-pane-eyebrow">Print to mark up</div>
+      <h1>Print and mark up your plan</h1>
+      <p class="v2-pane-lede">Print a marked-up-ready copy of your plan, draw notes by hand, and snap a photo back to your designer in the War room.</p>
+      <div id="v2-print-area"><div class="v2-loading">Loading proposals…</div></div>
+    </section>
+
+    <!-- Pane · Schedule -->
+    <section class="v2-pane" data-pane="schedule">
+      <div class="v2-pane-eyebrow">Schedule a call</div>
+      <h1>Talk to your designer</h1>
+      <p class="v2-pane-lede">Pick a time that works. Free, no obligation, on Zoom or in your yard.</p>
+      <div class="v2-schedule-card">
+        <h2>Book a 30-minute design call</h2>
+        <p>Discuss your project, materials, timing, and next steps with a Bayside designer.</p>
+        <a class="v2-btn v2-btn-primary" id="v2-schedule-cta" href="https://baysidepaversfreeconsultation.as.me/" target="_blank" rel="noopener" style="padding:12px 24px;font-size:13px;">📅 Open the booking calendar →</a>
+      </div>
+    </section>
+
+    <!-- Pane · How we install -->
+    <section class="v2-pane" data-pane="how-we-install">
+      <div class="v2-pane-eyebrow">Library</div>
+      <h1>How we install</h1>
+      <p class="v2-pane-lede">Our 5-phase quality standard plus deep dives by project type — pavers, driveways, pool decks, walls, turf, drainage, fire features, lighting. Videos, catalogs, and cutsheets included.</p>
+
+      <section id="how-we-build">
+        <details class="ho-qs-card">
+          <summary class="ho-qs-summary">
+            <span class="ho-qs-num">01</span>
+            <span class="ho-qs-title-wrap">
+              <span class="ho-qs-title">Site preparation</span>
+              <span class="ho-qs-tagline">Where every long-lasting hardscape begins</span>
+            </span>
+            <span class="ho-qs-arrow">›</span>
+          </summary>
+          <div class="ho-qs-body">
+            <p>Before a single paver lands, we set the stage. Our crew excavates to the right depth for your soil type and project category — patios, driveways, and pool decks each have their own minimum specs. We mark utilities, set up edge lines, and confirm grading so water flows away from your house, not toward it.</p>
+            <p>This is the unglamorous part of the project, but it's the difference between a hardscape that looks great for 5 years and one that looks great for 30. Most failures we get called in to fix come from someone skipping this phase.</p>
+          </div>
+        </details>
+        <details class="ho-qs-card">
+          <summary class="ho-qs-summary">
+            <span class="ho-qs-num">02</span>
+            <span class="ho-qs-title-wrap">
+              <span class="ho-qs-title">Base &amp; drainage</span>
+              <span class="ho-qs-tagline">The foundation under your finished surface</span>
+            </span>
+            <span class="ho-qs-arrow">›</span>
+          </summary>
+          <div class="ho-qs-body">
+            <p>The foundation is built in lifts of compacted aggregate — typically 2 to 4 inches at a time — to the standard your project demands. Patios get at least 4 inches; driveways get 8 inches; pool decks and parking get more. Every lift is compacted with the right equipment so the base reaches 98% Standard Proctor density before we move on.</p>
+            <p>Drainage is engineered in at this phase, not bolted on later. Surfaces are sloped a minimum of 2% away from structures, and where the project calls for it, perforated pipe and free-draining backfill carry water out before it can pool, freeze, or heave.</p>
+          </div>
+        </details>
+        <details class="ho-qs-card">
+          <summary class="ho-qs-summary">
+            <span class="ho-qs-num">03</span>
+            <span class="ho-qs-title-wrap">
+              <span class="ho-qs-title">Surface installation</span>
+              <span class="ho-qs-tagline">Pavers, porcelain, and finish work</span>
+            </span>
+            <span class="ho-qs-arrow">›</span>
+          </summary>
+          <div class="ho-qs-body">
+            <p>Concrete pavers go down on a precisely screeded one-inch bedding-sand layer, with edge restraints staked into the compacted base. Joints get tight tolerances (1/16 to 3/16 inch) and proper polymeric jointing sand to lock everything together and resist weed and insect intrusion.</p>
+            <p>Porcelain is a different beast — slabs are heavier, more brittle, and require pre-compacted bedding sand and 4mm plastic spacers between every unit. Porcelain is never compacted with a plate compactor after install (a common mistake that breaks slabs); we hand-set, level, and verify alignment instead.</p>
+          </div>
+        </details>
+        <details class="ho-qs-card">
+          <summary class="ho-qs-summary">
+            <span class="ho-qs-num">04</span>
+            <span class="ho-qs-title-wrap">
+              <span class="ho-qs-title">Walls &amp; vertical features</span>
+              <span class="ho-qs-tagline">Retaining walls, fire features, seat walls</span>
+            </span>
+            <span class="ho-qs-arrow">›</span>
+          </summary>
+          <div class="ho-qs-body">
+            <p>Retaining walls are engineered, not stacked. We start with a leveling pad of compacted aggregate, lay the first course slightly below grade for stability, and build up using running-bond patterns with proper backfill drainage and (where required) geosynthetic reinforcement layers based on soil type and wall height.</p>
+            <p>Fire features and seat walls get the same care — proper bases, weather-resistant adhesives where they belong, gas lines run by licensed plumbers when applicable, and finish caps mortared in to last.</p>
+          </div>
+        </details>
+        <details class="ho-qs-card">
+          <summary class="ho-qs-summary">
+            <span class="ho-qs-num">05</span>
+            <span class="ho-qs-title-wrap">
+              <span class="ho-qs-title">Finishing &amp; warranty</span>
+              <span class="ho-qs-tagline">Polymeric sand, sealing, and what we stand behind</span>
+            </span>
+            <span class="ho-qs-arrow">›</span>
+          </summary>
+          <div class="ho-qs-body">
+            <p>The last day is when most homeowners notice everything coming together. Polymeric jointing sand goes in, gets activated with water, and locks every joint. Where the design calls for sealing, we use the right sealer for the surface — penetrating for natural stone, joint-stabilizing for concrete pavers, none for some porcelain — and apply only after the install has fully cured.</p>
+            <p>Belgard's transferable lifetime limited warranty covers the materials, and we stand behind the workmanship. Adherence to ICPI (Interlocking Concrete Paver Institute) standards isn't optional for us — it's how we keep that warranty intact and how we sleep at night.</p>
+            <a href="https://cdn.prod.website-files.com/67c10dbe66a9f7b9cf3c6e47/68d2db027d1d1b4ad1543f05_Bayside%20Pavers%20Presentation%20(1)_compressed%20(1).pdf" target="_blank" rel="noopener" class="ho-qs-warranty-cta">📄 View full warranty PDF →</a>
+          </div>
+        </details>
+      </section>
+    </section>
+
+    <!-- Pane · Materials catalog -->
+    <section class="v2-pane" data-pane="materials">
+      <div class="v2-pane-eyebrow">Library</div>
+      <h1>Materials catalog</h1>
+      <p class="v2-pane-lede">Every paver, slab, wall block, and finish we install — searchable, tabbed by category, with manufacturer specs, warranties, and install guides per product. Click any material to dive in.</p>
+      <div id="v2-materials-mount"></div>
+    </section>
+
+    <!-- Pane · Refer & earn -->
+    <section class="v2-pane" data-pane="refer">
+      <div class="v2-pane-eyebrow">Earn</div>
+      <h1>Refer a neighbor</h1>
+      <p class="v2-pane-lede">Send your neighbor a $500-off invitation. When they complete a free design appointment, you both earn $500 off. Stackable up to $2,500.</p>
+
+      <div class="v2-credit-card">
+        <div class="v2-credit-eyebrow">Your referral credit</div>
+        <div class="v2-credit-amount" id="v2-credit-amount">$0</div>
+        <div class="v2-credit-cap" id="v2-credit-cap">of $2,500 max</div>
+        <div class="v2-credit-bar"><div class="v2-credit-bar-fill" id="v2-credit-fill" style="width:0%;"></div></div>
+        <p class="v2-credit-desc">Each completed referral earns $500. Maximum credit is $2,500 toward your next project.</p>
+        <button class="v2-btn v2-btn-primary" id="v2-refer-invite" style="padding:11px 22px;">✉️ Invite a neighbor</button>
+        <button class="v2-btn v2-btn-ghost" id="v2-refer-copy" style="padding:11px 22px; margin-left:8px;">🔗 Copy share link</button>
+      </div>
+
+      <div style="margin-top:32px;">
+        <div class="v2-pane-eyebrow" style="margin-bottom:14px;">Your referrals</div>
+        <div id="v2-refer-list"><div class="v2-loading">Loading…</div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Refer modal -->
+<div id="v2-refer-modal" style="position:fixed;inset:0;background:rgba(20,24,22,.55);display:none;align-items:flex-start;justify-content:center;z-index:1100;padding:32px 16px;overflow-y:auto;">
+  <div style="background:#fff;border-radius:14px;max-width:520px;width:100%;padding:28px 32px;box-shadow:0 24px 64px rgba(0,0,0,.32);margin:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 style="font-size:20px;font-weight:600;letter-spacing:-.012em;">Invite a neighbor</h2>
+      <button type="button" id="v2-refer-close" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--bp-muted);width:32px;height:32px;border-radius:50%;">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--bp-muted);margin-bottom:18px;line-height:1.55;">We'll send them a personal invitation with a $500-off coupon. When they complete a free design appointment, you both get $500 off.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--bp-charcoal);">
+        Their name<input id="v2-refer-name" type="text" required style="padding:10px 12px;border:1px solid var(--bp-border);border-radius:8px;font:inherit;font-size:13px;">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--bp-charcoal);">
+        Their email<input id="v2-refer-email" type="email" required style="padding:10px 12px;border:1px solid var(--bp-border);border-radius:8px;font:inherit;font-size:13px;">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--bp-charcoal);">
+        Their phone <span style="color:var(--bp-muted);font-weight:400;">(optional)</span>
+        <input id="v2-refer-phone" type="tel" style="padding:10px 12px;border:1px solid var(--bp-border);border-radius:8px;font:inherit;font-size:13px;">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--bp-charcoal);">
+        Personal note <span style="color:var(--bp-muted);font-weight:400;">(optional)</span>
+        <textarea id="v2-refer-note" rows="3" placeholder="Hey, you have to check out the team that did our backyard..." style="padding:10px 12px;border:1px solid var(--bp-border);border-radius:8px;font:inherit;font-size:13px;resize:vertical;"></textarea>
+      </label>
+    </div>
+    <div id="v2-refer-error" style="display:none;margin-top:12px;padding:10px 14px;background:#fef2f2;color:var(--bp-err);border:1px solid #fecaca;border-radius:8px;font-size:12px;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;">
+      <button type="button" id="v2-refer-cancel" class="v2-btn v2-btn-ghost" style="padding:10px 18px;">Cancel</button>
+      <button type="button" id="v2-refer-submit" class="v2-btn v2-btn-primary" style="padding:10px 22px;">Send invitation</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+
+const SUPABASE_URL  = 'https://gfgbypcnxkschnfsitfb.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmZ2J5cGNueGtzY2huZnNpdGZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTkzMTUsImV4cCI6MjA5MjI5NTMxNX0.EAwmiNR5OWcaI8Sr36MVn7FuMhYoZvfngse7y0ZOgvA';
+const REFERRAL_CAP_CENTS = 250000;
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+});
+
+const navEl = document.getElementById('v2-nav');
+const userName = document.getElementById('v2-user-name');
+const userEmail = document.getElementById('v2-user-email');
+const errorBanner = document.getElementById('v2-error-banner');
+const propBadge = document.getElementById('v2-prop-badge');
+const propArea = document.getElementById('v2-prop-area');
+const printArea = document.getElementById('v2-print-area');
+const heroTitle = document.getElementById('v2-hero-title');
+const heroBody  = document.getElementById('v2-hero-body');
+const heroCta   = document.getElementById('v2-hero-cta');
+const scheduleCta = document.getElementById('v2-schedule-cta');
+const overviewGreet = document.getElementById('v2-overview-greeting');
+const overviewStats = document.getElementById('v2-overview-stats');
+const creditAmount = document.getElementById('v2-credit-amount');
+const creditCap = document.getElementById('v2-credit-cap');
+const creditFill = document.getElementById('v2-credit-fill');
+
+let currentClient = null;
+let LATEST_PROPOSAL = null;
+
+// Sidebar nav
+function activatePane(slug) {
+  document.querySelectorAll('.v2-nav-btn').forEach(b =>
+    b.classList.toggle('is-active', b.dataset.pane === slug)
+  );
+  document.querySelectorAll('.v2-pane').forEach(p =>
+    p.classList.toggle('is-active', p.dataset.pane === slug)
+  );
+  if (window.location.hash !== '#' + slug) {
+    history.replaceState(null, '', '#' + slug);
+  }
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+navEl.addEventListener('click', e => {
+  const btn = e.target.closest('.v2-nav-btn');
+  if (!btn) return;
+  activatePane(btn.dataset.pane);
+});
+document.querySelectorAll('[data-jump-pane]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    activatePane(a.dataset.jumpPane);
+  });
+});
+window.addEventListener('hashchange', () => {
+  const slug = (window.location.hash || '#overview').slice(1);
+  if (document.querySelector(`[data-pane="${slug}"]`)) activatePane(slug);
+});
+
+document.getElementById('v2-signout').addEventListener('click', async () => {
+  try { await supabase.auth.signOut(); } catch (_) {}
+  window.location.replace('/account/signin.html');
+});
+
+// Auth gate
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
+  window.location.replace('/account/signin.html?next=/account/v2/');
+} else {
+  await loadAccount();
+}
+
+const initialHash = (window.location.hash || '#overview').slice(1);
+if (document.querySelector(`[data-pane="${initialHash}"]`)) activatePane(initialHash);
+
+function showError(msg) {
+  errorBanner.textContent = msg;
+  errorBanner.style.display = 'block';
+}
+
+async function loadAccount() {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: client, error: clientErr } = await supabase
+    .from('clients')
+    .select('id, name, email, phone, refer_code, must_change_password, referral_credit_cents, referral_credit_used_cents')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (clientErr) { showError('Could not load your account: ' + clientErr.message); return; }
+  if (!client) { showError('Homeowner account not found. Visit /login.html for team accounts.'); return; }
+  if (client.must_change_password) {
+    window.location.replace('/account/set-password.html');
+    return;
+  }
+  currentClient = client;
+  const firstName = (client.name || '').split(/[\s,&]+/)[0] || 'there';
+  userName.textContent = client.name || client.email || '—';
+  userEmail.textContent = client.email || '';
+  overviewGreet.textContent = `Welcome, ${firstName}`;
+
+  // Prefill Acuity with client info
+  const nameParts = (client.name || '').trim().split(/\s+/);
+  const acuityParams = new URLSearchParams();
+  if (nameParts[0]) acuityParams.set('firstName', nameParts[0]);
+  if (nameParts.length > 1) acuityParams.set('lastName', nameParts.slice(1).join(' '));
+  if (client.email) acuityParams.set('email', client.email);
+  if (client.phone) acuityParams.set('phone', client.phone);
+  scheduleCta.href = 'https://baysidepaversfreeconsultation.as.me/?' + acuityParams.toString();
+
+  applyCreditState(client);
+  await Promise.all([
+    loadProposals(client.id),
+    loadReferrals(client.id),
+  ]);
+  wireReferModal();
+}
+
+function applyCreditState(c) {
+  const earned = Number(c.referral_credit_cents || 0);
+  const used = Number(c.referral_credit_used_cents || 0);
+  const avail = Math.max(0, earned - used);
+  creditAmount.textContent = formatUSD(avail);
+  creditCap.textContent = `of ${formatUSD(REFERRAL_CAP_CENTS)} max`;
+  const pct = Math.min(100, Math.round((earned / REFERRAL_CAP_CENTS) * 100));
+  requestAnimationFrame(() => { creditFill.style.width = pct + '%'; });
+}
+
+async function loadProposals(clientId) {
+  const { data: links, error: linksErr } = await supabase
+    .from('client_proposals')
+    .select('proposal_id, status, sent_at, first_viewed_at, signed_at')
+    .eq('client_id', clientId)
+    .order('sent_at', { ascending: false });
+  if (linksErr) {
+    propArea.innerHTML = `<div class="v2-error-msg">Could not load proposals: ${escapeHtml(linksErr.message)}</div>`;
+    printArea.innerHTML = propArea.innerHTML;
+    return;
+  }
+  if (!links || links.length === 0) {
+    const emptyHtml = `
+      <div class="v2-empty">
+        <div class="v2-empty-icon">📐</div>
+        <h3>No proposals yet</h3>
+        <p>Your designer will publish your proposal here when it's ready.</p>
+        <a class="v2-btn v2-btn-primary" href="${escapeAttr(scheduleCta.href)}" target="_blank" rel="noopener" style="padding:11px 22px;">📅 Schedule a free design appointment</a>
+      </div>`;
+    propArea.innerHTML = emptyHtml;
+    printArea.innerHTML = emptyHtml;
+    propBadge.textContent = '0';
+    setOverviewEmpty();
+    return;
+  }
+
+  const proposalIds = links.map(l => l.proposal_id);
+  const [{ data: proposals }, { data: pubs }] = await Promise.all([
+    supabase.from('proposals').select('id, project_address, project_city, project_state, bid_total_amount, generated_html_slug, project_type, updated_at').in('id', proposalIds),
+    supabase.from('published_proposals').select('proposal_id, slug, project_address, total_amount, published_at').in('proposal_id', proposalIds),
+  ]);
+  const propMap = new Map((proposals || []).map(p => [p.id, p]));
+  const pubMap = new Map();
+  (pubs || []).forEach(pub => {
+    const e = pubMap.get(pub.proposal_id);
+    if (!e || new Date(pub.published_at) > new Date(e.published_at)) pubMap.set(pub.proposal_id, pub);
+  });
+  propBadge.textContent = String(links.length);
+
+  // Render
+  propArea.innerHTML = links.map(link => renderProposalCard(link, propMap, pubMap, false)).join('');
+  printArea.innerHTML = links.map(link => renderProposalCard(link, propMap, pubMap, true)).join('');
+
+  // Wire redesign + substitution buttons
+  propArea.addEventListener('click', e => {
+    const rBtn = e.target.closest('[data-redesign]');
+    if (rBtn && window.openRedesignModal) {
+      window.openRedesignModal(rBtn.dataset.redesign, currentClient.id, rBtn.dataset.addr);
+      return;
+    }
+    const sBtn = e.target.closest('[data-substitute]');
+    if (sBtn && window.openSubstitutionModal) {
+      window.openSubstitutionModal(sBtn.dataset.substitute, currentClient.id, sBtn.dataset.addr);
+    }
+  });
+
+  // Append request history
+  const histEl = document.createElement('div');
+  histEl.id = 'v2-prop-requests';
+  histEl.style.marginTop = '32px';
+  propArea.appendChild(histEl);
+  await loadProposalRequests(currentClient.id);
+
+  // Refresh history on save
+  window.addEventListener('v2-redesign-saved', () => loadProposalRequests(currentClient.id));
+  window.addEventListener('v2-substitution-saved', () => loadProposalRequests(currentClient.id));
+
+  // Latest proposal → overview hero + stats
+  const latest = links[0];
+  LATEST_PROPOSAL = { link: latest, prop: propMap.get(latest.proposal_id), pub: pubMap.get(latest.proposal_id) };
+  renderOverviewFromLatest();
+}
+
+function renderProposalCard(link, propMap, pubMap, printOnly) {
+  const prop = propMap.get(link.proposal_id);
+  const pub = pubMap.get(link.proposal_id);
+  const address = (pub && pub.project_address) || (prop && prop.project_address) || 'Your project';
+  const cityState = prop && prop.project_city
+    ? `${prop.project_city}${prop.project_state ? ', ' + prop.project_state : ''}` : '';
+  const totalCents = pub && pub.total_amount != null
+    ? Math.round(Number(pub.total_amount) * 100)
+    : (prop && prop.bid_total_amount != null ? Math.round(Number(prop.bid_total_amount) * 100) : null);
+  const totalDisplay = totalCents != null ? formatUSD(totalCents) : '—';
+  const slug = (pub && pub.slug) || (prop && prop.generated_html_slug) || null;
+  const viewUrl = slug ? `/p/${slug}` : null;
+  const status = link.status || 'sent';
+  const printUrl = `/account/print.html?id=${encodeURIComponent(link.proposal_id)}`;
+
+  const actions = printOnly
+    ? `<a class="v2-btn v2-btn-primary" href="${printUrl}" target="_blank" rel="noopener">🖨️ Print plan to mark up</a>`
+    : (viewUrl
+        ? `<a class="v2-btn v2-btn-primary" href="${viewUrl}" target="_blank" rel="noopener">View proposal →</a>
+           <button class="v2-btn v2-btn-ghost" type="button" data-redesign="${escapeAttr(link.proposal_id)}" data-addr="${escapeAttr(address)}">✏️ Request redesign</button>
+           <button class="v2-btn v2-btn-ghost" type="button" data-substitute="${escapeAttr(link.proposal_id)}" data-addr="${escapeAttr(address)}">🔄 Change materials</button>
+           <a class="v2-btn v2-btn-ghost" href="${printUrl}" target="_blank" rel="noopener">🖨️ Print to mark up</a>`
+        : `<button class="v2-btn v2-btn-primary" disabled>Not published yet</button>`);
+
+  return `
+    <div class="v2-prop-card">
+      <div class="v2-prop-head">
+        <div class="v2-prop-head-info">
+          <span class="v2-prop-status ${status}">${formatStatus(status)}</span>
+          <div class="v2-prop-addr">${escapeHtml(address)}</div>
+          ${cityState ? `<div class="v2-prop-meta">${escapeHtml(cityState)}</div>` : ''}
+        </div>
+        <div class="v2-prop-total">${totalDisplay}</div>
+      </div>
+      <div class="v2-prop-actions">${actions}</div>
+    </div>`;
+}
+
+function setOverviewEmpty() {
+  heroTitle.textContent = "You're not in the build sprint yet.";
+  heroBody.textContent = 'Schedule a free design appointment and your designer will start a proposal for your project.';
+  heroCta.style.display = 'inline-flex';
+  heroCta.href = scheduleCta.href;
+  overviewStats.innerHTML = '';
+}
+
+function renderOverviewFromLatest() {
+  if (!LATEST_PROPOSAL || !LATEST_PROPOSAL.prop) { setOverviewEmpty(); return; }
+  const { link, prop, pub } = LATEST_PROPOSAL;
+  const address = (pub && pub.project_address) || prop.project_address || 'Your project';
+  const totalCents = pub && pub.total_amount != null
+    ? Math.round(Number(pub.total_amount) * 100)
+    : (prop.bid_total_amount != null ? Math.round(Number(prop.bid_total_amount) * 100) : null);
+  const total = totalCents != null ? formatUSD(totalCents) : '—';
+  const status = link.status || 'sent';
+
+  const heroCopy = {
+    draft:       { t: 'Your proposal is in draft', b: 'Your designer is finalizing the line items. We\'ll notify you when it\'s ready to review.' },
+    sent:        { t: 'Your proposal is ready', b: 'Open the Proposal tab to review your full bid, line items, and materials.' },
+    viewed:      { t: 'Ready when you are', b: 'You\'ve viewed your proposal. Lock it in, request changes, or hop in the War room with your designer.' },
+    signed:      { t: 'Signed — install on deck', b: 'Your project is confirmed. Your designer will schedule the install crew shortly.' },
+    in_progress: { t: 'Install in progress', b: 'Your project is being built. Check the War room for daily updates.' },
+    complete:    { t: 'Project complete', b: 'Enjoy the new space. If anything needs attention, your installation warranty covers it.' },
+  }[status] || { t: 'Your project is live', b: 'Open the Proposal tab for details.' };
+
+  heroTitle.textContent = heroCopy.t;
+  heroBody.textContent = heroCopy.b;
+  heroCta.style.display = 'none';
+
+  overviewStats.innerHTML = `
+    <div class="v2-stat">
+      <div class="v2-stat-label">Project address</div>
+      <div class="v2-stat-val" style="font-size:16px;">${escapeHtml(address)}</div>
+      <div class="v2-stat-sub">${prop.project_city ? escapeHtml(prop.project_city) + (prop.project_state ? ', ' + escapeHtml(prop.project_state) : '') : ''}</div>
+    </div>
+    <div class="v2-stat">
+      <div class="v2-stat-label">Project bid</div>
+      <div class="v2-stat-val">${total}</div>
+      <div class="v2-stat-sub">Most recent proposal</div>
+    </div>
+    <div class="v2-stat">
+      <div class="v2-stat-label">Status</div>
+      <div class="v2-stat-val" style="font-size:18px;">${formatStatus(status)}</div>
+      <div class="v2-stat-sub">${prop.updated_at ? 'Updated ' + formatDate(prop.updated_at) : ''}</div>
+    </div>
+  `;
+}
+
+async function loadProposalRequests(clientId) {
+  const el = document.getElementById('v2-prop-requests');
+  if (!el) return;
+  const [{ data: redesigns }, { data: subs }] = await Promise.all([
+    supabase.from('proposal_redesign_requests')
+      .select('id, proposal_id, status, homeowner_note, designer_response, created_at, reviewed_at, photo_url')
+      .eq('client_id', clientId)
+      .order('created_at', { ascending: false }),
+    supabase.from('proposal_substitutions')
+      .select('id, proposal_id, status, homeowner_note, designer_response, created_at, reviewed_at')
+      .eq('client_id', clientId)
+      .order('created_at', { ascending: false }),
+  ]);
+  const items = [
+    ...(redesigns || []).map(r => ({ ...r, kind: 'redesign' })),
+    ...(subs || []).map(s => ({ ...s, kind: 'substitution' })),
+  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  if (!items.length) {
+    el.innerHTML = `
+      <div class="v2-pane-eyebrow" style="margin-bottom:14px;">Your requests</div>
+      <div class="v2-empty">
+        <div class="v2-empty-icon">📝</div>
+        <h3>No requests yet</h3>
+        <p>Use <strong>Request redesign</strong> or <strong>Change materials</strong> on a proposal above to submit a change.</p>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="v2-pane-eyebrow" style="margin-bottom:14px;">Your requests</div>
+    <div style="background:#fff;border:1px solid var(--bp-border);border-radius:12px;overflow:hidden;">
+      ${items.map(it => {
+        const status = it.status || 'pending';
+        const badge = ({
+          pending:   { bg: 'var(--bp-cream)', fg: 'var(--bp-muted)', label: 'Pending' },
+          reviewing: { bg: '#fef3c7',         fg: '#92400e',         label: 'In review' },
+          approved:  { bg: '#dcfce7',         fg: '#166534',         label: 'Approved' },
+          completed: { bg: 'var(--bp-green)', fg: '#fff',            label: 'Completed' },
+          declined:  { bg: '#fee2e2',         fg: '#991b1b',         label: 'Declined' },
+        })[status] || { bg: 'var(--bp-cream)', fg: 'var(--bp-muted)', label: status };
+        const icon = it.kind === 'redesign' ? '✏️' : '🔄';
+        const kindLabel = it.kind === 'redesign' ? 'Redesign request' : 'Material swap';
+        return `
+          <div style="padding:14px 18px;border-top:1px solid var(--bp-border);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+              <div style="min-width:0;flex:1;">
+                <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--bp-muted);font-weight:700;">${icon} ${kindLabel}</div>
+                <div style="font-size:13px;color:var(--bp-charcoal);margin-top:4px;line-height:1.5;">${escapeHtml(it.homeowner_note || '(no note)')}</div>
+                ${it.designer_response ? `<div style="margin-top:8px;padding:10px 12px;background:var(--bp-green-soft);border-radius:8px;font-size:12px;color:var(--bp-text);"><strong style="color:var(--bp-green-dk);">Designer reply:</strong> ${escapeHtml(it.designer_response)}</div>` : ''}
+                <div style="font-size:11px;color:var(--bp-muted);margin-top:6px;">Submitted ${formatDate(it.created_at)}${it.reviewed_at ? ' · reviewed ' + formatDate(it.reviewed_at) : ''}</div>
+              </div>
+              <span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:${badge.bg};color:${badge.fg};white-space:nowrap;flex-shrink:0;">${badge.label}</span>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+async function loadReferrals(clientId) {
+  const listEl = document.getElementById('v2-refer-list');
+  const { data, error } = await supabase
+    .from('referrals')
+    .select('id, referred_name, referred_email, status, invite_sent_at, scheduled_at, appointment_completed_at, credit_awarded_at, credit_amount_cents, created_at')
+    .eq('referrer_client_id', clientId)
+    .order('created_at', { ascending: false });
+  if (error) { listEl.innerHTML = `<div class="v2-error-msg">${escapeHtml(error.message)}</div>`; return; }
+  if (!data || data.length === 0) {
+    listEl.innerHTML = `
+      <div class="v2-empty">
+        <div class="v2-empty-icon">🎁</div>
+        <h3>No referrals yet</h3>
+        <p>Send your first invitation above. Every successful referral earns you $500 toward your next project.</p>
+      </div>`;
+    return;
+  }
+  listEl.innerHTML = `
+    <div style="background:#fff;border:1px solid var(--bp-border);border-radius:12px;overflow:hidden;">
+      ${data.map(r => {
+        const status = r.status || 'invited';
+        const cents = r.credit_amount_cents || 0;
+        const earned = !!r.credit_awarded_at;
+        const badge = ({
+          invited:   { bg: 'var(--bp-cream)', fg: 'var(--bp-muted)',   label: 'Invited' },
+          scheduled: { bg: '#fef3c7',         fg: '#92400e',           label: 'Scheduled' },
+          completed: { bg: '#dcfce7',         fg: '#166534',           label: 'Completed' },
+          credited:  { bg: 'var(--bp-green)', fg: '#fff',              label: 'Credited' },
+          expired:   { bg: '#f3f4f6',         fg: 'var(--bp-muted)',   label: 'Expired' },
+        })[status] || { bg: 'var(--bp-cream)', fg: 'var(--bp-muted)', label: status };
+        return `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-top:1px solid var(--bp-border);">
+            <div style="min-width:0;flex:1;">
+              <div style="font-size:13px;font-weight:600;color:var(--bp-text);">${escapeHtml(r.referred_name || r.referred_email || '—')}</div>
+              <div style="font-size:11px;color:var(--bp-muted);margin-top:2px;">${escapeHtml(r.referred_email || '')} · invited ${formatDate(r.invite_sent_at || r.created_at)}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+              ${earned ? `<span style="font-size:13px;font-weight:600;color:var(--bp-green-dk);">+${formatUSD(cents)}</span>` : ''}
+              <span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:${badge.bg};color:${badge.fg};">${badge.label}</span>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>
+    <div style="font-size:11px;color:var(--bp-muted);margin-top:10px;text-align:right;">${data.length} ${data.length === 1 ? 'referral' : 'referrals'} total</div>
+  `;
+}
+
+function wireReferModal() {
+  const modal = document.getElementById('v2-refer-modal');
+  const openBtn = document.getElementById('v2-refer-invite');
+  const closeBtn = document.getElementById('v2-refer-close');
+  const cancelBtn = document.getElementById('v2-refer-cancel');
+  const submitBtn = document.getElementById('v2-refer-submit');
+  const copyBtn = document.getElementById('v2-refer-copy');
+  const errEl = document.getElementById('v2-refer-error');
+
+  const open = () => { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; errEl.style.display = 'none'; };
+  const close = () => { modal.style.display = 'none'; document.body.style.overflow = ''; };
+  openBtn.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  cancelBtn.addEventListener('click', close);
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+
+  copyBtn.addEventListener('click', async () => {
+    const url = `${window.location.origin}/refer/?code=${encodeURIComponent(currentClient.refer_code || '')}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      copyBtn.textContent = '✓ Copied!';
+      setTimeout(() => { copyBtn.textContent = '🔗 Copy share link'; }, 2000);
+    } catch (_) {
+      window.prompt('Copy this link:', url);
+    }
+  });
+
+  submitBtn.addEventListener('click', async () => {
+    const name = document.getElementById('v2-refer-name').value.trim();
+    const email = document.getElementById('v2-refer-email').value.trim();
+    const phone = document.getElementById('v2-refer-phone').value.trim();
+    const note = document.getElementById('v2-refer-note').value.trim();
+    if (!name || !email) { errEl.textContent = 'Name and email are required.'; errEl.style.display = 'block'; return; }
+    submitBtn.disabled = true; submitBtn.textContent = 'Sending...';
+    try {
+      const res = await fetch('/api/refer/send-invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, note, refer_code: currentClient.refer_code }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `Send failed (${res.status})`);
+      }
+      close();
+      ['v2-refer-name','v2-refer-email','v2-refer-phone','v2-refer-note'].forEach(id => document.getElementById(id).value = '');
+      await loadReferrals(currentClient.id);
+    } catch (e) {
+      errEl.textContent = e.message || 'Could not send invitation. Please try again.';
+      errEl.style.display = 'block';
+    } finally {
+      submitBtn.disabled = false; submitBtn.textContent = 'Send invitation';
+    }
+  });
+}
+
+// Helpers
+function formatUSD(cents) {
+  const d = (Number(cents) || 0) / 100;
+  return d.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: d % 1 === 0 ? 0 : 2 });
+}
+function formatDate(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function formatStatus(s) {
+  const map = { draft: 'Draft', sent: 'Sent', viewed: 'Viewed', signed: 'Signed', in_progress: 'In progress', complete: 'Complete' };
+  return map[s] || s;
+}
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function escapeAttr(s) { return escapeHtml(s); }
+</script>
+
+<script type="module" src="/account/account-chat.js"></script>
+<script type="module" src="/account/account-build.js"></script>
+<script type="module" src="/account/account-materials.js"></script>
+<script type="module" src="/account/account-substitutions.js"></script>
+<script type="module" src="/account/account-redesign.js"></script>
+</body>
+</html>
