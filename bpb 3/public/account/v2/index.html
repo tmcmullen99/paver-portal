@@ -497,32 +497,68 @@
     </section>
 
     <!-- Pane · Materials catalog (stub for Sprint 31) -->
-    <section class="v2-pane" data-pane="materials">
-      <div class="v2-pane-eyebrow">Library</div>
-      <h1>Materials catalog</h1>
-      <p class="v2-pane-lede">Every paver, slab, wall block, and finish we install — searchable, tabbed by category, with manufacturer specs and warranties per product.</p>
-      <div class="v2-empty">
-        <div class="v2-empty-icon">🧱</div>
-        <h3>Coming next sprint</h3>
-        <p>Full-featured materials catalog with search, filter, and per-material warranty + install detail. For now you can browse the existing catalog in the legacy portal.</p>
-        <a class="v2-btn v2-btn-primary" href="/account/#materials" style="padding:11px 22px;">Open legacy catalog →</a>
-      </div>
-    </section>
+   <!-- Pane · Materials catalog -->
+<section class="v2-pane" data-pane="materials">
+  <div class="v2-pane-eyebrow">Library</div>
+  <h1>Materials catalog</h1>
+  <p class="v2-pane-lede">Every paver, slab, wall block, and finish we install — searchable, tabbed by category, with manufacturer specs, warranties, and install guides per product. Click any material to dive in.</p>
+  <div id="v2-materials-mount"></div>
+</section>
 
     <!-- Pane · Refer & earn -->
-    <section class="v2-pane" data-pane="refer">
-      <div class="v2-pane-eyebrow">Earn</div>
-      <h1>Refer a neighbor</h1>
-      <p class="v2-pane-lede">Send your neighbor a $500-off invitation. When they complete a free design appointment, you both earn $500 off.</p>
-      <div class="v2-credit-card">
-        <div class="v2-credit-eyebrow">Referral credit</div>
-        <div class="v2-credit-amount" id="v2-credit-amount">$0</div>
-        <div class="v2-credit-cap" id="v2-credit-cap">of $2,500 max</div>
-        <div class="v2-credit-bar"><div class="v2-credit-bar-fill" id="v2-credit-fill" style="width:0%;"></div></div>
-        <p class="v2-credit-desc">Refer a neighbor to Bayside Pavers. When they complete a design appointment, you both earn $500 off your next project.</p>
-        <a class="v2-btn v2-btn-primary" href="/account/#refer" style="padding:11px 22px;">Open referral tool →</a>
-      </div>
-    </section>
+    <!-- Pane · Refer & earn -->
+<section class="v2-pane" data-pane="refer">
+  <div class="v2-pane-eyebrow">Earn</div>
+  <h1>Refer a neighbor</h1>
+  <p class="v2-pane-lede">Send your neighbor a $500-off invitation. When they complete a free design appointment, you both earn $500 off. Stackable up to $2,500.</p>
+
+  <div class="v2-credit-card">
+    <div class="v2-credit-eyebrow">Your referral credit</div>
+    <div class="v2-credit-amount" id="v2-credit-amount">$0</div>
+    <div class="v2-credit-cap" id="v2-credit-cap">of $2,500 max</div>
+    <div class="v2-credit-bar"><div class="v2-credit-bar-fill" id="v2-credit-fill" style="width:0%;"></div></div>
+    <p class="v2-credit-desc">Each completed referral earns $500. Maximum credit is $2,500 toward your next project.</p>
+    <button class="v2-btn v2-btn-primary" id="v2-refer-invite" style="padding:11px 22px;">✉️ Invite a neighbor</button>
+    <button class="v2-btn v2-btn-ghost" id="v2-refer-copy" style="padding:11px 22px; margin-left:8px;">🔗 Copy share link</button>
+  </div>
+
+  <div style="margin-top:32px;">
+    <div class="v2-pane-eyebrow" style="margin-bottom:14px;">Your referrals</div>
+    <div id="v2-refer-list"><div class="v2-loading">Loading…</div></div>
+  </div>
+</section>
+
+<!-- Refer modal -->
+<div id="v2-refer-modal" style="position:fixed;inset:0;background:rgba(20,24,22,.55);display:none;align-items:flex-start;justify-content:center;z-index:1100;padding:32px 16px;overflow-y:auto;">
+  <div style="background:#fff;border-radius:14px;max-width:520px;width:100%;padding:28px 32px;box-shadow:0 24px 64px rgba(0,0,0,.32);margin:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 style="font-size:20px;font-weight:600;letter-spacing:-.012em;">Invite a neighbor</h2>
+      <button type="button" id="v2-refer-close" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--bp-muted);width:32px;height:32px;border-radius:50%;">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--bp-muted);margin-bottom:18px;line-height:1.55;">We'll send them a personal invitation with a $500-off coupon. When they complete a free design appointment, you both get $500 off.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--bp-charcoal);">
+        Their name<input id="v2-refer-name" type="text" required style="padding:10px 12px;border:1px solid var(--bp-border);border-radius:8px;font:inherit;font-size:13px;">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--bp-charcoal);">
+        Their email<input id="v2-refer-email" type="email" required style="padding:10px 12px;border:1px solid var(--bp-border);border-radius:8px;font:inherit;font-size:13px;">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--bp-charcoal);">
+        Their phone <span style="color:var(--bp-muted);font-weight:400;">(optional)</span>
+        <input id="v2-refer-phone" type="tel" style="padding:10px 12px;border:1px solid var(--bp-border);border-radius:8px;font:inherit;font-size:13px;">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--bp-charcoal);">
+        Personal note <span style="color:var(--bp-muted);font-weight:400;">(optional)</span>
+        <textarea id="v2-refer-note" rows="3" placeholder="Hey, you have to check out the team that did our backyard..." style="padding:10px 12px;border:1px solid var(--bp-border);border-radius:8px;font:inherit;font-size:13px;resize:vertical;"></textarea>
+      </label>
+    </div>
+    <div id="v2-refer-error" style="display:none;margin-top:12px;padding:10px 14px;background:#fef2f2;color:var(--bp-err);border:1px solid #fecaca;border-radius:8px;font-size:12px;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;">
+      <button type="button" id="v2-refer-cancel" class="v2-btn v2-btn-ghost" style="padding:10px 18px;">Cancel</button>
+      <button type="button" id="v2-refer-submit" class="v2-btn v2-btn-primary" style="padding:10px 22px;">Send invitation</button>
+    </div>
+  </div>
+</div>
 
   </main>
 </div>
@@ -636,11 +672,12 @@ async function loadAccount() {
   if (client.phone) acuityParams.set('phone', client.phone);
   scheduleCta.href = 'https://baysidepaversfreeconsultation.as.me/?' + acuityParams.toString();
 
-  applyCreditState(client);
-
-  await loadProposals(client.id);
-}
-
+ applyCreditState(client);
+  await Promise.all([
+    loadProposals(client.id),
+    loadReferrals(client.id),
+  ]);
+  wireReferModal();
 function applyCreditState(c) {
   const earned = Number(c.referral_credit_cents || 0);
   const used = Number(c.referral_credit_used_cents || 0);
@@ -809,6 +846,108 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 function escapeAttr(s) { return escapeHtml(s); }
+async function loadReferrals(clientId) {
+  const listEl = document.getElementById('v2-refer-list');
+  const { data, error } = await supabase
+    .from('referrals')
+    .select('id, referred_name, referred_email, status, invite_sent_at, scheduled_at, appointment_completed_at, credit_awarded_at, credit_amount_cents, created_at')
+    .eq('referrer_client_id', clientId)
+    .order('created_at', { ascending: false });
+  if (error) { listEl.innerHTML = `<div class="v2-error-msg">${escapeHtml(error.message)}</div>`; return; }
+  if (!data || data.length === 0) {
+    listEl.innerHTML = `
+      <div class="v2-empty">
+        <div class="v2-empty-icon">🎁</div>
+        <h3>No referrals yet</h3>
+        <p>Send your first invitation above. Every successful referral earns you $500 toward your next project.</p>
+      </div>`;
+    return;
+  }
+  listEl.innerHTML = `
+    <div style="background:#fff;border:1px solid var(--bp-border);border-radius:12px;overflow:hidden;">
+      ${data.map(r => {
+        const status = r.status || 'invited';
+        const cents = r.credit_amount_cents || 0;
+        const earned = !!r.credit_awarded_at;
+        const badge = ({
+          invited:   { bg: 'var(--bp-cream)', fg: 'var(--bp-muted)',   label: 'Invited' },
+          scheduled: { bg: '#fef3c7',         fg: '#92400e',           label: 'Scheduled' },
+          completed: { bg: '#dcfce7',         fg: '#166534',           label: 'Completed' },
+          credited:  { bg: 'var(--bp-green)', fg: '#fff',              label: 'Credited' },
+          expired:   { bg: '#f3f4f6',         fg: 'var(--bp-muted)',   label: 'Expired' },
+        })[status] || { bg: 'var(--bp-cream)', fg: 'var(--bp-muted)', label: status };
+        return `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-top:1px solid var(--bp-border);">
+            <div style="min-width:0;flex:1;">
+              <div style="font-size:13px;font-weight:600;color:var(--bp-text);">${escapeHtml(r.referred_name || r.referred_email || '—')}</div>
+              <div style="font-size:11px;color:var(--bp-muted);margin-top:2px;">${escapeHtml(r.referred_email || '')} · invited ${formatDate(r.invite_sent_at || r.created_at)}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+              ${earned ? `<span style="font-size:13px;font-weight:600;color:var(--bp-green-dk);">+${formatUSD(cents)}</span>` : ''}
+              <span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:${badge.bg};color:${badge.fg};">${badge.label}</span>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>
+    <div style="font-size:11px;color:var(--bp-muted);margin-top:10px;text-align:right;">${data.length} ${data.length === 1 ? 'referral' : 'referrals'} total</div>
+  `;
+}
+
+function wireReferModal() {
+  const modal = document.getElementById('v2-refer-modal');
+  const openBtn = document.getElementById('v2-refer-invite');
+  const closeBtn = document.getElementById('v2-refer-close');
+  const cancelBtn = document.getElementById('v2-refer-cancel');
+  const submitBtn = document.getElementById('v2-refer-submit');
+  const copyBtn = document.getElementById('v2-refer-copy');
+  const errEl = document.getElementById('v2-refer-error');
+
+  const open = () => { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; errEl.style.display = 'none'; };
+  const close = () => { modal.style.display = 'none'; document.body.style.overflow = ''; };
+  openBtn.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  cancelBtn.addEventListener('click', close);
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+
+  copyBtn.addEventListener('click', async () => {
+    const url = `${window.location.origin}/refer/?code=${encodeURIComponent(currentClient.refer_code || '')}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      copyBtn.textContent = '✓ Copied!';
+      setTimeout(() => { copyBtn.textContent = '🔗 Copy share link'; }, 2000);
+    } catch (_) {
+      window.prompt('Copy this link:', url);
+    }
+  });
+
+  submitBtn.addEventListener('click', async () => {
+    const name = document.getElementById('v2-refer-name').value.trim();
+    const email = document.getElementById('v2-refer-email').value.trim();
+    const phone = document.getElementById('v2-refer-phone').value.trim();
+    const note = document.getElementById('v2-refer-note').value.trim();
+    if (!name || !email) { errEl.textContent = 'Name and email are required.'; errEl.style.display = 'block'; return; }
+    submitBtn.disabled = true; submitBtn.textContent = 'Sending...';
+    try {
+      const res = await fetch('/api/refer/send-invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, note, refer_code: currentClient.refer_code }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `Send failed (${res.status})`);
+      }
+      close();
+      ['v2-refer-name','v2-refer-email','v2-refer-phone','v2-refer-note'].forEach(id => document.getElementById(id).value = '');
+      await loadReferrals(currentClient.id);
+    } catch (e) {
+      errEl.textContent = e.message || 'Could not send invitation. Please try again.';
+      errEl.style.display = 'block';
+    } finally {
+      submitBtn.disabled = false; submitBtn.textContent = 'Send invitation';
+    }
+  });
+}
 </script>
 
 <script type="module" src="/account/account-chat.js"></script>
