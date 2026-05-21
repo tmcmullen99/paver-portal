@@ -629,7 +629,7 @@ document.getElementById('v2-signout').addEventListener('click', async () => {
 // Auth gate
 const { data: { session } } = await supabase.auth.getSession();
 if (!session) {
-  window.location.replace('/account/signin.html?next=/account/v2/');
+  window.location.replace('/account/signin.html?next=/account/');
 } else {
   await loadAccount();
 }
