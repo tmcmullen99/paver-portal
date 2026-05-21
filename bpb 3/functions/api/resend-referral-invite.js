@@ -14,7 +14,9 @@
 //      source of truth.
 //   5. Update invite_sent_at = now() so the dashboard reflects the bump.
 //   6. Re-send the invite email via Resend with the same template and
-//      scheduling_token (token doesn't change — same referral row).
+//      scheduling_token (token doesn't change — same referral row). The
+//      personal_note stored at first-send time is re-included so the
+//      reminder preserves the homeowner's voice.
 //
 // Design note: this duplicates buildInviteHtml/Text from
 // send-referral-invite.js because Pages Functions don't share a module
@@ -92,7 +94,7 @@ export async function onRequestPost({ request, env }) {
     // ─── 4. Look up the referral, verify ownership + state ──────────────
     const referralResp = await fetch(
       SUPABASE_URL + '/rest/v1/referrals?id=eq.' + encodeURIComponent(referralId) +
-      '&select=id,referrer_client_id,referred_email,referred_name,status,scheduling_token,invite_sent_at',
+      '&select=id,referrer_client_id,referred_email,referred_name,status,scheduling_token,invite_sent_at,personal_note',
       {
         headers: {
           'apikey': SERVICE_ROLE,
@@ -156,6 +158,7 @@ export async function onRequestPost({ request, env }) {
     const landingUrl   = PUBLIC_BASE_URL + '/refer/?t=' + encodeURIComponent(referral.scheduling_token);
     const refeeFirst   = (referral.referred_name || '').split(/[\s,&]+/)[0] || 'there';
     const referrerName = callerClient.name || callerClient.email;
+    const personalNote = referral.personal_note || null;
 
     let emailSent  = false;
     let emailError = null;
@@ -174,8 +177,8 @@ export async function onRequestPost({ request, env }) {
             reply_to: callerClient.email,
             subject: 'Reminder: ' + (referrerName.split(/[\s,&]+/)[0] || 'a friend') +
                      ' wants you to claim your $500 from Bayside',
-            html:    buildInviteHtml({ referrerName, refeeFirstName: refeeFirst, landingUrl, isResend: true }),
-            text:    buildInviteText({ referrerName, refeeFirstName: refeeFirst, landingUrl, isResend: true }),
+            html:    buildInviteHtml({ referrerName, refeeFirstName: refeeFirst, landingUrl, isResend: true, personalNote }),
+            text:    buildInviteText({ referrerName, refeeFirstName: refeeFirst, landingUrl, isResend: true, personalNote }),
           }),
         });
         if (emailResp.ok) {
@@ -217,12 +220,23 @@ export async function onRequestOptions() {
 
 // ───────────────────────────────────────────────────────────────────────────
 // Email body — same template as send-referral-invite.js, with a "reminder"
-// nudge in the opening line when isResend=true.
+// nudge in the opening line when isResend=true. The personalNote is the
+// homeowner's original note stored at first-send time; re-included here so
+// the reminder preserves the homeowner's voice rather than reading as a
+// cold system nudge.
 // ───────────────────────────────────────────────────────────────────────────
-function buildInviteHtml({ referrerName, refeeFirstName, landingUrl, isResend }) {
+function buildInviteHtml({ referrerName, refeeFirstName, landingUrl, isResend, personalNote }) {
+  const referrerFirst = (referrerName || '').split(/[\s,&]+/)[0] || 'a Bayside customer';
   const opener = isResend
     ? 'Just a quick reminder — ' + escapeHtml(referrerName) + ' referred you to Bayside Pavers a few days ago, and you have $500 sitting on the table:'
     : escapeHtml(referrerName) + ' just referred you to Bayside Pavers — they thought you might be interested in what we are designing for their backyard, and they wanted you to have an unfair advantage:';
+
+  const noteBlock = personalNote
+    ? '<div style="background:#faf8f3;border-left:4px solid #5d7e69;padding:14px 18px;margin:22px 0 24px;border-radius:0 4px 4px 0;font-size:15px;line-height:1.65;color:#353535;font-style:italic;">' +
+      escapeHtml(personalNote).replace(/\n/g, '<br>') +
+      '<div style="margin-top:10px;font-size:13px;color:#70726f;font-style:normal;">— ' + escapeHtml(referrerFirst) + '</div>' +
+      '</div>'
+    : '';
 
   return '<!DOCTYPE html>\n' +
 '<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
@@ -238,12 +252,13 @@ function buildInviteHtml({ referrerName, refeeFirstName, landingUrl, isResend })
 '<tr><td style="padding:36px 40px 12px;">' +
 '<p style="margin:0 0 18px;font-size:16px;line-height:1.6;color:#1f2125;">Hi ' + escapeHtml(refeeFirstName) + ',</p>' +
 '<p style="margin:0 0 18px;font-size:15px;line-height:1.65;color:#58595b;">' + opener + '</p>' +
+noteBlock +
 '<div style="background:#dad7c5;border-radius:6px;padding:18px 22px;margin:20px 0 24px;text-align:center;">' +
 '<p style="margin:0 0 4px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#58595b;font-weight:600;">Your referral perk</p>' +
 '<p style="margin:0;font-size:22px;font-weight:600;color:#5d7e69;letter-spacing:-0.01em;">$500 off your first project</p>' +
 '</div>' +
 '<p style="margin:0 0 18px;font-size:15px;line-height:1.65;color:#58595b;">' +
-'Schedule a free design appointment with our team — no obligation. We will come out, walk your yard, and give you a real proposal. ' + escapeHtml((referrerName || '').split(/[\s,&]+/)[0]) + ' gets $500 toward their next project too.' +
+'Schedule a free design appointment with our team — no obligation. We will come out, walk your yard, and give you a real proposal. ' + escapeHtml(referrerFirst) + ' gets $500 toward their next project too.' +
 '</p>' +
 '<div style="text-align:center;margin:32px 0 12px;">' +
 '<a href="' + escapeHtml(landingUrl) + '" style="display:inline-block;background:#5d7e69;color:#fff;text-decoration:none;padding:14px 32px;border-radius:4px;font-size:15px;font-weight:600;">Claim your $500 &amp; schedule</a>' +
@@ -258,7 +273,7 @@ function buildInviteHtml({ referrerName, refeeFirstName, landingUrl, isResend })
 '</table></td></tr></table></body></html>';
 }
 
-function buildInviteText({ referrerName, refeeFirstName, landingUrl, isResend }) {
+function buildInviteText({ referrerName, refeeFirstName, landingUrl, isResend, personalNote }) {
   const referrerFirst = (referrerName || '').split(/[\s,&]+/)[0] || 'A friend';
   const opener = isResend
     ? 'Just a quick reminder — ' + referrerName + ' referred you to Bayside Pavers a'
@@ -266,12 +281,20 @@ function buildInviteText({ referrerName, refeeFirstName, landingUrl, isResend })
   const opener2 = isResend
     ? 'few days ago, and you have $500 sitting on the table.'
     : 'interested in what we are designing for their backyard.';
-  return [
+
+  const lines = [
     'Hi ' + refeeFirstName + ',',
     '',
     opener,
     opener2,
     '',
+  ];
+  if (personalNote) {
+    lines.push('A note from ' + referrerFirst + ':');
+    personalNote.split('\n').forEach(l => lines.push('  > ' + l));
+    lines.push('');
+  }
+  lines.push(
     'YOUR REFERRAL PERK: $500 off your first project',
     '',
     'Schedule a free design appointment with our team — no obligation. We will come out,',
@@ -283,8 +306,9 @@ function buildInviteText({ referrerName, refeeFirstName, landingUrl, isResend })
     'This invitation was sent because ' + referrerName + ' referred you.',
     'Reply to this email to reach them directly.',
     '',
-    '— Bayside Pavers · Creating backyards people love',
-  ].join('\n');
+    '— Bayside Pavers · Creating backyards people love'
+  );
+  return lines.join('\n');
 }
 
 function escapeHtml(s) {
