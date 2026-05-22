@@ -1,0 +1,100 @@
+<svg viewBox="0 0 980 680" xmlns="http://www.w3.org/2000/svg" font-family="'Onest', -apple-system, BlinkMacSystemFont, system-ui, sans-serif">
+  <defs>
+    <pattern id="soil" width="28" height="24" patternUnits="userSpaceOnUse">
+      <rect width="28" height="24" fill="#8c7a62"/>
+      <path d="M3 7 q3 -3 6 0" stroke="#71604a" stroke-width="1.2" fill="none" opacity="0.5"/>
+      <path d="M15 19 q2.5 -2.5 5 0" stroke="#71604a" stroke-width="1" fill="none" opacity="0.42"/>
+      <circle cx="19" cy="11" r="1.7" fill="#6c5b45" opacity="0.55"/>
+      <circle cx="7" cy="17" r="1.1" fill="#6c5b45" opacity="0.5"/>
+    </pattern>
+    <pattern id="aggregate" width="32" height="28" patternUnits="userSpaceOnUse">
+      <rect width="32" height="28" fill="#b0afa4"/>
+      <polygon points="6,5 12,7 10,13 4,11" fill="#959489" opacity="0.75"/>
+      <polygon points="21,4 27,6 26,12 20,11" fill="#8f8e83" opacity="0.6"/>
+      <polygon points="14,16 20,18 18,24 12,22" fill="#9b9a8f" opacity="0.7"/>
+      <polygon points="1,19 6,20 5,26 0,24" fill="#8f8e83" opacity="0.55"/>
+      <polygon points="26,18 31,20 29,26 24,24" fill="#969588" opacity="0.6"/>
+    </pattern>
+    <pattern id="sand" width="13" height="11" patternUnits="userSpaceOnUse">
+      <rect width="13" height="11" fill="#e6dabd"/>
+      <circle cx="2.5" cy="3" r="0.9" fill="#ccbb95"/><circle cx="8" cy="7" r="0.9" fill="#ccbb95"/>
+      <circle cx="11" cy="2" r="0.8" fill="#d4c6a4"/><circle cx="5" cy="9.5" r="0.8" fill="#d4c6a4"/>
+    </pattern>
+    <linearGradient id="paverTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cfc4a8"/><stop offset="1" stop-color="#bcb094"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="980" height="680" fill="#faf8f3"/>
+  <rect x="24" y="24" width="932" height="632" fill="none" stroke="#e3ddcd" stroke-width="1"/>
+
+  <text x="70" y="62" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12.5" letter-spacing="3" fill="#5d7e69" font-weight="600">BAYSIDE · HOW WE BUILD IT</text>
+  <text x="69" y="100" font-family="'Playfair Display', Georgia, serif" font-size="33" fill="#353535" font-weight="600">Anatomy of a paver driveway</text>
+  <line x1="70" y1="120" x2="470" y2="120" stroke="#d8d1bf" stroke-width="1.5"/>
+
+  <!-- Vehicle-load cue -->
+  <text x="250" y="132" text-anchor="middle" font-style="italic" font-size="13" fill="#7a6f54">vehicle load</text>
+  <g stroke="#5d7e69" stroke-width="2.2" fill="none">
+    <path d="M185 138 L185 149 M181 145 L185 149 L189 145"/>
+    <path d="M250 138 L250 149 M246 145 L250 149 L254 145"/>
+    <path d="M315 138 L315 149 M311 145 L315 149 L319 145"/>
+  </g>
+
+  <!-- Stack -->
+  <rect x="70" y="434" width="400" height="114" fill="url(#soil)"/>
+  <rect x="70" y="424" width="400" height="10" fill="#7f8a6e"/>
+  <line x1="70" y1="429" x2="470" y2="429" stroke="#faf8f3" stroke-width="1" stroke-dasharray="7 5" opacity="0.85"/>
+  <rect x="70" y="228" width="400" height="196" fill="url(#aggregate)"/>
+  <rect x="70" y="202" width="400" height="26" fill="url(#sand)"/>
+  <rect x="110" y="150" width="360" height="52" fill="url(#paverTop)"/>
+  <line x1="110" y1="152" x2="470" y2="152" stroke="#ddd2b7" stroke-width="1.5"/>
+  <g stroke="#9c906f" stroke-width="3">
+    <line x1="170" y1="150" x2="170" y2="202"/><line x1="230" y1="150" x2="230" y2="202"/>
+    <line x1="290" y1="150" x2="290" y2="202"/><line x1="350" y1="150" x2="350" y2="202"/>
+    <line x1="410" y1="150" x2="410" y2="202"/>
+  </g>
+  <rect x="70" y="150" width="400" height="398" fill="none" stroke="#cfc6b2" stroke-width="1.25"/>
+
+  <!-- Base-depth dimension in the left gutter (the driveway story) -->
+  <g stroke="#5d7e69" stroke-width="1.1">
+    <line x1="52" y1="228" x2="52" y2="424"/>
+    <line x1="46" y1="228" x2="58" y2="228"/><line x1="46" y1="424" x2="58" y2="424"/>
+  </g>
+  <text x="40" y="326" text-anchor="middle" transform="rotate(-90 40 326)" font-family="'JetBrains Mono', monospace" font-size="11.5" letter-spacing="1" fill="#5d7e69">8–12 in. base</text>
+
+  <!-- Leaders + labels -->
+  <g stroke="#5d7e69" stroke-width="1.1" fill="none">
+    <path d="M470 176 L504 176 L520 150"/><path d="M470 215 L504 215 L520 232"/>
+    <path d="M470 326 L504 326 L520 318"/><path d="M470 429 L504 429 L520 404"/>
+    <path d="M470 491 L504 491 L520 486"/>
+  </g>
+  <g fill="#5d7e69"><circle cx="470" cy="176" r="2.6"/><circle cx="470" cy="215" r="2.6"/><circle cx="470" cy="326" r="2.6"/><circle cx="470" cy="429" r="2.6"/><circle cx="470" cy="491" r="2.6"/></g>
+
+  <text x="528" y="145" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="1.5" fill="#5d7e69">01</text>
+  <text x="528" y="166" font-size="17" fill="#353535" font-weight="600">Driveway-rated pavers</text>
+  <text x="528" y="186" font-size="13.5" fill="#6b6b63">Thicker 80 mm units (vs. 60 mm patio) so they</text>
+  <text x="528" y="204" font-size="13.5" fill="#6b6b63">carry repeated wheel loads without rutting.</text>
+
+  <text x="528" y="227" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="1.5" fill="#5d7e69">02</text>
+  <text x="528" y="248" font-size="17" fill="#353535" font-weight="600">Bedding sand</text>
+  <text x="528" y="268" font-size="13.5" fill="#6b6b63">~1 in. coarse sand, screeded dead level under</text>
+  <text x="528" y="286" font-size="13.5" fill="#6b6b63">the whole field.</text>
+
+  <text x="528" y="313" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="1.5" fill="#5d7e69">03</text>
+  <text x="528" y="334" font-size="17" fill="#353535" font-weight="600">Deep compacted base</text>
+  <text x="528" y="354" font-size="13.5" fill="#6b6b63">The headline difference: roughly double a patio</text>
+  <text x="528" y="372" font-size="13.5" fill="#6b6b63">base, built up and compacted in lifts.</text>
+
+  <text x="528" y="399" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="1.5" fill="#5d7e69">04</text>
+  <text x="528" y="420" font-size="17" fill="#353535" font-weight="600">Geotextile fabric</text>
+  <text x="528" y="440" font-size="13.5" fill="#6b6b63">Separation layer that keeps base rock and soil</text>
+  <text x="528" y="458" font-size="13.5" fill="#6b6b63">from mixing under load.</text>
+
+  <text x="528" y="481" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="1.5" fill="#5d7e69">05</text>
+  <text x="528" y="502" font-size="17" fill="#353535" font-weight="600">Compacted subgrade</text>
+  <text x="528" y="522" font-size="13.5" fill="#6b6b63">Native soil graded and compacted to spec before</text>
+  <text x="528" y="540" font-size="13.5" fill="#6b6b63">any rock goes down.</text>
+
+  <line x1="70" y1="616" x2="910" y2="616" stroke="#e3ddcd" stroke-width="1"/>
+  <text x="70" y="640" font-size="12.5" fill="#9a9384">Typical assembly. Depths and materials vary by load, soil, and local code — your project's engineered spec governs the final build.</text>
+</svg>
