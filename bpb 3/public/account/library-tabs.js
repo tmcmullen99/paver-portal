@@ -49,6 +49,18 @@ const PROJECT_TYPES = [
     tagline: 'Tru-Scapes low-voltage, color-tunable, placed at the Pre-Walk.' },
 ];
 
+// Cross-section diagram per project type (static assets in /account/diagrams/)
+const PROJECT_DIAGRAMS = {
+  pavers:        { src: '/account/diagrams/paver-cross-section.svg',         alt: 'Cross-section of an interlocking paver installation' },
+  driveway:      { src: '/account/diagrams/driveway-cross-section.svg',       alt: 'Cross-section of a paver driveway and its deeper base' },
+  pool_deck:     { src: '/account/diagrams/pool-deck-cross-section.svg',      alt: 'Cross-section of a paver pool deck with coping and deck drain' },
+  walls:         { src: '/account/diagrams/retaining-wall-cross-section.svg', alt: 'Cross-section of a segmental retaining wall' },
+  turf:          { src: '/account/diagrams/turf-cross-section.svg',           alt: 'Cross-section of an artificial turf lawn' },
+  drainage:      { src: '/account/diagrams/french-drain-cross-section.svg',   alt: 'Cross-section of a French drain' },
+  fire_features: { src: '/account/diagrams/fire-pit-cross-section.svg',       alt: 'Cross-section of a gas fire pit' },
+  lighting:      { src: '/account/diagrams/lighting-system-diagram.svg',      alt: 'Diagram of a low-voltage landscape lighting system' },
+};
+
 // materials.category uses hyphens; project_types uses underscores. Map.
 const CATEGORY_TO_PROJECT_TYPES = {
   'pavers':        ['pavers', 'driveway', 'pool_deck'],
@@ -240,6 +252,7 @@ function renderActiveTab(state) {
 
   return [
     renderHero(type, { videos, docs, articles, materials }),
+    renderDiagram(type),
     renderPhases(state.data.bayside_standards),
     renderVideosSection(videos),
     renderGuidesSection(docs),
@@ -286,6 +299,23 @@ function renderHero(type, counts) {
 
 function statChip(count, label) {
   return `<span class="bpb-library-stat">${count} ${escapeHtml(label)}</span>`;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Cross-section diagram
+// ───────────────────────────────────────────────────────────────────────────
+
+function renderDiagram(type) {
+  const d = PROJECT_DIAGRAMS[type.id];
+  if (!d) return '';
+  return `
+    <section class="bpb-library-section">
+      <h3><i class="ti ti-stack-2" aria-hidden="true"></i> How it's built</h3>
+      <figure class="bpb-library-diagram">
+        <img src="${escapeAttr(d.src)}" alt="${escapeAttr(d.alt)}" loading="lazy">
+      </figure>
+    </section>
+  `;
 }
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -636,6 +666,8 @@ function injectBaseStyles() {
     .bpb-library-section{margin:20px 0}
     .bpb-library-section h3{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;margin:0 0 10px;color:#2a2a26}
     .bpb-library-section h3 .ti{font-size:16px;color:#5d7e69}
+    .bpb-library-diagram{margin:0;border:1px solid #e2dfd2;border-radius:12px;overflow:hidden;background:#faf8f3}
+    .bpb-library-diagram img{display:block;width:100%;height:auto}
     .bpb-library-phases{display:flex;flex-direction:column;gap:6px}
     .bpb-library-phase{border:1px solid #e2dfd2;border-radius:8px;overflow:hidden}
     .bpb-library-phase-header{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;background:#fff;border:none;text-align:left;cursor:pointer;font-family:inherit}
