@@ -494,6 +494,8 @@
           </div>
         </details>
       </section>
+
+      <div id="bpb-library-mount"></div>
     </section>
 
     <!-- Pane · Materials catalog -->
@@ -1034,7 +1036,12 @@ function escapeAttr(s) { return escapeHtml(s); }
 </script>
 
 <script type="module" src="/account/account-chat.js"></script>
-<script type="module" src="/account/account-build.js"></script>
+<script type="module">
+  // Unified Library (replaces account-build.js) — per-type deep dives
+  import { mountLibrary } from '/account/library-tabs.js';
+  const el = document.getElementById('bpb-library-mount');
+  if (el) mountLibrary(el, { mode: 'portal' });
+</script>
 <script type="module" src="/account/account-materials.js"></script>
 <script type="module" src="/account/account-substitutions.js"></script>
 <script type="module" src="/account/account-redesign.js"></script>
