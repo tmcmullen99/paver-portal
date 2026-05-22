@@ -22,6 +22,17 @@ const CATEGORIES = [
   { slug: 'other',         label: 'Other' },
 ];
 
+// Cross-section diagram per material category (static assets in /account/diagrams/)
+const CATEGORY_DIAGRAMS = {
+  'pavers':        { src: '/account/diagrams/paver-cross-section.svg',         alt: 'Cross-section of an interlocking paver installation' },
+  'porcelain':     { src: '/account/diagrams/paver-cross-section.svg',         alt: 'Cross-section of a paver installation (porcelain pavers use the same base)' },
+  'walls':         { src: '/account/diagrams/retaining-wall-cross-section.svg', alt: 'Cross-section of a segmental retaining wall' },
+  'fire-features': { src: '/account/diagrams/fire-pit-cross-section.svg',       alt: 'Cross-section of a gas fire pit' },
+  'decking':       { src: '/account/diagrams/pool-deck-cross-section.svg',      alt: 'Cross-section of a paver pool deck' },
+  'turf':          { src: '/account/diagrams/turf-cross-section.svg',           alt: 'Cross-section of an artificial turf lawn' },
+  'lighting':      { src: '/account/diagrams/lighting-system-diagram.svg',      alt: 'Diagram of a low-voltage landscape lighting system' },
+};
+
 let MATERIALS = [];
 let MANUFACTURERS = [];
 let INSTALL_GUIDES = [];
@@ -127,6 +138,8 @@ function injectStyles() {
     .vm-modal-desc { font-size: 14px; color: var(--bp-charcoal); line-height: 1.6; margin-bottom: 18px; }
     .vm-modal-section { margin-top: 22px; }
     .vm-modal-section-title { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--bp-muted); font-weight: 700; margin-bottom: 10px; }
+    .vm-modal-diagram { margin: 0; border: 1px solid var(--bp-border); border-radius: 10px; overflow: hidden; background: var(--bp-cream); }
+    .vm-modal-diagram img { display: block; width: 100%; height: auto; }
 
     .vm-warranty-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 540px) { .vm-warranty-grid { grid-template-columns: 1fr; } }
@@ -222,6 +235,17 @@ function pickImageUrl(m) {
   const hostBlocked = (u) => /belgard\.com/i.test(u || '');
   const urls = [m.primary_image_url, m.swatch_url].filter(Boolean);
   return urls.find(u => !hostBlocked(u)) || urls[0] || null;
+}
+function diagramSectionFor(m) {
+  const d = CATEGORY_DIAGRAMS[(m.category || '').toLowerCase()];
+  if (!d) return '';
+  return `
+    <div class="vm-modal-section">
+      <div class="vm-modal-section-title">How it's built</div>
+      <figure class="vm-modal-diagram">
+        <img src="${escapeAttr(d.src)}" alt="${escapeAttr(d.alt)}" loading="lazy">
+      </figure>
+    </div>`;
 }
 function matchesCat(m) {
   if (activeCat === 'all') return true;
@@ -373,6 +397,7 @@ function openModal(mid) {
         ${metaBits ? `<div class="vm-modal-meta">${metaBits}</div>` : ''}
         ${m.description ? `<div class="vm-modal-desc">${escapeHtml(m.description)}</div>` : ''}
         ${m.color || m.collection ? `<div class="vm-modal-meta"><strong style="color:var(--bp-text)">Color:</strong>&nbsp;${escapeHtml(m.color || '—')}${m.collection ? ' &nbsp;·&nbsp; <strong style="color:var(--bp-text)">Collection:</strong>&nbsp;' + escapeHtml(m.collection) : ''}</div>` : ''}
+        ${diagramSectionFor(m)}
         ${warrantyHtml}
         ${guidesHtml}
         <div class="vm-cta-row">
