@@ -24,6 +24,18 @@ const PROJECT_TYPES = [
   { slug: 'lighting',      label: 'Lighting',        lede: 'Low-voltage LED path lighting and accent fixtures. Transformer-driven, weatherproof connections, and proper voltage drop calculations across long runs — so lights at the end of a path are as bright as the ones at the start.' },
 ];
 
+// Cross-section diagram per project type (static assets in /account/diagrams/)
+const PROJECT_DIAGRAMS = {
+  pavers:        { src: '/account/diagrams/paver-cross-section.svg',         alt: 'Cross-section of an interlocking paver installation' },
+  driveway:      { src: '/account/diagrams/driveway-cross-section.svg',       alt: 'Cross-section of a paver driveway and its deeper base' },
+  pool_deck:     { src: '/account/diagrams/pool-deck-cross-section.svg',      alt: 'Cross-section of a paver pool deck with coping and deck drain' },
+  walls:         { src: '/account/diagrams/retaining-wall-cross-section.svg', alt: 'Cross-section of a segmental retaining wall' },
+  turf:          { src: '/account/diagrams/turf-cross-section.svg',           alt: 'Cross-section of an artificial turf lawn' },
+  drainage:      { src: '/account/diagrams/french-drain-cross-section.svg',   alt: 'Cross-section of a French drain' },
+  fire_features: { src: '/account/diagrams/fire-pit-cross-section.svg',       alt: 'Cross-section of a gas fire pit' },
+  lighting:      { src: '/account/diagrams/lighting-system-diagram.svg',      alt: 'Diagram of a low-voltage landscape lighting system' },
+};
+
 let GUIDES_CACHE = [];
 let currentTab = 'pavers';
 
@@ -115,6 +127,7 @@ function injectStyles() {
       padding-bottom: 18px;
       border-bottom: 1px solid var(--bp-border);
     }
+    .ho-pt-diagram { width: 100%; height: auto; display: block; border: 1px solid var(--bp-border); border-radius: 12px; background: var(--bp-cream); }
     .ho-pt-sub { margin-bottom: 22px; }
     .ho-pt-sub:last-child { margin-bottom: 0; }
     .ho-pt-sub h4 {
@@ -304,10 +317,15 @@ function renderBody() {
   const products = guides.filter(g => g.content_type === 'catalog' || g.content_type === 'spec_sheet');
 
   const ledeHtml = `<p class="ho-pt-lede">${escapeHtml(type.lede)}</p>`;
+  const dgm = PROJECT_DIAGRAMS[type.slug];
+  const diagramHtml = dgm
+    ? `<div class="ho-pt-sub"><h4>How it's built</h4><img class="ho-pt-diagram" src="${escapeAttr(dgm.src)}" alt="${escapeAttr(dgm.alt)}" loading="lazy"></div>`
+    : '';
 
   if (guides.length === 0) {
     bodyEl.innerHTML = `
       ${ledeHtml}
+      ${diagramHtml}
       <div class="ho-pt-empty">
         <p>Detailed ${escapeHtml(type.label.toLowerCase())} content is coming soon.</p>
         <p>Schedule a design appointment to walk through your specific project with our team.</p>
@@ -316,7 +334,7 @@ function renderBody() {
     return;
   }
 
-  let html = ledeHtml;
+  let html = ledeHtml + diagramHtml;
   if (videos.length > 0) {
     html += `
       <div class="ho-pt-sub">
