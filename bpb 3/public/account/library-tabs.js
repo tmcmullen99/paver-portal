@@ -1,27 +1,52 @@
-// account-build.js · Sprint 29.1
-// Project-type-tabbed guides under "How we build".
-// Merges catalogs + spec_sheets under "Browse products" with distinct badges.
+// ═══════════════════════════════════════════════════════════════════════════
+// bpb 3/public/account/library-tabs.js
+// Sprint 35 Phase B — Tabbed Library shared component
+//
+// Renders the per-project-type library in two contexts:
+//
+//   Portal mode  — mounted from /account/index.html into the Library pane.
+//                  Queries Supabase directly for all data. All 8 tabs are
+//                  interactive.
+//
+//   Proposal mode — injected into /p/<slug> via the Cloudflare Pages
+//                  function. Calls get_proposal_quality_context(slug);
+//                  detected types are sorted to the front, non-detected
+//                  remain visible but greyed-out at the end (capability
+//                  signaling).
+//
+// Public API:
+//   mountLibrary(container, options) -> Promise<state>
+//     options.mode         : 'portal' | 'proposal'  (required)
+//     options.proposalSlug : string                 (required in proposal mode)
+//     options.initialTab   : string                 (optional override)
+//
+// Hash routing: #library/<project_type> preserves selected tab across
+// reloads and back-button. Falls back to first detected type or 'pavers'.
+// ═══════════════════════════════════════════════════════════════════════════
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { supabase } from '/js/supabase-client.js';
 
-const SUPABASE_URL  = 'https://gfgbypcnxkschnfsitfb.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmZ2J5cGNueGtzY2huZnNpdGZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTkzMTUsImV4cCI6MjA5MjI5NTMxNX0.EAwmiNR5OWcaI8Sr36MVn7FuMhYoZvfngse7y0ZOgvA';
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
-  auth: { persistSession: true, autoRefreshToken: true },
-});
-
-const ACUITY_URL = 'https://baysidepaversfreeconsultation.as.me/';
+// ───────────────────────────────────────────────────────────────────────────
+// Constants
+// ───────────────────────────────────────────────────────────────────────────
 
 const PROJECT_TYPES = [
-  { slug: 'pavers',        label: 'Pavers',          lede: 'Paver patios, walkways, and garden paths — the most common Bayside project. Built to ICPI standards with polymeric jointing sand, your choice of pattern, and a base graded for your soil and climate.' },
-  { slug: 'driveway',      label: 'Driveways',       lede: 'Driveways carry your car day in, day out. The base depth (8" vs 4" for patios), bond pattern (herringbone for shear strength), and edge restraints all matter more here than anywhere else.' },
-  { slug: 'pool_deck',     label: 'Pool decks',      lede: 'Pool decks are a different animal — slip resistance, surface temperature, and how the coping meets the deck all need solving. Porcelain has become the go-to for new builds; pavers are still the workhorse for retrofits.' },
-  { slug: 'walls',         label: 'Retaining walls', lede: 'Retaining walls are engineered structures, not stacked stones. A leveling pad of compacted aggregate, drainage backfill, and geosynthetic reinforcement (where soil and height demand it) is what keeps them straight for decades.' },
-  { slug: 'turf',          label: 'Turf',            lede: 'Synthetic turf installs over a free-draining base with proper sub-grade compaction and infill brushing. Shade tolerance, drainage, and pet-specific systems all factor into product selection.' },
-  { slug: 'drainage',      label: 'Drainage',        lede: 'Drainage gets engineered into every project from day one — sub-surface pipe where the design needs it, surface grading sloped at least 2% away from structures, and proper outlets so water actually leaves. Also a standalone fix when an existing yard floods.' },
-  { slug: 'fire_features', label: 'Fire features',   lede: 'Fire pits, fire walls, and outdoor fireplaces. Bases are built like retaining walls; gas runs go through licensed plumbers; finish caps are mortared in to last.' },
-  { slug: 'lighting',      label: 'Lighting',        lede: 'Low-voltage LED path lighting and accent fixtures. Transformer-driven, weatherproof connections, and proper voltage drop calculations across long runs — so lights at the end of a path are as bright as the ones at the start.' },
+  { id: 'pavers',        label: 'Pavers',        icon: 'ti-bricks',
+    tagline: 'Interlocking concrete units that outlast slabs by decades when installed right.' },
+  { id: 'driveway',      label: 'Driveways',     icon: 'ti-car',
+    tagline: 'Engineered to bear the daily weight of cars, trucks, and time.' },
+  { id: 'pool_deck',     label: 'Pool decks',    icon: 'ti-swimming',
+    tagline: 'Slip-resistant surfaces designed for wet feet and bare ones.' },
+  { id: 'walls',         label: 'Walls',         icon: 'ti-wall',
+    tagline: 'Retaining and freestanding walls built to engineered standards.' },
+  { id: 'turf',          label: 'Turf',          icon: 'ti-plant',
+    tagline: 'Synthetic grass on a paver-grade base — 15 years plush, not 2.' },
+  { id: 'drainage',      label: 'Drainage',      icon: 'ti-droplet',
+    tagline: 'Engineered grade and pipes that move water away from your home.' },
+  { id: 'fire_features', label: 'Fire features', icon: 'ti-flame',
+    tagline: 'Fire pits and outdoor fireplaces, lined and code-compliant.' },
+  { id: 'lighting',      label: 'Lighting',      icon: 'ti-bulb',
+    tagline: 'Tru-Scapes low-voltage, color-tunable, placed at the Pre-Walk.' },
 ];
 
 // Cross-section diagram per project type (static assets in /account/diagrams/)
@@ -36,448 +61,790 @@ const PROJECT_DIAGRAMS = {
   lighting:      { src: '/account/diagrams/lighting-system-diagram.svg',      alt: 'Diagram of a low-voltage landscape lighting system' },
 };
 
-let GUIDES_CACHE = [];
-let STEPS_CACHE = [];
-let currentTab = 'pavers';
+// materials.category uses hyphens; project_types uses underscores. Map.
+const CATEGORY_TO_PROJECT_TYPES = {
+  'pavers':        ['pavers', 'driveway', 'pool_deck'],
+  'porcelain':     ['pool_deck', 'pavers'],
+  'walls':         ['walls', 'fire_features'],
+  'fire-features': ['fire_features'],
+  'decking':       ['pool_deck'],
+  'lighting':      ['lighting'],
+  'accessories':   ['pavers', 'driveway', 'pool_deck', 'walls', 'fire_features'],
+  'other':         [],
+};
 
-(async function init() {
-  const howWeBuild = document.getElementById('how-we-build');
-  if (!howWeBuild) return;
-  injectStyles();
-  const oldIv = howWeBuild.querySelector('.ho-iv-section');
-  if (oldIv) oldIv.remove();
-  const section = document.createElement('div');
-  section.className = 'ho-pt-section';
-  section.innerHTML = `
-    <div class="ho-pt-head">
-      <h3>Detailed guides by project type</h3>
-      <p>Each project type has its own build process, products, and warranty considerations. Pick the one that matches yours.</p>
-    </div>
-    <div class="ho-pt-tabs" id="ho-pt-tabs"></div>
-    <div class="ho-pt-body" id="ho-pt-body">
-      <div class="ho-pt-loading">Loading project guides…</div>
+function categoriesForProjectType(projectType) {
+  return Object.entries(CATEGORY_TO_PROJECT_TYPES)
+    .filter(([, types]) => types.includes(projectType))
+    .map(([cat]) => cat);
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Public API
+// ───────────────────────────────────────────────────────────────────────────
+
+export async function mountLibrary(container, options = {}) {
+  if (!container) throw new Error('mountLibrary: container element required');
+  if (!options.mode) throw new Error('mountLibrary: options.mode required');
+
+  injectBaseStyles();
+
+  const state = {
+    mode: options.mode,
+    proposalSlug: options.proposalSlug,
+    data: null,
+    detectedTypes: [],
+    activeTab: null,
+    container,
+  };
+
+  // Render loading skeleton immediately
+  container.innerHTML = `<div class="bpb-library-loading">Loading library…</div>`;
+
+  try {
+    state.data = options.mode === 'proposal'
+      ? await fetchProposalData(options.proposalSlug)
+      : await fetchPortalData();
+  } catch (err) {
+    console.error('[library-tabs] data fetch failed:', err);
+    container.innerHTML = `<div class="bpb-library-error">Couldn't load the library. Please refresh the page.</div>`;
+    return null;
+  }
+
+  state.detectedTypes = options.mode === 'proposal'
+    ? (state.data.project_types_detected || [])
+    : PROJECT_TYPES.map(t => t.id);
+
+  const validIds = new Set(PROJECT_TYPES.map(t => t.id));
+  let initialTab = readHashTab() || options.initialTab || state.detectedTypes[0] || 'pavers';
+  if (!validIds.has(initialTab)) initialTab = state.detectedTypes[0] || 'pavers';
+  state.activeTab = initialTab;
+
+  render(state);
+  setupHashListener(state);
+  return state;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Data fetching
+// ───────────────────────────────────────────────────────────────────────────
+
+async function fetchPortalData() {
+  const [baysideRes, manufacturersRes, guidesRes, articlesRes, materialsRes, stepsRes] = await Promise.all([
+    supabase.from('manufacturer_info')
+      .select('quality_standards, warranty_summary, about')
+      .eq('name', 'Bayside').single(),
+    supabase.from('manufacturer_info')
+      .select('name, display_name, warranty_summary, warranty_url, about, sort_order')
+      .eq('is_active', true).order('sort_order'),
+    supabase.from('install_guides')
+      .select('id, kind, video_id, url, title, description, category, manufacturer, thumbnail_url, sort_order')
+      .eq('is_active', true).order('sort_order'),
+    supabase.from('content_articles')
+      .select('id, slug, title, excerpt, hero_image_url, author, published_at, project_types, source_url, is_external, reading_time_min, sort_order')
+      .eq('is_active', true).order('sort_order'),
+    supabase.from('materials')
+      .select('id, name, category, color, swatch_url, manufacturer, line')
+      .order('name'),
+    supabase.from('installation_steps')
+      .select('project_type, step_order, title, body_md, bullets, source_url, source_page')
+      .eq('is_active', true).order('step_order'),
+  ]);
+
+  return {
+    bayside_standards: baysideRes.data || {},
+    manufacturers: manufacturersRes.data || [],
+    install_guides: guidesRes.data || [],
+    content_articles: articlesRes.data || [],
+    materials: materialsRes.data || [],
+    installation_steps: stepsRes.data || [],
+  };
+}
+
+async function fetchProposalData(slug) {
+  const { data, error } = await supabase.rpc('get_proposal_quality_context', { p_slug: slug });
+  if (error) throw error;
+  // Proposal RPC doesn't include full materials list — fetch separately for tab grids
+  const [materialsRes, stepsRes] = await Promise.all([
+    supabase.from('materials')
+      .select('id, name, category, color, swatch_url, manufacturer, line')
+      .order('name'),
+    supabase.from('installation_steps')
+      .select('project_type, step_order, title, body_md, bullets, source_url, source_page')
+      .eq('is_active', true).order('step_order'),
+  ]);
+  return {
+    ...data,
+    materials: materialsRes.data || [],
+    installation_steps: stepsRes.data || [],
+  };
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Top-level render
+// ───────────────────────────────────────────────────────────────────────────
+
+function render(state) {
+  state.container.innerHTML = `
+    ${state.mode === 'portal' ? renderGlobalSearch() : ''}
+    ${renderTabStrip(state)}
+    <div id="bpb-library-tab-content" class="bpb-library-tab-content">
+      ${renderActiveTab(state)}
     </div>
   `;
-  howWeBuild.appendChild(section);
-  await Promise.all([loadGuides(), loadSteps()]);
-  renderTabs();
-  renderBody();
-})();
-
-function injectStyles() {
-  if (document.getElementById('ho-pt-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'ho-pt-styles';
-  style.textContent = `
-    .ho-pt-section { margin-top: 22px; }
-    .ho-pt-head { margin-bottom: 16px; }
-    .ho-pt-head h3 { font-size: 15px; font-weight: 600; color: var(--bp-text); margin-bottom: 6px; }
-    .ho-pt-head p { font-size: 13px; color: var(--bp-muted); line-height: 1.55; max-width: 580px; }
-    .ho-pt-tabs {
-      display: flex; gap: 6px; flex-wrap: wrap;
-      margin-bottom: 14px; padding-bottom: 14px;
-      border-bottom: 1px solid var(--bp-border);
-    }
-    .ho-pt-tab {
-      flex-shrink: 0;
-      background: transparent;
-      border: 1px solid var(--bp-border);
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-family: inherit; font-size: 12px; font-weight: 600;
-      color: var(--bp-muted);
-      cursor: pointer;
-      display: inline-flex; align-items: center; gap: 8px;
-      transition: background .15s, color .15s, border-color .15s;
-      white-space: nowrap;
-    }
-    .ho-pt-tab:hover {
-      color: var(--bp-text);
-      background: var(--bp-cream);
-      border-color: var(--bp-green);
-    }
-    .ho-pt-tab.is-active {
-      background: var(--bp-green); color: #fff;
-      border-color: var(--bp-green);
-    }
-    .ho-pt-tab-count {
-      background: rgba(0,0,0,0.06);
-      padding: 1px 7px;
-      border-radius: 999px;
-      font-size: 10px; font-weight: 700;
-      letter-spacing: 0.02em;
-    }
-    .ho-pt-tab.is-active .ho-pt-tab-count {
-      background: rgba(255,255,255,0.22); color: #fff;
-    }
-    .ho-pt-tab-count.empty {
-      background: var(--bp-cream); color: var(--bp-muted);
-    }
-    .ho-pt-body {
-      background: #fff;
-      border: 1px solid var(--bp-border);
-      border-radius: 12px;
-      padding: 22px 24px 24px;
-      min-height: 200px;
-    }
-    .ho-pt-lede {
-      font-size: 14px;
-      line-height: 1.65;
-      color: var(--bp-charcoal);
-      margin-bottom: 20px;
-      padding-bottom: 18px;
-      border-bottom: 1px solid var(--bp-border);
-    }
-    .ho-pt-diagram { width: 100%; height: auto; display: block; border: 1px solid var(--bp-border); border-radius: 12px; background: var(--bp-cream); }
-    .ho-pt-steps-intro { font-size: 13px; color: var(--bp-muted); line-height: 1.6; margin-bottom: 12px; }
-    .ho-pt-steps { display: flex; flex-direction: column; gap: 8px; }
-    .ho-pt-step { border: 1px solid var(--bp-border); border-radius: 8px; overflow: hidden; }
-    .ho-pt-step[open] { border-color: var(--bp-green); }
-    .ho-pt-step-head { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 11px 14px; user-select: none; }
-    .ho-pt-step-head::-webkit-details-marker { display: none; }
-    .ho-pt-step-num { font-size: 11px; font-weight: 700; color: var(--bp-green); font-family: monospace; }
-    .ho-pt-step-title { font-size: 13px; font-weight: 600; color: var(--bp-text); flex: 1; }
-    .ho-pt-step-arrow { color: var(--bp-muted); font-size: 16px; transition: transform .2s; }
-    .ho-pt-step[open] .ho-pt-step-arrow { transform: rotate(90deg); }
-    .ho-pt-step-detail { padding: 0 14px 14px; }
-    .ho-pt-step-detail p { font-size: 13px; color: var(--bp-charcoal); line-height: 1.6; margin: 0 0 8px; }
-    .ho-pt-step-bullets { margin: 0; padding-left: 18px; }
-    .ho-pt-step-bullets li { font-size: 12.5px; color: var(--bp-muted); line-height: 1.5; margin-bottom: 3px; }
-    .ho-pt-sub { margin-bottom: 22px; }
-    .ho-pt-sub:last-child { margin-bottom: 0; }
-    .ho-pt-sub h4 {
-      font-size: 10px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      font-weight: 700;
-      color: var(--bp-charcoal);
-      margin-bottom: 10px;
-    }
-    .ho-pt-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 10px;
-    }
-    .ho-pt-card {
-      display: block;
-      background: #fff;
-      border: 1px solid var(--bp-border);
-      border-radius: 8px;
-      overflow: hidden;
-      text-decoration: none;
-      color: inherit;
-      transition: border-color .15s, transform .15s, box-shadow .15s;
-    }
-    .ho-pt-card:hover {
-      border-color: var(--bp-green);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(93,126,105,0.10);
-    }
-    .ho-pt-card-thumb {
-      position: relative;
-      aspect-ratio: 16/9;
-      background: #000;
-      overflow: hidden;
-    }
-    .ho-pt-card-thumb img {
-      width: 100%; height: 100%;
-      object-fit: cover; display: block;
-    }
-    .ho-pt-card-thumb.pdf {
-      background: var(--bp-tan);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--bp-charcoal);
-      font-size: 13px; font-weight: 700;
-      letter-spacing: 0.1em;
-    }
-    .ho-pt-card-thumb.catalog {
-      background: var(--bp-green-soft);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--bp-green-dk);
-      font-size: 11px; font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 8px;
-      text-align: center;
-      line-height: 1.2;
-    }
-    .ho-pt-card-thumb.spec {
-      background: linear-gradient(135deg, var(--bp-green-soft) 0%, var(--bp-cream) 100%);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--bp-green-dk);
-      font-size: 11px; font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 8px;
-      text-align: center;
-      line-height: 1.2;
-    }
-    .ho-pt-card-play {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      color: rgba(255,255,255,0.94);
-      font-size: 22px;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.55);
-      pointer-events: none;
-    }
-    .ho-pt-card-label { padding: 8px 10px 10px; }
-    .ho-pt-card-title {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--bp-text);
-      line-height: 1.3;
-      margin-bottom: 2px;
-    }
-    .ho-pt-card-kind {
-      font-size: 9px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--bp-muted);
-      font-weight: 700;
-    }
-    .ho-pt-empty {
-      background: var(--bp-cream);
-      border: 1px dashed var(--bp-border);
-      border-radius: 10px;
-      padding: 24px;
-      text-align: center;
-      color: var(--bp-muted);
-      font-size: 13px;
-      line-height: 1.6;
-    }
-    .ho-pt-empty p { margin-bottom: 10px; }
-    .ho-pt-empty p:last-child { margin-bottom: 14px; }
-    .ho-pt-empty-cta {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--bp-green); color: #fff;
-      padding: 10px 20px;
-      border-radius: 999px;
-      font-size: 12px; font-weight: 600;
-      text-decoration: none;
-      transition: background .15s;
-    }
-    .ho-pt-empty-cta:hover { background: var(--bp-green-dk); }
-    .ho-pt-loading {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--bp-muted);
-      font-size: 13px;
-    }
-    @media (max-width: 480px) {
-      .ho-pt-grid { grid-template-columns: repeat(2, 1fr); }
-      .ho-pt-body { padding: 18px 16px 20px; }
-    }
-  `;
-  document.head.appendChild(style);
+  attachTabClickHandlers(state);
+  if (state.mode === 'portal') attachSearchHandlers(state);
+  attachAccordionHandlers(state);
+  attachMaterialClickHandlers(state);
 }
 
-async function loadGuides() {
-  try {
-    const { data, error } = await supabase
-      .from('install_guides')
-      .select('id, kind, content_type, video_id, url, title, description, category, manufacturer, project_types, thumbnail_url, sort_order')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true });
-    if (error) throw error;
-    GUIDES_CACHE = data || [];
-  } catch (err) {
-    console.warn('[account-build loadGuides]', err);
-    GUIDES_CACHE = [];
-  }
+function rerenderActiveTab(state) {
+  const target = state.container.querySelector('#bpb-library-tab-content');
+  if (target) target.innerHTML = renderActiveTab(state);
+  attachAccordionHandlers(state);
+  attachMaterialClickHandlers(state);
 }
 
-async function loadSteps() {
-  try {
-    const { data, error } = await supabase
-      .from('installation_steps')
-      .select('project_type, step_order, title, body_md, bullets')
-      .eq('is_active', true)
-      .order('step_order', { ascending: true });
-    if (error) throw error;
-    STEPS_CACHE = data || [];
-  } catch (err) {
-    console.warn('[account-build loadSteps]', err);
-    STEPS_CACHE = [];
-  }
-}
+// ───────────────────────────────────────────────────────────────────────────
+// Tab strip
+// ───────────────────────────────────────────────────────────────────────────
 
-function countGuidesForType(slug) {
-  return GUIDES_CACHE.filter(g =>
-    Array.isArray(g.project_types) && g.project_types.includes(slug)
-  ).length;
-}
-function getGuidesForType(slug) {
-  return GUIDES_CACHE.filter(g =>
-    Array.isArray(g.project_types) && g.project_types.includes(slug)
-  );
-}
-function getStepsForType(slug) {
-  return STEPS_CACHE
-    .filter(s => s.project_type === slug)
-    .sort((a, b) => (a.step_order || 0) - (b.step_order || 0));
-}
-
-function renderStepsSection(slug) {
-  const steps = getStepsForType(slug);
-  if (!steps.length) return '';
-  const intro = steps.find(s => s.step_order === 0);
-  const body = steps.filter(s => s.step_order > 0);
-  const items = body.map(s => {
-    const bullets = Array.isArray(s.bullets) && s.bullets.length
-      ? `<ul class="ho-pt-step-bullets">${s.bullets.map(b => `<li>${escapeHtml(b)}</li>`).join('')}</ul>`
-      : '';
-    return `<details class="ho-pt-step">
-      <summary class="ho-pt-step-head">
-        <span class="ho-pt-step-num">${String(s.step_order).padStart(2, '0')}</span>
-        <span class="ho-pt-step-title">${escapeHtml(s.title || '')}</span>
-        <span class="ho-pt-step-arrow">›</span>
-      </summary>
-      <div class="ho-pt-step-detail">
-        ${s.body_md ? `<p>${escapeHtml(s.body_md)}</p>` : ''}
-        ${bullets}
-      </div>
-    </details>`;
+function renderTabStrip(state) {
+  const detected = new Set(state.detectedTypes);
+  // Detected first (in PROJECT_TYPES order), then non-detected greyed
+  const sorted = [
+    ...PROJECT_TYPES.filter(t => detected.has(t.id)),
+    ...PROJECT_TYPES.filter(t => !detected.has(t.id)),
+  ];
+  const tabs = sorted.map(type => {
+    const isActive = state.activeTab === type.id;
+    const isDetected = detected.has(type.id);
+    return `
+      <button class="bpb-library-tab ${isActive ? 'is-active' : ''} ${isDetected ? '' : 'is-greyed'}"
+              data-tab="${type.id}" type="button" role="tab"
+              aria-selected="${isActive ? 'true' : 'false'}"
+              aria-label="${escapeAttr(type.label + (isDetected && state.mode === 'proposal' ? ' — your project' : ''))}"
+              title="${escapeAttr(type.tagline)}">
+        <i class="ti ${type.icon}" aria-hidden="true"></i>
+        ${escapeHtml(type.label)}
+        ${isDetected && state.mode === 'proposal' ? '<span class="bpb-library-tab-dot" aria-hidden="true"></span>' : ''}
+      </button>
+    `;
   }).join('');
-  return `<div class="ho-pt-sub">
-    <h4>Step-by-step build</h4>
-    ${intro && intro.body_md ? `<p class="ho-pt-steps-intro">${escapeHtml(intro.body_md)}</p>` : ''}
-    <div class="ho-pt-steps">${items}</div>
-  </div>`;
+  return `<div class="bpb-library-tab-strip" role="tablist">${tabs}</div>`;
 }
 
-function renderTabs() {
-  const tabsEl = document.getElementById('ho-pt-tabs');
-  if (!tabsEl) return;
-  tabsEl.innerHTML = PROJECT_TYPES.map(t => {
-    const count = countGuidesForType(t.slug);
-    const isActive = t.slug === currentTab;
-    return `<button type="button" class="ho-pt-tab ${isActive ? 'is-active' : ''}" data-slug="${escapeAttr(t.slug)}">
-      ${escapeHtml(t.label)}
-      <span class="ho-pt-tab-count ${count === 0 ? 'empty' : ''}">${count}</span>
-    </button>`;
-  }).join('');
-  tabsEl.querySelectorAll('[data-slug]').forEach(btn => {
+function attachTabClickHandlers(state) {
+  state.container.querySelectorAll('.bpb-library-tab').forEach(btn => {
     btn.addEventListener('click', () => {
-      const slug = btn.dataset.slug;
-      if (slug === currentTab) return;
-      currentTab = slug;
-      renderTabs();
-      renderBody();
+      const newTab = btn.dataset.tab;
+      if (newTab === state.activeTab) return;
+      state.activeTab = newTab;
+      writeHashTab(newTab);
+      state.container.querySelectorAll('.bpb-library-tab').forEach(b => {
+        const on = b.dataset.tab === newTab;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      rerenderActiveTab(state);
     });
   });
 }
 
-function renderBody() {
-  const bodyEl = document.getElementById('ho-pt-body');
-  if (!bodyEl) return;
-  const type = PROJECT_TYPES.find(t => t.slug === currentTab);
-  if (!type) { bodyEl.innerHTML = ''; return; }
+// ───────────────────────────────────────────────────────────────────────────
+// Active tab content
+// ───────────────────────────────────────────────────────────────────────────
 
-  const guides = getGuidesForType(type.slug);
-  const videos = guides.filter(g => g.content_type === 'video');
-  const installGuides = guides.filter(g => g.content_type === 'install_guide');
-  // Sprint 29.1 · merge catalogs + spec_sheets under "Browse products"
-  const products = guides.filter(g => g.content_type === 'catalog' || g.content_type === 'spec_sheet');
+function renderActiveTab(state) {
+  const type = PROJECT_TYPES.find(t => t.id === state.activeTab);
+  if (!type) return `<p>Unknown tab</p>`;
 
-  const ledeHtml = `<p class="ho-pt-lede">${escapeHtml(type.lede)}</p>`;
-  const dgm = PROJECT_DIAGRAMS[type.slug];
-  const diagramHtml = dgm
-    ? `<div class="ho-pt-sub"><h4>How it's built</h4><img class="ho-pt-diagram" src="${escapeAttr(dgm.src)}" alt="${escapeAttr(dgm.alt)}" loading="lazy"></div>`
+  const articles = filterArticles(state.data.content_articles || [], type.id);
+  const guides = filterGuides(state.data.install_guides || [], type.id);
+  const videos = guides.filter(g => g.video_id);
+  const docs = guides.filter(g => !g.video_id);
+  const materials = filterMaterials(state.data.materials || [], type.id);
+  const steps = filterSteps(state.data.installation_steps || [], type.id);
+
+  return [
+    renderHero(type, { videos, docs, articles, materials }),
+    renderDiagram(type),
+    steps.length ? renderInstallSteps(steps) : renderPhases(state.data.bayside_standards),
+    renderWarranty(state.data.bayside_standards, state.data.manufacturers || [], materials),
+    renderVideosSection(videos),
+    renderGuidesSection(docs),
+    renderArticlesSection(articles),
+    renderMaterialsSection(type, materials),
+  ].join('');
+}
+
+function filterArticles(articles, projectType) {
+  return articles.filter(a => Array.isArray(a.project_types) && a.project_types.includes(projectType));
+}
+
+function filterGuides(guides, projectType) {
+  const cats = categoriesForProjectType(projectType);
+  return guides.filter(g => cats.includes(g.category));
+}
+
+function filterMaterials(materials, projectType) {
+  const cats = categoriesForProjectType(projectType);
+  return materials.filter(m => cats.includes(m.category));
+}
+
+function filterSteps(steps, projectType) {
+  return steps
+    .filter(s => s.project_type === projectType)
+    .sort((a, b) => (a.step_order || 0) - (b.step_order || 0));
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Hero
+// ───────────────────────────────────────────────────────────────────────────
+
+function renderHero(type, counts) {
+  return `
+    <div class="bpb-library-hero">
+      <i class="ti ${type.icon} bpb-library-hero-icon" aria-hidden="true"></i>
+      <div class="bpb-library-hero-text">
+        <h2>${escapeHtml(type.label)}</h2>
+        <p>${escapeHtml(type.tagline)}</p>
+      </div>
+      <div class="bpb-library-hero-stats">
+        ${statChip(counts.videos.length, counts.videos.length === 1 ? 'video' : 'videos')}
+        ${statChip(counts.docs.length, counts.docs.length === 1 ? 'guide' : 'guides')}
+        ${statChip(counts.articles.length, counts.articles.length === 1 ? 'article' : 'articles')}
+        ${statChip(counts.materials.length, counts.materials.length === 1 ? 'material' : 'materials')}
+      </div>
+    </div>
+  `;
+}
+
+function statChip(count, label) {
+  return `<span class="bpb-library-stat">${count} ${escapeHtml(label)}</span>`;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Cross-section diagram
+// ───────────────────────────────────────────────────────────────────────────
+
+function renderDiagram(type) {
+  const d = PROJECT_DIAGRAMS[type.id];
+  if (!d) return '';
+  return `
+    <section class="bpb-library-section">
+      <h3><i class="ti ti-stack-2" aria-hidden="true"></i> How it's built</h3>
+      <figure class="bpb-library-diagram">
+        <img src="${escapeAttr(d.src)}" alt="${escapeAttr(d.alt)}" loading="lazy">
+      </figure>
+    </section>
+  `;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Install steps (per project type)
+// ───────────────────────────────────────────────────────────────────────────
+
+const STEP_SOURCE_LABELS = [
+  { match: 'belgard.com',     label: 'Belgard Product Installation Guide' },
+  { match: 'msisurfaces.com', label: 'MSI Evergrass Installation Guide' },
+];
+
+function stepSourceCitation(steps) {
+  const withSrc = (steps || []).find(s => s.source_url);
+  if (!withSrc) return '';
+  let label = 'Manufacturer installation guide';
+  for (const s of STEP_SOURCE_LABELS) {
+    if (withSrc.source_url.includes(s.match)) { label = s.label; break; }
+  }
+  const page = withSrc.source_page ? ` (p. ${withSrc.source_page})` : '';
+  return `<p class="bpb-library-step-source">Source: <a href="${escapeAttr(withSrc.source_url)}" target="_blank" rel="noopener">${escapeHtml(label + page)}</a></p>`;
+}
+
+function renderInstallSteps(steps) {
+  const intro = steps.find(s => s.step_order === 0);
+  const body = steps.filter(s => s.step_order > 0);
+  const items = body.map(s => {
+    const bullets = Array.isArray(s.bullets) && s.bullets.length
+      ? `<ul class="bpb-library-step-bullets">${s.bullets.map(b => `<li>${escapeHtml(b)}</li>`).join('')}</ul>`
+      : '';
+    return `
+      <div class="bpb-library-phase">
+        <button class="bpb-library-phase-header" type="button" aria-expanded="false">
+          <span class="bpb-library-phase-num">${String(s.step_order).padStart(2, '0')}</span>
+          <span class="bpb-library-phase-title">${escapeHtml(s.title || '')}</span>
+          <i class="ti ti-chevron-down bpb-library-phase-chevron" aria-hidden="true"></i>
+        </button>
+        <div class="bpb-library-phase-body" hidden>
+          ${s.body_md ? `<p>${escapeHtml(s.body_md)}</p>` : ''}
+          ${bullets}
+        </div>
+      </div>
+    `;
+  }).join('');
+  return `
+    <section class="bpb-library-section">
+      <h3><i class="ti ti-tools" aria-hidden="true"></i> How we install</h3>
+      ${intro && intro.body_md ? `<p class="bpb-library-install-intro">${escapeHtml(intro.body_md)}</p>` : ''}
+      <div class="bpb-library-phases">${items}</div>
+      ${stepSourceCitation(steps)}
+    </section>
+  `;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Phases (5-phase quality standards)
+// ───────────────────────────────────────────────────────────────────────────
+
+function renderWarranty(baysideStandards, manufacturers, materials) {
+  const bayside = (baysideStandards && baysideStandards.warranty_summary) ? baysideStandards : null;
+  const present = new Set(
+    (materials || []).map(m => (m.manufacturer || '').toLowerCase().trim()).filter(Boolean)
+  );
+  const mfrWarranties = (manufacturers || []).filter(mfr => {
+    if (!mfr.warranty_summary) return false;
+    const nm = (mfr.name || '').toLowerCase().trim();
+    const dn = (mfr.display_name || '').toLowerCase().trim();
+    if (nm === 'bayside') return false;
+    return present.has(nm) || present.has(dn) ||
+      [...present].some(p => (nm && (p.includes(nm) || nm.includes(p))) ||
+                             (dn && (p.includes(dn) || dn.includes(p))));
+  });
+  if (!bayside && !mfrWarranties.length) return '';
+  const baysideHtml = bayside ? `
+      <div class="bpb-library-warranty-item bpb-library-warranty-primary">
+        <div class="bpb-library-warranty-name">Bayside Pavers — workmanship</div>
+        <p>${escapeHtml(bayside.warranty_summary)}</p>
+        ${bayside.warranty_url ? `<a href="${escapeAttr(bayside.warranty_url)}" target="_blank" rel="noopener">View warranty</a>` : ''}
+      </div>` : '';
+  const mfrHtml = mfrWarranties.map(mfr => `
+      <div class="bpb-library-warranty-item">
+        <div class="bpb-library-warranty-name">${escapeHtml(mfr.display_name || mfr.name || '')} — materials</div>
+        <p>${escapeHtml(mfr.warranty_summary)}</p>
+        ${mfr.warranty_url ? `<a href="${escapeAttr(mfr.warranty_url)}" target="_blank" rel="noopener">View warranty</a>` : ''}
+      </div>`).join('');
+  return `
+    <section class="bpb-library-section">
+      <h3><i class="ti ti-shield-check" aria-hidden="true"></i> What protects it</h3>
+      <div class="bpb-library-warranty">${baysideHtml}${mfrHtml}</div>
+    </section>
+  `;
+}
+
+function renderPhases(baysideStandards) {
+  const phases = (baysideStandards && baysideStandards.quality_standards) || [];
+  if (!phases.length) return '';
+
+  const items = phases.map((p, i) => `
+    <div class="bpb-library-phase">
+      <button class="bpb-library-phase-header" type="button" aria-expanded="false">
+        <span class="bpb-library-phase-num">${String(i + 1).padStart(2, '0')}</span>
+        <span class="bpb-library-phase-title">${escapeHtml(p.step || '')}</span>
+        <span class="bpb-library-phase-detail">${escapeHtml(p.detail || '')}</span>
+        <i class="ti ti-chevron-down bpb-library-phase-chevron" aria-hidden="true"></i>
+      </button>
+      ${p.body ? `<div class="bpb-library-phase-body" hidden>${escapeHtml(p.body)}</div>` : ''}
+    </div>
+  `).join('');
+
+  return `
+    <section class="bpb-library-section">
+      <h3><i class="ti ti-tools" aria-hidden="true"></i> How we install</h3>
+      <div class="bpb-library-phases">${items}</div>
+    </section>
+  `;
+}
+
+function attachAccordionHandlers(state) {
+  state.container.querySelectorAll('.bpb-library-phase-header').forEach(hdr => {
+    hdr.addEventListener('click', () => {
+      const body = hdr.nextElementSibling;
+      if (!body) return;
+      const isOpen = !body.hasAttribute('hidden');
+      if (isOpen) { body.setAttribute('hidden', ''); hdr.setAttribute('aria-expanded', 'false'); }
+      else        { body.removeAttribute('hidden'); hdr.setAttribute('aria-expanded', 'true'); }
+    });
+  });
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Videos
+// ───────────────────────────────────────────────────────────────────────────
+
+function renderVideosSection(videos) {
+  if (!videos.length) return '';
+  const cards = videos.map(v => `
+    <a class="bpb-library-video-card" href="https://www.youtube.com/watch?v=${escapeAttr(v.video_id)}" target="_blank" rel="noopener">
+      <div class="bpb-library-video-thumb">
+        ${v.thumbnail_url
+          ? `<img src="${escapeAttr(v.thumbnail_url)}" alt="" loading="lazy">`
+          : `<i class="ti ti-player-play" aria-hidden="true"></i>`}
+      </div>
+      <div class="bpb-library-video-title">${escapeHtml(v.title || 'Video')}</div>
+    </a>
+  `).join('');
+  return `
+    <section class="bpb-library-section">
+      <h3><i class="ti ti-player-play" aria-hidden="true"></i> Videos</h3>
+      <div class="bpb-library-video-grid">${cards}</div>
+    </section>
+  `;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Install guides
+// ───────────────────────────────────────────────────────────────────────────
+
+function renderGuidesSection(docs) {
+  if (!docs.length) return '';
+  const items = docs.map(d => `
+    <a class="bpb-library-guide-card" href="${escapeAttr(d.url)}" target="_blank" rel="noopener">
+      <i class="ti ${d.kind === 'catalog' ? 'ti-book' : 'ti-file-text'}" aria-hidden="true"></i>
+      <div class="bpb-library-guide-meta">
+        <div class="bpb-library-guide-title">${escapeHtml(d.title || 'Document')}</div>
+        ${d.manufacturer ? `<div class="bpb-library-guide-mfr">${escapeHtml(d.manufacturer)}</div>` : ''}
+      </div>
+      <i class="ti ti-external-link" aria-hidden="true"></i>
+    </a>
+  `).join('');
+  return `
+    <section class="bpb-library-section">
+      <h3><i class="ti ti-file-text" aria-hidden="true"></i> Install guides &amp; catalogs</h3>
+      <div class="bpb-library-guide-list">${items}</div>
+    </section>
+  `;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Expert articles
+// ───────────────────────────────────────────────────────────────────────────
+
+function renderArticlesSection(articles) {
+  if (!articles.length) return '';
+  const cards = articles.map(a => {
+    const isExternal = a.is_external && a.source_url;
+    const href = isExternal ? a.source_url : `#library/article/${escapeAttr(a.slug)}`;
+    return `
+      <a class="bpb-library-article-card" href="${escapeAttr(href)}" ${isExternal ? 'target="_blank" rel="noopener"' : ''}>
+        <div class="bpb-library-article-title">
+          ${escapeHtml(a.title)}
+          ${isExternal ? '<i class="ti ti-external-link" aria-hidden="true"></i>' : ''}
+        </div>
+        ${a.excerpt ? `<div class="bpb-library-article-excerpt">${escapeHtml(a.excerpt)}</div>` : ''}
+        <div class="bpb-library-article-meta">
+          ${a.author ? escapeHtml(a.author) : ''}
+          ${a.reading_time_min ? ` · ${a.reading_time_min} min read` : ''}
+          ${isExternal ? ' · external' : ''}
+        </div>
+      </a>
+    `;
+  }).join('');
+  return `
+    <section class="bpb-library-section">
+      <h3><i class="ti ti-book" aria-hidden="true"></i> Expert articles</h3>
+      <div class="bpb-library-article-grid">${cards}</div>
+    </section>
+  `;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Materials
+// ───────────────────────────────────────────────────────────────────────────
+
+function renderMaterialsSection(type, materials) {
+  if (!materials.length) return '';
+  const top = materials.slice(0, 12);
+  const moreCount = Math.max(0, materials.length - top.length);
+  const cards = top.map(m => `
+    <a class="bpb-library-material-card" data-material-id="${escapeAttr(m.id)}" href="#material/${escapeAttr(m.id)}">
+      <div class="bpb-library-material-thumb">
+        ${m.swatch_url ? `<img src="${escapeAttr(m.swatch_url)}" alt="" loading="lazy">` : ''}
+      </div>
+      <div class="bpb-library-material-name">${escapeHtml(m.name || 'Material')}</div>
+      ${m.color ? `<div class="bpb-library-material-color">${escapeHtml(m.color)}</div>` : ''}
+    </a>
+  `).join('');
+  const moreLink = moreCount > 0
+    ? `<div class="bpb-library-more">+${moreCount} more — search above to find a specific material</div>`
     : '';
-  const stepsHtml = renderStepsSection(type.slug);
-
-  if (guides.length === 0) {
-    bodyEl.innerHTML = `
-      ${ledeHtml}
-      ${diagramHtml}
-      ${stepsHtml}
-      <div class="ho-pt-empty">
-        <p>Detailed ${escapeHtml(type.label.toLowerCase())} content is coming soon.</p>
-        <p>Schedule a design appointment to walk through your specific project with our team.</p>
-        <a class="ho-pt-empty-cta" href="${ACUITY_URL}" target="_blank" rel="noopener">📅 Schedule a free design appointment</a>
-      </div>`;
-    return;
-  }
-
-  let html = ledeHtml + diagramHtml + stepsHtml;
-  if (videos.length > 0) {
-    html += `
-      <div class="ho-pt-sub">
-        <h4>Watch how we build</h4>
-        <div class="ho-pt-grid">${videos.map(renderVideoCard).join('')}</div>
-      </div>`;
-  }
-  if (installGuides.length > 0) {
-    html += `
-      <div class="ho-pt-sub">
-        <h4>Detailed installation guides</h4>
-        <div class="ho-pt-grid">${installGuides.map(renderPdfCard).join('')}</div>
-      </div>`;
-  }
-  if (products.length > 0) {
-    html += `
-      <div class="ho-pt-sub">
-        <h4>Browse products &amp; specs</h4>
-        <div class="ho-pt-grid">${products.map(renderProductCard).join('')}</div>
-      </div>`;
-  }
-  bodyEl.innerHTML = html;
+  return `
+    <section class="bpb-library-section">
+      <h3><i class="ti ti-package" aria-hidden="true"></i> Materials we install</h3>
+      <div class="bpb-library-material-grid">${cards}</div>
+      ${moreLink}
+    </section>
+  `;
 }
 
-function renderVideoCard(g) {
-  const title = g.title || (g.manufacturer ? `${g.manufacturer} installation` : 'Installation video');
-  const thumb = g.thumbnail_url || `https://i.ytimg.com/vi/${g.video_id}/hqdefault.jpg`;
-  return `<a class="ho-pt-card" href="https://www.youtube.com/watch?v=${escapeAttr(g.video_id)}" target="_blank" rel="noopener">
-    <div class="ho-pt-card-thumb">
-      <img src="${escapeAttr(thumb)}" alt="" loading="lazy">
-      <div class="ho-pt-card-play">▶</div>
-    </div>
-    <div class="ho-pt-card-label">
-      <div class="ho-pt-card-title">${escapeHtml(title)}</div>
-      <div class="ho-pt-card-kind">Video</div>
-    </div>
-  </a>`;
+function attachMaterialClickHandlers(state) {
+  state.container.querySelectorAll('.bpb-library-material-card').forEach(card => {
+    card.addEventListener('click', e => {
+      e.preventDefault();
+      const id = card.dataset.materialId;
+      const material = (state.data.materials || []).find(m => m.id === id);
+      if (material) openMaterialModal(state, material);
+    });
+  });
 }
 
-function renderPdfCard(g) {
-  const title = g.title || 'Installation guide';
-  return `<a class="ho-pt-card" href="${escapeAttr(g.url || '#')}" target="_blank" rel="noopener">
-    <div class="ho-pt-card-thumb pdf"><span>PDF</span></div>
-    <div class="ho-pt-card-label">
-      <div class="ho-pt-card-title">${escapeHtml(title)}</div>
-      <div class="ho-pt-card-kind">Install guide</div>
+// ───────────────────────────────────────────────────────────────────────────
+// Material detail modal
+// ───────────────────────────────────────────────────────────────────────────
+
+function openMaterialModal(state, material) {
+  const manufacturer = (state.data.manufacturers || []).find(m =>
+    (m.name || '').toLowerCase() === (material.manufacturer || '').toLowerCase()
+  );
+  const baysideWarranty = state.data.bayside_standards && state.data.bayside_standards.warranty_summary;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'bpb-library-modal-overlay';
+  overlay.innerHTML = `
+    <div class="bpb-library-modal" role="dialog" aria-modal="true" aria-label="Material details">
+      <button class="bpb-library-modal-close" type="button" aria-label="Close">
+        <i class="ti ti-x" aria-hidden="true"></i>
+      </button>
+      <div class="bpb-library-modal-header">
+        ${material.swatch_url ? `<img class="bpb-library-modal-hero" src="${escapeAttr(material.swatch_url)}" alt="">` : ''}
+        <div class="bpb-library-modal-title-block">
+          <div class="bpb-library-modal-mfr">${escapeHtml(material.manufacturer || '')}</div>
+          <h2>${escapeHtml(material.name || 'Material')}</h2>
+          ${material.color ? `<div class="bpb-library-modal-color">${escapeHtml(material.color)}</div>` : ''}
+        </div>
+      </div>
+      <div class="bpb-library-modal-warranties">
+        ${manufacturer ? `
+          <div class="bpb-library-warranty-card">
+            <h3>${escapeHtml(manufacturer.display_name || manufacturer.name)} warranty</h3>
+            <p>${escapeHtml(manufacturer.warranty_summary || '—')}</p>
+            ${manufacturer.warranty_url
+              ? `<a href="${escapeAttr(manufacturer.warranty_url)}" target="_blank" rel="noopener">View full warranty →</a>`
+              : ''}
+          </div>
+        ` : ''}
+        <div class="bpb-library-warranty-card">
+          <h3>Bayside installation warranty</h3>
+          <p>${escapeHtml(baysideWarranty || '25-year installation warranty on all Bayside-installed work.')}</p>
+        </div>
+      </div>
     </div>
-  </a>`;
+  `;
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  overlay.querySelector('.bpb-library-modal-close').addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', function onEsc(e) {
+    if (e.key === 'Escape') { close(); document.removeEventListener('keydown', onEsc); }
+  });
 }
 
-// Sprint 29.1 · merged card renderer for both catalogs and spec_sheets
-function renderProductCard(g) {
-  const title = g.title || (g.manufacturer ? `${g.manufacturer} product` : 'Product');
-  const isSpec = g.content_type === 'spec_sheet';
-  const isPdf  = g.kind === 'pdf';
-  const kindLabel = isSpec
-    ? (isPdf ? 'Cut sheet' : 'Product page')
-    : 'Catalog';
-  let thumbClass, thumbContent;
-  if (isPdf) {
-    thumbClass = 'pdf';
-    thumbContent = isSpec ? 'CUTSHEET' : 'CATALOG';
-  } else {
-    thumbClass = isSpec ? 'spec' : 'catalog';
-    thumbContent = escapeHtml(g.manufacturer || 'Product');
-  }
-  return `<a class="ho-pt-card" href="${escapeAttr(g.url || '#')}" target="_blank" rel="noopener">
-    <div class="ho-pt-card-thumb ${thumbClass}">${thumbContent}</div>
-    <div class="ho-pt-card-label">
-      <div class="ho-pt-card-title">${escapeHtml(title)}</div>
-      <div class="ho-pt-card-kind">${kindLabel}</div>
+// ───────────────────────────────────────────────────────────────────────────
+// Global search (portal mode only)
+// ───────────────────────────────────────────────────────────────────────────
+
+function renderGlobalSearch() {
+  return `
+    <div class="bpb-library-search">
+      <i class="ti ti-search" aria-hidden="true"></i>
+      <input type="search" id="bpb-library-search-input"
+             placeholder="Search all materials by name, color, or manufacturer..."
+             autocomplete="off">
+      <div id="bpb-library-search-results" class="bpb-library-search-results" hidden></div>
     </div>
-  </a>`;
+  `;
 }
+
+function attachSearchHandlers(state) {
+  const input = state.container.querySelector('#bpb-library-search-input');
+  const resultsEl = state.container.querySelector('#bpb-library-search-results');
+  if (!input || !resultsEl) return;
+  let timer = null;
+
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const q = input.value.trim().toLowerCase();
+      if (!q || q.length < 2) { resultsEl.setAttribute('hidden', ''); return; }
+      const matches = (state.data.materials || []).filter(m =>
+        (m.name || '').toLowerCase().includes(q) ||
+        (m.color || '').toLowerCase().includes(q) ||
+        (m.manufacturer || '').toLowerCase().includes(q)
+      ).slice(0, 8);
+      if (!matches.length) {
+        resultsEl.innerHTML = `<div class="bpb-library-search-empty">No matches for "${escapeHtml(q)}"</div>`;
+      } else {
+        resultsEl.innerHTML = matches.map(m => `
+          <button class="bpb-library-search-result" type="button" data-material-id="${escapeAttr(m.id)}">
+            ${m.swatch_url ? `<img src="${escapeAttr(m.swatch_url)}" alt="" loading="lazy">` : '<i class="ti ti-package" aria-hidden="true"></i>'}
+            <div>
+              <div class="bpb-library-search-name">${escapeHtml(m.name || 'Material')}</div>
+              <div class="bpb-library-search-meta">${escapeHtml([m.manufacturer, m.color, m.category].filter(Boolean).join(' · '))}</div>
+            </div>
+          </button>
+        `).join('');
+        resultsEl.querySelectorAll('.bpb-library-search-result').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const material = (state.data.materials || []).find(m => m.id === btn.dataset.materialId);
+            if (!material) return;
+            const targetType = (CATEGORY_TO_PROJECT_TYPES[material.category] || ['pavers'])[0];
+            if (targetType && targetType !== state.activeTab) {
+              state.activeTab = targetType;
+              writeHashTab(targetType);
+              state.container.querySelectorAll('.bpb-library-tab').forEach(b => {
+                b.classList.toggle('is-active', b.dataset.tab === targetType);
+              });
+              rerenderActiveTab(state);
+            }
+            resultsEl.setAttribute('hidden', '');
+            input.value = '';
+            openMaterialModal(state, material);
+          });
+        });
+      }
+      resultsEl.removeAttribute('hidden');
+    }, 150);
+  });
+
+  document.addEventListener('click', e => {
+    if (!state.container.contains(e.target)) resultsEl.setAttribute('hidden', '');
+  });
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Hash routing
+// ───────────────────────────────────────────────────────────────────────────
+
+function readHashTab() {
+  const m = (location.hash || '').match(/^#library\/([a-z_]+)/);
+  return m ? m[1] : null;
+}
+
+function writeHashTab(tab) {
+  if (readHashTab() === tab) return;
+  const newHash = `#library/${tab}`;
+  if (history.replaceState) history.replaceState(null, '', newHash);
+  else location.hash = newHash;
+}
+
+function setupHashListener(state) {
+  window.addEventListener('hashchange', () => {
+    const tab = readHashTab();
+    if (tab && tab !== state.activeTab && PROJECT_TYPES.some(t => t.id === tab)) {
+      state.activeTab = tab;
+      state.container.querySelectorAll('.bpb-library-tab').forEach(b => {
+        b.classList.toggle('is-active', b.dataset.tab === tab);
+      });
+      rerenderActiveTab(state);
+    }
+  });
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Base styles (minimum-viable; full styling lands in index.html rewrite)
+// ───────────────────────────────────────────────────────────────────────────
+
+function injectBaseStyles() {
+  if (document.getElementById('bpb-library-tabs-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'bpb-library-tabs-styles';
+  style.textContent = `
+    .bpb-library-loading,.bpb-library-error{padding:2rem;text-align:center;color:#666;font-size:14px}
+    .bpb-library-error{color:#c33}
+    .bpb-library-search{position:relative;display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f7f6f0;border-radius:8px;margin-bottom:16px}
+    .bpb-library-search input{flex:1;border:none;background:transparent;font-size:15px;outline:none;color:#2a2a26;font-family:inherit}
+    .bpb-library-search .ti-search{color:#888;font-size:18px}
+    .bpb-library-search-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid #e2dfd2;border-radius:8px;max-height:320px;overflow-y:auto;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+    .bpb-library-search-result{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:none;background:transparent;text-align:left;cursor:pointer;font-family:inherit}
+    .bpb-library-search-result:hover{background:#f7f6f0}
+    .bpb-library-search-result img,.bpb-library-search-result .ti{width:32px;height:32px;border-radius:4px;object-fit:cover;font-size:20px;color:#888;display:flex;align-items:center;justify-content:center}
+    .bpb-library-search-name{font-size:14px;font-weight:500;color:#2a2a26}
+    .bpb-library-search-meta{font-size:12px;color:#777;margin-top:2px}
+    .bpb-library-search-empty{padding:14px;color:#888;font-size:13px;text-align:center}
+    .bpb-library-tab-strip{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid #e2dfd2;margin-bottom:20px;padding-bottom:0}
+    .bpb-library-tab{display:flex;align-items:center;gap:6px;padding:10px 14px;font-size:13px;color:#666;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit}
+    .bpb-library-tab:hover{color:#2a2a26}
+    .bpb-library-tab.is-active{color:#2a2a26;border-bottom-color:#5d7e69;font-weight:500}
+    .bpb-library-tab.is-greyed{color:#aaa;opacity:.6}
+    .bpb-library-tab .ti{font-size:15px}
+    .bpb-library-hero{display:flex;align-items:center;gap:14px;padding:20px;background:#fff;border:1px solid #e2dfd2;border-radius:12px;margin-bottom:16px}
+    .bpb-library-hero-icon{font-size:32px;color:#5d7e69}
+    .bpb-library-hero-text h2{margin:0;font-size:18px;font-weight:500;color:#2a2a26}
+    .bpb-library-hero-text p{margin:2px 0 0;font-size:13px;color:#666}
+    .bpb-library-hero-stats{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+    .bpb-library-stat{font-size:11px;padding:3px 10px;background:#f7f6f0;border-radius:999px;color:#666}
+    .bpb-library-section{margin:20px 0}
+    .bpb-library-section h3{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;margin:0 0 10px;color:#2a2a26}
+    .bpb-library-section h3 .ti{font-size:16px;color:#5d7e69}
+    .bpb-library-diagram{margin:0;border:1px solid #e2dfd2;border-radius:12px;overflow:hidden;background:#faf8f3}
+    .bpb-library-diagram img{display:block;width:100%;height:auto}
+    .bpb-library-phases{display:flex;flex-direction:column;gap:6px}
+    .bpb-library-phase{border:1px solid #e2dfd2;border-radius:8px;overflow:hidden}
+    .bpb-library-phase-header{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;background:#fff;border:none;text-align:left;cursor:pointer;font-family:inherit}
+    .bpb-library-phase-header:hover{background:#fafaf6}
+    .bpb-library-phase-num{font-size:12px;color:#5d7e69;font-weight:500;font-family:monospace}
+    .bpb-library-phase-title{font-size:14px;font-weight:500;color:#2a2a26}
+    .bpb-library-phase-detail{font-size:13px;color:#666;flex:1}
+    .bpb-library-phase-chevron{margin-left:auto;color:#888}
+    .bpb-library-phase-body{padding:12px 14px;background:#fafaf6;font-size:13px;color:#444;line-height:1.6}
+    .bpb-library-install-intro{font-size:13px;color:#555;line-height:1.6;margin:0 0 12px}
+    .bpb-library-phase-body p{margin:0 0 8px}
+    .bpb-library-step-bullets{margin:0;padding-left:18px}
+    .bpb-library-step-bullets li{font-size:13px;color:#444;line-height:1.55;margin-bottom:3px}
+    .bpb-library-step-source{font-size:12px;color:#777;margin:10px 0 0}
+    .bpb-library-step-source a{color:#5d7e69;text-decoration:none;border-bottom:1px solid rgba(93,126,105,.35)}
+    .bpb-library-warranty{display:flex;flex-direction:column;gap:10px}
+    .bpb-library-warranty-item{border:1px solid #e2dfd2;border-radius:10px;padding:12px 14px;background:#fff}
+    .bpb-library-warranty-primary{border-color:#5d7e69;background:#f3f7f4}
+    .bpb-library-warranty-name{font-weight:600;font-size:13px;color:#353535;margin-bottom:4px}
+    .bpb-library-warranty-item p{margin:0 0 6px;font-size:13px;color:#555;line-height:1.55}
+    .bpb-library-warranty-item a{font-size:12px;color:#5d7e69;text-decoration:none;border-bottom:1px solid rgba(93,126,105,.35)}
+    .bpb-library-tab-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#5d7e69;margin-left:6px;vertical-align:middle}
+    .bpb-library-tab:focus-visible,.bpb-library-phase-header:focus-visible,.bpb-library-section a:focus-visible{outline:2px solid #5d7e69;outline-offset:2px;border-radius:4px}
+    @media (prefers-reduced-motion: reduce){.bpb-library-tab,.bpb-library-phase-chevron{transition:none !important}}
+    .bpb-library-video-grid,.bpb-library-material-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+    .bpb-library-video-card,.bpb-library-material-card,.bpb-library-article-card,.bpb-library-guide-card{background:#fff;border:1px solid #e2dfd2;border-radius:8px;padding:10px;text-decoration:none;color:#2a2a26;display:block}
+    .bpb-library-video-card:hover,.bpb-library-material-card:hover,.bpb-library-article-card:hover,.bpb-library-guide-card:hover{border-color:#5d7e69}
+    .bpb-library-video-thumb,.bpb-library-material-thumb{background:#f7f6f0;aspect-ratio:16/9;border-radius:4px;margin-bottom:8px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+    .bpb-library-material-thumb{aspect-ratio:1/1}
+    .bpb-library-video-thumb img,.bpb-library-material-thumb img{width:100%;height:100%;object-fit:cover}
+    .bpb-library-video-title,.bpb-library-material-name{font-size:13px;font-weight:500}
+    .bpb-library-material-color{font-size:11px;color:#777;margin-top:2px}
+    .bpb-library-guide-list,.bpb-library-article-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+    .bpb-library-guide-card{display:flex;align-items:center;gap:10px}
+    .bpb-library-guide-card .ti:first-child{font-size:20px;color:#5d7e69}
+    .bpb-library-guide-card .ti-external-link{font-size:14px;color:#888;margin-left:auto}
+    .bpb-library-guide-meta{flex:1;min-width:0}
+    .bpb-library-guide-title{font-size:13px;font-weight:500}
+    .bpb-library-guide-mfr{font-size:11px;color:#777}
+    .bpb-library-article-title{font-size:13px;font-weight:500;display:flex;align-items:center;gap:4px;margin-bottom:4px}
+    .bpb-library-article-excerpt{font-size:12px;color:#555;line-height:1.5;margin-bottom:6px}
+    .bpb-library-article-meta{font-size:11px;color:#888}
+    .bpb-library-more{font-size:12px;color:#777;margin-top:10px;text-align:center}
+    .bpb-library-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+    .bpb-library-modal{background:#fff;border-radius:12px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;position:relative;padding:20px}
+    .bpb-library-modal-close{position:absolute;top:12px;right:12px;background:transparent;border:none;font-size:22px;cursor:pointer;color:#666;padding:6px}
+    .bpb-library-modal-hero{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;margin-bottom:14px}
+    .bpb-library-modal-mfr{font-size:11px;color:#777;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+    .bpb-library-modal h2{margin:0;font-size:20px;font-weight:500}
+    .bpb-library-modal-color{font-size:13px;color:#666;margin-top:2px}
+    .bpb-library-modal-warranties{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+    .bpb-library-warranty-card{padding:12px;background:#f7f6f0;border-radius:8px}
+    .bpb-library-warranty-card h3{font-size:13px;font-weight:500;margin:0 0 6px;color:#2a2a26}
+    .bpb-library-warranty-card p{font-size:12px;color:#555;margin:0 0 6px;line-height:1.5}
+    .bpb-library-warranty-card a{font-size:12px;color:#5d7e69;text-decoration:none}
+    @media (max-width:520px){.bpb-library-modal-warranties{grid-template-columns:1fr}.bpb-library-hero{flex-direction:column;align-items:flex-start}.bpb-library-hero-stats{margin-left:0}}
+  `;
+  document.head.appendChild(style);
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Utilities
+// ───────────────────────────────────────────────────────────────────────────
 
 function escapeHtml(s) {
-  return String(s == null ? '' : s)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
 }
 function escapeAttr(s) { return escapeHtml(s); }
