@@ -61,6 +61,47 @@ const PROJECT_DIAGRAMS = {
   lighting:      { src: '/account/diagrams/lighting-system-diagram.svg',      alt: 'Diagram of a low-voltage landscape lighting system' },
 };
 
+// Content attribution — Track 3 personalization. Articles are credited to the
+// Bayside designer who owns the homeowner's account, so the person they're
+// already working with shows up as the expert behind the content. Resolved
+// per-mount; falls back gracefully if the designer can't be determined.
+let CONTENT_AUTHOR = 'Your designer';
+
+async function resolveContentAuthor(options) {
+  // A host can pass an explicit name (e.g. a proposal page supplying its designer).
+  if (options && options.authorName) {
+    return String(options.authorName).trim().split(/\s+/)[0] || 'Your designer';
+  }
+  // Portal mode: ask the DB for the logged-in homeowner's own designer (first name).
+  if (options && options.mode === 'portal') {
+    try {
+      const { data } = await supabase.rpc('get_account_designer');
+      const first = (data || '').trim().split(/\s+/)[0];
+      if (first) return first;
+    } catch (err) {
+      console.warn('[library-tabs] designer lookup failed:', err);
+    }
+  }
+  return 'Your designer';
+}
+
+async function resolvePortalProjectTypes() {
+  // Detect the logged-in homeowner's own project type(s) from their proposals,
+  // so the portal Library leads with what they're actually buying. Returns null
+  // to signal "show all types" when nothing can be detected.
+  try {
+    const { data } = await supabase.rpc('get_account_project_types');
+    if (Array.isArray(data) && data.length) {
+      const valid = new Set(PROJECT_TYPES.map(t => t.id));
+      const filtered = data.filter(t => valid.has(t));
+      if (filtered.length) return filtered;
+    }
+  } catch (err) {
+    console.warn('[library-tabs] project-type lookup failed:', err);
+  }
+  return null;
+}
+
 // materials.category uses hyphens; project_types uses underscores. Map.
 const CATEGORY_TO_PROJECT_TYPES = {
   'pavers':        ['pavers', 'driveway', 'pool_deck'],
@@ -111,9 +152,21 @@ export async function mountLibrary(container, options = {}) {
     return null;
   }
 
+  // Portal personalization (Track 3): attribute content to the homeowner's
+  // designer and lead with their actual project type(s) — resolved in parallel.
+  let portalTypes = null;
+  if (options.mode === 'portal') {
+    [CONTENT_AUTHOR, portalTypes] = await Promise.all([
+      resolveContentAuthor(options),
+      resolvePortalProjectTypes(),
+    ]);
+  } else {
+    CONTENT_AUTHOR = await resolveContentAuthor(options);
+  }
+
   state.detectedTypes = options.mode === 'proposal'
     ? (state.data.project_types_detected || [])
-    : PROJECT_TYPES.map(t => t.id);
+    : (portalTypes && portalTypes.length ? portalTypes : PROJECT_TYPES.map(t => t.id));
 
   const validIds = new Set(PROJECT_TYPES.map(t => t.id));
   let initialTab = readHashTab() || options.initialTab || state.detectedTypes[0] || 'pavers';
@@ -211,6 +264,11 @@ function rerenderActiveTab(state) {
 
 function renderTabStrip(state) {
   const detected = new Set(state.detectedTypes);
+  // "Your project" markers show whenever detection personalized the strip to a
+  // real subset (in either mode). On fallback (all types detected) we show no
+  // markers, so we don't end up dotting every tab.
+  const personalized = state.detectedTypes.length > 0
+    && state.detectedTypes.length < PROJECT_TYPES.length;
   // Detected first (in PROJECT_TYPES order), then non-detected greyed
   const sorted = [
     ...PROJECT_TYPES.filter(t => detected.has(t.id)),
@@ -219,15 +277,16 @@ function renderTabStrip(state) {
   const tabs = sorted.map(type => {
     const isActive = state.activeTab === type.id;
     const isDetected = detected.has(type.id);
+    const mark = isDetected && personalized;
     return `
       <button class="bpb-library-tab ${isActive ? 'is-active' : ''} ${isDetected ? '' : 'is-greyed'}"
               data-tab="${type.id}" type="button" role="tab"
               aria-selected="${isActive ? 'true' : 'false'}"
-              aria-label="${escapeAttr(type.label + (isDetected && state.mode === 'proposal' ? ' — your project' : ''))}"
+              aria-label="${escapeAttr(type.label + (mark ? ' — your project' : ''))}"
               title="${escapeAttr(type.tagline)}">
         <i class="ti ${type.icon}" aria-hidden="true"></i>
         ${escapeHtml(type.label)}
-        ${isDetected && state.mode === 'proposal' ? '<span class="bpb-library-tab-dot" aria-hidden="true"></span>' : ''}
+        ${mark ? '<span class="bpb-library-tab-dot" aria-hidden="true"></span>' : ''}
       </button>
     `;
   }).join('');
@@ -532,7 +591,7 @@ function renderArticlesSection(articles) {
         </div>
         ${a.excerpt ? `<div class="bpb-library-article-excerpt">${escapeHtml(a.excerpt)}</div>` : ''}
         <div class="bpb-library-article-meta">
-          ${a.author ? escapeHtml(a.author) : ''}
+          ${escapeHtml(CONTENT_AUTHOR)}
           ${a.reading_time_min ? ` · ${a.reading_time_min} min read` : ''}
           ${isExternal ? ' · external' : ''}
         </div>
