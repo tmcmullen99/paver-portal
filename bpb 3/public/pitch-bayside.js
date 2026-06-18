@@ -236,7 +236,7 @@ if (hdDemo) cardObserver.observe(hdDemo);
   let currentMaterial = {
     name: 'Catalina Grana',
     color: 'Scandina Gray',
-    price: 14.20,
+    price: 28.50,
     img: 'https://gfgbypcnxkschnfsitfb.supabase.co/storage/v1/object/public/proposal-photos/swatches/2f59ac36-3424-463d-a7ab-45bfd9a2bb07.png?v=1776891712228'
   };
   const ORIGINAL_MATERIAL_NAME = 'Catalina Grana';
