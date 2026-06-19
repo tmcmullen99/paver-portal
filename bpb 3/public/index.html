@@ -1,751 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bayside Pavers — Admin</title>
-<style>
-  :root{
-    --bg:#f7f6f3; --surface:#ffffff; --line:#e7e4dd; --line2:#efece6;
-    --ink:#1f2421; --muted:#6b7280; --faint:#9ca3af;
-    --accent:#5d7e69; --accent-ink:#2f4a3a;
-    --hot:#dc2626; --warm:#d97706; --cool:#6b7280;
-    --ok:#065f46; --okbg:#ecfdf5; --okline:#a7f3d0;
-    --info:#1e40af; --infobg:#eff6ff;
-    --warnbg:#fffbeb; --warnline:#fde68a; --warnink:#78350f;
-    --shadow:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.05);
-    --radius:11px;
-    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  }
-  *{box-sizing:border-box} html,body{margin:0;padding:0}
-  body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
-  a{color:var(--accent-ink)}
-  .hidden{display:none!important}
-
-  /* ── Login ── */
-  #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-  .login-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:34px 30px;width:100%;max-width:380px}
-  .login-card h1{font-size:20px;margin:0 0 4px;font-weight:650}
-  .login-card p{color:var(--muted);margin:0 0 22px;font-size:13px}
-  .field{margin-bottom:12px}
-  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500}
-  .field input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font-size:14px;font-family:inherit;background:#fff}
-  .field input:focus{outline:none;border-color:var(--accent)}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 16px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:14px;font-weight:550;cursor:pointer;font-family:inherit;width:100%}
-  .btn:hover{background:#faf9f6}
-  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-  .btn.primary:hover{filter:brightness(1.05)}
-  .btn.small{width:auto;padding:7px 13px;font-size:12.5px}
-  .login-or{text-align:center;color:var(--faint);font-size:12px;margin:14px 0}
-  .login-msg{margin-top:14px;font-size:12.5px;text-align:center;min-height:18px}
-  .login-msg.err{color:var(--hot)} .login-msg.ok{color:var(--ok)}
-
-  /* ── App shell ── */
-  #app{max-width:1080px;margin:0 auto;padding:0 18px 60px}
-  .topbar{display:flex;align-items:center;gap:12px;padding:18px 2px 16px;position:sticky;top:0;background:linear-gradient(var(--bg) 78%,transparent);z-index:20}
-  .brand{font-weight:700;font-size:17px;letter-spacing:-.01em}
-  .brand .dot{color:var(--accent)}
-  .pulse{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 rgba(93,126,105,.5);animation:pulse 2.4s infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(93,126,105,.45)}70%{box-shadow:0 0 0 7px rgba(93,126,105,0)}100%{box-shadow:0 0 0 0 rgba(93,126,105,0)}}
-  .topbar .spacer{flex:1}
-  .who{font-size:12.5px;color:var(--muted)}
-  .who b{color:var(--ink);font-weight:600}
-
-  /* ── KPI strip ── */
-  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}
-  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:13px 14px}
-  .kpi .v{font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
-  .kpi .l{font-size:11px;color:var(--muted);margin-top:3px;font-weight:500}
-  .kpi.hot .v{color:var(--hot)}
-  .kpi.leads .v{color:var(--accent-ink)}
-
-  /* ── Tabs ── */
-  .tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-  .tab-btn{background:none;border:none;padding:10px 14px;font-size:14px;font-weight:550;color:var(--muted);cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-1px}
-  .tab-btn:hover{color:var(--ink)}
-  .tab-btn.active{color:var(--ink);border-bottom-color:var(--accent)}
-  .tab-badge{display:inline-block;min-width:18px;padding:0 5px;font-size:11px;border-radius:99px;background:var(--ink);color:#fff;text-align:center;margin-left:4px;font-weight:600}
-  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-  .toolbar .spacer{flex:1}
-  .chk{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer}
-
-  /* ── Deal cards ── */
-  .deal-list,.leads-list{display:flex;flex-direction:column;gap:10px}
-  .deal-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:border-color .12s,box-shadow .12s}
-  .deal-card:hover{border-color:#d6d2c8;box-shadow:var(--shadow)}
-  .score-chip{flex:none;width:46px;height:46px;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:16px;background:#f3f4f6;color:var(--cool)}
-  .score-chip small{font-size:8px;font-weight:600;opacity:.7;text-transform:uppercase;letter-spacing:.04em}
-  .score-chip.hot{background:#fef2f2;color:var(--hot)}
-  .score-chip.warm{background:#fffbeb;color:var(--warm)}
-  .deal-main{flex:1;min-width:0}
-  .deal-name{font-weight:650;font-size:15px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .deal-signal{font-size:12.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .deal-meta{font-size:11.5px;color:var(--faint);margin-top:4px}
-  .deal-amt{flex:none;text-align:right}
-  .deal-amt .n{font-weight:700;font-size:15px}
-  .deal-amt .s{font-size:11px;color:var(--faint)}
-  .pill{display:inline-flex;align-items:center;font-size:11px;padding:2px 8px;border-radius:99px;font-weight:600;white-space:nowrap}
-  .pill.signed{background:var(--okbg);color:var(--ok)}
-  .pill.viewed{background:var(--infobg);color:var(--info)}
-  .pill.sent{background:#f3f4f6;color:#374151}
-  .pill.draft{background:#f9fafb;color:var(--faint)}
-  .pill.archived{background:#f3f4f6;color:var(--faint)}
-  .pill.intent{background:#fef2f2;color:var(--hot)}
-  .pill.nurture{background:#f5f3ff;color:#5b21b6}
-
-  /* ── Lead cards ── */
-  .lead-card{border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;background:var(--surface)}
-  .lead-card.aging{border-color:#fed7aa;background:#fffaf5}
-  .lead-head{display:flex;justify-content:space-between;align-items:baseline}
-  .lead-name{font-size:15px;font-weight:650}
-  .lead-days{font-size:12px;color:var(--muted)}
-  .lead-days.aging{color:#c2410c;font-weight:600}
-  .lead-addr{font-size:13px;color:#4b5563;margin:2px 0 10px}
-  .lead-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-  .lead-pill{font-size:11px;padding:3px 9px;border-radius:99px;background:#f3f4f6;color:#374151;font-weight:500}
-  .lead-pill.ok{background:var(--okbg);color:var(--ok)}
-  .lead-pill.warn{background:#fef2f2;color:#991b1b}
-  .lead-pill.open{background:var(--infobg);color:var(--info)}
-  .lead-pill.muted{background:#f9fafb;color:var(--faint)}
-  .lead-foot{font-size:11px;color:var(--faint)}
-  .lead-notes{margin-top:8px;font-size:12px;color:var(--warnink);background:var(--warnbg);border:1px solid var(--warnline);border-radius:6px;padding:8px 10px;white-space:pre-wrap}
-
-  /* ── Activity feed ── */
-  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
-  .chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 13px;font-size:12.5px;font-weight:550;color:var(--muted);cursor:pointer;font-family:inherit}
-  .chip:hover{background:#faf9f6}
-  .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
-  .act-list{display:flex;flex-direction:column;gap:2px}
-  .act-row{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border-radius:9px;border:1px solid transparent}
-  .act-row.click{cursor:pointer}
-  .act-row.click:hover{background:var(--surface);border-color:var(--line)}
-  .act-ico{flex:none;width:30px;height:30px;border-radius:8px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:15px}
-  .act-main{flex:1;min-width:0}
-  .act-line{font-size:13.5px}
-  .act-line b{font-weight:650}
-  .act-meta{font-size:11.5px;color:var(--faint);margin-top:2px}
-
-  /* ── Team ── */
-  .team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-bottom:24px}
-  .member{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
-  .member.inactive{opacity:.55}
-  .member .nm{font-weight:650;display:flex;align-items:center;gap:7px}
-  .role-tag{font-size:10px;padding:1px 7px;border-radius:99px;background:#f3f4f6;color:#374151;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
-  .role-tag.master{background:var(--accent);color:#fff}
-  .member .stat{font-size:12.5px;color:var(--muted);margin-top:8px}
-  .member .stat b{color:var(--ink)}
-  .section-h{font-size:13px;font-weight:650;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:6px 0 12px}
-  .add-form{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;max-width:520px}
-  .add-row{display:flex;gap:10px;flex-wrap:wrap}
-  .add-row .field{flex:1;min-width:150px;margin-bottom:0}
-  .add-form .field select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font-size:14px;font-family:inherit;background:#fff}
-  .invite{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px dashed var(--line);border-radius:9px;margin-top:8px;font-size:13px}
-  .invite .e{font-weight:600} .invite .spacer{flex:1}
-  .form-msg{font-size:12.5px;margin-top:10px;min-height:16px}
-  .form-msg.err{color:var(--hot)} .form-msg.ok{color:var(--ok)}
-
-  .empty{text-align:center;color:var(--faint);padding:40px 0;font-size:13.5px}
-
-  /* ── Slide-over drill-in ── */
-  #scrim{position:fixed;inset:0;background:rgba(20,22,20,.34);opacity:0;pointer-events:none;transition:opacity .18s;z-index:40}
-  #scrim.show{opacity:1;pointer-events:auto}
-  #drill{position:fixed;top:0;right:0;height:100vh;width:min(560px,100vw);background:var(--bg);box-shadow:-8px 0 30px rgba(0,0,0,.12);transform:translateX(100%);transition:transform .22s ease;z-index:41;overflow-y:auto}
-  #drill.show{transform:translateX(0)}
-  .drill-top{position:sticky;top:0;background:var(--bg);display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line);z-index:2}
-  .drill-top .x{margin-left:auto;cursor:pointer;border:none;background:none;font-size:22px;color:var(--muted);line-height:1}
-  .drill-body{padding:18px 20px 60px}
-  .drill-section{margin-bottom:22px}
-  .drill-section h3{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 10px;font-weight:650}
-  .kv{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;padding:4px 0}
-  .kv .k{color:var(--muted)} .kv .v{font-weight:550;text-align:right}
-  .notes-block{background:var(--warnbg);border:1px solid var(--warnline);padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.55;white-space:pre-wrap;color:var(--warnink)}
-  .bar{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:12.5px}
-  .bar .lbl{width:88px;color:var(--muted);flex:none}
-  .bar .track{flex:1;height:7px;background:#eee;border-radius:99px;overflow:hidden}
-  .bar .fill{height:100%;background:var(--accent);border-radius:99px}
-  .bar .num{width:30px;text-align:right;color:var(--ink);font-weight:600}
-  .sug{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:7px}
-  .etrack-row,.intent-row,.msg-row,.evt-row{padding:9px 12px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;font-size:13px;background:var(--surface)}
-  .etrack-subj{font-weight:600;margin-bottom:3px}
-  .etrack-meta,.evt-meta{font-size:11.5px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-  .badge{display:inline-flex;padding:2px 7px;font-size:10.5px;border-radius:99px;font-weight:600}
-  .badge.sent{background:#f3f4f6;color:#6b7280}
-  .badge.open{background:var(--okbg);color:var(--ok)}
-  .badge.click{background:var(--infobg);color:var(--info)}
-  .badge.bounced{background:#fef2f2;color:#991b1b}
-  .tl{display:flex;flex-direction:column;gap:0}
-  .tl-step{display:flex;gap:10px;align-items:flex-start;padding:6px 0}
-  .tl-dot{width:11px;height:11px;border-radius:50%;border:2px solid var(--line);margin-top:3px;flex:none;background:#fff}
-  .tl-dot.done{background:var(--accent);border-color:var(--accent)}
-  .tl-txt{font-size:13px} .tl-txt .when{font-size:11.5px;color:var(--faint)}
-  .drill-link{display:inline-block;margin-top:4px;font-size:13px;font-weight:600}
-  #full-thread{display:flex;flex-direction:column;gap:8px}
-  .bubble{max-width:85%;padding:9px 12px;border-radius:12px;font-size:13px}
-  .bubble.in{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px}
-  .bubble.out{align-self:flex-end;background:#eef3ef;border:1px solid #d9e4dc;border-bottom-right-radius:4px}
-  .bub-head{font-size:11px;color:var(--faint);margin-bottom:3px;font-weight:600}
-  .bub-body{white-space:pre-wrap}
-  .att{margin-top:5px;font-size:11.5px;color:var(--accent-ink)}
-
-  /* ── New-lead modal ── */
-  .leads-toolbar{display:flex;justify-content:flex-end;margin-bottom:12px}
-  .modal-scrim{position:fixed;inset:0;background:rgba(20,22,20,.5);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:60px 20px;overflow-y:auto}
-  .modal{background:var(--surface);border-radius:14px;padding:30px 32px;max-width:560px;width:100%;box-shadow:var(--shadow);z-index:51;position:relative}
-  .modal h2{margin:0 0 6px;font-size:20px;font-weight:650;text-transform:none;letter-spacing:0;color:var(--ink)}
-  .modal .muted{color:var(--muted);font-size:13px;margin:0 0 22px}
-  .modal .field-row{display:flex;gap:12px}
-  .modal .field-row .field{flex:1}
-  .modal .field{margin-bottom:12px}
-  .modal .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:5px;font-weight:550}
-  .modal .field input,.modal .field select,.modal .field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-size:14px;font-family:inherit;background:#fff}
-  .modal .field textarea{resize:vertical;min-height:88px}
-  .form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
-
-  @media (max-width:760px){
-    .kpis{grid-template-columns:repeat(3,1fr)}
-    .deal-amt{display:none}
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bayside Pavers · Redirecting…</title>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f4f4ef; color: #1f2125;
+      margin: 0; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e4e4df;
+      border-radius: 12px;
+      padding: 32px 36px;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(31, 33, 37, 0.06);
+    }
+    .spinner {
+      width: 28px; height: 28px;
+      border: 3px solid #e8eee9;
+      border-top-color: #5d7e69;
+      border-radius: 50%;
+      margin: 0 auto 18px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    h1 { font-size: 16px; font-weight: 600; margin: 0 0 6px; color: #1f2125; }
+    p { font-size: 13px; color: #70726f; margin: 0; line-height: 1.5; }
+    .fallback { margin-top: 18px; }
+    .fallback a { color: #5d7e69; font-weight: 600; text-decoration: none; }
+    .fallback a:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
-
-<!-- ════════ LOGIN ════════ -->
-<div id="login">
-  <div class="login-card">
-    <h1>Bayside Admin</h1>
-    <p>Sign in with your master account.</p>
-    <div class="field"><label>Email</label><input id="li-email" type="email" autocomplete="email" placeholder="you@baysidepavers.com"></div>
-    <div class="field"><label>Password</label><input id="li-pass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
-    <button class="btn primary" id="li-go">Sign in</button>
-    <div class="login-or">— or —</div>
-    <button class="btn" id="li-magic">Email me a magic link</button>
-    <div class="login-msg" id="li-msg"></div>
-  </div>
-</div>
-
-<!-- ════════ APP ════════ -->
-<div id="app" class="hidden">
-  <div class="topbar">
-    <span class="brand">Bayside<span class="dot">.</span> Admin</span>
-    <span class="pulse" title="Live — refreshing every 30s"></span>
-    <span class="spacer"></span>
-    <span class="who">Signed in as <b id="who-name">—</b></span>
-    <button class="btn small" id="sign-out">Sign out</button>
+  <div class="card">
+    <div class="spinner"></div>
+    <h1>Routing you to the right place…</h1>
+    <p id="ho-route-msg">Checking your account.</p>
+    <p class="fallback" id="ho-fallback" style="display:none;">
+      Stuck? <a href="/account/signin.html">Continue to sign-in</a>
+    </p>
   </div>
 
-  <div class="kpis">
-    <div class="kpi hot"><div class="v" id="k-hot">—</div><div class="l">Hot deals</div></div>
-    <div class="kpi"><div class="v" id="k-eng">—</div><div class="l">Engaged 24h</div></div>
-    <div class="kpi"><div class="v" id="k-stall">—</div><div class="l">Stalled</div></div>
-    <div class="kpi"><div class="v" id="k-signed">—</div><div class="l">Signed this wk</div></div>
-    <div class="kpi"><div class="v" id="k-pipe">—</div><div class="l">Open pipeline</div></div>
-    <div class="kpi leads"><div class="v" id="k-leads">—</div><div class="l">New leads</div></div>
-  </div>
+  <script type="module">
+    /*
+     * Phase 6.6 Sprint 6 Step 1 — role-aware root router.
+     *
+     * Replaces the prior meta-refresh-to-signin stub. That stub broke
+     * navigation for authenticated designers/admin: clicking the topbar
+     * logo on /dashboard.html or /admin/ landed here, which immediately
+     * forwarded to /account/signin.html (the homeowner sign-in page) —
+     * even though the user was already authenticated as staff. The new
+     * flow checks session + role and routes to the correct surface:
+     *
+     *   master       -> /admin/
+     *   designer     -> /dashboard.html
+     *   homeowner    -> /account/
+     *   unauthed     -> /account/signin.html  (preserves prior default)
+     *
+     * The 1.5s fallback timer is defensive: if the auth check or role
+     * lookup hangs, we fall through to the public sign-in rather than
+     * leaving the user staring at a spinner forever.
+     */
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="deals">Deals</button>
-    <button class="tab-btn" data-tab="leads">Leads <span class="tab-badge hidden" id="leads-badge"></span></button>
-    <button class="tab-btn" data-tab="activity">Activity</button>
-    <button class="tab-btn" data-tab="team">Team</button>
-  </div>
-
-  <!-- Deals -->
-  <div id="tab-deals" class="tab-panel">
-    <div class="toolbar">
-      <span class="spacer"></span>
-      <label class="chk"><input type="checkbox" id="inc-archived"> Show archived</label>
-    </div>
-    <div id="deal-list" class="deal-list"></div>
-  </div>
-
-  <!-- Leads -->
-  <div id="tab-leads" class="tab-panel hidden">
-    <div class="leads-toolbar">
-      <button class="btn primary small" id="new-lead-btn">+ New lead</button>
-    </div>
-    <div id="leads-list" class="leads-list"></div>
-  </div>
-
-  <!-- Activity -->
-  <div id="tab-activity" class="tab-panel hidden">
-    <div class="chips" id="act-chips">
-      <button class="chip active" data-kinds="">All</button>
-      <button class="chip" data-kinds="view">Views</button>
-      <button class="chip" data-kinds="message_in,message_out">Messages</button>
-      <button class="chip" data-kinds="sign_intent,signed,redesign_request">Buying signals</button>
-      <button class="chip" data-kinds="email_open,email_click,email_bounce,email_complaint">Email</button>
-      <button class="chip" data-kinds="lead_added,follow_up_sent,pdf_download">Pipeline</button>
-    </div>
-    <div id="activity-list" class="act-list"></div>
-  </div>
-
-  <!-- Team -->
-  <div id="tab-team" class="tab-panel hidden">
-    <div class="section-h">Team</div>
-    <div id="team-grid" class="team-grid"></div>
-    <div class="section-h">Add a salesperson</div>
-    <div class="add-form">
-      <div class="add-row">
-        <div class="field"><label>Name</label><input id="add-name" placeholder="Jane Doe"></div>
-        <div class="field"><label>Email</label><input id="add-email" type="email" placeholder="jane@…"></div>
-        <div class="field" style="max-width:130px"><label>Role</label>
-          <select id="add-role"><option value="designer">Designer</option><option value="master">Master</option></select>
-        </div>
-      </div>
-      <div style="margin-top:12px"><button class="btn primary small" id="add-go">Send invite</button></div>
-      <div class="form-msg" id="add-msg"></div>
-      <div id="invite-list" style="margin-top:14px"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ════════ DRILL-IN SLIDE-OVER ════════ -->
-<div id="scrim"></div>
-<aside id="drill">
-  <div class="drill-top">
-    <strong id="drill-title">Deal</strong>
-    <button class="x" id="drill-x">×</button>
-  </div>
-  <div class="drill-body" id="drill-body"></div>
-</aside>
-
-<!-- ════════ NEW-LEAD MODAL ════════ -->
-<div id="newlead-scrim" class="modal-scrim hidden">
-  <div id="newlead-modal" class="modal">
-    <h2>Add new lead</h2>
-    <p class="muted">After your discovery appointment, drop the details here. Bayside will send the welcome + portal invite, schedule the 3-day design-phase nurture, and ping the team — all automatically.</p>
-    <form id="newlead-form">
-      <div class="field-row">
-        <div class="field"><label>Full name *</label><input id="nl-name" required></div>
-        <div class="field"><label>Email *</label><input id="nl-email" type="email" required></div>
-      </div>
-      <div class="field-row">
-        <div class="field"><label>Phone</label><input id="nl-phone"></div>
-        <div class="field"><label>Project type</label>
-          <select id="nl-pt">
-            <option value="">— pick one —</option>
-            <option value="backyard_expansion">Backyard expansion</option>
-            <option value="patio">Patio</option>
-            <option value="driveway">Driveway</option>
-            <option value="pool_deck">Pool deck</option>
-            <option value="walkway">Walkway</option>
-            <option value="turf">Artificial turf</option>
-            <option value="retaining_wall">Retaining wall</option>
-            <option value="outdoor_kitchen">Outdoor kitchen</option>
-            <option value="pergola">Pergola</option>
-            <option value="custom">Custom / multi</option>
-          </select>
-        </div>
-      </div>
-      <div class="field"><label>Project address</label><input id="nl-address"></div>
-      <div class="field"><label>Friendly phrasing for emails (optional)</label><input id="nl-ptf" placeholder="e.g. corner-lot backyard expansion"></div>
-      <div class="field"><label>Discovery notes</label><textarea id="nl-notes" rows="6" placeholder="Qualification, scope, budget, anything to help the designer pick up where you left off..."></textarea></div>
-      <div class="form-actions">
-        <button type="button" class="btn small" id="nl-cancel">Cancel</button>
-        <button type="submit" class="btn primary small" id="nl-submit">Add lead</button>
-      </div>
-      <div id="nl-msg" class="form-msg"></div>
-    </form>
-  </div>
-</div>
-
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-// ════════ CONFIG ════════
-const SUPABASE_URL      = 'https://gfgbypcnxkschnfsitfb.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_Ko4LNw2VjhZVFmwJ-i2qtA_XeGgBcew';
-// ═══════════════════════════════════════════════════════════════════════════════════════════════
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-const $ = (id) => document.getElementById(id);
-let currentTab = 'deals';
-let pollTimer = null;
-let activityFilter = null;
-
-const KIND_META = {
-  view:            {icon:'👁', label:'Viewed'},
-  message_in:      {icon:'💬', label:'Message in'},
-  message_out:     {icon:'↩️', label:'Reply sent'},
-  sign_intent:     {icon:'✍️', label:'Sign intent'},
-  signed:          {icon:'✅', label:'Signed'},
-  redesign_request:{icon:'🎨', label:'Redesign'},
-  email_open:      {icon:'📩', label:'Email open'},
-  email_click:     {icon:'🔗', label:'Email click'},
-  email_bounce:    {icon:'⚠️', label:'Bounce'},
-  email_complaint: {icon:'🚫', label:'Spam'},
-  pdf_download:    {icon:'📄', label:'PDF download'},
-  lead_added:      {icon:'🆕', label:'New lead'},
-  follow_up_sent:  {icon:'📤', label:'Follow-up'},
-};
-
-// ── Helpers ──
-const escHTML = (s) => (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const fmtMoney = (n) => (n==null?'—':'$'+Number(n).toLocaleString('en-US',{maximumFractionDigits:0}));
-function fmtWhen(ts){ if(!ts) return '—'; const d=new Date(ts); return d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }
-function fmtRel(ts){ if(!ts) return '—'; const diff=Date.now()-new Date(ts).getTime(); const day=864e5;
-  if(diff<36e5) return Math.max(1,Math.round(diff/6e4))+'m ago';
-  if(diff<day) return Math.round(diff/36e5)+'h ago';
-  return Math.round(diff/day)+'d ago'; }
-const titleCase = (s) => (s||'').replace(/(^|[_\s])(\w)/g,(_,a,b)=>(a?' ':'')+b.toUpperCase());
-
-// ════════ AUTH ════════
-async function boot(){
-  if(SUPABASE_ANON_KEY.includes('PASTE_')){ $('li-msg').className='login-msg err'; $('li-msg').textContent='Anon key not configured in index.html.'; }
-  const { data:{ session } } = await supabase.auth.getSession();
-  if(session) verifyAdmin(); else showLogin();
-}
-supabase.auth.onAuthStateChange((_e, session)=>{ if(session) verifyAdmin(); });
-
-function showLogin(){ $('app').classList.add('hidden'); $('login').classList.remove('hidden'); if(pollTimer){clearInterval(pollTimer);pollTimer=null;} }
-
-async function verifyAdmin(){
-  const { data, error } = await supabase.rpc('get_admin_self');
-  if(error || !data || data.error || data.role!=='master'){
-    await supabase.auth.signOut();
-    $('login').classList.remove('hidden'); $('app').classList.add('hidden');
-    $('li-msg').className='login-msg err';
-    $('li-msg').textContent='That account isn\'t a master / admin.';
-    return;
-  }
-  $('who-name').textContent = data.display_name || data.email;
-  $('login').classList.add('hidden'); $('app').classList.remove('hidden');
-  await refreshAll();
-  if(!pollTimer) pollTimer = setInterval(()=>{ loadKpis(); refreshTab(); }, 30000);
-}
-
-$('li-go').onclick = async ()=>{
-  $('li-msg').textContent='';
-  const email=$('li-email').value.trim(), password=$('li-pass').value;
-  if(!email||!password){ $('li-msg').className='login-msg err'; $('li-msg').textContent='Enter email and password.'; return; }
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if(error){ $('li-msg').className='login-msg err'; $('li-msg').textContent=error.message; }
-};
-$('li-magic').onclick = async ()=>{
-  $('li-msg').textContent='';
-  const email=$('li-email').value.trim();
-  if(!email){ $('li-msg').className='login-msg err'; $('li-msg').textContent='Enter your email first.'; return; }
-  const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo: window.location.href } });
-  if(error){ $('li-msg').className='login-msg err'; $('li-msg').textContent=error.message; }
-  else { $('li-msg').className='login-msg ok'; $('li-msg').textContent='Check your email for the sign-in link.'; }
-};
-$('sign-out').onclick = async ()=>{ await supabase.auth.signOut(); showLogin(); };
-
-// ════════ TABS ════════
-document.querySelectorAll('.tab-btn').forEach(b=>{
-  b.onclick = ()=>{
-    document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    currentTab = b.dataset.tab;
-    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
-    $('tab-'+currentTab).classList.remove('hidden');
-    refreshTab();
-  };
-});
-function refreshTab(){
-  if(currentTab==='deals') renderDeals();
-  else if(currentTab==='leads') renderLeads();
-  else if(currentTab==='activity') renderActivity();
-  else if(currentTab==='team') renderTeam();
-}
-async function refreshAll(){ await loadKpis(); refreshTab(); }
-
-// ════════ KPIs ════════
-async function loadKpis(){
-  const { data, error } = await supabase.rpc('get_admin_kpis');
-  if(error || !data || data.error) return;
-  $('k-hot').textContent    = data.hot_count ?? 0;
-  $('k-eng').textContent    = data.engaged_24h ?? 0;
-  $('k-stall').textContent  = data.stalled_count ?? 0;
-  $('k-signed').textContent = data.signed_this_week ?? 0;
-  $('k-pipe').textContent   = fmtMoney(data.open_pipeline);
-  $('k-leads').textContent  = data.new_leads ?? 0;
-  const badge = $('leads-badge');
-  if(data.new_leads){ badge.textContent = data.new_leads; badge.classList.remove('hidden'); }
-  else badge.classList.add('hidden');
-}
-
-// ════════ DEALS ════════
-function scoreClass(s){ if(s>=20) return 'hot'; if(s>=10) return 'warm'; return ''; }
-$('inc-archived').onchange = renderDeals;
-
-async function renderDeals(){
-  const inc = $('inc-archived').checked;
-  const { data, error } = await supabase.rpc('get_admin_deals_feed', { p_include_archived: inc });
-  const el = $('deal-list');
-  if(error || !Array.isArray(data)){ el.innerHTML = `<div class="empty">Couldn't load deals.</div>`; return; }
-  if(!data.length){ el.innerHTML = `<div class="empty">No deals yet.</div>`; return; }
-  el.innerHTML = data.map(d=>{
-    const hs = d.hot_score ?? 0;
-    const pills = [`<span class="pill ${d.stage}">${titleCase(d.stage)}</span>`];
-    if(d.has_signing_intent && d.stage!=='signed') pills.push(`<span class="pill intent">✍️ Sign intent</span>`);
-    if(d.nurture_phase && d.nurture_phase!=='signed') pills.push(`<span class="pill nurture">${titleCase(d.nurture_phase)}</span>`);
-    return `
-      <div class="deal-card" data-pid="${d.proposal_id}">
-        <div class="score-chip ${scoreClass(hs)}">${hs}<small>score</small></div>
-        <div class="deal-main">
-          <div class="deal-name">${escHTML(d.client_name)} ${pills.join(' ')}</div>
-          <div class="deal-signal">${escHTML(d.top_signal || d.project_address || '')}</div>
-          <div class="deal-meta">${escHTML(d.owner_name||'—')} · last touch ${fmtRel(d.last_viewed_at||d.sent_at)}</div>
-        </div>
-        <div class="deal-amt"><div class="n">${fmtMoney(d.total_amount)}</div><div class="s">${escHTML(d.proposal_slug||'')}</div></div>
-      </div>`;
-  }).join('');
-  el.querySelectorAll('.deal-card').forEach(c=> c.onclick = ()=> openDrill(c.dataset.pid));
-}
-
-// ════════ LEADS ════════
-async function renderLeads(){
-  const { data:leads, error } = await supabase.rpc('get_admin_leads');
-  const el = $('leads-list');
-  if(error || !Array.isArray(leads)){ el.innerHTML = `<div class="empty">Couldn't load leads.</div>`; return; }
-  if(!leads.length){ el.innerHTML = `<div class="empty">No pre-proposal leads right now.</div>`; return; }
-  el.innerHTML = leads.map(l=>{
-    const aging = (l.days_in_pipeline>=5) ? ' aging' : '';
-    const welcomed = l.welcome_sent_at ? `<span class="lead-pill ok">Welcomed</span>` : `<span class="lead-pill warn">No welcome</span>`;
-    const nurture = (l.nurture_pending>0)
-      ? `<span class="lead-pill">${l.nurture_pending} nurture queued${l.nurture_next_at?' · next '+fmtWhen(l.nurture_next_at):''}</span>`
-      : `<span class="lead-pill muted">Nurture complete</span>`;
-    const account = l.has_account ? `<span class="lead-pill ok">Account active</span>` : `<span class="lead-pill muted">No account yet</span>`;
-    const eng = (l.emails_opened>0||l.emails_clicked>0)
-      ? `<span class="lead-pill open">${l.emails_opened||0} opened · ${l.emails_clicked||0} clicked</span>`
-      : `<span class="lead-pill muted">No email opens yet</span>`;
-    return `
-      <div class="lead-card${aging}">
-        <div class="lead-head">
-          <div class="lead-name">${escHTML(l.name)}</div>
-          <div class="lead-days${aging}">${l.days_in_pipeline}d in pipeline</div>
-        </div>
-        <div class="lead-addr">${escHTML(l.project_address||'—')}</div>
-        <div class="lead-pills">${welcomed} ${nurture} ${account} ${eng}</div>
-        <div class="lead-foot">Designer: ${escHTML(l.designer_name)} · added ${fmtWhen(l.created_at)}</div>
-        ${l.notes ? `<div class="lead-notes">${escHTML(l.notes)}</div>` : ''}
-      </div>`;
-  }).join('');
-}
-
-// ════════ ACTIVITY FEED ════════
-document.querySelectorAll('#act-chips .chip').forEach(ch=>{
-  ch.onclick = ()=>{
-    document.querySelectorAll('#act-chips .chip').forEach(x=>x.classList.remove('active'));
-    ch.classList.add('active');
-    const k = ch.dataset.kinds;
-    activityFilter = k ? k.split(',') : null;
-    renderActivity();
-  };
-});
-async function renderActivity(){
-  const { data, error } = await supabase.rpc('get_admin_activity_feed', { p_limit:150, p_kinds:activityFilter, p_owner:null });
-  const el = $('activity-list');
-  if(error || !Array.isArray(data)){ el.innerHTML = `<div class="empty">Couldn't load activity.</div>`; return; }
-  if(!data.length){ el.innerHTML = `<div class="empty">No activity in this view.</div>`; return; }
-  el.innerHTML = data.map(a=>{
-    const m = KIND_META[a.kind] || {icon:'•',label:a.kind};
-    const who = a.client_name || 'Unknown';
-    return `<div class="act-row${a.proposal_id?' click':''}"${a.proposal_id?` data-pid="${a.proposal_id}"`:''}>
-        <div class="act-ico">${m.icon}</div>
-        <div class="act-main">
-          <div class="act-line"><b>${escHTML(who)}</b> · ${escHTML(a.summary)}</div>
-          <div class="act-meta">${escHTML(m.label)} · ${escHTML(a.designer_name||'—')} · ${fmtRel(a.occurred_at)}</div>
-        </div>
-      </div>`;
-  }).join('');
-  el.querySelectorAll('.act-row.click').forEach(r=> r.onclick = ()=> openDrill(r.dataset.pid));
-}
-
-// ════════ TEAM ════════
-async function renderTeam(){
-  const { data, error } = await supabase.rpc('get_admin_team');
-  if(error || !data || data.error){ $('team-grid').innerHTML = `<div class="empty">Couldn't load team.</div>`; return; }
-  $('team-grid').innerHTML = (data.members||[]).map(m=>`
-    <div class="member ${m.is_active?'':'inactive'}">
-      <div class="nm">${escHTML(m.display_name||m.email)} <span class="role-tag ${m.role}">${m.role}</span></div>
-      <div class="stat"><b>${m.open_deals}</b> open deal${m.open_deals===1?'':'s'} · <b>${m.signed_this_month}</b> signed this month</div>
-      <div class="stat" style="font-size:11.5px;color:var(--faint)">${escHTML(m.email)}</div>
-    </div>`).join('');
-  const inv = data.pending_invites||[];
-  $('invite-list').innerHTML = inv.length ? (`<div class="section-h" style="margin-top:4px">Pending invites</div>` + inv.map(i=>`
-    <div class="invite"><span class="e">${escHTML(i.display_name)}</span> · ${escHTML(i.email)} <span class="role-tag ${i.role}">${i.role}</span><span class="spacer"></span><span style="color:var(--faint);font-size:11.5px">${fmtWhen(i.invited_at)}</span></div>`).join('')) : '';
-}
-$('add-go').onclick = async ()=>{
-  const msg=$('add-msg'); msg.textContent='';
-  const p_display_name=$('add-name').value.trim(), p_email=$('add-email').value.trim(), p_role=$('add-role').value;
-  if(!p_display_name||!p_email){ msg.className='form-msg err'; msg.textContent='Name and email required.'; return; }
-  const { data, error } = await supabase.rpc('admin_add_salesperson', { p_email, p_display_name, p_role });
-  if(error){ msg.className='form-msg err'; msg.textContent=error.message; return; }
-  if(data && data.error){
-    const map={forbidden:'Not authorized.',invalid_role:'Pick a valid role.',missing_fields:'Name and email required.',already_on_team:'That person is already on the team.',duplicate_pending:'There\'s already a pending invite for that email.'};
-    msg.className='form-msg err'; msg.textContent=map[data.error]||data.error; return;
-  }
-  msg.className='form-msg ok'; msg.textContent='Invite recorded. (Provision their login from Supabase Auth.)';
-  $('add-name').value=''; $('add-email').value='';
-  renderTeam();
-};
-
-// ════════ DRILL-IN ════════
-function closeDrill(){ $('drill').classList.remove('show'); $('scrim').classList.remove('show'); }
-$('drill-x').onclick = closeDrill;
-$('scrim').onclick = closeDrill;
-
-async function openDrill(pid){
-  if(!pid) return;
-  $('drill-body').innerHTML = `<div class="empty">Loading…</div>`;
-  $('drill').classList.add('show'); $('scrim').classList.add('show');
-  const { data, error } = await supabase.rpc('get_admin_deal_detail', { p_proposal_id: pid });
-  if(error || !data || data.error){ $('drill-body').innerHTML = `<div class="empty">Couldn't load this deal.</div>`; return; }
-  $('drill-title').textContent = data.deal?.client_name || 'Deal';
-  $('drill-body').innerHTML = renderDrillBody(data);
-  const tb = $('thread-btn');
-  if(tb) tb.onclick = ()=> loadFullThread(tb.dataset.cid);
-}
-
-async function loadFullThread(cid){
-  const box = $('full-thread'); const btn = $('thread-btn');
-  if(!box) return;
-  box.innerHTML = `<div class="empty" style="padding:14px">Loading…</div>`;
-  const { data, error } = await supabase.rpc('get_admin_client_thread', { p_client_id: cid });
-  if(error || !Array.isArray(data)){ box.innerHTML = `<div class="empty" style="padding:14px">Couldn't load.</div>`; return; }
-  if(btn) btn.style.display='none';
-  if(!data.length){ box.innerHTML = `<div class="empty" style="padding:14px">No messages yet.</div>`; return; }
-  box.innerHTML = data.map(m=>{
-    const out = (m.sender_role!=='homeowner');
-    const atts = (m.attachments||[]).map(a=>`<div class="att">📎 ${escHTML(a.file_name||'attachment')}</div>`).join('');
-    return `<div class="bubble ${out?'out':'in'}">
-        <div class="bub-head">${escHTML(m.sender_name)} · ${fmtWhen(m.created_at)}</div>
-        <div class="bub-body">${escHTML(m.body||'')}</div>${atts}
-      </div>`;
-  }).join('');
-}
-
-function bar(lbl,val){ const v=Math.max(0,Math.min(100,val||0)); return `<div class="bar"><span class="lbl">${lbl}</span><span class="track"><span class="fill" style="width:${v}%"></span></span><span class="num">${v}</span></div>`; }
-
-function buildSuggestions(deal,score,intents){
-  const s=[]; const hs=score?.hot_score||0;
-  if(deal.stage==='signed') s.push('🎉 Signed — kick off construction prep and send the welcome / next-steps package.');
-  if(intents && intents.length && deal.stage!=='signed') s.push('✍️ Sign intent on file — call now while they\'re in buying mode.');
-  if(deal.design_retainer_interest_at) s.push('💰 Expressed design-retainer interest — follow up to lock the engagement.');
-  if(deal.stage!=='signed' && hs>=20) s.push('🔥 Hot score — reach out today; they\'re actively engaged.');
-  if(deal.stage==='sent' && !deal.first_viewed_at) s.push('📤 Sent but never opened — resend or nudge with a quick text.');
-  if(deal.last_viewed_at && (Date.now()-new Date(deal.last_viewed_at))>7*864e5 && deal.stage!=='signed') s.push('🥶 Quiet 7+ days — re-engage with a fresh angle or a discount reminder.');
-  if(!s.length) s.push('Keep nurturing — no urgent action flagged right now.');
-  return s;
-}
-
-function renderDrillBody(d){
-  const deal=d.deal||{}, score=d.score||null, intents=d.signing_intents||[], msgs=d.recent_messages||[], events=d.recent_events||[], emails=d.email_tracking||[];
-
-  const summary = `
-    <div class="drill-section">
-      <div class="kv"><span class="k">Project</span><span class="v">${escHTML(deal.project_address||'—')}</span></div>
-      <div class="kv"><span class="k">Amount</span><span class="v">${fmtMoney(deal.total_amount)}${deal.discounted_price?` <span style="color:var(--faint)">(disc ${fmtMoney(deal.discounted_price)})</span>`:''}</span></div>
-      <div class="kv"><span class="k">Stage</span><span class="v"><span class="pill ${deal.stage}">${titleCase(deal.stage)}</span></span></div>
-      <div class="kv"><span class="k">Designer</span><span class="v">${escHTML(deal.owner_name||'—')}</span></div>
-      <div class="kv"><span class="k">Contact</span><span class="v">${escHTML(deal.client_email||'—')}${deal.client_phone?' · '+escHTML(deal.client_phone):''}</span></div>
-    </div>`;
-
-  const notes = deal.client_notes ? `<div class="drill-section"><h3>📋 Notes</h3><div class="notes-block">${escHTML(deal.client_notes)}</div></div>` : '';
-
-  const scoreSection = score && score.hot_score!=null ? `
-    <div class="drill-section"><h3>Hot score — ${score.hot_score}</h3>
-      ${bar('Engagement',score.engagement_score)}${bar('Recency',score.recency_score)}${bar('Urgency',score.urgency_score)}${bar('Intent',score.intent_score)}
-      <div style="font-size:12px;color:var(--muted);margin-top:6px">${escHTML(score.top_signal||'')} · ${score.distinct_sessions||0} session(s) · updated ${fmtRel(score.computed_at)}</div>
-    </div>` : '';
-
-  const emailSection = emails.filter(e=>e.sent_at).length ? `
-    <div class="drill-section"><h3>📨 Email engagement</h3>
-      ${emails.filter(e=>e.sent_at).map(e=>{
-        const b=[]; if(e.bounced_at) b.push('<span class="badge bounced">Bounced</span>');
-        else { b.push(`<span class="badge ${e.opened_at?'open':'sent'}">${e.opened_at?`Opened${e.open_count>1?' ×'+e.open_count:''}`:'Not opened'}</span>`); if(e.clicked_at) b.push(`<span class="badge click">Clicked${e.click_count>1?' ×'+e.click_count:''}</span>`); }
-        return `<div class="etrack-row"><div class="etrack-subj">${escHTML(e.subject||titleCase(e.notification_kind))}</div><div class="etrack-meta">Sent ${fmtWhen(e.sent_at)} ${b.join(' ')}</div></div>`;
-      }).join('')}
-    </div>` : '';
-
-  const sug = `<div class="drill-section"><h3>💡 Suggested next step</h3>${buildSuggestions(deal,score,intents).map(s=>`<div class="sug">${escHTML(s)}</div>`).join('')}</div>`;
-
-  const steps=[
-    {l:'Proposal sent',t:deal.sent_at},
-    {l:'First viewed',t:deal.first_viewed_at},
-    {l:'Sign intent',t:intents.length?intents[intents.length-1].clicked_at:null},
-    {l:'Signed',t:deal.signed_at},
-  ];
-  const timeline = `<div class="drill-section"><h3>Timeline</h3><div class="tl">${steps.map(s=>`<div class="tl-step"><span class="tl-dot ${s.t?'done':''}"></span><span class="tl-txt">${s.l}${s.t?` <span class="when">— ${fmtWhen(s.t)}</span>`:` <span class="when">— pending</span>`}</span></div>`).join('')}</div></div>`;
-
-  const intentsSection = intents.length ? `<div class="drill-section"><h3>✍️ Signing intents</h3>${intents.map(i=>`<div class="intent-row"><b>${escHTML(i.viewer_name||'Someone')}</b> <span style="color:var(--faint);font-size:11.5px">${fmtWhen(i.clicked_at)}</span>${i.viewer_message?`<div style="margin-top:4px;color:var(--muted)">${escHTML(i.viewer_message)}</div>`:''}</div>`).join('')}</div>` : '';
-
-  const msgSection = msgs.length ? `<div class="drill-section"><h3>Recent messages</h3>${msgs.map(m=>`<div class="msg-row"><b>${escHTML(titleCase(m.sender_role))}</b> <span style="color:var(--faint);font-size:11.5px">${fmtWhen(m.created_at)}</span><div style="margin-top:3px">${escHTML((m.body||'').slice(0,200))}</div></div>`).join('')}</div>` : '';
-
-  const threadBlock = deal.client_id ? `<div class="drill-section"><h3>💬 Full conversation</h3><button class="btn small" id="thread-btn" data-cid="${deal.client_id}">Load full conversation</button><div id="full-thread" style="margin-top:10px"></div></div>` : '';
-
-  const evtSection = events.length ? `<div class="drill-section"><h3>Activity feed</h3>${events.slice(0,12).map(e=>`<div class="evt-row"><div class="etrack-subj">${escHTML(titleCase(e.event_type))}</div><div class="evt-meta">${fmtWhen(e.occurred_at)}</div></div>`).join('')}</div>` : '';
-
-  const link = deal.proposal_slug ? `<div class="drill-section"><a class="drill-link" href="https://portal-baysidepavers.com/p/${encodeURIComponent(deal.proposal_slug)}" target="_blank" rel="noopener">Open proposal page ↗</a></div>` : '';
-
-  return summary + notes + scoreSection + emailSection + sug + timeline + intentsSection + msgSection + threadBlock + evtSection + link;
-}
-
-// ════════ NEW LEAD MODAL ════════
-$('new-lead-btn').onclick = openNewLead;
-$('nl-cancel').onclick    = closeNewLead;
-$('newlead-scrim').onclick = (e) => { if (e.target.id === 'newlead-scrim') closeNewLead(); };
-
-function openNewLead(){
-  $('newlead-form').reset();
-  $('nl-msg').textContent = '';
-  $('nl-msg').className = 'form-msg';
-  $('newlead-scrim').classList.remove('hidden');
-  setTimeout(() => $('nl-name').focus(), 50);
-}
-function closeNewLead(){ $('newlead-scrim').classList.add('hidden'); }
-
-$('newlead-form').onsubmit = async (e) => {
-  e.preventDefault();
-  const msg = $('nl-msg'); msg.textContent = ''; msg.className = 'form-msg';
-  const payload = {
-    name: $('nl-name').value.trim(),
-    email: $('nl-email').value.trim(),
-    phone: $('nl-phone').value.trim() || null,
-    address: $('nl-address').value.trim() || null,
-    notes: $('nl-notes').value.trim() || null,
-    project_type: $('nl-pt').value || null,
-    project_type_friendly: $('nl-ptf').value.trim() || null,
-  };
-  if (!payload.name || !payload.email) {
-    msg.className = 'form-msg err'; msg.textContent = 'Name and email are required.'; return;
-  }
-  const btn = $('nl-submit'); btn.disabled = true; btn.textContent = 'Adding…';
-  try {
-    const { data:{ session } } = await supabase.auth.getSession();
-    if (!session) throw new Error('Not signed in.');
-    const r = await fetch('/api/create-lead', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+    const SUPABASE_URL = 'https://gfgbypcnxkschnfsitfb.supabase.co';
+    const SUPABASE_ANON = 'sb_publishable_Ko4LNw2VjhZVFmwJ-i2qtA_XeGgBcew';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
     });
-    const data = await r.json();
-    if (!r.ok || data.error) {
-      const errMap = {
-        name_required: 'Name is required.',
-        email_required: 'Email is required.',
-        email_invalid: "That email doesn't look right.",
-        duplicate_email: 'A client with that email already exists.',
-        forbidden: "You don't have permission to add leads.",
-      };
-      throw new Error(errMap[data.error] || data.detail || 'Could not add lead.');
-    }
-    msg.className = 'form-msg ok';
-    msg.textContent = data.warning
-      ? `Lead added — but ${data.warning}. Check the queue.`
-      : 'Lead added. Welcome + portal invite on the way.';
-    setTimeout(() => { closeNewLead(); loadKpis(); renderLeads(); }, 1200);
-  } catch (err) {
-    msg.className = 'form-msg err'; msg.textContent = err.message;
-  } finally {
-    btn.disabled = false; btn.textContent = 'Add lead';
-  }
-};
 
-boot();
-</script>
+    const routeMsg = document.getElementById('ho-route-msg');
+    const fallback = document.getElementById('ho-fallback');
+
+    const fallbackTimer = setTimeout(() => {
+      fallback.style.display = 'block';
+      window.location.replace('/account/signin.html');
+    }, 1500);
+
+    function go(path, label) {
+      clearTimeout(fallbackTimer);
+      routeMsg.textContent = label;
+      window.location.replace(path);
+    }
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        go('/account/signin.html', 'Taking you to sign-in.');
+      } else {
+        const userId = session.user.id;
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role, is_active')
+          .eq('id', userId)
+          .maybeSingle();
+
+        if (profile && profile.is_active) {
+          if (profile.role === 'master') {
+            go('/admin/', 'Taking you to the admin dashboard.');
+          } else if (profile.role === 'designer') {
+            go('/dashboard.html', 'Taking you to your dashboard.');
+          } else {
+            go('/account/signin.html', 'Account not recognized.');
+          }
+        } else {
+          const { data: client } = await supabase
+            .from('clients')
+            .select('id')
+            .eq('user_id', userId)
+            .maybeSingle();
+
+          if (client) {
+            go('/account/', 'Taking you to your account.');
+          } else {
+            go('/account/signin.html', 'No account found for this sign-in.');
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Root router error:', err);
+      go('/account/signin.html', 'Something went wrong. Sending you to sign-in.');
+    }
+  </script>
 </body>
 </html>
