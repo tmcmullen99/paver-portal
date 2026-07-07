@@ -1,15 +1,20 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // auth-util.js
-// Shared authentication helpers for BPB admin + Bayside client platform.
+// Shared authentication helpers for BPB admin + client platform.
 //
-// Phase 5A: role-based gating. The `profiles` table has a role column
-// with values 'master' (Tim) and 'designer' (Bayside reps). Admin pages
-// must call one of:
+// SPRINT 1 (Decouple): the /admin/ area is now MASTER-ONLY. The designer
+// product (/dashboard, /editor, /site-map) contains no role branches at
+// all — every query there is scoped to owner_user_id, for everyone.
 //
-//   requireMaster()    → master only. Redirects designers to /admin/.
-//   requireDesigner()  → designer or master. Redirects clients out.
-//   requireAdmin()     → kept as alias for requireDesigner() so existing
-//                        pages keep working unchanged.
+// requireDesigner() and requireAdmin() were previously "designer or
+// master" guards used by every /admin/ page. Since ALL of their importers
+// live under /admin/ (verified via repo-wide grep), tightening them here
+// seals the entire admin area in one change. Designers hitting any /admin/
+// URL — bookmark, stale link, typed path — are bounced to /dashboard.
+//
+//   requireMaster()    → master only. Non-masters bounced to /dashboard.
+//   requireDesigner()  → NOW ALSO master only (admin-area guard).
+//   requireAdmin()     → alias of requireDesigner(), unchanged signature.
 //
 // Core functions:
 //   getCurrentUser()           → current authenticated user (or null)
@@ -89,38 +94,34 @@ export async function requireMaster() {
   const user = await getCurrentUser();
   if (!user) {
     const ret = encodeURIComponent(window.location.pathname + window.location.search);
-    window.location.href = `/client/login.html?admin=1&return=${ret}`;
+    window.location.href = `/login.html?redirect=${ret}`;
     return null;
   }
   const profile = await getProfile(user);
   if (!isMasterUser(profile)) {
-    alert('Master access required. Returning to admin home.');
-    window.location.href = '/admin/';
+    // Designers and clients have no business in /admin/. Send designers
+    // to their pipeline; send anyone else (clients) home. No alert()
+    // popups — a clean redirect reads as "that page isn't for you"
+    // rather than an error.
+    if (isDesignerUser(profile)) {
+      window.location.replace('/dashboard');
+    } else {
+      window.location.replace('/');
+    }
     return null;
   }
   return { user, profile };
 }
 
 /**
- * Guards designer + master pages. Redirects to login if unauthenticated,
- * to home if authenticated but not internal staff.
+ * SPRINT 1: previously "designer or master" — now an alias for
+ * requireMaster(). Every importer of this function is an /admin/ page,
+ * and /admin/ is master-only after the decouple. Keeping the export
+ * name means zero changes needed across the ~27 admin files.
  * Returns {user, profile} on success, null on failure (after redirect).
  */
 export async function requireDesigner() {
-  const user = await getCurrentUser();
-  if (!user) {
-    const ret = encodeURIComponent(window.location.pathname + window.location.search);
-    window.location.href = `/client/login.html?admin=1&return=${ret}`;
-    return null;
-  }
-  const profile = await getProfile(user);
-  if (!isDesignerUser(profile)) {
-    alert('Staff access required. Signing you out.');
-    await supabase.auth.signOut();
-    window.location.href = '/';
-    return null;
-  }
-  return { user, profile };
+  return requireMaster();
 }
 
 /**
