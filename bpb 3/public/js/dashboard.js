@@ -17,6 +17,7 @@
 // data, so nothing can leak.
 
 import { supabase } from './supabase-client.js';
+import { applyBranding } from './branding.js';
 import { getProposalEngagementBulk, formatRelativeTime } from './engagement-utils.js';
 
 const banner = document.getElementById('ddBanner');
@@ -83,7 +84,7 @@ const STAGES = [
 function renderUserChrome(profile) {
   const name = profile.display_name || profile.email || 'You';
   userName.textContent = name;
-  document.title = 'Pipeline · Bayside Proposal Builder';
+  applyBranding({ pageTitle: 'Pipeline' });
 
   // Masters get a link to the admin console in the sidebar. This is the
   // ONLY role-conditional element on the page, and it's pure navigation —
