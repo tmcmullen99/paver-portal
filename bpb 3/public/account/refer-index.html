@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claim your $500 · Bayside Pavers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bp-green:    #5d7e69;
+    --bp-green-dk: #4a6554;
+    --bp-green-soft: #e8eee9;
+    --bp-charcoal: #353535;
+    --bp-tan:      #dad7c5;
+    --bp-cream:    #faf8f3;
+    --bp-bg:       #f4f4ef;
+    --bp-card:     #ffffff;
+    --bp-border:   #e4e4df;
+    --bp-text:     #1f2125;
+    --bp-muted:    #70726f;
+    --bp-err:      #b91c1c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--bp-text);
+    background: var(--bp-bg);
+    line-height: 1.5; font-size: 15px;
+  }
+
+  .rf-nav {
+    background: #fff;
+    border-bottom: 1px solid var(--bp-border);
+    padding: 14px 24px;
+    display: flex; align-items: center;
+  }
+  .rf-nav img { height: 32px; width: auto; }
+
+  .rf-page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 36px 24px 80px;
+  }
+
+  .rf-state {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 12px;
+    padding: 40px 28px;
+    text-align: center;
+    color: var(--bp-muted);
+  }
+  .rf-state.error {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: var(--bp-err);
+  }
+  .rf-state h2 {
+    color: var(--bp-text);
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .rf-state p { font-size: 14px; line-height: 1.6; max-width: 420px; margin: 0 auto; }
+  .rf-state.error h2 { color: var(--bp-err); }
+
+  .rf-hero {
+    background: linear-gradient(135deg, var(--bp-green) 0%, var(--bp-green-dk) 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 36px 32px 32px;
+    margin-bottom: 22px;
+    box-shadow: 0 12px 32px rgba(93, 126, 105, 0.18);
+    text-align: center;
+  }
+  .rf-hero-eyebrow {
+    font-size: 11px; letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+    font-weight: 600; margin-bottom: 10px;
+  }
+  .rf-hero-title {
+    font-size: 26px; font-weight: 600;
+    letter-spacing: -0.014em;
+    margin-bottom: 18px; line-height: 1.25;
+  }
+  .rf-perk-tile {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 0 auto 20px;
+    max-width: 320px;
+  }
+  .rf-perk-tile-eyebrow {
+    font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .rf-perk-tile-amount {
+    font-size: 30px; font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.018em;
+    line-height: 1.1;
+  }
+  .rf-hero-lede {
+    font-size: 14px; line-height: 1.6;
+    color: rgba(255, 255, 255, 0.86);
+    max-width: 480px; margin: 0 auto;
+  }
+
+  .rf-card {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 14px;
+    padding: 28px 28px 30px;
+    margin-bottom: 22px;
+    box-shadow: 0 6px 20px rgba(31, 33, 37, 0.04);
+  }
+  .rf-card h3 {
+    font-size: 18px; font-weight: 600;
+    color: var(--bp-text);
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .rf-card-sub {
+    font-size: 13px;
+    color: var(--bp-muted);
+    margin-bottom: 22px;
+    line-height: 1.55;
+  }
+  .rf-form { display: flex; flex-direction: column; gap: 14px; }
+  .rf-field { display: flex; flex-direction: column; gap: 5px; }
+  .rf-field label {
+    font-size: 12px; font-weight: 600;
+    color: var(--bp-charcoal);
+  }
+  .rf-field label em {
+    color: var(--bp-err); font-style: normal; margin-left: 2px;
+  }
+  .rf-field input {
+    font-family: inherit; font-size: 15px;
+    padding: 12px 14px;
+    border: 1px solid var(--bp-border);
+    border-radius: 8px; background: #fff;
+    color: var(--bp-text);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .rf-field input:focus {
+    outline: none;
+    border-color: var(--bp-green);
+    box-shadow: 0 0 0 3px rgba(93, 126, 105, 0.16);
+  }
+  .rf-field-hint {
+    font-size: 11px; color: var(--bp-muted);
+    line-height: 1.5;
+  }
+
+  .rf-submit {
+    background: var(--bp-green); color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 24px;
+    font: inherit; font-size: 15px; font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, transform .12s;
+    margin-top: 6px;
+  }
+  .rf-submit:hover { background: var(--bp-green-dk); transform: translateY(-1px); }
+  .rf-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .rf-error {
+    background: #fef2f2;
+    color: var(--bp-err);
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .rf-error[hidden] { display: none; }
+
+  .rf-trust {
+    text-align: center;
+    color: var(--bp-muted);
+    font-size: 12px;
+    line-height: 1.7;
+    padding: 0 12px;
+  }
+  .rf-trust strong { color: var(--bp-charcoal); font-weight: 600; }
+
+  .rf-success {
+    background: #fff;
+    border: 1px solid var(--bp-green);
+    border-radius: 14px;
+    padding: 38px 28px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(93, 126, 105, 0.14);
+  }
+  .rf-success-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--bp-green-soft);
+    color: var(--bp-green);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .rf-success h2 {
+    font-size: 22px; font-weight: 600;
+    color: var(--bp-text);
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+  }
+  .rf-success p {
+    font-size: 14px; line-height: 1.65;
+    color: var(--bp-muted);
+    max-width: 440px; margin: 0 auto 22px;
+  }
+  .rf-success-cta {
+    display: inline-block;
+    background: var(--bp-green); color: #fff;
+    padding: 12px 28px;
+    border-radius: 999px;
+    font-size: 14px; font-weight: 600;
+    text-decoration: none;
+    transition: background .15s;
+  }
+  .rf-success-cta:hover { background: var(--bp-green-dk); }
+
+  @media (max-width: 540px) {
+    .rf-page { padding: 24px 16px 60px; }
+    .rf-hero { padding: 28px 22px 26px; }
+    .rf-hero-title { font-size: 22px; }
+    .rf-card { padding: 22px 22px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="rf-nav">
+  <img src="https://baysidepavers.com/wp-content/uploads/2023/03/baysidepavers-logo-light-scaled.png" alt="Bayside Pavers">
+</nav>
+
+<main class="rf-page">
+
+  <div class="rf-state" id="rf-loading">
+    <p>Loading your invitation…</p>
+  </div>
+
+  <div class="rf-state error" id="rf-error" style="display:none;">
+    <h2>This link isn't valid</h2>
+    <p id="rf-error-msg">The referral link you clicked may be expired or already used.</p>
+  </div>
+
+  <div id="rf-main" style="display:none;">
+    <section class="rf-hero">
+      <div class="rf-hero-eyebrow">A neighborly recommendation</div>
+      <h1 class="rf-hero-title" id="rf-hero-title">…</h1>
+      <div class="rf-perk-tile">
+        <div class="rf-perk-tile-eyebrow">Your referral perk</div>
+        <div class="rf-perk-tile-amount">$500 off your first project</div>
+      </div>
+      <p class="rf-hero-lede">
+        Bayside Pavers transforms backyards across the Bay Area — patios, pool decks, fire features,
+        the whole hardscape. Schedule a free design appointment and we'll walk your space, no obligation.
+      </p>
+    </section>
+
+    <section class="rf-card">
+      <h3>Tell us a little about your project</h3>
+      <p class="rf-card-sub">After you submit, we'll set up your account and send you straight to scheduling.</p>
+
+      <form class="rf-form" id="rf-form" novalidate>
+        <div class="rf-field">
+          <label for="rf-name">Your name <em>*</em></label>
+          <input type="text" id="rf-name" required maxlength="120" autocomplete="name">
+        </div>
+        <div class="rf-field">
+          <label for="rf-email">Your email <em>*</em></label>
+          <input type="email" id="rf-email" required autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false">
+        </div>
+        <div class="rf-field">
+          <label for="rf-phone">Phone (optional)</label>
+          <input type="tel" id="rf-phone" autocomplete="tel">
+        </div>
+        <div class="rf-field">
+          <label for="rf-address">Property address <em>*</em></label>
+          <input type="text" id="rf-address" required autocomplete="street-address" placeholder="123 Main St, Oakland CA">
+          <span class="rf-field-hint">Where you'd want the project — this also becomes your initial password (lowercased, no spaces). You can change it after signing in.</span>
+        </div>
+
+        <div class="rf-error" id="rf-form-error" hidden></div>
+
+        <button type="submit" class="rf-submit" id="rf-submit">Claim my $500 &amp; schedule →</button>
+      </form>
+    </section>
+
+    <p class="rf-trust">
+      <strong>Hundreds of happy customers</strong> across the Bay Area · Licensed &amp; insured
+    </p>
+  </div>
+
+  <div class="rf-success" id="rf-success" style="display:none;">
+    <div class="rf-success-icon">✓</div>
+    <h2 id="rf-success-title">Welcome to Bayside!</h2>
+    <p id="rf-success-msg">Account created. Redirecting you to scheduling…</p>
+    <a class="rf-success-cta" id="rf-success-cta" href="#">Continue to scheduling →</a>
+  </div>
+
+</main>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+
+const SUPABASE_URL  = 'https://gfgbypcnxkschnfsitfb.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_Ko4LNw2VjhZVFmwJ-i2qtA_XeGgBcew';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+const elLoading = document.getElementById('rf-loading');
+const elError   = document.getElementById('rf-error');
+const elErrorMsg = document.getElementById('rf-error-msg');
+const elMain    = document.getElementById('rf-main');
+const elTitle   = document.getElementById('rf-hero-title');
+const elForm    = document.getElementById('rf-form');
+const elFormErr = document.getElementById('rf-form-error');
+const elSubmit  = document.getElementById('rf-submit');
+const elName    = document.getElementById('rf-name');
+const elEmail   = document.getElementById('rf-email');
+const elPhone   = document.getElementById('rf-phone');
+const elAddress = document.getElementById('rf-address');
+const elSuccess = document.getElementById('rf-success');
+const elSuccessTitle = document.getElementById('rf-success-title');
+const elSuccessMsg   = document.getElementById('rf-success-msg');
+const elSuccessCta   = document.getElementById('rf-success-cta');
+
+const params = new URLSearchParams(window.location.search);
+const token  = (params.get('t') || '').trim();
+const code   = (params.get('code') || '').trim();
+
+let referrerInfo = null;
+let mode = null;
+
+(async function init() {
+  if (!token && !code) {
+    showError("This page needs a referral link. Reach out to your friend for the link they shared with you.");
+    return;
+  }
+  if (token && code) {
+    showError("This link is malformed — it has both an invitation token and a share code.");
+    return;
+  }
+
+  try {
+    if (token) {
+      mode = 'token';
+      const { data, error } = await supabase.rpc('get_referral_info', { p_token: token });
+      if (error) throw new Error(error.message);
+      if (!data || !data.valid) {
+        const reason = data && data.error === 'invalid_token'
+          ? "This invitation link isn't recognized — it may be expired or mistyped."
+          : data && data.status && data.status !== 'sent'
+            ? "This invitation has already been used. Sign in at /account/signin.html if you already have a Bayside account."
+            : "We can't verify this link.";
+        showError(reason);
+        return;
+      }
+      referrerInfo = data;
+      if (data.referred_name)  elName.value  = data.referred_name;
+      if (data.referred_email) elEmail.value = data.referred_email;
+    } else {
+      mode = 'code';
+      const { data, error } = await supabase.rpc('get_referrer_by_code', { p_code: code });
+      if (error) throw new Error(error.message);
+      if (!data || !data.valid) {
+        showError("This share link isn't recognized — the friend who shared it may have a typo, or their account was removed.");
+        return;
+      }
+      referrerInfo = data;
+    }
+
+    showMain();
+  } catch (err) {
+    showError("We hit an error verifying your link: " + ((err && err.message) || 'unknown'));
+  }
+})();
+
+function showError(msg) {
+  elLoading.style.display = 'none';
+  elMain.style.display    = 'none';
+  elSuccess.style.display = 'none';
+  elError.style.display   = 'block';
+  elErrorMsg.textContent  = msg;
+}
+
+function showMain() {
+  elLoading.style.display = 'none';
+  elError.style.display   = 'none';
+  elSuccess.style.display = 'none';
+  elMain.style.display    = 'block';
+
+  const firstName = (referrerInfo && referrerInfo.referrer_first_name) || 'A friend';
+  elTitle.textContent = `${firstName} sent you here`;
+}
+
+elForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  elFormErr.hidden = true;
+
+  const name    = elName.value.trim();
+  const email   = elEmail.value.trim().toLowerCase();
+  const phone   = elPhone.value.trim();
+  const address = elAddress.value.trim();
+
+  if (!name)    return showFormError('Please enter your name.');
+  if (!email || !email.includes('@')) return showFormError('Please enter a valid email.');
+  if (!address) return showFormError('Please enter your project address.');
+  if (address.replace(/[^a-z0-9]/gi, '').length < 8) {
+    return showFormError('Address is too short (it doubles as your initial password — needs at least 8 letters/numbers).');
+  }
+
+  elSubmit.disabled = true;
+  elSubmit.textContent = 'Setting up your account…';
+
+  try {
+    const payload = { name, email, address };
+    if (phone) payload.phone = phone;
+    if (mode === 'token') payload.token = token;
+    else                  payload.code  = code;
+
+    const resp = await fetch('/api/accept-referral', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await resp.json().catch(() => ({}));
+
+    if (!resp.ok || !data.ok) {
+      throw new Error(data.error || ('Server returned ' + resp.status));
+    }
+
+    showSuccess(data);
+
+  } catch (err) {
+    elSubmit.disabled = false;
+    elSubmit.textContent = 'Claim my $500 & schedule →';
+    showFormError((err && err.message) || 'Something went wrong creating your account.');
+  }
+});
+
+function showFormError(msg) {
+  elFormErr.textContent = msg;
+  elFormErr.hidden = false;
+  elFormErr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function showSuccess(data) {
+  elMain.style.display    = 'none';
+  elSuccess.style.display = 'block';
+
+  elSuccessTitle.textContent = 'Welcome to Bayside!';
+  elSuccessMsg.textContent = data.acuity_url
+    ? `Your account is set up and we sent your sign-in details to ${elEmail.value}. Click below to schedule your free design appointment.`
+    : `Your account is set up — we sent your sign-in details to ${elEmail.value}. Reach out to your designer when you're ready to schedule.`;
+
+  if (data.acuity_url) {
+    elSuccessCta.href = data.acuity_url;
+    elSuccessCta.textContent = 'Schedule your design appointment →';
+    setTimeout(() => { window.location.href = data.acuity_url; }, 3000);
+  } else {
+    elSuccessCta.href = '/account/signin.html';
+    elSuccessCta.textContent = 'Sign in to your new account →';
+  }
+}
+</script>
+</body>
+</html>
