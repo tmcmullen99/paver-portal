@@ -1,491 +1,402 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>My Clients · Bayside Proposal Builder</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  /* ═════════════════════════════════════════════════════════════════════
-     SPRINT 1.5B — Designer Clients Workspace
-     Designer-app replacement for the /admin/ client tools that were
-     walled off in Sprint 1. Every query on this page runs through the
-     browser Supabase client under RLS, which (after the 1.5B migration)
-     scopes designers to clients they created or clients linked to their
-     own proposals. Masters see all clients here — same page, same code,
-     the scope difference lives entirely in the database.
-     ═════════════════════════════════════════════════════════════════════ */
-  :root {
-    --bp-green: #5d7e69; --bp-green-dark: #4a6654; --bp-green-soft: #e8eee9;
-    --bp-charcoal: #353535; --bp-cream: #faf8f3; --bp-cream-shade: #f1eee6;
-    --bp-navy: #1a1f2e; --rule: #e5e5e5;
-    --text: #23282f; --text-muted: #666; --text-faint: #9aa0a6;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bp-cream); color: var(--text); min-height: 100vh;
-  }
-  a { color: var(--bp-green-dark); }
+/**
+ * BPB — /api/send-chat-message  (SPRINT 1.5B security rewrite)
+ *
+ * Staff chat-send with auto-email fallback.
+ *
+ * SECURITY (what changed in 1.5B):
+ *   • The old version trusted sender_user_id and sender_role from the
+ *     request body and required NO authentication — anyone could post a
+ *     message into any client thread as "master". Now:
+ *   • The Cloudflare middleware admits only active master/designer JWTs.
+ *   • This endpoint derives the sender's identity ENTIRELY from the
+ *     validated JWT — sender_user_id and sender_role in the body are
+ *     ignored.
+ *   • Designers may only message clients they own: clients they created,
+ *     or clients linked (via client_proposals) to a proposal they own.
+ *     Masters may message any client.
+ *
+ * Behavior
+ *   1. ALWAYS inserts a row into client_messages.
+ *   2. If clients.account_setup_at IS NULL (the client has never signed in),
+ *      ALSO fires a Resend email with the message body + a magic-link CTA.
+ *
+ * Body (JSON)
+ *   {
+ *     client_id: uuid  (required) — target client
+ *     body:      text  (required, max 5000 chars)
+ *   }
+ *
+ * Env vars (Cloudflare Pages)
+ *   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, RESEND_FROM_EMAIL
+ *
+ * Response
+ *   { ok, message_id, email_sent, client_has_account, fallback_path }
+ */
 
-  .topbar {
-    display: flex; align-items: center; justify-content: space-between;
-    background: #fff; border-bottom: 1px solid var(--rule);
-    padding: 0 20px; height: 60px; position: sticky; top: 0; z-index: 50;
-  }
-  .topbar-left { display: flex; align-items: center; gap: 14px; }
-  .back-link {
-    text-decoration: none; font-size: 13px; font-weight: 600;
-    color: var(--text-muted); padding: 6px 10px; border-radius: 6px;
-  }
-  .back-link:hover { background: var(--bp-cream-shade); color: var(--text); }
-  .page-title { font-size: 16px; font-weight: 700; }
-  .page-sub {
-    font-family: 'JetBrains Mono', monospace; font-size: 9px;
-    letter-spacing: 0.18em; text-transform: uppercase; color: var(--bp-green);
-    display: block; margin-top: 1px;
-  }
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+// SPRINT 2B: brand identity comes from company_settings (single row) so
+// white-labeling never requires touching this function again. These are
+// last-resort fallbacks only.
+const FALLBACK_PORTAL_BASE = 'https://portal-baysidepavers.com';
+const FALLBACK_REPLY_TO = 'tim@mcmullen.properties';
 
-  .layout {
-    display: grid; grid-template-columns: 300px 1fr;
-    min-height: calc(100vh - 60px);
-  }
-
-  /* ── Client list (left) ── */
-  .clist {
-    background: #fff; border-right: 1px solid var(--rule);
-    display: flex; flex-direction: column;
-    position: sticky; top: 60px; height: calc(100vh - 60px); overflow: hidden;
-  }
-  .clist-search { padding: 14px 14px 10px; border-bottom: 1px solid var(--rule); }
-  .clist-search input {
-    width: 100%; padding: 9px 12px; border: 1px solid var(--rule);
-    border-radius: 8px; font: inherit; font-size: 13px; background: var(--bp-cream);
-  }
-  .clist-search input:focus { outline: 2px solid var(--bp-green-soft); border-color: var(--bp-green); }
-  .clist-items { overflow-y: auto; flex: 1; }
-  .clist-item {
-    width: 100%; text-align: left; background: transparent; border: 0;
-    border-bottom: 1px solid var(--bp-cream-shade); border-left: 3px solid transparent;
-    padding: 12px 14px; cursor: pointer; font: inherit; display: block;
-  }
-  .clist-item:hover { background: var(--bp-cream); }
-  .clist-item.active { background: var(--bp-green-soft); border-left-color: var(--bp-green); }
-  .clist-name { font-size: 13.5px; font-weight: 600; color: var(--text); }
-  .clist-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .clist-empty { padding: 30px 18px; font-size: 13px; color: var(--text-muted); line-height: 1.5; }
-
-  /* ── Detail (right) ── */
-  .detail { padding: 22px 26px 60px; max-width: 980px; }
-  .detail-empty { padding: 60px 30px; color: var(--text-muted); font-size: 14px; }
-  .d-header { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 4px; }
-  .d-name { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
-  .d-contact { font-size: 13px; color: var(--text-muted); margin: 4px 0 18px; line-height: 1.6; }
-  .d-contact a { text-decoration: none; }
-
-  .d-section { background: #fff; border: 1px solid var(--rule); border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; }
-  .d-section-title {
-    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
-    letter-spacing: 0.16em; text-transform: uppercase; color: var(--bp-green);
-    margin-bottom: 12px;
-  }
-  .d-empty-line { font-size: 13px; color: var(--text-faint); }
-
-  /* proposals */
-  .prop-row {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 10px 0; border-bottom: 1px solid var(--bp-cream-shade);
-  }
-  .prop-row:last-child { border-bottom: 0; }
-  .prop-label { font-size: 13.5px; font-weight: 600; }
-  .prop-meta { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
-  .prop-actions { display: flex; gap: 8px; flex-shrink: 0; }
-  .mini-btn {
-    font: inherit; font-size: 12px; font-weight: 600; text-decoration: none;
-    padding: 6px 12px; border-radius: 999px; border: 1px solid var(--rule);
-    background: #fff; color: var(--text); cursor: pointer;
-  }
-  .mini-btn:hover { border-color: var(--bp-green); color: var(--bp-green-dark); background: var(--bp-green-soft); }
-  .status-pill {
-    font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.12em;
-    text-transform: uppercase; padding: 3px 8px; border-radius: 999px;
-    background: var(--bp-cream-shade); color: var(--text-muted);
-  }
-  .status-pill.pending { background: #fdf3e3; color: #a06a12; }
-  .status-pill.signed  { background: var(--bp-green-soft); color: var(--bp-green-dark); }
-
-  /* requests */
-  .req-card { border: 1px solid var(--bp-cream-shade); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
-  .req-card:last-child { margin-bottom: 0; }
-  .req-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
-  .req-kind { font-size: 12.5px; font-weight: 700; }
-  .req-note { font-size: 13px; color: var(--text); line-height: 1.5; background: var(--bp-cream); border-radius: 8px; padding: 9px 12px; margin: 6px 0 8px; }
-  .req-when { font-size: 11.5px; color: var(--text-faint); }
-  .req-respond { display: none; margin-top: 8px; }
-  .req-respond.open { display: block; }
-  .req-respond textarea {
-    width: 100%; min-height: 68px; font: inherit; font-size: 13px;
-    border: 1px solid var(--rule); border-radius: 8px; padding: 9px 12px; resize: vertical;
-  }
-  .req-respond .mini-btn { margin-top: 8px; }
-  .req-response-done { font-size: 12.5px; color: var(--bp-green-dark); background: var(--bp-green-soft); border-radius: 8px; padding: 8px 12px; margin-top: 6px; line-height: 1.45; }
-
-  /* chat */
-  .chat-thread { max-height: 420px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 2px 10px; }
-  .msg { max-width: 78%; padding: 9px 13px; border-radius: 12px; font-size: 13.5px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
-  .msg.staff { align-self: flex-end; background: var(--bp-green); color: #fff; border-bottom-right-radius: 4px; }
-  .msg.homeowner { align-self: flex-start; background: var(--bp-cream-shade); color: var(--text); border-bottom-left-radius: 4px; }
-  .msg-when { font-size: 10px; opacity: 0.75; margin-top: 4px; }
-  .chat-compose { display: flex; gap: 10px; margin-top: 12px; }
-  .chat-compose textarea {
-    flex: 1; min-height: 46px; max-height: 140px; font: inherit; font-size: 13.5px;
-    border: 1px solid var(--rule); border-radius: 10px; padding: 11px 13px; resize: vertical;
-  }
-  .chat-compose textarea:focus { outline: 2px solid var(--bp-green-soft); border-color: var(--bp-green); }
-  .send-btn {
-    background: var(--bp-green); color: #fff; border: 0; border-radius: 10px;
-    padding: 0 20px; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer;
-    align-self: stretch;
-  }
-  .send-btn:hover { background: var(--bp-green-dark); }
-  .send-btn:disabled { opacity: 0.6; cursor: wait; }
-  .chat-hint { font-size: 11.5px; color: var(--text-faint); margin-top: 8px; line-height: 1.5; }
-
-  .banner-err {
-    background: #fbeaea; border: 1px solid #e6b8b8; color: #8a2b2b;
-    border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px;
-  }
-  .hidden { display: none !important; }
-
-  @media (max-width: 860px) {
-    .layout { grid-template-columns: 1fr; }
-    .clist { position: static; height: auto; max-height: 40vh; border-right: 0; border-bottom: 1px solid var(--rule); }
-  }
-</style>
-</head>
-<body>
-
-<header class="topbar">
-  <div class="topbar-left">
-    <a href="/dashboard" class="back-link">← Pipeline</a>
-    <div>
-      <div class="page-title">My Clients</div>
-      <span class="page-sub">clients · requests · messages</span>
-    </div>
-  </div>
-</header>
-
-<div class="layout">
-  <aside class="clist">
-    <div class="clist-search">
-      <input type="search" id="clSearch" placeholder="Search name, email, address…" autocomplete="off">
-    </div>
-    <div class="clist-items" id="clItems">
-      <div class="clist-empty">Loading clients…</div>
-    </div>
-  </aside>
-
-  <main class="detail" id="detail">
-    <div class="detail-empty" id="detailEmpty">Select a client to see their proposals, requests, and messages.</div>
-
-    <div id="detailBody" class="hidden">
-      <div id="detailBanner"></div>
-      <div class="d-header"><div class="d-name" id="dName">…</div></div>
-      <div class="d-contact" id="dContact"></div>
-
-      <section class="d-section">
-        <div class="d-section-title">Proposals</div>
-        <div id="dProposals"><div class="d-empty-line">Loading…</div></div>
-      </section>
-
-      <section class="d-section">
-        <div class="d-section-title">Requests — substitutions &amp; redesigns</div>
-        <div id="dRequests"><div class="d-empty-line">Loading…</div></div>
-      </section>
-
-      <section class="d-section">
-        <div class="d-section-title">Messages</div>
-        <div class="chat-thread" id="dThread"><div class="d-empty-line">Loading…</div></div>
-        <div class="chat-compose">
-          <textarea id="chatInput" placeholder="Write a message…"></textarea>
-          <button class="send-btn" id="chatSend">Send</button>
-        </div>
-        <div class="chat-hint">If this client hasn't activated their portal account yet, your message is also emailed to them automatically with a sign-in link.</div>
-      </section>
-    </div>
-  </main>
-</div>
-
-<script type="module">
-// auth-util import: gives helpers AND installs the transparent bearer-token
-// fetch wrapper (Sprint 1.5A) that /api/send-chat-message requires.
-import { supabase } from '/js/supabase-client.js';
-import { getCurrentUser, getProfile } from '/js/auth-util.js';
-
-const $ = (id) => document.getElementById(id);
-const esc = (s) => (s == null ? '' : String(s))
-  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-  .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const fmtWhen = (ts) => ts ? new Date(ts).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
-const fmtUSD = (n) => n == null ? '' : '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
-
-let profile = null;
-let clients = [];
-let activeClientId = null;
-let chatPollTimer = null;
-
-// ── Boot: designer OR master may use this page (designer app, single scope
-//    per user via RLS — the page code has no role branches for data).
-(async function boot() {
-  const user = await getCurrentUser();
-  if (!user) { window.location.replace('/login.html?redirect=%2Fclients.html'); return; }
-  profile = await getProfile(user);
-  if (!profile || profile.is_active === false || !['master','designer'].includes(profile.role)) {
-    window.location.replace('/'); return;
-  }
-  await loadClients();
-})();
-
-async function loadClients() {
-  // RLS decides visibility: designers get their own clients, master gets all.
-  const { data, error } = await supabase
-    .from('clients')
-    .select('id, name, email, phone, address, created_at')
-    .is('deleted_at', null)
-    .order('created_at', { ascending: false });
-
-  const box = $('clItems');
-  if (error) {
-    box.innerHTML = '<div class="clist-empty">Could not load clients: ' + esc(error.message) + '</div>';
-    return;
-  }
-  clients = data || [];
-  renderClientList();
-}
-
-function renderClientList() {
-  const q = ($('clSearch').value || '').trim().toLowerCase();
-  const filtered = q
-    ? clients.filter(c => [c.name, c.email, c.address].some(v => (v || '').toLowerCase().includes(q)))
-    : clients;
-
-  const box = $('clItems');
-  if (!filtered.length) {
-    box.innerHTML = '<div class="clist-empty">' + (q
-      ? 'No clients match “' + esc(q) + '”.'
-      : 'No clients yet. Create one from <strong>+ New proposal</strong> on your Pipeline.') + '</div>';
-    return;
-  }
-  box.innerHTML = filtered.map(c => `
-    <button class="clist-item${c.id === activeClientId ? ' active' : ''}" data-id="${esc(c.id)}">
-      <div class="clist-name">${esc(c.name || '(unnamed)')}</div>
-      <div class="clist-meta">${esc(c.email || '')}${c.address ? ' · ' + esc(c.address) : ''}</div>
-    </button>
-  `).join('');
-  box.querySelectorAll('.clist-item').forEach(el =>
-    el.addEventListener('click', () => selectClient(el.dataset.id)));
-}
-
-$('clSearch').addEventListener('input', renderClientList);
-
-async function selectClient(id) {
-  activeClientId = id;
-  renderClientList();
-  const c = clients.find(x => x.id === id);
-  if (!c) return;
-
-  $('detailEmpty').classList.add('hidden');
-  $('detailBody').classList.remove('hidden');
-  $('detailBanner').innerHTML = '';
-  $('dName').textContent = c.name || '(unnamed)';
-  $('dContact').innerHTML = [
-    c.email ? `<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>` : null,
-    c.phone ? esc(c.phone) : null,
-    c.address ? esc(c.address) : null,
-  ].filter(Boolean).join(' &nbsp;·&nbsp; ');
-
-  $('dProposals').innerHTML = '<div class="d-empty-line">Loading…</div>';
-  $('dRequests').innerHTML = '<div class="d-empty-line">Loading…</div>';
-  $('dThread').innerHTML = '<div class="d-empty-line">Loading…</div>';
-
-  await Promise.all([loadProposals(id), loadRequests(id), loadThread(id, true)]);
-
-  if (chatPollTimer) clearInterval(chatPollTimer);
-  chatPollTimer = setInterval(() => { if (activeClientId === id) loadThread(id, false); }, 20000);
-}
-
-// ── Proposals ──────────────────────────────────────────────────────────────
-async function loadProposals(clientId) {
-  const { data, error } = await supabase
-    .from('client_proposals')
-    .select('proposal_id, status, sent_at, signed_at, proposals ( id, project_label, project_address, project_city, status, bid_total_amount, canonical_slug )')
-    .eq('client_id', clientId)
-    .order('created_at', { ascending: false });
-
-  const box = $('dProposals');
-  if (error) { box.innerHTML = '<div class="d-empty-line">Could not load proposals: ' + esc(error.message) + '</div>'; return; }
-
-  const rows = (data || []).filter(r => r.proposals);
-  if (!rows.length) { box.innerHTML = '<div class="d-empty-line">No proposals linked to this client yet.</div>'; return; }
-
-  box.innerHTML = rows.map(r => {
-    const p = r.proposals;
-    const label = p.project_label || p.project_address || 'Proposal';
-    const meta = [p.project_city, p.bid_total_amount ? fmtUSD(p.bid_total_amount) : null].filter(Boolean).join(' · ');
-    const st = (p.status || r.status || 'draft');
-    const stClass = st === 'signed' || st === 'completed' ? 'signed' : (st === 'draft' ? '' : 'pending');
-    const viewLink = p.canonical_slug ? `<a class="mini-btn" href="/p/${esc(p.canonical_slug)}" target="_blank" rel="noopener">View</a>` : '';
-    return `
-      <div class="prop-row">
-        <div>
-          <div class="prop-label">${esc(label)} <span class="status-pill ${stClass}">${esc(st)}</span></div>
-          ${meta ? `<div class="prop-meta">${esc(meta)}</div>` : ''}
-        </div>
-        <div class="prop-actions">
-          <a class="mini-btn" href="/editor?id=${esc(p.id)}">Edit</a>
-          ${viewLink}
-        </div>
-      </div>`;
-  }).join('');
-}
-
-// ── Requests (substitutions + redesigns) ──────────────────────────────────
-async function loadRequests(clientId) {
-  const [subs, redesigns] = await Promise.all([
-    supabase.from('proposal_substitutions')
-      .select('id, proposal_id, status, homeowner_note, designer_response, created_at')
-      .eq('client_id', clientId).order('created_at', { ascending: false }),
-    supabase.from('proposal_redesign_requests')
-      .select('id, proposal_id, status, homeowner_note, designer_response, photo_url, created_at')
-      .eq('client_id', clientId).order('created_at', { ascending: false }),
-  ]);
-
-  const box = $('dRequests');
-  const errs = [subs.error, redesigns.error].filter(Boolean);
-  if (errs.length) { box.innerHTML = '<div class="d-empty-line">Could not load requests: ' + esc(errs[0].message) + '</div>'; return; }
-
-  const items = [
-    ...(subs.data || []).map(r => ({ ...r, kind: 'Substitution', table: 'proposal_substitutions' })),
-    ...(redesigns.data || []).map(r => ({ ...r, kind: 'Redesign', table: 'proposal_redesign_requests' })),
-  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-  if (!items.length) { box.innerHTML = '<div class="d-empty-line">No substitution or redesign requests from this client.</div>'; return; }
-
-  box.innerHTML = items.map(r => {
-    const pending = !r.designer_response && (r.status || 'pending') !== 'responded';
-    return `
-      <div class="req-card" data-table="${esc(r.table)}" data-id="${esc(r.id)}">
-        <div class="req-top">
-          <span class="req-kind">${esc(r.kind)} <span class="status-pill ${pending ? 'pending' : ''}">${esc(r.status || 'pending')}</span></span>
-          <span class="req-when">${esc(fmtWhen(r.created_at))}</span>
-        </div>
-        ${r.homeowner_note ? `<div class="req-note">${esc(r.homeowner_note)}</div>` : ''}
-        ${r.photo_url ? `<div style="margin:4px 0 8px;"><a class="mini-btn" href="${esc(r.photo_url)}" target="_blank" rel="noopener">View attached markup</a></div>` : ''}
-        ${r.designer_response
-          ? `<div class="req-response-done"><strong>Your response:</strong> ${esc(r.designer_response)}</div>`
-          : `<button class="mini-btn req-open-btn" type="button">Respond</button>
-             <div class="req-respond">
-               <textarea placeholder="Write your response — the client sees this in their portal…"></textarea>
-               <button class="mini-btn req-send-btn" type="button">Save response</button>
-             </div>`}
-      </div>`;
-  }).join('');
-
-  box.querySelectorAll('.req-open-btn').forEach(btn =>
-    btn.addEventListener('click', () => btn.nextElementSibling.classList.toggle('open')));
-  box.querySelectorAll('.req-send-btn').forEach(btn =>
-    btn.addEventListener('click', () => submitRequestResponse(btn)));
-}
-
-async function submitRequestResponse(btn) {
-  const card = btn.closest('.req-card');
-  const text = card.querySelector('textarea').value.trim();
-  if (!text) return;
-  btn.disabled = true; btn.textContent = 'Saving…';
-
-  const user = await getCurrentUser();
-  const { error } = await supabase
-    .from(card.dataset.table)
-    .update({
-      designer_response: text,
-      status: 'responded',
-      reviewed_by: user ? user.id : null,
-      reviewed_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', card.dataset.id);
-
-  if (error) {
-    btn.disabled = false; btn.textContent = 'Save response';
-    showBanner('Could not save response: ' + error.message);
-    return;
-  }
-  await loadRequests(activeClientId);
-}
-
-// ── Messages ───────────────────────────────────────────────────────────────
-async function loadThread(clientId, scroll) {
-  const { data, error } = await supabase
-    .from('client_messages')
-    .select('id, sender_role, body, created_at')
-    .eq('client_id', clientId)
-    .order('created_at', { ascending: true })
-    .limit(200);
-
-  const box = $('dThread');
-  if (error) { box.innerHTML = '<div class="d-empty-line">Could not load messages: ' + esc(error.message) + '</div>'; return; }
-  if (!data || !data.length) { box.innerHTML = '<div class="d-empty-line">No messages yet — start the conversation below.</div>'; return; }
-
-  box.innerHTML = data.map(m => {
-    const mine = m.sender_role === 'designer' || m.sender_role === 'master';
-    return `<div class="msg ${mine ? 'staff' : 'homeowner'}">${esc(m.body)}<div class="msg-when">${esc(fmtWhen(m.created_at))}</div></div>`;
-  }).join('');
-  if (scroll) box.scrollTop = box.scrollHeight;
-}
-
-$('chatSend').addEventListener('click', sendMessage);
-$('chatInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) sendMessage();
-});
-
-async function sendMessage() {
-  const input = $('chatInput');
-  const text = input.value.trim();
-  if (!text || !activeClientId) return;
-
-  const btn = $('chatSend');
-  btn.disabled = true; btn.textContent = 'Sending…';
+async function loadCompanySettings(env) {
   try {
-    // The auth-util fetch wrapper attaches the bearer token automatically;
-    // the server derives sender identity from the JWT and (for designers)
-    // verifies this client is theirs.
-    const resp = await fetch('/api/send-chat-message', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ client_id: activeClientId, body: text }),
-    });
-    const out = await resp.json().catch(() => ({}));
-    if (!resp.ok || !out.ok) throw new Error(out.error || ('HTTP ' + resp.status));
-    input.value = '';
-    await loadThread(activeClientId, true);
-    if (out.fallback_path === 'email') {
-      showBanner(out.email_sent
-        ? 'Client hasn’t activated their portal yet — your message was also emailed to them with a sign-in link.'
-        : 'Saved in the portal, but the fallback email could not be sent.', !out.email_sent);
+    const resp = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/company_settings?id=eq.1&select=company_name,portal_base_url,reply_to_email,from_email_name&limit=1`,
+      { headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` } }
+    );
+    if (resp.ok) {
+      const rows = await resp.json();
+      if (rows && rows[0]) return rows[0];
     }
   } catch (e) {
-    showBanner('Could not send: ' + (e.message || e));
-  } finally {
-    btn.disabled = false; btn.textContent = 'Send';
+    console.error('company_settings load failed (using fallbacks):', e);
   }
+  return {};
 }
 
-function showBanner(msg, isError = true) {
-  $('detailBanner').innerHTML = `<div class="banner-err" style="${isError ? '' : 'background:#eef4ee;border-color:#bcd6bf;color:#2f5c38;'}">${esc(msg)}</div>`;
-  setTimeout(() => { $('detailBanner').innerHTML = ''; }, 6000);
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function jsonResponse(body, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+  });
 }
-</script>
-</body>
-</html>
+
+function clamp(s, max) {
+  return String(s == null ? '' : s).trim().slice(0, max);
+}
+
+function esc(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+export async function onRequestOptions() {
+  return new Response(null, { status: 204, headers: CORS_HEADERS });
+}
+
+export async function onRequestPost({ request, env }) {
+  let body;
+  try {
+    body = await request.json();
+  } catch (e) {
+    return jsonResponse({ error: 'Invalid JSON' }, 400);
+  }
+
+  const client_id   = clamp(body.client_id, 36);
+  const messageBody = clamp(body.body, 5000);
+
+  if (!UUID_RE.test(client_id)) return jsonResponse({ error: 'client_id is required and must be a UUID' }, 400);
+  if (!messageBody)             return jsonResponse({ error: 'body is required' }, 400);
+
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('send-chat-message: SUPABASE config missing');
+    return jsonResponse({ error: 'Server misconfigured' }, 500);
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // 0. Identify the sender from the validated JWT. The middleware has
+  //    already confirmed this is an active master or designer; here we
+  //    resolve WHO they are and enforce client ownership for designers.
+  //    sender_user_id / sender_role from the request body are IGNORED.
+  // ──────────────────────────────────────────────────────────────────
+  const sender = await resolveSender(request, env);
+  if (!sender.ok) return jsonResponse({ error: sender.error }, sender.status);
+  const sender_user_id = sender.userId;
+  const sender_role    = sender.role;            // 'master' | 'designer'
+
+  if (sender_role === 'designer') {
+    const owns = await designerOwnsClient(env, sender_user_id, client_id);
+    if (!owns) {
+      return jsonResponse({ error: 'Forbidden — this client is not assigned to you' }, 403);
+    }
+  }
+
+  const settings = await loadCompanySettings(env);
+
+  const sbHeaders = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+    apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+    Prefer: 'return=representation',
+  };
+
+  // ──────────────────────────────────────────────────────────────────
+  // 1. Look up the client (need name, email, account_setup_at, user_id)
+  // ──────────────────────────────────────────────────────────────────
+  const clientResp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/clients?id=eq.${encodeURIComponent(client_id)}&deleted_at=is.null&select=id,name,email,account_setup_at,user_id`,
+    { headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` } }
+  );
+  if (!clientResp.ok) {
+    const errText = await clientResp.text();
+    console.error('Client lookup failed:', clientResp.status, errText);
+    return jsonResponse({ error: 'Could not look up client' }, 500);
+  }
+  const clientRows = await clientResp.json();
+  if (!clientRows || !clientRows[0]) {
+    return jsonResponse({ error: 'Client not found' }, 404);
+  }
+  const client = clientRows[0];
+
+  // ──────────────────────────────────────────────────────────────────
+  // 2. Insert the chat message (service role bypasses RLS)
+  // ──────────────────────────────────────────────────────────────────
+  const msgResp = await fetch(`${env.SUPABASE_URL}/rest/v1/client_messages`, {
+    method: 'POST',
+    headers: sbHeaders,
+    body: JSON.stringify({
+      client_id,
+      sender_user_id,
+      sender_role,
+      body: messageBody,
+    }),
+  });
+
+  if (!msgResp.ok) {
+    const errText = await msgResp.text();
+    console.error('client_messages insert failed:', msgResp.status, errText);
+    return jsonResponse({ error: 'Could not save message', detail: errText }, 500);
+  }
+
+  const inserted = await msgResp.json();
+  const message_id = (inserted && inserted[0] && inserted[0].id) || null;
+
+  // ──────────────────────────────────────────────────────────────────
+  // 3. Email fallback for clients who haven't activated their account
+  // ──────────────────────────────────────────────────────────────────
+  let email_sent = false;
+  let fallback_path = 'none';
+
+  if (!client.account_setup_at) {
+    fallback_path = 'email';
+    if (env.RESEND_API_KEY && env.RESEND_FROM_EMAIL) {
+      try {
+        const magicLink = await generateMagicLink(env, client, settings);
+        if (magicLink) {
+          email_sent = await sendChatMessageEmail(env, client, messageBody, magicLink, sender, settings);
+        }
+      } catch (e) {
+        console.error('Chat email fallback failed (non-fatal):', e);
+      }
+    } else {
+      console.log('send-chat-message: Resend not fully configured, email skipped.');
+    }
+  }
+
+  return jsonResponse({
+    ok: true,
+    message_id,
+    email_sent,
+    client_has_account: !!client.account_setup_at,
+    fallback_path,
+  });
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// SPRINT 1.5B — sender resolution + designer ownership enforcement
+// ──────────────────────────────────────────────────────────────────────────
+
+/**
+ * Resolves the caller's identity from the Bearer token. The middleware
+ * already validated the token maps to an active staff profile; this
+ * re-resolves so the endpoint never trusts client-supplied identity.
+ * Returns { ok, userId, role, displayName, email } or { ok:false, ... }.
+ */
+async function resolveSender(request, env) {
+  const authHeader = request.headers.get('Authorization') || '';
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+  if (!token) return { ok: false, status: 401, error: 'Unauthorized — missing bearer token' };
+
+  const userResp = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+    headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${token}` },
+  });
+  if (!userResp.ok) return { ok: false, status: 401, error: 'Unauthorized — invalid session' };
+  const user = await userResp.json();
+  if (!user || !user.id) return { ok: false, status: 401, error: 'Unauthorized — invalid session' };
+
+  const profResp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=role,is_active,display_name,email&limit=1`,
+    { headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` } }
+  );
+  if (!profResp.ok) return { ok: false, status: 500, error: 'Profile lookup failed' };
+  const rows = await profResp.json();
+  const profile = Array.isArray(rows) ? rows[0] : null;
+  if (!profile || profile.is_active === false || !['master', 'designer'].includes(profile.role)) {
+    return { ok: false, status: 403, error: 'Forbidden — staff access required' };
+  }
+
+  return {
+    ok: true,
+    userId: user.id,
+    role: profile.role,
+    displayName: profile.display_name || null,
+    email: profile.email || user.email || null,
+  };
+}
+
+/**
+ * A designer owns a client when they created the client OR the client is
+ * linked (via client_proposals) to a proposal the designer owns.
+ */
+async function designerOwnsClient(env, designerId, clientId) {
+  const headers = {
+    apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+    Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+  };
+
+  const createdResp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/clients?id=eq.${encodeURIComponent(clientId)}&created_by=eq.${encodeURIComponent(designerId)}&select=id&limit=1`,
+    { headers }
+  );
+  if (createdResp.ok) {
+    const rows = await createdResp.json();
+    if (rows && rows[0]) return true;
+  }
+
+  const linkResp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/client_proposals?client_id=eq.${encodeURIComponent(clientId)}&select=proposal_id,proposals!inner(owner_user_id)&proposals.owner_user_id=eq.${encodeURIComponent(designerId)}&limit=1`,
+    { headers }
+  );
+  if (linkResp.ok) {
+    const rows = await linkResp.json();
+    if (rows && rows[0]) return true;
+  }
+
+  return false;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Magic-link generation
+//
+// If the client has a Supabase user_id, use type=magiclink. Otherwise use
+// type=invite to create the user. If 'invite' is rejected because the user
+// already exists in auth.users, recurse once with the user_id forced.
+// ──────────────────────────────────────────────────────────────────────────
+
+async function generateMagicLink(env, client, settings = {}) {
+  const portalBase = settings.portal_base_url || FALLBACK_PORTAL_BASE;
+  const redirectTo = `${portalBase}/client/dashboard.html`;
+  const linkType = client.user_id ? 'magiclink' : 'invite';
+
+  const resp = await fetch(`${env.SUPABASE_URL}/auth/v1/admin/generate_link`, {
+    method: 'POST',
+    headers: {
+      apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      type: linkType,
+      email: client.email,
+      options: { redirectTo },
+    }),
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    if (linkType === 'invite' && /already|exists|registered/i.test(errText)) {
+      return generateMagicLink(env, { ...client, user_id: 'forced' }, settings);
+    }
+    console.error(`generate_link (${linkType}) failed:`, resp.status, errText);
+    return null;
+  }
+
+  const data = await resp.json();
+  return (data && data.properties && data.properties.action_link) || data.action_link || null;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Email composition — branded chat-message fallback
+// ──────────────────────────────────────────────────────────────────────────
+
+async function sendChatMessageEmail(env, client, messageBody, magicLink, sender, settings = {}) {
+  const companyName = settings.company_name || 'Bayside Pavers';
+  const portalName  = settings.from_email_name || (companyName + ' Portal');
+  const firstName = ((client.name || '').trim().split(/\s+/)[0]) || 'there';
+  // SPRINT 1.5B: personalize by actual sender (designer or master) instead
+  // of the hardcoded "Tim". Falls back gracefully.
+  const senderName = (sender && sender.displayName) || 'your designer';
+  const senderFirst = String(senderName).trim().split(/\s+/)[0] || 'Your designer';
+  const replyTo = (sender && sender.email) || settings.reply_to_email || FALLBACK_REPLY_TO;
+  const subject = `💬 New message from ${senderFirst} · ${companyName}`;
+
+  // Render the message body with line breaks preserved as <br>.
+  const messageHtml = esc(messageBody).replace(/\r?\n/g, '<br>');
+
+  const text = [
+    `Hi ${firstName},`,
+    ``,
+    `${senderFirst} from ${companyName} just sent you a message:`,
+    ``,
+    `  ${messageBody.split('\n').join('\n  ')}`,
+    ``,
+    `To reply and see your full proposal, sign in to your ${portalName} account:`,
+    `${magicLink}`,
+    ``,
+    `Or just reply to this email — your reply goes straight to ${senderFirst}.`,
+    ``,
+    `— ${portalName}`,
+  ].join('\n');
+
+  const html = `
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Inter','Onest',sans-serif;max-width:620px;margin:0 auto;padding:24px;color:#0e1218;background:#fff;">
+  <div style="border-bottom:3px solid #5d7e69;padding-bottom:14px;margin-bottom:22px;">
+    <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#5d7e69;font-weight:700;margin-bottom:6px;">NEW MESSAGE · ${esc(portalName.toUpperCase())}</div>
+    <h1 style="font-size:22px;margin:0;color:#0e1218;line-height:1.3;font-weight:600;">Hi ${esc(firstName)} — ${esc(senderFirst)} sent you a note.</h1>
+  </div>
+
+  <div style="background:#faf8f3;border-left:3px solid #5d7e69;padding:16px 18px;margin-bottom:24px;border-radius:4px;">
+    <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5d7e69;font-weight:700;margin-bottom:8px;">FROM ${esc(senderFirst.toUpperCase())}</div>
+    <div style="font-size:15px;color:#0e1218;line-height:1.55;">${messageHtml}</div>
+  </div>
+
+  <div style="margin:24px 0 16px;text-align:center;">
+    <a href="${esc(magicLink)}" style="display:inline-block;background:#5d7e69;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:15px;">View &amp; reply in ${esc(portalName)} →</a>
+  </div>
+
+  <div style="background:#f7f8f5;border-radius:8px;padding:16px 18px;margin:24px 0;font-size:13px;color:#4a5450;line-height:1.55;">
+    The button above signs you in automatically — no password needed. Once you're in, you can see all proposal details, request material changes, or lock in the project when you're ready.
+    <br><br>
+    <strong style="color:#0e1218;">Don't want to log in?</strong> Just reply to this email. Your reply goes directly to ${esc(senderFirst)}.
+  </div>
+
+  <div style="border-top:1px solid #eee;padding-top:14px;color:#999;font-size:11px;line-height:1.5;text-align:center;">
+    ${esc(portalName)}
+  </div>
+</div>`.trim();
+
+  try {
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from:     env.RESEND_FROM_EMAIL,
+        to:       [client.email],
+        reply_to: replyTo,
+        subject,
+        text,
+        html,
+      }),
+    });
+    if (resp.ok) return true;
+    const errText = await resp.text();
+    console.error('Resend chat-message email failed:', resp.status, errText);
+    return false;
+  } catch (e) {
+    console.error('Resend exception (chat-message):', e);
+    return false;
+  }
+}
