@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sign in · Bayside Pavers Builder</title>
+  <title>Sign in</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -262,14 +262,14 @@
 <body>
   <div class="login-wrap">
     <div class="login-brand">
-      <img src="https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69a04f4369bc9cc20b8d2155_BaysidePavers_original%20(2)%20(1).png" alt="Bayside Pavers">
-      <div class="login-brand-tagline">Internal proposal builder</div>
+      <img data-brand="logo" src="https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69a04f4369bc9cc20b8d2155_BaysidePavers_original%20(2)%20(1).png" alt="">
+      <div class="login-brand-tagline" data-brand="product">Proposal Builder</div>
     </div>
 
     <div class="login-card">
       <div class="login-eyebrow" id="loginEyebrow">Welcome back</div>
       <h1 class="login-title" id="loginTitle">Sign in</h1>
-      <p class="login-lede" id="loginLede">Bayside team members only — your homeowner clients access proposals via direct link, no login needed.</p>
+      <p class="login-lede" id="loginLede">Team members only — your homeowner clients access proposals via their own portal link.</p>
 
       <!-- ─── State: signin (email/password) ───────────────────────── -->
       <form class="login-form" id="signinForm" novalidate>
@@ -347,6 +347,8 @@
 
   <script type="module">
     import { supabase } from '/js/supabase-client.js';
+    import { applyBranding } from '/js/branding.js';
+    applyBranding({ pageTitle: 'Sign in' });
 
     // ─── DOM refs ───────────────────────────────────────────────────
     const eyebrowEl   = document.getElementById('loginEyebrow');
@@ -379,7 +381,7 @@
         case 'signin':
           eyebrowEl.textContent = 'Welcome back';
           titleEl.textContent = 'Sign in';
-          ledeEl.textContent = 'Bayside team members only — your homeowner clients access proposals via direct link, no login needed.';
+          ledeEl.textContent = 'Team members only — your homeowner clients access proposals via their own portal link.';
           ledeEl.hidden = false;
           signinForm.hidden = false;
           break;
@@ -405,7 +407,7 @@
           break;
         case 'recovery':
           if (__isInvite) {
-            eyebrowEl.textContent = 'Welcome to Bayside';
+            eyebrowEl.textContent = 'Welcome to the team';
             titleEl.textContent = 'Set your password';
           } else {
             eyebrowEl.textContent = 'Set new password';
@@ -532,7 +534,7 @@
         clearLoading(magicLinkBtn);
         const msg = (err && err.message) || 'Could not send magic link.';
         if (/signups not allowed/i.test(msg) || /not found/i.test(msg)) {
-          showError("We couldn't find an account for that email. Ask Tim to invite you, or check the spelling.");
+          showError("We couldn't find an account for that email. Ask your administrator to invite you, or check the spelling.");
         } else {
           showError(msg);
         }
