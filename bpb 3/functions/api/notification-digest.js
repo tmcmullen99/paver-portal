@@ -284,7 +284,7 @@ function buildDigestHtml({ recipientName, lookbackHours, totalSessions, totalEve
 '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f7f7f4;padding:32px 20px;">' +
 '<tr><td align="center">' +
 '<table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width:600px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">' +
-'<tr><td style="background:#5d7e69;padding:24px 32px;">' +
+'<tr><td style="background:#9c7440;padding:24px 32px;">' +
 '<div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#dad7c5;font-weight:600;margin-bottom:4px;">Daily digest</div>' +
 '<h1 style="margin:0;color:#fff;font-size:20px;font-weight:600;letter-spacing:-0.01em;">' + totalEvents + ' event' + (totalEvents === 1 ? '' : 's') + ' across ' + proposals.length + ' proposal' + (proposals.length === 1 ? '' : 's') + '</h1>' +
 '</td></tr>' +

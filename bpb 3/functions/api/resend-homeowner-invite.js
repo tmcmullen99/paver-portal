@@ -190,7 +190,7 @@ export async function onRequestPost({ request, env }) {
     let emailError = null;
 
     if (RESEND_API_KEY) {
-      const designerName = (callerProfile.display_name || 'Your Bayside Pavers designer').trim();
+      const designerName = (callerProfile.display_name || 'Your designer').trim();
       const emailHtml = buildResendHtml({ name: client.name, designerName, magicLink });
       const emailText = buildResendText({ name: client.name, designerName, magicLink });
 
@@ -204,7 +204,7 @@ export async function onRequestPost({ request, env }) {
           body: JSON.stringify({
             from:    RESEND_FROM,
             to:      [email],
-            subject: 'Fresh link to your Bayside Pavers proposal portal',
+            subject: 'Fresh link to your Paver Portal proposal portal',
             html:    emailHtml,
             text:    emailText,
           }),
@@ -249,19 +249,19 @@ function buildResendHtml({ name, designerName, magicLink }) {
     '<body style="margin:0;padding:0;background:#f7f7f4;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#1f2125;">' +
     '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f7f7f4;padding:40px 20px;"><tr><td align="center">' +
     '<table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width:600px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">' +
-    '<tr><td style="padding:32px 40px 16px;text-align:center;"><img src="https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69a04f4369bc9cc20b8d2155_BaysidePavers_original%20(2)%20(1).png" alt="Bayside Pavers" style="height:36px;width:auto;"></td></tr>' +
+    '<tr><td style="padding:32px 40px 16px;text-align:center;"><img src="https://portal-baysidepavers.com/assets/paver-portal-logo.svg" alt="Paver Portal" style="height:36px;width:auto;"></td></tr>' +
     '<tr><td style="padding:8px 40px 24px;">' +
     '<p style="margin:0 0 18px;font-size:16px;line-height:1.6;">Hi ' + escapeHtml(name) + ',</p>' +
-    '<p style="margin:0 0 18px;font-size:15px;line-height:1.65;color:#58595b;">Here&#39;s a fresh link to your Bayside Pavers proposal portal — click below and you&#39;ll be signed in automatically.</p>' +
+    '<p style="margin:0 0 18px;font-size:15px;line-height:1.65;color:#58595b;">Here&#39;s a fresh link to your Paver Portal proposal portal — click below and you&#39;ll be signed in automatically.</p>' +
     '<div style="text-align:center;margin:24px 0 28px;">' +
-    '<a href="' + escapeHtml(magicLink) + '" style="display:inline-block;background:#5d7e69;color:#fff;text-decoration:none;padding:14px 32px;border-radius:4px;font-size:15px;font-weight:600;">Open My Proposal Portal &rarr;</a>' +
+    '<a href="' + escapeHtml(magicLink) + '" style="display:inline-block;background:#9c7440;color:#fff;text-decoration:none;padding:14px 32px;border-radius:4px;font-size:15px;font-weight:600;">Open My Proposal Portal &rarr;</a>' +
     '</div>' +
     '<p style="margin:0 0 0;font-size:12px;line-height:1.55;color:#a0a09c;font-style:italic;">This link is good for 7 days. Reply to this email if you need another.</p>' +
     '</td></tr>' +
     '<tr><td style="padding:24px 40px;background:#f7f7f4;border-top:1px solid #e4e4df;">' +
     '<p style="margin:0 0 4px;font-size:14px;">Talk soon,</p>' +
     '<p style="margin:0;font-size:14px;font-weight:600;">' + escapeHtml(designerName) + '</p>' +
-    '<p style="margin:0;font-size:13px;color:#70726f;">Bayside Pavers</p>' +
+    '<p style="margin:0;font-size:13px;color:#70726f;">Paver Portal</p>' +
     '</td></tr></table></td></tr></table></body></html>';
 }
 
@@ -269,7 +269,7 @@ function buildResendText({ name, designerName, magicLink }) {
   return [
     'Hi ' + name + ',',
     '',
-    'Here\'s a fresh link to your Bayside Pavers proposal portal — click below and',
+    'Here\'s a fresh link to your Paver Portal proposal portal — click below and',
     'you\'ll be signed in automatically.',
     '',
     magicLink,
@@ -278,7 +278,7 @@ function buildResendText({ name, designerName, magicLink }) {
     '',
     'Talk soon,',
     designerName,
-    'Bayside Pavers',
+    'Paver Portal',
   ].join('\n');
 }
 

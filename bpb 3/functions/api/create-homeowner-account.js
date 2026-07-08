@@ -214,7 +214,7 @@ export async function onRequestPost({ request, env }) {
     let welcomeEmailError = null;
 
     if (RESEND_API_KEY) {
-      const designerName = (callerProfile.display_name || 'Your Bayside Pavers designer').trim();
+      const designerName = (callerProfile.display_name || 'Your designer').trim();
       const emailHtml = buildWelcomeEmailHtml({
         name, designerName, magicLink,
       });
@@ -232,7 +232,7 @@ export async function onRequestPost({ request, env }) {
           body: JSON.stringify({
             from:    RESEND_FROM,
             to:      [email],
-            subject: 'Your Bayside Pavers proposal portal',
+            subject: 'Your Paver Portal proposal portal',
             html:    emailHtml,
             text:    emailText,
           }),
@@ -286,14 +286,14 @@ function buildWelcomeEmailHtml({ name, designerName, magicLink }) {
 '<html><head>' +
 '<meta charset="utf-8">' +
 '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-'<title>Your Bayside Pavers proposal portal</title>' +
+'<title>Your Paver Portal proposal portal</title>' +
 '</head>' +
 '<body style="margin:0;padding:0;background:#f7f7f4;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#1f2125;">' +
 '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f7f7f4;padding:40px 20px;">' +
 '<tr><td align="center">' +
 '<table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width:600px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">' +
 '<tr><td style="padding:32px 40px 16px;text-align:center;">' +
-'<img src="https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69a04f4369bc9cc20b8d2155_BaysidePavers_original%20(2)%20(1).png" alt="Bayside Pavers" style="height:36px;width:auto;">' +
+'<img src="https://portal-baysidepavers.com/assets/paver-portal-logo.svg" alt="Paver Portal" style="height:36px;width:auto;">' +
 '</td></tr>' +
 '<tr><td style="padding:8px 40px 24px;">' +
 '<p style="margin:0 0 18px;font-size:16px;line-height:1.6;color:#1f2125;">Hi ' + escapeHtml(name) + ',</p>' +
@@ -301,7 +301,7 @@ function buildWelcomeEmailHtml({ name, designerName, magicLink }) {
 '<p style="margin:0 0 18px;font-size:15px;line-height:1.65;color:#58595b;">I&#39;ve built you a dedicated client portal where you can review everything — the full scope of work, selected materials with manufacturer cut sheets, 3D renderings, and the complete price breakdown. You can come back to it anytime to check details, review updates, or just show your family.</p>' +
 '<p style="margin:0 0 24px;font-size:15px;line-height:1.65;color:#58595b;">Click below to open your portal — it&#39;ll log you in automatically.</p>' +
 '<div style="text-align:center;margin:24px 0 28px;">' +
-'<a href="' + escapeHtml(magicLink) + '" style="display:inline-block;background:#5d7e69;color:#fff;text-decoration:none;padding:14px 32px;border-radius:4px;font-size:15px;font-weight:600;">Open My Proposal Portal &rarr;</a>' +
+'<a href="' + escapeHtml(magicLink) + '" style="display:inline-block;background:#9c7440;color:#fff;text-decoration:none;padding:14px 32px;border-radius:4px;font-size:15px;font-weight:600;">Open My Proposal Portal &rarr;</a>' +
 '</div>' +
 '<div style="background:#f7f7f4;border-radius:6px;padding:18px 22px;margin:0 0 20px;">' +
 '<p style="margin:0 0 10px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#58595b;font-weight:600;">What&#39;s inside your portal</p>' +
@@ -317,12 +317,12 @@ function buildWelcomeEmailHtml({ name, designerName, magicLink }) {
 '<tr><td style="padding:24px 40px;background:#f7f7f4;border-top:1px solid #e4e4df;">' +
 '<p style="margin:0 0 4px;font-size:14px;color:#1f2125;">Looking forward to it,</p>' +
 '<p style="margin:0 0 4px;font-size:14px;font-weight:600;color:#1f2125;">' + escapeHtml(designerName) + '</p>' +
-'<p style="margin:0;font-size:13px;color:#70726f;">Bayside Pavers</p>' +
-'<p style="margin:8px 0 0;font-size:12px;color:#a0a09c;">415.691.9272 · Tim@BaysidePavers.com</p>' +
+'<p style="margin:0;font-size:13px;color:#70726f;">Paver Portal</p>' +
+'<p style="margin:8px 0 0;font-size:12px;color:#a0a09c;">tim@mcmullen.properties</p>' +
 '</td></tr>' +
 '<tr><td style="padding:14px 40px 18px;background:#f7f7f4;text-align:center;">' +
 '<p style="margin:0 0 4px;font-size:11px;color:#a0a09c;">Can&#39;t click the button? Copy and paste this link into your browser:</p>' +
-'<p style="margin:0;font-size:11px;color:#a0a09c;word-break:break-all;"><a href="' + escapeHtml(magicLink) + '" style="color:#5d7e69;text-decoration:underline;">' + escapeHtml(magicLink) + '</a></p>' +
+'<p style="margin:0;font-size:11px;color:#a0a09c;word-break:break-all;"><a href="' + escapeHtml(magicLink) + '" style="color:#9c7440;text-decoration:underline;">' + escapeHtml(magicLink) + '</a></p>' +
 '</td></tr>' +
 '</table>' +
 '</td></tr></table>' +
@@ -354,8 +354,8 @@ function buildWelcomeEmailText({ name, designerName, magicLink }) {
     '',
     'Looking forward to it,',
     designerName,
-    'Bayside Pavers',
-    '415.691.9272 · Tim@BaysidePavers.com',
+    'Paver Portal',
+    'tim@mcmullen.properties',
   ].join('\n');
 }
 

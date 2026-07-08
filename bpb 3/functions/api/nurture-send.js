@@ -165,7 +165,7 @@ export async function onRequestPost({ request, env }) {
       const vars = {
         client_first_name: extractFirstName(client.name) || 'there',
         proposal_address: client.address || '',
-        designer_name: cfg.default_designer_name || 'Bayside Pavers',
+        designer_name: cfg.default_designer_name || 'Paver Portal',
       };
       const renderedSubject = substituteMergeFields(template.subject || '', vars);
       const renderedBodyMd = substituteMergeFields(template.body_md || '', vars);
@@ -203,7 +203,7 @@ export async function onRequestPost({ request, env }) {
       }
 
       // ─── Send via Resend ─────────────────────────────────────────
-      const fromAddr = (cfg.from_name || 'Bayside Pavers') + ' <' + cfg.from_email + '>';
+      const fromAddr = (cfg.from_name || 'Paver Portal') + ' <' + cfg.from_email + '>';
       const resendResp = await fetch(RESEND_URL, {
         method: 'POST',
         headers: {
@@ -310,7 +310,7 @@ async function markRowFailed(sb, rowId, errorMsg) {
 
 // ─── Email shell ─────────────────────────────────────────────────────
 function buildEmailHtml({ bodyMdRendered, unsubUrl, cfg, testBanner }) {
-  const businessName = escapeHtml(cfg.business_name || 'Bayside Pavers');
+  const businessName = escapeHtml(cfg.business_name || 'Paver Portal');
   const businessAddress = escapeHtml(cfg.business_address || '');
   const businessPhone = escapeHtml(cfg.business_phone || '');
   const unsubSafe = escapeHtml(unsubUrl);
@@ -330,7 +330,7 @@ function buildEmailHtml({ bodyMdRendered, unsubUrl, cfg, testBanner }) {
 '<tr><td align="center">' +
 '<table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width:600px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,0.06);">' +
 testBannerHtml +
-'<tr><td style="background:#5d7e69;padding:22px 32px;text-align:left;">' +
+'<tr><td style="background:#9c7440;padding:22px 32px;text-align:left;">' +
 '<div style="font-family:Georgia,serif;font-size:22px;font-weight:600;color:#fff;letter-spacing:-0.01em;">' + businessName + '</div>' +
 '</td></tr>' +
 '<tr><td style="padding:28px 32px 12px;font-size:15px;line-height:1.6;color:#353535;">' +
@@ -354,7 +354,7 @@ function buildEmailText({ bodyMdRendered, unsubUrl, cfg }) {
   lines.push(bodyMdRendered.trim());
   lines.push('');
   lines.push('---');
-  lines.push((cfg.business_name || 'Bayside Pavers')
+  lines.push((cfg.business_name || 'Paver Portal')
     + (cfg.business_address ? ' · ' + cfg.business_address : '')
     + (cfg.business_phone ? ' · ' + cfg.business_phone : ''));
   lines.push('Unsubscribe: ' + unsubUrl);
@@ -398,7 +398,7 @@ function renderInline(text) {
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, t, u) =>
-      '<a href="' + escapeAttr(u) + '" style="color:#5d7e69;">' + t + '</a>');
+      '<a href="' + escapeAttr(u) + '" style="color:#9c7440;">' + t + '</a>');
 }
 
 function escapeHtml(s) {

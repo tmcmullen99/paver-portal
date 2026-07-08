@@ -267,7 +267,7 @@ async function sendOne({ item, callerUser, callerProfile, isMaster, replyTo, for
 
   // Render email
   const proposalAddress = proposal.address || proposal.project_address || 'your proposal';
-  const designerName = (callerProfile.display_name || 'your Bayside designer').trim();
+  const designerName = (callerProfile.display_name || 'your designer').trim();
   const proposalUrl = await resolveProposalUrl(sb, proposalId, request);
 
   const html = buildHtml({
@@ -408,7 +408,7 @@ function buildHtml({ bodyText, designerName, proposalAddress, proposalUrl }) {
 
   const cta = proposalUrl
     ? '<div style="text-align:center;margin:24px 0 28px;">' +
-      '<a href="' + escapeHtml(proposalUrl) + '" style="display:inline-block;background:#5d7e69;color:#fff;text-decoration:none;padding:13px 28px;border-radius:4px;font-size:14px;font-weight:600;">View your proposal &rarr;</a>' +
+      '<a href="' + escapeHtml(proposalUrl) + '" style="display:inline-block;background:#9c7440;color:#fff;text-decoration:none;padding:13px 28px;border-radius:4px;font-size:14px;font-weight:600;">View your proposal &rarr;</a>' +
       '</div>'
     : '';
 
@@ -417,13 +417,13 @@ function buildHtml({ bodyText, designerName, proposalAddress, proposalUrl }) {
     '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f7f7f4;padding:40px 20px;"><tr><td align="center">' +
     '<table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width:600px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">' +
     '<tr><td style="padding:32px 40px 16px;text-align:center;">' +
-    '<img src="https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69a04f4369bc9cc20b8d2155_BaysidePavers_original%20(2)%20(1).png" alt="Bayside Pavers" style="height:32px;width:auto;">' +
+    '<img src="https://portal-baysidepavers.com/assets/paver-portal-logo.svg" alt="Paver Portal" style="height:32px;width:auto;">' +
     '</td></tr>' +
     '<tr><td style="padding:8px 40px 12px;">' + paragraphs + cta + '</td></tr>' +
     '<tr><td style="padding:24px 40px;background:#f7f7f4;border-top:1px solid #e4e4df;">' +
     '<p style="margin:0 0 4px;font-size:14px;">Talk soon,</p>' +
     '<p style="margin:0;font-size:14px;font-weight:600;">' + escapeHtml(designerName) + '</p>' +
-    '<p style="margin:0;font-size:13px;color:#70726f;">Bayside Pavers</p>' +
+    '<p style="margin:0;font-size:13px;color:#70726f;">Paver Portal</p>' +
     '<p style="margin:8px 0 0;font-size:12px;color:#a0a09c;">Re: ' + escapeHtml(proposalAddress) + '</p>' +
     '</td></tr></table></td></tr></table></body></html>';
 }
@@ -431,7 +431,7 @@ function buildHtml({ bodyText, designerName, proposalAddress, proposalUrl }) {
 function buildText({ bodyText, designerName, proposalAddress, proposalUrl }) {
   const lines = [bodyText, ''];
   if (proposalUrl) lines.push('View your proposal: ' + proposalUrl, '');
-  lines.push('Talk soon,', designerName, 'Bayside Pavers', '', 'Re: ' + proposalAddress);
+  lines.push('Talk soon,', designerName, 'Paver Portal', '', 'Re: ' + proposalAddress);
   return lines.join('\n');
 }
 
