@@ -18,6 +18,7 @@
 
 import { supabase } from './supabase-client.js';
 import { applyBranding } from './branding.js';
+import { initTour } from './tour.js';
 import { getProposalEngagementBulk, formatRelativeTime } from './engagement-utils.js';
 
 const banner = document.getElementById('ddBanner');
@@ -61,7 +62,7 @@ const STAGES = [
 
   const { data: profile, error: profErr } = await supabase
     .from('profiles')
-    .select('id, role, display_name, email, is_active')
+    .select('id, role, display_name, email, is_active, onboarding_completed_at')
     .eq('id', session.user.id)
     .maybeSingle();
 
@@ -79,6 +80,10 @@ const STAGES = [
   ensureModalStyles();
   attachEventListeners();
   await loadAndRender();
+
+  // SPRINT 3: first-run product tour (auto-plays once per user, replayable
+  // from the "?" Help button this call also injects).
+  initTour({ supabase, profile: currentProfile });
 })();
 
 function renderUserChrome(profile) {
