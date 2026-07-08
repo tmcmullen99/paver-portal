@@ -119,6 +119,12 @@ export async function onRequestPost({ request, env }) {
     if (!owns) {
       return jsonResponse({ error: 'Forbidden — this client is not assigned to you' }, 403);
     }
+  } else {
+    // Master: company boundary (Stage 3 multi-tenancy)
+    const sameCompany = await clientInCompany(env, client_id, sender.companyId);
+    if (!sameCompany) {
+      return jsonResponse({ error: 'Forbidden — this client is not in your workspace' }, 403);
+    }
   }
 
   const settings = await loadCompanySettings(env);
@@ -225,7 +231,7 @@ async function resolveSender(request, env) {
   if (!user || !user.id) return { ok: false, status: 401, error: 'Unauthorized — invalid session' };
 
   const profResp = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=role,is_active,display_name,email&limit=1`,
+    `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=role,is_active,display_name,email,company_id&limit=1`,
     { headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` } }
   );
   if (!profResp.ok) return { ok: false, status: 500, error: 'Profile lookup failed' };
@@ -239,9 +245,24 @@ async function resolveSender(request, env) {
     ok: true,
     userId: user.id,
     role: profile.role,
+    companyId: profile.company_id || null,
     displayName: profile.display_name || null,
     email: profile.email || user.email || null,
   };
+}
+
+/**
+ * STAGE 3: masters may only message clients inside their own company.
+ */
+async function clientInCompany(env, clientId, companyId) {
+  if (!companyId) return false;
+  const resp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/clients?id=eq.${encodeURIComponent(clientId)}&company_id=eq.${encodeURIComponent(companyId)}&select=id&limit=1`,
+    { headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` } }
+  );
+  if (!resp.ok) return false;
+  const rows = await resp.json();
+  return !!(rows && rows[0]);
 }
 
 /**
@@ -350,18 +371,18 @@ async function sendChatMessageEmail(env, client, messageBody, magicLink, sender,
 
   const html = `
 <div style="font-family:-apple-system,BlinkMacSystemFont,'Inter','Onest',sans-serif;max-width:620px;margin:0 auto;padding:24px;color:#0e1218;background:#fff;">
-  <div style="border-bottom:3px solid #5d7e69;padding-bottom:14px;margin-bottom:22px;">
-    <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#5d7e69;font-weight:700;margin-bottom:6px;">NEW MESSAGE · ${esc(portalName.toUpperCase())}</div>
+  <div style="border-bottom:3px solid #9c7440;padding-bottom:14px;margin-bottom:22px;">
+    <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#9c7440;font-weight:700;margin-bottom:6px;">NEW MESSAGE · ${esc(portalName.toUpperCase())}</div>
     <h1 style="font-size:22px;margin:0;color:#0e1218;line-height:1.3;font-weight:600;">Hi ${esc(firstName)} — ${esc(senderFirst)} sent you a note.</h1>
   </div>
 
-  <div style="background:#faf8f3;border-left:3px solid #5d7e69;padding:16px 18px;margin-bottom:24px;border-radius:4px;">
-    <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5d7e69;font-weight:700;margin-bottom:8px;">FROM ${esc(senderFirst.toUpperCase())}</div>
+  <div style="background:#faf8f3;border-left:3px solid #9c7440;padding:16px 18px;margin-bottom:24px;border-radius:4px;">
+    <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#9c7440;font-weight:700;margin-bottom:8px;">FROM ${esc(senderFirst.toUpperCase())}</div>
     <div style="font-size:15px;color:#0e1218;line-height:1.55;">${messageHtml}</div>
   </div>
 
   <div style="margin:24px 0 16px;text-align:center;">
-    <a href="${esc(magicLink)}" style="display:inline-block;background:#5d7e69;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:15px;">View &amp; reply in ${esc(portalName)} →</a>
+    <a href="${esc(magicLink)}" style="display:inline-block;background:#9c7440;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:15px;">View &amp; reply in ${esc(portalName)} →</a>
   </div>
 
   <div style="background:#f7f8f5;border-radius:8px;padding:16px 18px;margin:24px 0;font-size:13px;color:#4a5450;line-height:1.55;">
