@@ -1,309 +1,210 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// tour.js — SPRINT 3 (built-in designer tutorial)
+// help-chat.js — SPRINT 4 (in-app knowledge base chat widget)
 //
-// Self-contained spotlight tour for the designer dashboard, plus a floating
-// "?" Help button (bottom-right) that replays it anytime. No libraries.
+// Floating chat panel opened from the "?" Help menu (tour.js lazy-imports
+// this module on first use, so pages pay zero cost until someone asks for
+// help). Talks to /api/help-chat, which is JWT-gated to staff and grounded
+// in the portal capability manual stored in Supabase.
 //
-// Behavior:
-//   • initTour({ supabase, profile }) — call once after the dashboard
-//     renders. If profile.onboarding_completed_at is NULL, the tour starts
-//     automatically ~600ms later (lets the pipeline paint first).
-//   • Finishing OR skipping stamps profiles.onboarding_completed_at so it
-//     never auto-plays again (per user, cross-device — it's in the DB).
-//   • The "?" button is always injected; "Replay the tour" works forever.
-//     It also carries a menu slot where the Sprint 4 knowledge-base chat
-//     will live.
-//
-// The tour is branding-aware: the welcome step uses the product name from
-// company_settings via branding.js.
+// History persists in sessionStorage so the conversation survives page
+// navigation within the tab.
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { getBranding } from './branding.js';
+import { supabase } from '/js/supabase-client.js';
+import { getBranding } from '/js/branding.js';
 
-let _ctx = null;          // { supabase, profile }
-let _steps = [];
-let _idx = 0;
-let _open = false;
+const HISTORY_KEY = 'bpb-help-chat-v1';
+const MAX_KEPT = 24; // stored turns (API truncates further)
 
-// ── Step definitions ────────────────────────────────────────────────────────
-// target: CSS selector to spotlight (null = centered card)
-function buildSteps(brand) {
-  const product = `${brand.company_name} ${brand.product_name}`;
-  return [
-    {
-      target: null,
-      title: `Welcome to ${brand.product_name} 👋`,
-      body: `This is your pipeline command center — every proposal you create moves through it, from first draft to signed deal. This 60-second tour shows you the full workflow. You can replay it anytime from the <strong>?</strong> button in the corner.`,
-    },
-    {
-      target: '#ddFunnelStages',
-      title: 'Your pipeline, in five stages',
-      body: `Proposals move automatically: <strong>Draft</strong> while you're building → <strong>Sent</strong> once published → <strong>Viewed</strong> when your client opens it → <strong>Engaged</strong> when they interact heavily (4+ views, a substitution, or a redesign request) → <strong>Signed</strong>. Click any stage to see the deals sitting in it.`,
-    },
-    {
-      target: '#ddStatRow',
-      title: 'Your numbers at a glance',
-      body: `Open value is everything still in play; closed total and win rate track how you're converting. These update live as clients view and sign.`,
-    },
-    {
-      target: '#ddNewBtn',
-      title: 'Creating a proposal starts here',
-      body: `Click <strong>+ New proposal</strong> and pick an existing client or add a new one — name, email, and the project address are all you need to get moving. You'll land in the editor immediately.`,
-    },
-    {
-      target: null,
-      title: 'Inside the editor',
-      body: `The editor is where the magic happens: upload the bid PDF and it's <strong>parsed automatically</strong> into line items, then pick materials from the catalog, add the site plan, and hit <strong>Publish</strong>. Publishing generates a beautiful proposal page with its own private link for your client — no account required for them to view it.`,
-    },
-    {
-      target: 'a[href="/clients.html"]',
-      title: 'My Clients — your client workspace',
-      body: `Everything client-facing lives here: their contact info and proposals, <strong>chat</strong> (messages are emailed to clients who haven't activated their portal yet, with a sign-in link), and their <strong>substitution and redesign requests</strong> waiting on your response.`,
-    },
-    {
-      target: null,
-      title: `You're ready 🎉`,
-      body: `That's the loop: create → publish → client engages → you respond → signed. If you ever need a refresher, hit the <strong>?</strong> button bottom-right to replay this tour. Welcome to ${product}.`,
-      finishLabel: 'Start building',
-    },
-  ];
+let panel = null;
+let sending = false;
+
+export async function openHelpChat() {
+  if (panel) { panel.remove(); panel = null; return; }
+  ensureStyles();
+
+  const brand = await getBranding().catch(() => ({ product_name: 'Portal' }));
+
+  panel = document.createElement('div');
+  panel.id = 'bpbHelpChatPanel';
+  panel.innerHTML = `
+    <div class="hc-head">
+      <div>
+        <div class="hc-title">${esc(brand.product_name || 'Portal')} Help</div>
+        <div class="hc-sub">Ask anything about using the portal</div>
+      </div>
+      <button class="hc-close" type="button" title="Close">✕</button>
+    </div>
+    <div class="hc-thread" id="hcThread"></div>
+    <div class="hc-chips" id="hcChips">
+      <button type="button">How do I publish a proposal?</button>
+      <button type="button">What does my client see?</button>
+      <button type="button">How do substitutions work?</button>
+    </div>
+    <div class="hc-compose">
+      <textarea id="hcInput" rows="1" placeholder="Type a question…"></textarea>
+      <button id="hcSend" type="button">Send</button>
+    </div>`;
+  document.body.appendChild(panel);
+
+  panel.querySelector('.hc-close').addEventListener('click', () => { panel.remove(); panel = null; });
+  panel.querySelector('#hcSend').addEventListener('click', () => send());
+  const input = panel.querySelector('#hcInput');
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+  panel.querySelectorAll('#hcChips button').forEach(b =>
+    b.addEventListener('click', () => { input.value = b.textContent; send(); }));
+
+  renderThread();
+  input.focus();
 }
 
-// ── Public API ──────────────────────────────────────────────────────────────
-export async function initTour(ctx) {
-  _ctx = ctx || {};
-  injectHelpButton();
-  const done = _ctx.profile && _ctx.profile.onboarding_completed_at;
-  if (!done) {
-    setTimeout(() => { if (!_open) startTour(); }, 600);
+// ── History ────────────────────────────────────────────────────────────────
+function loadHistory() {
+  try { return JSON.parse(sessionStorage.getItem(HISTORY_KEY)) || []; }
+  catch (_) { return []; }
+}
+function saveHistory(h) {
+  try { sessionStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(-MAX_KEPT))); } catch (_) {}
+}
+
+// ── Send / render ──────────────────────────────────────────────────────────
+async function send() {
+  if (sending || !panel) return;
+  const input = panel.querySelector('#hcInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const history = loadHistory();
+  history.push({ role: 'user', content: text });
+  saveHistory(history);
+  input.value = '';
+  renderThread(true);
+
+  sending = true;
+  const sendBtn = panel.querySelector('#hcSend');
+  sendBtn.disabled = true;
+  appendTyping();
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const resp = await fetch('/api/help-chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(session && session.access_token ? { Authorization: 'Bearer ' + session.access_token } : {}),
+      },
+      body: JSON.stringify({ messages: history.map(({ role, content }) => ({ role, content })) }),
+    });
+    const out = await resp.json().catch(() => ({}));
+    if (!resp.ok || !out.ok) throw new Error(out.error || ('HTTP ' + resp.status));
+    history.push({ role: 'assistant', content: out.reply });
+    saveHistory(history);
+  } catch (e) {
+    history.push({ role: 'assistant', content: '⚠️ ' + (e.message || 'Something went wrong — try again.') });
+    saveHistory(history);
+  } finally {
+    sending = false;
+    if (panel) {
+      panel.querySelector('#hcSend').disabled = false;
+      renderThread(true);
+      panel.querySelector('#hcInput').focus();
+    }
   }
 }
 
-export async function startTour() {
-  if (_open) return;
-  const brand = await getBranding().catch(() => ({ company_name: '', product_name: 'the Proposal Builder' }));
-  _steps = buildSteps(brand);
-  _idx = 0;
-  _open = true;
-  ensureStyles();
-  buildOverlay();
-  showStep(0);
+function renderThread(scroll) {
+  if (!panel) return;
+  const thread = panel.querySelector('#hcThread');
+  const chips = panel.querySelector('#hcChips');
+  const history = loadHistory();
+
+  chips.style.display = history.length ? 'none' : 'flex';
+
+  if (!history.length) {
+    thread.innerHTML = '<div class="hc-empty">Hi! I know this portal inside and out — how proposals work, what your clients see, chat, substitutions, redesigns, publishing… Ask me anything.</div>';
+    return;
+  }
+  thread.innerHTML = history.map(m =>
+    `<div class="hc-msg ${m.role === 'user' ? 'me' : 'bot'}">${esc(m.content)}</div>`
+  ).join('');
+  if (scroll) thread.scrollTop = thread.scrollHeight;
 }
 
-// ── Persistence ─────────────────────────────────────────────────────────────
-async function markCompleted() {
-  try {
-    if (!_ctx || !_ctx.supabase || !_ctx.profile) return;
-    if (_ctx.profile.onboarding_completed_at) return; // already stamped
-    const ts = new Date().toISOString();
-    const { error } = await _ctx.supabase
-      .from('profiles')
-      .update({ onboarding_completed_at: ts })
-      .eq('id', _ctx.profile.id);
-    if (!error) _ctx.profile.onboarding_completed_at = ts;
-  } catch (_) { /* non-fatal */ }
+function appendTyping() {
+  if (!panel) return;
+  const thread = panel.querySelector('#hcThread');
+  const t = document.createElement('div');
+  t.className = 'hc-msg bot hc-typing';
+  t.textContent = '…';
+  thread.appendChild(t);
+  thread.scrollTop = thread.scrollHeight;
 }
 
-// ── Overlay / rendering ─────────────────────────────────────────────────────
+// ── Styles ─────────────────────────────────────────────────────────────────
 function ensureStyles() {
-  if (document.getElementById('bpb-tour-css')) return;
+  if (document.getElementById('bpb-helpchat-css')) return;
   const css = document.createElement('style');
-  css.id = 'bpb-tour-css';
+  css.id = 'bpb-helpchat-css';
   css.textContent = `
-    #bpbTourShade {
-      position: fixed; inset: 0; z-index: 10000;
+    #bpbHelpChatPanel {
+      position: fixed; right: 18px; bottom: 74px; z-index: 9995;
+      width: 360px; max-width: calc(100vw - 24px); height: 480px; max-height: calc(100vh - 110px);
+      background: #fff; border: 1px solid #e5e5e5; border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      display: flex; flex-direction: column; overflow: hidden;
+      font-family: 'Onest', -apple-system, sans-serif;
     }
-    #bpbTourRing {
-      position: absolute; border-radius: 10px;
-      box-shadow: 0 0 0 9999px rgba(16, 20, 28, 0.62), 0 0 0 3px #5d7e69;
-      transition: all 0.25s ease; pointer-events: none;
+    #bpbHelpChatPanel .hc-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; background: #1a1f2e; color: #fff;
     }
-    #bpbTourRing.center { box-shadow: 0 0 0 9999px rgba(16, 20, 28, 0.62); }
-    #bpbTourCard {
-      position: absolute; z-index: 10001; width: 340px; max-width: calc(100vw - 32px);
-      background: #fff; border-radius: 14px; padding: 18px 20px 16px;
-      box-shadow: 0 18px 50px rgba(0,0,0,0.3);
-      font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: #23282f; transition: all 0.25s ease;
+    #bpbHelpChatPanel .hc-title { font-size: 14px; font-weight: 700; }
+    #bpbHelpChatPanel .hc-sub { font-size: 11px; opacity: 0.75; margin-top: 1px; }
+    #bpbHelpChatPanel .hc-close {
+      background: transparent; border: 0; color: #fff; opacity: 0.7;
+      font-size: 14px; cursor: pointer; padding: 4px 6px;
     }
-    #bpbTourCard .t-count {
-      font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.16em;
-      text-transform: uppercase; color: #5d7e69; font-weight: 600; margin-bottom: 6px;
+    #bpbHelpChatPanel .hc-close:hover { opacity: 1; }
+    #bpbHelpChatPanel .hc-thread {
+      flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 8px;
+      background: #faf8f3;
     }
-    #bpbTourCard .t-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
-    #bpbTourCard .t-body { font-size: 13.5px; line-height: 1.55; color: #444; }
-    #bpbTourCard .t-body strong { color: #23282f; }
-    #bpbTourCard .t-actions { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
-    #bpbTourCard .t-spacer { flex: 1; }
-    #bpbTourCard button {
-      font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
-      border-radius: 8px; padding: 8px 14px; border: 1px solid #e5e5e5; background: #fff; color: #555;
+    #bpbHelpChatPanel .hc-empty { font-size: 13px; color: #666; line-height: 1.55; padding: 6px 2px; }
+    #bpbHelpChatPanel .hc-msg {
+      max-width: 85%; padding: 9px 12px; border-radius: 12px;
+      font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
     }
-    #bpbTourCard button:hover { border-color: #5d7e69; color: #4a6654; }
-    #bpbTourCard button.t-next { background: #5d7e69; border-color: #5d7e69; color: #fff; }
-    #bpbTourCard button.t-next:hover { background: #4a6654; }
-    #bpbTourCard button.t-skip { border: 0; background: transparent; color: #999; padding: 8px 6px; }
-    #bpbTourCard button.t-skip:hover { color: #555; }
-
-    #bpbHelpBtn {
-      position: fixed; right: 18px; bottom: 18px; z-index: 9990;
-      width: 44px; height: 44px; border-radius: 999px; border: 0;
-      background: #1a1f2e; color: #fff; font: 700 18px/1 'Onest', sans-serif;
-      cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,0.22);
-      display: flex; align-items: center; justify-content: center;
-      transition: transform 0.12s, background 0.15s;
+    #bpbHelpChatPanel .hc-msg.me { align-self: flex-end; background: #5d7e69; color: #fff; border-bottom-right-radius: 4px; }
+    #bpbHelpChatPanel .hc-msg.bot { align-self: flex-start; background: #fff; border: 1px solid #eee; color: #23282f; border-bottom-left-radius: 4px; }
+    #bpbHelpChatPanel .hc-typing { color: #999; letter-spacing: 2px; }
+    #bpbHelpChatPanel .hc-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; background: #faf8f3; }
+    #bpbHelpChatPanel .hc-chips button {
+      font: 500 11.5px 'Onest', sans-serif; color: #4a6654; background: #e8eee9;
+      border: 0; border-radius: 999px; padding: 7px 11px; cursor: pointer;
     }
-    #bpbHelpBtn:hover { background: #5d7e69; transform: scale(1.06); }
-    #bpbHelpMenu {
-      position: fixed; right: 18px; bottom: 70px; z-index: 9991;
-      background: #fff; border: 1px solid #e5e5e5; border-radius: 12px;
-      box-shadow: 0 14px 40px rgba(0,0,0,0.18); overflow: hidden;
-      font-family: 'Onest', sans-serif; min-width: 210px;
+    #bpbHelpChatPanel .hc-chips button:hover { background: #d9e4dc; }
+    #bpbHelpChatPanel .hc-compose {
+      display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid #eee; background: #fff;
     }
-    #bpbHelpMenu button {
-      display: block; width: 100%; text-align: left; border: 0; background: #fff;
-      font: 500 13px/1.3 'Onest', sans-serif; color: #23282f;
-      padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f1eee6;
+    #bpbHelpChatPanel .hc-compose textarea {
+      flex: 1; resize: none; font: 400 13px/1.4 'Onest', sans-serif;
+      border: 1px solid #e5e5e5; border-radius: 10px; padding: 9px 11px; max-height: 90px;
     }
-    #bpbHelpMenu button:last-child { border-bottom: 0; }
-    #bpbHelpMenu button:hover { background: #e8eee9; color: #4a6654; }
-    #bpbHelpMenu .soon { color: #9aa0a6; font-size: 11px; margin-left: 6px; }
+    #bpbHelpChatPanel .hc-compose textarea:focus { outline: 2px solid #e8eee9; border-color: #5d7e69; }
+    #bpbHelpChatPanel .hc-compose button {
+      font: 600 13px 'Onest', sans-serif; color: #fff; background: #5d7e69;
+      border: 0; border-radius: 10px; padding: 0 16px; cursor: pointer;
+    }
+    #bpbHelpChatPanel .hc-compose button:hover { background: #4a6654; }
+    #bpbHelpChatPanel .hc-compose button:disabled { opacity: 0.6; cursor: wait; }
   `;
   document.head.appendChild(css);
 }
 
-function buildOverlay() {
-  const shade = document.createElement('div');
-  shade.id = 'bpbTourShade';
-  shade.innerHTML = `
-    <div id="bpbTourRing" class="center"></div>
-    <div id="bpbTourCard" role="dialog" aria-modal="true">
-      <div class="t-count" id="bpbTourCount"></div>
-      <div class="t-title" id="bpbTourTitle"></div>
-      <div class="t-body" id="bpbTourBody"></div>
-      <div class="t-actions">
-        <button class="t-skip" id="bpbTourSkip" type="button">Skip tour</button>
-        <div class="t-spacer"></div>
-        <button id="bpbTourBack" type="button">Back</button>
-        <button class="t-next" id="bpbTourNext" type="button">Next</button>
-      </div>
-    </div>`;
-  document.body.appendChild(shade);
-
-  shade.querySelector('#bpbTourSkip').addEventListener('click', endTour);
-  shade.querySelector('#bpbTourBack').addEventListener('click', () => showStep(_idx - 1));
-  shade.querySelector('#bpbTourNext').addEventListener('click', () => {
-    if (_idx >= _steps.length - 1) endTour();
-    else showStep(_idx + 1);
-  });
-  document.addEventListener('keydown', escHandler);
-  window.addEventListener('resize', repositionCurrent);
-}
-
-function escHandler(e) { if (e.key === 'Escape' && _open) endTour(); }
-
-async function endTour() {
-  _open = false;
-  document.removeEventListener('keydown', escHandler);
-  window.removeEventListener('resize', repositionCurrent);
-  const shade = document.getElementById('bpbTourShade');
-  if (shade) shade.remove();
-  await markCompleted();
-}
-
-function showStep(i) {
-  _idx = Math.max(0, Math.min(i, _steps.length - 1));
-  const step = _steps[_idx];
-
-  const countEl = document.getElementById('bpbTourCount');
-  const titleEl = document.getElementById('bpbTourTitle');
-  const bodyEl  = document.getElementById('bpbTourBody');
-  const backBtn = document.getElementById('bpbTourBack');
-  const nextBtn = document.getElementById('bpbTourNext');
-  if (!countEl) return;
-
-  countEl.textContent = `Step ${_idx + 1} of ${_steps.length}`;
-  titleEl.textContent = step.title;
-  bodyEl.innerHTML = step.body;      // step content is app-authored, not user data
-  backBtn.style.visibility = _idx === 0 ? 'hidden' : 'visible';
-  nextBtn.textContent = _idx === _steps.length - 1 ? (step.finishLabel || 'Finish') : 'Next';
-
-  const target = step.target ? document.querySelector(step.target) : null;
-  if (target) target.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  // Give smooth-scroll a beat before measuring
-  setTimeout(() => positionFor(target), target ? 260 : 0);
-}
-
-function repositionCurrent() {
-  if (!_open) return;
-  const step = _steps[_idx];
-  positionFor(step.target ? document.querySelector(step.target) : null);
-}
-
-function positionFor(target) {
-  const ring = document.getElementById('bpbTourRing');
-  const card = document.getElementById('bpbTourCard');
-  if (!ring || !card) return;
-
-  const vw = window.innerWidth, vh = window.innerHeight;
-
-  if (!target) {
-    ring.classList.add('center');
-    ring.style.top = '50%'; ring.style.left = '50%';
-    ring.style.width = '0'; ring.style.height = '0';
-    card.style.top = Math.max(24, vh / 2 - card.offsetHeight / 2) + 'px';
-    card.style.left = Math.max(16, vw / 2 - card.offsetWidth / 2) + 'px';
-    return;
-  }
-
-  const r = target.getBoundingClientRect();
-  const pad = 6;
-  ring.classList.remove('center');
-  ring.style.top = (r.top - pad) + 'px';
-  ring.style.left = (r.left - pad) + 'px';
-  ring.style.width = (r.width + pad * 2) + 'px';
-  ring.style.height = (r.height + pad * 2) + 'px';
-
-  // Card placement: below the target if room, else above, else beside.
-  const cw = card.offsetWidth || 340, ch = card.offsetHeight || 220;
-  let top, left;
-  if (r.bottom + ch + 20 < vh) top = r.bottom + 14;
-  else if (r.top - ch - 20 > 0) top = r.top - ch - 14;
-  else top = Math.max(16, Math.min(vh - ch - 16, r.top));
-  left = Math.max(16, Math.min(vw - cw - 16, r.left + r.width / 2 - cw / 2));
-  card.style.top = top + 'px';
-  card.style.left = left + 'px';
-}
-
-// ── Help "?" button + menu ─────────────────────────────────────────────────
-function injectHelpButton() {
-  if (document.getElementById('bpbHelpBtn')) return;
-  ensureStyles();
-
-  const btn = document.createElement('button');
-  btn.id = 'bpbHelpBtn';
-  btn.type = 'button';
-  btn.title = 'Help';
-  btn.textContent = '?';
-  document.body.appendChild(btn);
-
-  let menu = null;
-  const closeMenu = () => { if (menu) { menu.remove(); menu = null; } };
-
-  btn.addEventListener('click', () => {
-    if (menu) { closeMenu(); return; }
-    menu = document.createElement('div');
-    menu.id = 'bpbHelpMenu';
-    menu.innerHTML = `
-      <button type="button" id="bpbHelpReplay">▶ Replay the tour</button>
-      <button type="button" id="bpbHelpChat">💬 Ask anything <span class="soon">coming soon</span></button>
-    `;
-    document.body.appendChild(menu);
-    menu.querySelector('#bpbHelpReplay').addEventListener('click', () => { closeMenu(); startTour(); });
-    menu.querySelector('#bpbHelpChat').addEventListener('click', closeMenu);
-    // Click-away
-    setTimeout(() => document.addEventListener('click', function away(e) {
-      if (menu && !menu.contains(e.target) && e.target !== btn) { closeMenu(); document.removeEventListener('click', away); }
-    }), 0);
-  });
+function esc(s) {
+  return (s == null ? '' : String(s))
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
