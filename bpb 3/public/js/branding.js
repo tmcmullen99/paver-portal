@@ -56,11 +56,23 @@ export async function getBranding() {
 
   _inflight = (async () => {
     try {
-      const { data, error } = await supabase
-        .from('company_settings')
-        .select('company_name, product_name, tagline, logo_url, primary_color, support_email, reply_to_email, from_email_name, portal_base_url')
-        .eq('id', 1)
-        .maybeSingle();
+      // STAGE 4 (multi-tenancy): the get_my_branding() RPC resolves WHOSE
+      // branding this caller should see — staff get their company,
+      // homeowners get their contractor's company, anonymous visitors get
+      // the product default. Falls back to the default row if the RPC is
+      // unavailable (e.g. before the migration ran).
+      let data = null, error = null;
+      const rpc = await supabase.rpc('get_my_branding');
+      if (!rpc.error && Array.isArray(rpc.data) && rpc.data[0]) {
+        data = rpc.data[0];
+      } else {
+        const direct = await supabase
+          .from('company_settings')
+          .select('company_name, product_name, tagline, logo_url, primary_color, support_email, reply_to_email, from_email_name, portal_base_url')
+          .eq('id', 1)
+          .maybeSingle();
+        data = direct.data; error = direct.error;
+      }
       if (error || !data) return { ...DEFAULTS };
       const merged = { ...DEFAULTS, ...stripNulls(data) };
       try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(merged)); } catch (_) {}
@@ -130,3 +142,9 @@ export async function applyBranding(opts = {}) {
 export function clearBrandingCache() {
   try { sessionStorage.removeItem(CACHE_KEY); } catch (_) {}
 }
+
+// Different sign-ins can belong to different companies — never serve one
+// tenant's cached identity to another after an auth change in this tab.
+supabase.auth.onAuthStateChange((event) => {
+  if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') clearBrandingCache();
+});
