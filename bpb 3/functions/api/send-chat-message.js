@@ -44,14 +44,24 @@ const CORS_HEADERS = {
 const FALLBACK_PORTAL_BASE = 'https://portal-baysidepavers.com';
 const FALLBACK_REPLY_TO = 'tim@mcmullen.properties';
 
-async function loadCompanySettings(env) {
+async function loadCompanySettings(env, companyId) {
+  const headers = { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` };
+  const fields = 'select=company_name,portal_base_url,reply_to_email,from_email_name';
   try {
-    const resp = await fetch(
-      `${env.SUPABASE_URL}/rest/v1/company_settings?id=eq.1&select=company_name,portal_base_url,reply_to_email,from_email_name&limit=1`,
-      { headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` } }
-    );
-    if (resp.ok) {
-      const rows = await resp.json();
+    // STAGE 4: emails carry the CLIENT's company branding.
+    if (companyId) {
+      const resp = await fetch(
+        `${env.SUPABASE_URL}/rest/v1/company_settings?company_id=eq.${encodeURIComponent(companyId)}&${fields}&limit=1`,
+        { headers }
+      );
+      if (resp.ok) {
+        const rows = await resp.json();
+        if (rows && rows[0]) return rows[0];
+      }
+    }
+    const fallback = await fetch(`${env.SUPABASE_URL}/rest/v1/company_settings?id=eq.1&${fields}&limit=1`, { headers });
+    if (fallback.ok) {
+      const rows = await fallback.json();
       if (rows && rows[0]) return rows[0];
     }
   } catch (e) {
@@ -127,7 +137,7 @@ export async function onRequestPost({ request, env }) {
     }
   }
 
-  const settings = await loadCompanySettings(env);
+
 
   const sbHeaders = {
     'Content-Type': 'application/json',
@@ -140,7 +150,7 @@ export async function onRequestPost({ request, env }) {
   // 1. Look up the client (need name, email, account_setup_at, user_id)
   // ──────────────────────────────────────────────────────────────────
   const clientResp = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/clients?id=eq.${encodeURIComponent(client_id)}&deleted_at=is.null&select=id,name,email,account_setup_at,user_id`,
+    `${env.SUPABASE_URL}/rest/v1/clients?id=eq.${encodeURIComponent(client_id)}&deleted_at=is.null&select=id,name,email,account_setup_at,user_id,company_id`,
     { headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` } }
   );
   if (!clientResp.ok) {
@@ -153,6 +163,9 @@ export async function onRequestPost({ request, env }) {
     return jsonResponse({ error: 'Client not found' }, 404);
   }
   const client = clientRows[0];
+
+  // STAGE 4: branding follows the client's company
+  const settings = await loadCompanySettings(env, client.company_id);
 
   // ──────────────────────────────────────────────────────────────────
   // 2. Insert the chat message (service role bypasses RLS)
@@ -341,7 +354,7 @@ async function generateMagicLink(env, client, settings = {}) {
 // ──────────────────────────────────────────────────────────────────────────
 
 async function sendChatMessageEmail(env, client, messageBody, magicLink, sender, settings = {}) {
-  const companyName = settings.company_name || 'Bayside Pavers';
+  const companyName = settings.company_name || 'Paver Portal';
   const portalName  = settings.from_email_name || (companyName + ' Portal');
   const firstName = ((client.name || '').trim().split(/\s+/)[0]) || 'there';
   // SPRINT 1.5B: personalize by actual sender (designer or master) instead
