@@ -13,14 +13,21 @@
 import { supabase } from '/js/supabase-client.js';
 import { getBranding } from '/js/branding.js';
 
-const HISTORY_KEY = 'bpb-help-chat-v1';
+const HISTORY_KEYS = { portal: 'bpb-help-chat-v1', pro: 'bpb-ask-pro-v1' };
 const MAX_KEPT = 24; // stored turns (API truncates further)
+
+const CHIPS = {
+  portal: ['How do I publish a proposal?', 'What does my client see?', 'How do substitutions work?'],
+  pro: ['Base depth for a driveway in clay soil?', 'Do I need a permit for a 4-ft retaining wall in Contra Costa County?', 'Best jointing sand for a pool deck?'],
+};
 
 let panel = null;
 let sending = false;
+let mode = 'pro';   // field-first default; Portal help one tap away
 
-export async function openHelpChat() {
-  if (panel) { panel.remove(); panel = null; return; }
+export async function openHelpChat(startMode) {
+  if (panel) { panel.remove(); panel = null; if (!startMode) return; }
+  if (startMode === 'pro' || startMode === 'portal') mode = startMode;
   ensureStyles();
 
   const brand = await getBranding().catch(() => ({ product_name: 'Portal' }));
@@ -30,22 +37,23 @@ export async function openHelpChat() {
   panel.innerHTML = `
     <div class="hc-head">
       <div>
-        <div class="hc-title">${esc(brand.product_name || 'Portal')} Help</div>
-        <div class="hc-sub">Ask anything about using the portal</div>
+        <div class="hc-title" id="hcTitle"></div>
+        <div class="hc-sub" id="hcSub"></div>
       </div>
       <button class="hc-close" type="button" title="Close">✕</button>
     </div>
-    <div class="hc-thread" id="hcThread"></div>
-    <div class="hc-chips" id="hcChips">
-      <button type="button">How do I publish a proposal?</button>
-      <button type="button">What does my client see?</button>
-      <button type="button">How do substitutions work?</button>
+    <div class="hc-tabs">
+      <button type="button" data-mode="pro" id="hcTabPro">🛠 Ask a Pro</button>
+      <button type="button" data-mode="portal" id="hcTabPortal">❔ Portal help</button>
     </div>
+    <div class="hc-thread" id="hcThread"></div>
+    <div class="hc-chips" id="hcChips"></div>
     <div class="hc-compose">
       <textarea id="hcInput" rows="1" placeholder="Type a question…"></textarea>
       <button id="hcSend" type="button">Send</button>
     </div>`;
   document.body.appendChild(panel);
+  panel.dataset.brandProduct = brand.product_name || 'Portal';
 
   panel.querySelector('.hc-close').addEventListener('click', () => { panel.remove(); panel = null; });
   panel.querySelector('#hcSend').addEventListener('click', () => send());
@@ -53,20 +61,37 @@ export async function openHelpChat() {
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   });
-  panel.querySelectorAll('#hcChips button').forEach(b =>
-    b.addEventListener('click', () => { input.value = b.textContent; send(); }));
+  panel.querySelectorAll('.hc-tabs button').forEach(t =>
+    t.addEventListener('click', () => setMode(t.dataset.mode)));
 
-  renderThread();
+  setMode(mode);
   input.focus();
+}
+
+function setMode(m) {
+  mode = m === 'portal' ? 'portal' : 'pro';
+  if (!panel) return;
+  const product = panel.dataset.brandProduct || 'Portal';
+  panel.querySelector('#hcTitle').textContent = mode === 'pro' ? 'Ask a Pro' : product + ' Help';
+  panel.querySelector('#hcSub').textContent = mode === 'pro'
+    ? 'Materials, installs, codes — expert answers in the field'
+    : 'Ask anything about using the portal';
+  panel.querySelectorAll('.hc-tabs button').forEach(t =>
+    t.classList.toggle('active', t.dataset.mode === mode));
+  const chips = panel.querySelector('#hcChips');
+  chips.innerHTML = CHIPS[mode].map(c => `<button type="button">${esc(c)}</button>`).join('');
+  chips.querySelectorAll('button').forEach(b =>
+    b.addEventListener('click', () => { panel.querySelector('#hcInput').value = b.textContent; send(); }));
+  renderThread(true);
 }
 
 // ── History ────────────────────────────────────────────────────────────────
 function loadHistory() {
-  try { return JSON.parse(sessionStorage.getItem(HISTORY_KEY)) || []; }
+  try { return JSON.parse(sessionStorage.getItem(HISTORY_KEYS[mode])) || []; }
   catch (_) { return []; }
 }
 function saveHistory(h) {
-  try { sessionStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(-MAX_KEPT))); } catch (_) {}
+  try { sessionStorage.setItem(HISTORY_KEYS[mode], JSON.stringify(h.slice(-MAX_KEPT))); } catch (_) {}
 }
 
 // ── Send / render ──────────────────────────────────────────────────────────
@@ -95,7 +120,7 @@ async function send() {
         'Content-Type': 'application/json',
         ...(session && session.access_token ? { Authorization: 'Bearer ' + session.access_token } : {}),
       },
-      body: JSON.stringify({ messages: history.map(({ role, content }) => ({ role, content })) }),
+      body: JSON.stringify({ mode, messages: history.map(({ role, content }) => ({ role, content })) }),
     });
     const out = await resp.json().catch(() => ({}));
     if (!resp.ok || !out.ok) throw new Error(out.error || ('HTTP ' + resp.status));
@@ -123,7 +148,9 @@ function renderThread(scroll) {
   chips.style.display = history.length ? 'none' : 'flex';
 
   if (!history.length) {
-    thread.innerHTML = '<div class="hc-empty">Hi! I know this portal inside and out — how proposals work, what your clients see, chat, substitutions, redesigns, publishing… Ask me anything.</div>';
+    thread.innerHTML = mode === 'pro'
+      ? '<div class="hc-empty">Standing in a yard with a question? Materials, base prep, drainage, ICPI standards, county permit rules — ask and I\'ll answer like the sharpest estimator you know. I can check current local codes on the web, but always confirm with the building department.</div>'
+      : '<div class="hc-empty">Hi! I know this portal inside and out — how proposals work, what your clients see, chat, substitutions, redesigns, publishing… Ask me anything.</div>';
     return;
   }
   thread.innerHTML = history.map(m =>
@@ -167,6 +194,20 @@ function ensureStyles() {
       font-size: 14px; cursor: pointer; padding: 4px 6px;
     }
     #bpbHelpChatPanel .hc-close:hover { opacity: 1; }
+    #bpbHelpChatPanel .hc-tabs { display: flex; gap: 0; border-bottom: 1px solid #eee; background: #fff; }
+    #bpbHelpChatPanel .hc-tabs button {
+      flex: 1; font: 600 12px 'Onest', sans-serif; color: #8a857c; background: #fff;
+      border: 0; border-bottom: 2px solid transparent; padding: 10px 6px; cursor: pointer;
+    }
+    #bpbHelpChatPanel .hc-tabs button.active { color: #7d5c31; border-bottom-color: #9c7440; background: #faf6ee; }
+    @media (max-width: 640px) {
+      #bpbHelpChatPanel {
+        inset: 0 !important; right: 0 !important; bottom: 0 !important;
+        width: 100vw !important; max-width: 100vw !important;
+        height: 100dvh !important; max-height: 100dvh !important;
+        border-radius: 0 !important; border: 0 !important;
+      }
+    }
     #bpbHelpChatPanel .hc-thread {
       flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 8px;
       background: #faf8f3;
