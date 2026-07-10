@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product feedback · Paver Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --tan:#9c7440; --walnut:#7d5c31; --gold:#d9a441; --sand:#f1e7d3; --cream:#faf6ee; --espresso:#33281c; --rule:#e5e0d6; --muted:#6f6a60; --err:#b91c1c; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Onest',sans-serif; background:var(--cream); min-height:100vh; color:#23282f; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; background:#fff; border-bottom:1px solid var(--rule); padding:0 22px; height:58px; position:sticky; top:0; z-index:5; }
+  .topbar a { color:var(--muted); text-decoration:none; font-size:13px; font-weight:600; }
+  .topbar a:hover { color:var(--walnut); }
+  .title { font-size:15px; font-weight:700; }
+  .sub { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--tan); }
+  main { max-width:760px; margin:0 auto; padding:26px 18px 90px; }
+  .card { background:#fff; border:1px solid var(--rule); border-radius:14px; padding:22px 24px; margin-bottom:20px; }
+  h2 { font-size:17px; font-weight:700; margin-bottom:4px; }
+  .lede { font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.55; }
+  .cats { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .cat { font:600 12px 'Onest',sans-serif; border:1.5px solid var(--rule); background:#fff; border-radius:999px; padding:7px 14px; cursor:pointer; }
+  .cat.sel { border-color:var(--tan); background:var(--sand); color:var(--walnut); }
+  textarea { width:100%; min-height:110px; font:400 14px 'Onest',sans-serif; border:1px solid var(--rule); border-radius:10px; padding:11px 13px; resize:vertical; margin-bottom:8px; }
+  input[type=text] { width:100%; font:400 13px 'Onest',sans-serif; border:1px solid var(--rule); border-radius:10px; padding:9px 12px; margin-bottom:12px; }
+  button.send { background:var(--tan); color:#fff; border:0; border-radius:10px; padding:12px 22px; font:600 14px 'Onest',sans-serif; cursor:pointer; }
+  button.send:hover { background:var(--walnut); }
+  button.send:disabled { opacity:.6; }
+  .msg { display:none; margin-top:10px; font-size:13px; font-weight:600; }
+  .fb-item { padding:14px 0; border-bottom:1px solid #f2ecdf; }
+  .fb-item:last-child { border-bottom:0; }
+  .fb-head { display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap; }
+  .pill { font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; padding:3px 9px; border-radius:999px; font-weight:600; }
+  .pill.bug { background:#fbeeee; color:var(--err); }
+  .pill.feature { background:var(--sand); color:var(--walnut); }
+  .pill.idea { background:#fbf2dc; color:#a06a12; }
+  .pill.ux { background:#e7eef4; color:#3f6fa8; }
+  .pill.praise { background:#eaf3ea; color:#2f5c38; }
+  .pill.status { background:#f4f0e7; color:var(--muted); }
+  .fb-body { font-size:13.5px; line-height:1.55; white-space:pre-wrap; }
+  .fb-meta { font-size:11px; color:var(--muted); margin-top:5px; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div><div class="title">Product feedback</div><span class="sub">You break it · we build it better</span></div>
+  <a href="/dashboard">← Back to pipeline</a>
+</header>
+<main>
+  <div class="card">
+    <h2>What did you find?</h2>
+    <p class="lede">Bugs, missing features, confusing screens, wild ideas, things clients say — <strong>everything is useful.</strong> One thought per submission keeps the list actionable.</p>
+    <div class="cats" id="cats">
+      <button class="cat sel" data-c="bug" type="button">🐛 Bug</button>
+      <button class="cat" data-c="feature" type="button">🧩 Feature request</button>
+      <button class="cat" data-c="idea" type="button">💡 Idea</button>
+      <button class="cat" data-c="ux" type="button">🤔 Confusing UX</button>
+      <button class="cat" data-c="praise" type="button">🔥 This works great</button>
+    </div>
+    <input id="fbPage" type="text" placeholder="Where? (e.g. /dashboard, editor site map, client portal chat)">
+    <textarea id="fbBody" placeholder="What happened, what you expected, or what you'd build…"></textarea>
+    <button class="send" id="fbSend" type="button">Submit feedback</button>
+    <div class="msg" id="fbMsg"></div>
+  </div>
+  <div class="card">
+    <h2>Submitted so far</h2>
+    <p class="lede">Everything your workspace has filed, newest first.</p>
+    <div id="fbList">Loading…</div>
+  </div>
+</main>
+
+<script type="module">
+import { supabase } from '/js/supabase-client.js';
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+let category = 'bug';
+
+document.querySelectorAll('.cat').forEach(c => c.addEventListener('click', () => {
+  document.querySelectorAll('.cat').forEach(x => x.classList.remove('sel'));
+  c.classList.add('sel'); category = c.dataset.c;
+}));
+
+const { data: { user } } = await supabase.auth.getUser();
+if (!user) window.location.replace('/login.html?redirect=/feedback.html');
+
+async function load() {
+  const { data, error } = await supabase
+    .from('product_feedback')
+    .select('category, page, body, status, author_name, created_at')
+    .order('created_at', { ascending: false })
+    .limit(100);
+  const list = $('fbList');
+  if (error) { list.innerHTML = 'Could not load: ' + esc(error.message); return; }
+  if (!data || !data.length) { list.innerHTML = '<span style="color:var(--muted); font-size:13px;">Nothing yet — you get to file the first one. 🏆</span>'; return; }
+  list.innerHTML = data.map(f => `
+    <div class="fb-item">
+      <div class="fb-head">
+        <span class="pill ${esc(f.category)}">${esc(f.category)}</span>
+        ${f.page ? `<span style="font-size:11px;color:var(--muted);font-weight:600;">${esc(f.page)}</span>` : ''}
+        <span class="pill status" style="margin-left:auto;">${esc(f.status)}</span>
+      </div>
+      <div class="fb-body">${esc(f.body)}</div>
+      <div class="fb-meta">${esc(f.author_name || 'Team')} · ${new Date(f.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+    </div>`).join('');
+}
+
+$('fbSend').addEventListener('click', async () => {
+  const body = $('fbBody').value.trim();
+  if (!body) return;
+  const btn = $('fbSend'); btn.disabled = true;
+  const { data: prof } = await supabase.from('profiles').select('display_name').eq('id', user.id).maybeSingle();
+  const { error } = await supabase.from('product_feedback').insert({
+    author_user_id: user.id,
+    author_name: (prof && prof.display_name) || user.email,
+    category,
+    page: $('fbPage').value.trim() || null,
+    body,
+  });
+  const msg = $('fbMsg');
+  if (error) {
+    msg.textContent = 'Could not submit: ' + error.message; msg.style.color = 'var(--err)';
+  } else {
+    msg.textContent = '✓ Logged — thank you. Every one of these shapes the roadmap.'; msg.style.color = 'var(--walnut)';
+    $('fbBody').value = ''; $('fbPage').value = '';
+    load();
+  }
+  msg.style.display = 'block'; btn.disabled = false;
+  setTimeout(() => { msg.style.display = 'none'; }, 4000);
+});
+
+load();
+</script>
+</body>
+</html>
