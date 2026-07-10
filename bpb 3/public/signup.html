@@ -27,13 +27,17 @@
   .logo { height: 34px; display: block; margin-bottom: 22px; }
   h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.014em; margin-bottom: 6px; }
   .lede { font-size: 13.5px; color: var(--muted); line-height: 1.55; margin-bottom: 22px; }
-  .plan {
-    background: var(--pp-sand); border-radius: 12px; padding: 14px 16px; margin-bottom: 22px;
-    display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  .plans { display: grid; gap: 10px; margin-bottom: 22px; }
+  .plan-card {
+    text-align: left; background: #fff; border: 1.5px solid var(--rule); border-radius: 12px;
+    padding: 13px 16px; cursor: pointer; font: inherit; transition: border-color .15s, background .15s;
   }
+  .plan-card:hover { border-color: var(--pp-tan); }
+  .plan-card.selected { border-color: var(--pp-tan); background: var(--pp-sand); }
   .plan-name { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pp-walnut); }
-  .plan-price { font-size: 20px; font-weight: 700; color: var(--pp-espresso); }
+  .plan-price { font-size: 20px; font-weight: 700; color: var(--pp-espresso); margin: 3px 0 2px; }
   .plan-price span { font-size: 12px; font-weight: 500; color: var(--muted); }
+  .plan-price em { font-style: normal; font-size: 12px; font-weight: 600; color: var(--pp-walnut); }
   .plan-trial { font-size: 11.5px; color: var(--pp-walnut); font-weight: 600; }
   label { display: block; font-size: 12px; font-weight: 600; color: var(--text); margin: 0 0 5px; }
   input {
@@ -64,15 +68,20 @@
 
 <div class="card">
   <img class="logo" src="/assets/paver-portal-logo.svg" alt="Paver Portal">
-  <h1>Start your 14-day trial</h1>
-  <p class="lede">Proposals your clients actually read, sign, and share — built for hardscaping companies.</p>
+  <h1 id="pageTitle">Start your free trial</h1>
+  <p class="lede">Proposals your clients actually read, sign, and share — built for hardscaping pros.</p>
 
-  <div class="plan">
-    <div>
-      <div class="plan-name">Pro plan</div>
-      <div class="plan-trial">14 days free · cancel anytime</div>
-    </div>
-    <div class="plan-price">$249<span>/mo</span></div>
+  <div class="plans">
+    <button type="button" class="plan-card selected" data-plan="individual">
+      <div class="plan-name">Individual designer</div>
+      <div class="plan-price">$49<span>/mo</span></div>
+      <div class="plan-trial">10-day free trial · 3 proposals included · cancel anytime</div>
+    </button>
+    <button type="button" class="plan-card" data-plan="team">
+      <div class="plan-name">Team</div>
+      <div class="plan-price">$249<span>/mo</span> <em>+ $19/designer</em></div>
+      <div class="plan-trial">Structured onboarding with the Paver Portal team</div>
+    </button>
   </div>
 
   <div class="canceled" id="canceledMsg">Checkout canceled — your card wasn't charged. Pick up where you left off below.</div>
@@ -91,15 +100,29 @@
   <input id="fPassword" type="password" placeholder="At least 8 characters" autocomplete="new-password">
 
   <button id="goBtn" type="button">Continue to secure checkout →</button>
-  <p class="fine">Card handled by Stripe. Your workspace is created the moment checkout completes.<br>By continuing you agree to the <a href="/terms.html">Terms of Service</a> and <a href="/privacy.html">Privacy Policy</a>.<br>Already have an account? <a href="/login.html">Sign in</a></p>
+  <p class="fine" id="finePrint">Card handled by Stripe · 10-day free trial · no charge until your trial ends.<br>By continuing you agree to the <a href="/terms.html">Terms of Service</a> and <a href="/privacy.html">Privacy Policy</a>.<br>Already have an account? <a href="/login.html">Sign in</a></p>
 </div>
 
 <script>
 (function () {
   const $ = (id) => document.getElementById(id);
-  if (new URLSearchParams(location.search).get('canceled')) {
+  const params = new URLSearchParams(location.search);
+  if (params.get('canceled')) {
     $('canceledMsg').style.display = 'block';
   }
+
+  let plan = params.get('plan') === 'team' ? 'team' : 'individual';
+  const applyPlanUI = () => {
+    document.querySelectorAll('.plan-card').forEach(c =>
+      c.classList.toggle('selected', c.dataset.plan === plan));
+    $('pageTitle').textContent = plan === 'team' ? 'Set up your team workspace' : 'Start your free trial';
+    $('finePrint').firstChild.textContent = plan === 'team'
+      ? 'Card handled by Stripe · billed monthly · our team reaches out within one business day to schedule onboarding.'
+      : 'Card handled by Stripe · 10-day free trial · no charge until your trial ends.';
+  };
+  document.querySelectorAll('.plan-card').forEach(c =>
+    c.addEventListener('click', () => { plan = c.dataset.plan; applyPlanUI(); }));
+  applyPlanUI();
   const showErr = (m) => { const e = $('errBox'); e.textContent = m; e.style.display = 'block'; };
 
   $('goBtn').addEventListener('click', async () => {
@@ -119,7 +142,7 @@
       const resp = await fetch('/api/signup-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ company_name, owner_name, email, password }),
+        body: JSON.stringify({ company_name, owner_name, email, password, plan }),
       });
       const out = await resp.json().catch(() => ({}));
       if (!resp.ok || !out.url) throw new Error(out.error || 'Could not start checkout.');

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paver Portal — The smarter way to sell hardscapes</title>
+<meta name="description" content="Scaled site-map measuring, branded proposals, live client engagement, and built-in expert answers — the sales platform for hardscaping designers. 10-day free trial.">
+<meta property="og:title" content="Paver Portal — The smarter way to sell hardscapes">
+<meta property="og:description" content="Proposals your clients actually read, sign, and share. Know which deals are alive. 10-day free trial, 3 proposals included.">
+<link rel="icon" href="/assets/paver-portal-icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tan:#9c7440; --walnut:#7d5c31; --gold:#d9a441; --sand:#f1e7d3;
+    --cream:#faf6ee; --espresso:#33281c; --rule:#e7e0d2;
+    --text:#23282f; --muted:#6f6a60; --ok:#2f7a43;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body { font-family:'Onest',-apple-system,sans-serif; background:var(--cream); color:var(--text); line-height:1.6; }
+  a { color:var(--walnut); text-decoration:none; }
+  .wrap { max-width:1120px; margin:0 auto; padding:0 22px; }
+  .mono { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; }
+
+  /* Nav */
+  nav { position:sticky; top:0; z-index:100; background:rgba(250,246,238,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--rule); }
+  .nav-in { display:flex; align-items:center; justify-content:space-between; height:62px; }
+  .nav-logo img { height:30px; display:block; }
+  .nav-links { display:flex; align-items:center; gap:22px; }
+  .nav-links a { font-size:13.5px; font-weight:600; color:var(--text); }
+  .nav-links a:hover { color:var(--walnut); }
+  .btn { display:inline-block; background:var(--tan); color:#fff !important; border-radius:999px; padding:11px 22px; font-weight:700; font-size:14px; transition:background .15s, transform .12s; }
+  .btn:hover { background:var(--walnut); transform:translateY(-1px); }
+  .btn.big { padding:15px 30px; font-size:15.5px; }
+  .btn.ghost { background:#fff; color:var(--text) !important; border:1px solid var(--rule); }
+  .btn.ghost:hover { border-color:var(--tan); color:var(--walnut) !important; background:var(--sand); }
+  @media (max-width:720px){ .nav-links a.hide-m { display:none; } }
+
+  /* Hero */
+  .hero { padding:74px 0 30px; display:grid; grid-template-columns:1.05fr .95fr; gap:44px; align-items:center; }
+  @media (max-width:900px){ .hero { grid-template-columns:1fr; padding-top:44px; } }
+  .hero .mono { color:var(--tan); margin-bottom:14px; display:block; }
+  h1 { font-size:clamp(34px,4.6vw,54px); font-weight:800; letter-spacing:-.025em; line-height:1.08; margin-bottom:18px; }
+  h1 em { font-style:normal; color:var(--tan); }
+  .hero p { font-size:17px; color:var(--muted); max-width:520px; margin-bottom:26px; }
+  .hero-ctas { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:18px; }
+  .badges { display:flex; gap:18px; flex-wrap:wrap; }
+  .badges span { font-size:12.5px; color:var(--muted); font-weight:600; }
+  .badges span::before { content:'✓ '; color:var(--ok); }
+
+  /* Mock cards */
+  .mock { background:#fff; border:1px solid var(--rule); border-radius:16px; box-shadow:0 24px 60px rgba(51,40,28,.12); overflow:hidden; }
+  .mock-bar { display:flex; align-items:center; gap:8px; background:var(--espresso); padding:9px 14px; }
+  .mock-bar i { width:9px; height:9px; border-radius:99px; background:#5a4a37; display:inline-block; }
+  .mock-bar .url { font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#cbb894; margin-left:6px; }
+  .mock-body { padding:16px 18px 18px; }
+  .mock h4 { font-size:13.5px; font-weight:700; margin-bottom:2px; }
+  .mock .sub { font-size:11px; color:var(--muted); margin-bottom:12px; }
+  .m-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid #f4eee1; font-size:12.5px; }
+  .m-row:last-child { border-bottom:0; }
+  .m-strong { font-weight:700; }
+  .m-dim { color:var(--muted); font-size:11px; }
+  .m-pill { font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; padding:3px 8px; border-radius:999px; font-weight:600; white-space:nowrap; }
+  .m-pill.hot { background:#eef6ef; color:var(--ok); }
+  .m-pill.warm { background:var(--sand); color:var(--walnut); }
+  .m-pill.gold { background:#fbf2dc; color:#a06a12; }
+  .m-stat { text-align:right; }
+  .m-stat b { font-size:16px; display:block; letter-spacing:-.01em; }
+  .m-bars { display:flex; gap:4px; align-items:flex-end; height:44px; margin:8px 0 2px; }
+  .m-bars i { flex:1; background:var(--sand); border-radius:3px 3px 0 0; }
+  .m-bars i.g { background:var(--gold); }
+  .m-bars i.t { background:var(--tan); }
+
+  /* Stat strip */
+  .strip { border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); background:#fff; margin-top:44px; }
+  .strip-in { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; padding:26px 0; text-align:center; }
+  .strip b { font-size:26px; font-weight:800; letter-spacing:-.02em; display:block; color:var(--espresso); }
+  .strip span { font-size:12px; color:var(--muted); font-weight:600; }
+  .strip-note { text-align:center; font-size:11.5px; color:var(--muted); padding-bottom:18px; }
+
+  /* Feature sections */
+  .features { padding:70px 0 10px; }
+  .sec-head { text-align:center; max-width:640px; margin:0 auto 54px; }
+  .sec-head .mono { color:var(--tan); display:block; margin-bottom:10px; }
+  h2 { font-size:clamp(26px,3.4vw,38px); font-weight:800; letter-spacing:-.022em; line-height:1.15; }
+  .sec-head p { color:var(--muted); font-size:15.5px; margin-top:12px; }
+  .feat { display:grid; grid-template-columns:1fr 1fr; gap:52px; align-items:center; padding:44px 0; }
+  .feat:nth-child(even) .feat-copy { order:2; }
+  @media (max-width:860px){ .feat { grid-template-columns:1fr; gap:26px; } .feat:nth-child(even) .feat-copy { order:0; } }
+  .feat-num { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold); font-weight:600; letter-spacing:.2em; margin-bottom:10px; }
+  h3 { font-size:24px; font-weight:800; letter-spacing:-.018em; line-height:1.2; margin-bottom:12px; }
+  .feat-copy p { color:var(--muted); font-size:14.5px; margin-bottom:14px; }
+  .checks { list-style:none; }
+  .checks li { font-size:13.5px; padding:4px 0 4px 24px; position:relative; font-weight:500; }
+  .checks li::before { content:'✓'; position:absolute; left:0; color:var(--ok); font-weight:800; }
+
+  /* Why trio */
+  .why { background:var(--espresso); color:#fff; padding:70px 0; margin-top:60px; }
+  .why h2 { color:#fff; text-align:center; max-width:720px; margin:0 auto 8px; }
+  .why .lede { text-align:center; color:#cbb894; font-size:15px; max-width:620px; margin:0 auto 44px; }
+  .why-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; }
+  .why-card { background:rgba(255,255,255,.05); border:1px solid rgba(217,164,65,.25); border-radius:14px; padding:22px 24px; }
+  .why-card h4 { font-size:16px; font-weight:700; margin-bottom:8px; color:var(--gold); }
+  .why-card p { font-size:13.5px; color:#d8cbb4; line-height:1.6; }
+
+  /* Pricing */
+  .pricing { padding:80px 0 30px; }
+  .price-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; max-width:820px; margin:0 auto; }
+  .price-card { background:#fff; border:1.5px solid var(--rule); border-radius:18px; padding:28px 28px 26px; position:relative; }
+  .price-card.hot { border-color:var(--tan); box-shadow:0 18px 50px rgba(156,116,64,.14); }
+  .tag { position:absolute; top:-11px; left:24px; background:var(--tan); color:#fff; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; font-weight:600; padding:4px 10px; border-radius:999px; }
+  .price-card .mono { color:var(--walnut); }
+  .amount { font-size:40px; font-weight:800; letter-spacing:-.025em; margin:10px 0 2px; color:var(--espresso); }
+  .amount span { font-size:14px; font-weight:500; color:var(--muted); }
+  .amount em { font-style:normal; font-size:14px; font-weight:700; color:var(--walnut); }
+  .price-sub { font-size:12.5px; color:var(--muted); margin-bottom:16px; font-weight:600; }
+  .price-card .checks { margin-bottom:20px; }
+  .price-card .btn { width:100%; text-align:center; }
+
+  /* Final CTA + footer */
+  .final { text-align:center; padding:70px 0 80px; }
+  .final h2 { max-width:640px; margin:0 auto 12px; }
+  .final p { color:var(--muted); margin-bottom:24px; }
+  footer { border-top:1px solid var(--rule); background:#fff; padding:26px 0; }
+  .foot-in { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .foot-in img { height:24px; }
+  .foot-links { display:flex; gap:18px; font-size:12.5px; }
+  .foot-copy { font-size:11.5px; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="nav-logo" href="/"><img src="/assets/paver-portal-logo.svg" alt="Paver Portal"></a>
+    <div class="nav-links">
+      <a href="#features" class="hide-m">Features</a>
+      <a href="#pricing" class="hide-m">Pricing</a>
+      <a href="/login.html">Sign in</a>
+      <a class="btn" href="/signup.html">Start free trial</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ Hero ═══ -->
+<header class="wrap hero">
+  <div>
+    <span class="mono">Built for hardscaping pros</span>
+    <h1>The smarter way to <em>sell hardscapes.</em></h1>
+    <p>Scaled site-map measuring, branded proposals your clients actually read, live engagement on every deal, and expert answers in the field — one platform, from first measurement to signature.</p>
+    <div class="hero-ctas">
+      <a class="btn big" href="/signup.html">Start your free trial</a>
+      <a class="btn ghost" href="#features">See how it works ↓</a>
+    </div>
+    <div class="badges">
+      <span>10-day free trial</span>
+      <span>3 proposals included</span>
+      <span>Cancel anytime</span>
+    </div>
+  </div>
+
+  <div class="mock" aria-hidden="true">
+    <div class="mock-bar"><i></i><i></i><i></i><span class="url">paverportal.com/dashboard · live pipeline</span></div>
+    <div class="mock-body">
+      <h4>Your pipeline</h4>
+      <div class="sub">Every open, return visit, and request — captured automatically</div>
+      <div class="m-row">
+        <div><div class="m-strong">1719 Yorktown Rd</div><div class="m-dim">Viewed 4× today · shared with spouse</div></div>
+        <span class="m-pill hot">Engaged</span>
+        <div class="m-stat"><b>$86,400</b><span class="m-dim">backyard + pool deck</span></div>
+      </div>
+      <div class="m-row">
+        <div><div class="m-strong">40 Sierra Ct</div><div class="m-dim">Substitution requested · 1h ago</div></div>
+        <span class="m-pill gold">Action</span>
+        <div class="m-stat"><b>$42,750</b><span class="m-dim">driveway</span></div>
+      </div>
+      <div class="m-row">
+        <div><div class="m-strong">228 Alder Ln</div><div class="m-dim">Opened 20 min after publish</div></div>
+        <span class="m-pill warm">Viewed</span>
+        <div class="m-stat"><b>$31,200</b><span class="m-dim">patio + walls</span></div>
+      </div>
+      <div class="m-bars"><i style="height:30%"></i><i style="height:44%" class="t"></i><i style="height:38%"></i><i style="height:62%" class="t"></i><i style="height:52%"></i><i style="height:78%" class="g"></i><i style="height:70%" class="t"></i><i style="height:92%" class="g"></i></div>
+      <div class="m-dim">Engagement events · trailing 8 days</div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ Proof strip ═══ -->
+<div class="strip">
+  <div class="wrap strip-in">
+    <div><b>1,304 sqft</b><span>measured on one real deal — geometry, not guessing</span></div>
+    <div><b>17 / 17</b><span>active days of client engagement captured</span></div>
+    <div><b>Same-hour</b><span>follow-up on engaged buyers beats cold cadence</span></div>
+    <div><b>1 platform</b><span>measure · propose · chat · close</span></div>
+  </div>
+  <div class="wrap strip-note">Built and battle-tested on real paver deals for a year before it became a product.</div>
+</div>
+
+<!-- ═══ Features ═══ -->
+<section class="features wrap" id="features">
+  <div class="sec-head">
+    <span class="mono">How it works</span>
+    <h2>Most design teams go dark the moment a proposal goes out.<br>Yours won't.</h2>
+    <p>Deals rarely die in a price war. They die because the homeowner went quiet — or the number was off — and nobody knew. Paver Portal makes the invisible visible.</p>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">01 · MEASURE</div>
+      <h3>Accurate pricing starts at the measurement.</h3>
+      <p>Upload any aerial — Google Earth works — click two points on a known distance, and the whole map locks to scale. Every region you draw returns real square footage. You never type a number; pricing follows the geometry.</p>
+      <ul class="checks">
+        <li>One-time scale calibration per property</li>
+        <li>Draw regions, get instant sqft &amp; linear ft</li>
+        <li>Pricing flows from measurement, not eyeballing</li>
+      </ul>
+    </div>
+    <div class="mock" aria-hidden="true">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">/editor · site map · 1719 Yorktown Rd</span></div>
+      <div class="mock-body">
+        <h4>Regions measured</h4>
+        <div class="sub">A → B reference = 80 ft · scale locked ✓</div>
+        <div class="m-row"><span>Main paver area</span><b>872 sqft</b></div>
+        <div class="m-row"><span>Off-bedroom patio</span><b>318 sqft</b></div>
+        <div class="m-row"><span>Seating wall</span><b>12.98 lnft</b></div>
+        <div class="m-row"><span>Decorative rock</span><b>114 sqft</b></div>
+        <div class="m-row"><span class="m-strong">Total measured scope</span><b class="m-strong">1,304 sqft</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">02 · PROPOSE</div>
+      <h3>From contractor bid to polished proposal in minutes.</h3>
+      <p>Drop in the bid PDF and it's parsed into line items automatically. Pick materials from a centralized catalog — photos, specs, and current pricing included — so every draft reflects today's number, not last quarter's.</p>
+      <ul class="checks">
+        <li>AI bid parsing — no retyping line items</li>
+        <li>Centralized material catalog with photos &amp; specs</li>
+        <li>Publish to a private link — no client login required</li>
+      </ul>
+    </div>
+    <div class="mock" aria-hidden="true">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">/editor · bid parsed ✓</span></div>
+      <div class="mock-body">
+        <h4>Parsed from GreenScape_Bid_Final.pdf</h4>
+        <div class="sub">6 line items extracted · review &amp; publish</div>
+        <div class="m-row"><span>Demo &amp; excavation</span><b>$6,850</b></div>
+        <div class="m-row"><span>Base prep · Class II, 6" compacted</span><b>$9,120</b></div>
+        <div class="m-row"><span>Belgard Catalina Slate · 872 sqft</span><b>$21,780</b></div>
+        <div class="m-row"><span>Seating wall · Weston Stone</span><b>$4,940</b></div>
+        <div class="m-row"><span class="m-strong">Project total</span><b class="m-strong">$42,690</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">03 · ENGAGE</div>
+      <h3>Give every client a portal worth coming back to.</h3>
+      <p>Your client gets a branded space with their proposal, materials, a step-by-step look at how their project gets built, direct chat with you, and one-tap requests for material swaps or redesigns. Every conversation in one place — no lost texts, no buried emails.</p>
+      <ul class="checks">
+        <li>Chat with automatic email fallback</li>
+        <li>Substitution &amp; redesign requests, tracked</li>
+        <li>Print-to-mark-up plans and a referral program built in</li>
+      </ul>
+    </div>
+    <div class="mock" aria-hidden="true">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">client portal · chat with designer</span></div>
+      <div class="mock-body">
+        <h4>Sarah &amp; Mike Torres</h4>
+        <div class="sub">1719 Yorktown Rd · proposal viewed 4×</div>
+        <div class="m-row"><div><div class="m-strong">"Could we see the Catalina in the walnut blend instead?"</div><div class="m-dim">Substitution request · 1h ago</div></div><span class="m-pill gold">Respond</span></div>
+        <div class="m-row"><div><div class="m-strong">"Love the seating wall placement 👏"</div><div class="m-dim">Chat · yesterday</div></div><span class="m-pill hot">Read</span></div>
+        <div class="m-row"><div><div class="m-strong">Printed plan to mark up</div><div class="m-dim">Activity · 2 days ago</div></div><span class="m-pill warm">Signal</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">04 · CLOSE</div>
+      <h3>Know which deals are alive — and call at the right moment.</h3>
+      <p>Every page open, return visit, share, and request moves the deal through your pipeline automatically: Draft → Sent → Viewed → Engaged → Signed. When a homeowner re-reads the proposal three times on a Tuesday night, you'll know Wednesday morning.</p>
+      <ul class="checks">
+        <li>Automatic stage progression from real behavior</li>
+        <li>Open value, win rate, and closed totals at a glance</li>
+        <li>Follow up on signal, not gut feel</li>
+      </ul>
+    </div>
+    <div class="mock" aria-hidden="true">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">/dashboard · funnel</span></div>
+      <div class="mock-body">
+        <h4>This month</h4>
+        <div class="sub">Open value $214,300 · win rate 38%</div>
+        <div class="m-row"><span>Draft</span><span class="m-dim">████░░░░░░</span><b>4</b></div>
+        <div class="m-row"><span>Sent</span><span class="m-dim">██████░░░░</span><b>6</b></div>
+        <div class="m-row"><span>Viewed</span><span class="m-dim">█████░░░░░</span><b>5</b></div>
+        <div class="m-row"><span class="m-strong">Engaged</span><span class="m-dim">███░░░░░░░</span><b class="m-strong">3</b></div>
+        <div class="m-row"><span>Signed</span><span class="m-dim">██░░░░░░░░</span><b>2</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">05 · IN THE FIELD</div>
+      <h3>An expert in your pocket, standing in the yard.</h3>
+      <p><strong>Ask a Pro</strong> answers the questions that come up on-site — base depths, drainage, ICPI standards, even county permit rules with live code lookups. The mobile field kit captures photos, notes, and measurements straight onto the client record, two taps from your phone.</p>
+      <ul class="checks">
+        <li>Expert answers on materials, installs &amp; local codes</li>
+        <li>Camera-first photos, notes &amp; labeled measurements</li>
+        <li>Everything lands on the client record instantly</li>
+      </ul>
+    </div>
+    <div class="mock" aria-hidden="true">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">🛠 Ask a Pro</span></div>
+      <div class="mock-body">
+        <div class="m-row"><div><div class="m-dim">You</div><div class="m-strong">Do I need a permit for a 4-ft retaining wall in Contra Costa County?</div></div></div>
+        <div class="m-row"><div><div class="m-dim">Ask a Pro</div><div>Yes — walls over 4 ft measured from the bottom of the footing require a permit and engineered plans there. Under 4 ft with no surcharge is typically exempt. Confirm with the county building department; parcels vary.</div></div></div>
+        <div class="m-row"><div><div class="m-dim">Field kit</div><div class="m-strong">📐 Back patio width — 14 ft 6 in &nbsp;·&nbsp; 📷 3 photos added</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">06 · YOUR BRAND</div>
+      <h3>Your name on the door. Everywhere.</h3>
+      <p>Your logo, your colors, your company name — on the proposal, the client portal, and every email that goes out. Your clients see <em>your</em> brand delivering a big-company experience. Paver Portal stays behind the curtain.</p>
+      <ul class="checks">
+        <li>Custom branding on both plans</li>
+        <li>Branded emails with your reply-to address</li>
+        <li>Clients experience your company, not our software</li>
+      </ul>
+    </div>
+    <div class="mock" aria-hidden="true">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">summit-hardscapes · client email</span></div>
+      <div class="mock-body">
+        <h4>💬 New message from Alex · Summit Hardscapes</h4>
+        <div class="sub">from Summit Hardscapes Portal · reply goes to alex@…</div>
+        <div class="m-row"><div><div class="m-strong">"Updated the pool deck with the travertine you liked —"</div><div class="m-dim">View &amp; reply in Summit Portal →</div></div><span class="m-pill warm">Branded</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Why ═══ -->
+<section class="why">
+  <div class="wrap">
+    <h2>Deals don't usually die in a price war.<br>They die quiet.</h2>
+    <p class="lede">Paver Portal exists so that never happens to a deal you're already working.</p>
+    <div class="why-grid">
+      <div class="why-card"><h4>One consistent experience</h4><p>No more designer-by-designer formats — emailed PDFs for one client, paper printouts for another. Every homeowner gets the same polished, branded experience.</p></div>
+      <div class="why-card"><h4>The instrument panel stays lit</h4><p>Opens, re-reads, shares, requests — captured automatically after every send. "Should I call today?" stops being guesswork.</p></div>
+      <div class="why-card"><h4>Pricing that keeps up</h4><p>A centralized catalog means today's proposal carries today's number — even when suppliers push a mid-quarter rate change.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Pricing ═══ -->
+<section class="pricing wrap" id="pricing">
+  <div class="sec-head">
+    <span class="mono">Pricing</span>
+    <h2>Simple pricing that scales with your crew.</h2>
+    <p>Start solo, bring the team when you're ready. No contracts, no per-proposal fees.</p>
+  </div>
+  <div class="price-grid">
+    <div class="price-card hot">
+      <span class="tag">Most popular</span>
+      <span class="mono">Individual designer</span>
+      <div class="amount">$49<span>/mo</span></div>
+      <div class="price-sub">10-day free trial · create &amp; share up to 3 proposals on us</div>
+      <ul class="checks">
+        <li>Full designer access — nothing held back</li>
+        <li>Unlimited clients &amp; unlimited proposals after trial</li>
+        <li>Site-map measuring, bid parsing, client portal</li>
+        <li>Ask a Pro + mobile field kit</li>
+        <li>Custom branding on everything clients see</li>
+      </ul>
+      <a class="btn" href="/signup.html">Start your free trial</a>
+    </div>
+    <div class="price-card">
+      <span class="mono">Team</span>
+      <div class="amount">$249<span>/mo</span> <em>+ $19/designer</em></div>
+      <div class="price-sub">Structured onboarding with the Paver Portal team</div>
+      <ul class="checks">
+        <li>Admin account + designer seats</li>
+        <li>Unlimited clients across the whole team</li>
+        <li>Per-designer pipelines with clean data separation</li>
+        <li>Guided onboarding &amp; catalog setup</li>
+        <li>Custom branding company-wide</li>
+      </ul>
+      <a class="btn ghost" href="/signup.html?plan=team">Set up your team</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Final CTA ═══ -->
+<section class="final wrap">
+  <h2>Your next proposal could be the one that tells you when it's being read.</h2>
+  <p>Full application access · 3 client proposals on the free trial · set up in minutes.</p>
+  <a class="btn big" href="/signup.html">Start your free trial</a>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <img src="/assets/paver-portal-logo.svg" alt="Paver Portal">
+    <div class="foot-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="mailto:tim@mcmullen.properties">Contact</a>
+    </div>
+    <div class="foot-copy">© 2026 Paver Portal</div>
+  </div>
+</footer>
+
+</body>
+</html>
