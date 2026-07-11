@@ -178,6 +178,48 @@
   .swatch { width:24px; height:24px; border-radius:99px; border:2px solid #fff; box-shadow:0 0 0 1px var(--rule); cursor:pointer; }
   .swatch.sel { box-shadow:0 0 0 2px var(--espresso); }
 
+  /* ═══ Scroll-triggered demo attention ═══ */
+  .mock { opacity:0; transform:translateY(18px); transition:opacity .5s ease, transform .5s ease; }
+  .mock.inview { opacity:1; transform:none; }
+
+  /* TRY IT badge flares when its card is on screen */
+  .mock.attn .try-tag {
+    background:var(--gold); color:var(--espresso); transform:scale(1.12);
+    animation:tagFlare 1.6s ease-in-out infinite;
+    transition:transform .25s ease, background .25s ease;
+  }
+  @keyframes tagFlare {
+    0%,100% { box-shadow:0 0 0 0 rgba(217,164,65,.55); }
+    50%     { box-shadow:0 0 0 9px rgba(217,164,65,0); }
+  }
+
+  /* Pulsing gold ring on the card's primary control */
+  .pulse-ring { position:relative; animation:ringPulse 1.8s ease-out infinite; border-radius:inherit; }
+  @keyframes ringPulse {
+    0%   { box-shadow:0 0 0 0 rgba(217,164,65,.65); }
+    70%  { box-shadow:0 0 0 14px rgba(217,164,65,0); }
+    100% { box-shadow:0 0 0 0 rgba(217,164,65,0); }
+  }
+  .pulse-scale { animation:gentleBounce 1.8s ease-in-out infinite; }
+  @keyframes gentleBounce {
+    0%,100% { transform:scale(1); } 50% { transform:scale(1.045); }
+  }
+
+  /* "tap to try" nudge on the site map */
+  .sm-nudge {
+    position:absolute; pointer-events:none; display:flex; align-items:center; gap:8px;
+    background:rgba(51,40,28,.92); color:#f1e7d3; font:600 11.5px 'Onest',sans-serif;
+    border-radius:999px; padding:8px 14px; box-shadow:0 8px 24px rgba(0,0,0,.25);
+    animation:nudgeBob 1.6s ease-in-out infinite;
+  }
+  .sm-nudge .dot { width:9px; height:9px; border-radius:99px; background:var(--gold); animation:tagFlare 1.6s infinite; }
+  @keyframes nudgeBob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mock { opacity:1; transform:none; transition:none; }
+    .mock.attn .try-tag, .pulse-ring, .pulse-scale, .sm-nudge, .sm-nudge .dot { animation:none !important; }
+  }
+
   /* ═══ MOBILE (dense) ═══ */
   @media (max-width: 720px) {
     .d-only { display:none; }
@@ -1043,6 +1085,84 @@
   }
   if (document.readyState === 'complete') setTimeout(run, 800);
   else window.addEventListener('load', function(){ setTimeout(run, 800); });
+})();
+</script>
+
+<script>
+// Scroll-triggered attention: each demo card rises in, its TRY IT badge
+// flares, and its primary control pulses until the visitor interacts.
+(function () {
+  'use strict';
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.mock').forEach(function (m) { m.classList.add('inview'); });
+    return;
+  }
+
+  // primary control(s) per card, located by a distinctive descendant
+  function primaryControls(card) {
+    var sels = ['#bidParseBtn', '#funRun', '#smSvg', '#portalChips button', '#proChips button', '#brandName'];
+    var out = [];
+    sels.forEach(function (sel) {
+      card.querySelectorAll(sel).forEach(function (el) { out.push(el); });
+    });
+    return out;
+  }
+
+  var interacted = new WeakSet();
+
+  function calm(card) {
+    interacted.add(card);
+    card.classList.remove('attn');
+    card.querySelectorAll('.pulse-ring, .pulse-scale').forEach(function (el) {
+      el.classList.remove('pulse-ring', 'pulse-scale');
+    });
+    var n = card.querySelector('.sm-nudge');
+    if (n) n.remove();
+  }
+
+  function excite(card) {
+    if (interacted.has(card)) return;
+    card.classList.add('attn');
+    primaryControls(card).forEach(function (el) {
+      if (el.tagName === 'BUTTON' || el.tagName === 'INPUT') {
+        el.classList.add('pulse-ring');
+        if (el.tagName === 'BUTTON') el.classList.add('pulse-scale');
+      }
+    });
+    // site map: floating "tap the yard" nudge over the SVG
+    var svg = card.querySelector('#smSvg');
+    if (svg && !card.querySelector('.sm-nudge')) {
+      var wrap = svg.parentElement;
+      if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+      var n = document.createElement('div');
+      n.className = 'sm-nudge';
+      n.innerHTML = '<span class="dot"></span> Tap the yard to draw &amp; measure';
+      n.style.left = '50%'; n.style.top = '46%'; n.style.transform = 'translate(-50%,-50%)';
+      wrap.appendChild(n);
+    }
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('inview');
+        excite(e.target);
+      } else {
+        e.target.classList.remove('attn');
+      }
+    });
+  }, { threshold: 0.45 });
+
+  document.querySelectorAll('.mock').forEach(function (card) {
+    io.observe(card);
+    ['pointerdown', 'focusin'].forEach(function (evt) {
+      card.addEventListener(evt, function () { calm(card); }, { once: true });
+    });
+  });
+
+  // hero card is already "live" — let it rise in but skip the pulses
+  var hero = document.querySelector('.hero .mock');
+  if (hero) interacted.add(hero);
 })();
 </script>
 </body>
