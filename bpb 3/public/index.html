@@ -180,8 +180,17 @@
   @media (max-width: 720px) {
     .d-only { display:none; }
     .m-only { display:inline; }
-    .wrap { padding:0 14px; }
+    .wrap { padding:0 18px; }
     body { line-height:1.5; }
+
+    /* Contained & centered: nothing slams the screen edges */
+    .hero > div:first-child { max-width:460px; margin:0 auto; text-align:center; }
+    .hero .mono { display:block; }
+    .checks { text-align:left; }
+    .feat-copy { width:100%; max-width:440px; margin:0 auto; }
+    .feat .mock, .hero .mock { width:100%; max-width:440px; margin-left:auto; margin-right:auto; }
+    .why-card, .price-card { width:100%; max-width:420px; margin-left:auto; margin-right:auto; }
+    .strip-in { max-width:440px; margin:0 auto; }
 
     /* Nav */
     .nav-in { height:54px; gap:8px; }
@@ -196,9 +205,9 @@
     .hero .mono { margin-bottom:8px; font-size:9px; }
     h1 { font-size:25px; margin-bottom:8px; line-height:1.14; }
     .hero p { font-size:13.5px; margin-bottom:12px; line-height:1.45; }
-    .hero-ctas { flex-direction:column; align-items:stretch; gap:8px; margin-bottom:10px; }
-    .hero-ctas .btn { text-align:center; }
-    .badges { gap:4px 12px; }
+    .hero-ctas { flex-direction:column; align-items:center; gap:9px; margin-bottom:10px; }
+    .hero-ctas .btn { text-align:center; width:auto; min-width:240px; max-width:100%; padding:13px 32px; }
+    .badges { gap:4px 12px; justify-content:center; }
     .badges span { font-size:10.5px; }
 
     /* Proof strip */
@@ -221,7 +230,7 @@
     .checks li { font-size:12.5px; padding:2.5px 0 2.5px 21px; }
 
     /* Demo cards */
-    .mock { margin:0 -2px; border-radius:13px; }
+    .mock { border-radius:15px; }
     .mock-bar { padding:7px 11px; }
     .try-tag { font-size:8px; padding:3px 7px; }
     .mock-body { padding:12px 13px 13px; }
