@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set up your workspace · Paver Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root { --tan:#9c7440; --walnut:#7d5c31; --gold:#d9a441; --sand:#f1e7d3; --cream:#faf6ee; --espresso:#33281c; --rule:#e5e0d6; --text:#23282f; --muted:#6f6a60; --ok:#2f7a43; --err:#b91c1c; }
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body { font-family:'Onest',sans-serif; background:var(--cream); color:var(--text); min-height:100vh; }
+  .top { display:flex; align-items:center; justify-content:center; padding:18px 16px 6px; }
+  .top img { height:28px; }
+  main { max-width:560px; margin:0 auto; padding:10px 16px 90px; }
+
+  /* progress */
+  .dots { display:flex; gap:8px; justify-content:center; margin:10px 0 22px; }
+  .dot { width:34px; height:6px; border-radius:99px; background:var(--rule); transition:background .25s; }
+  .dot.on { background:var(--tan); }
+
+  .step { display:none; }
+  .step.on { display:block; animation:rise .35s ease; }
+  @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+  .eyebrow { font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--tan); font-weight:600; margin-bottom:8px; text-align:center; }
+  h1 { font-size:23px; font-weight:700; letter-spacing:-.015em; text-align:center; margin-bottom:8px; line-height:1.2; }
+  .lede { font-size:13.5px; color:var(--muted); text-align:center; margin-bottom:20px; line-height:1.5; }
+
+  .card { background:#fff; border:1px solid var(--rule); border-radius:16px; padding:18px; margin-bottom:14px; }
+
+  /* Step 1: brand */
+  .logo-drop {
+    border:2px dashed var(--rule); border-radius:14px; padding:22px 14px; text-align:center;
+    cursor:pointer; transition:border-color .2s, background .2s;
+  }
+  .logo-drop:hover, .logo-drop.has { border-color:var(--tan); background:var(--cream); }
+  .logo-drop img { max-height:64px; max-width:88%; margin-bottom:8px; }
+  .logo-drop .big { font-size:15px; font-weight:700; }
+  .logo-drop .small { font-size:12px; color:var(--muted); margin-top:3px; }
+  .swatches { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:14px; }
+  .swatch { width:42px; height:42px; border-radius:99px; cursor:pointer; border:3px solid #fff; box-shadow:0 0 0 1.5px var(--rule); }
+  .swatch.sel { box-shadow:0 0 0 3px var(--espresso); }
+  .brand-preview { display:flex; align-items:center; gap:10px; background:var(--cream); border-radius:12px; padding:12px 14px; margin-top:14px; }
+  .brand-preview img { height:26px; }
+  .brand-preview b { font-size:14px; }
+  .brand-preview .tag { margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--walnut); background:var(--sand); border-radius:99px; padding:3px 9px; font-weight:600; }
+
+  /* Step 2: manufacturers */
+  .mfg { display:flex; align-items:center; gap:12px; border:2px solid var(--rule); border-radius:14px; padding:14px 16px; margin-bottom:10px; cursor:pointer; transition:border-color .15s, background .15s; }
+  .mfg.sel { border-color:var(--tan); background:var(--sand); }
+  .mfg .check { width:26px; height:26px; border-radius:8px; border:2px solid var(--rule); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; flex-shrink:0; }
+  .mfg.sel .check { background:var(--tan); border-color:var(--tan); }
+  .mfg b { font-size:15px; }
+  .mfg .count { margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); white-space:nowrap; }
+
+  /* Step 3: pricing */
+  .rate { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid #f2ecdf; }
+  .rate:last-child { border-bottom:0; }
+  .rate .nm { flex:1; font-size:13.5px; font-weight:600; min-width:0; }
+  .rate .un { font-size:11px; color:var(--muted); white-space:nowrap; }
+  .rate input { width:86px; font:600 16px 'Onest',sans-serif; border:1.5px solid var(--rule); border-radius:9px; padding:8px 10px; text-align:right; }
+  .rate input:focus { outline:none; border-color:var(--tan); }
+  .add-row { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .add-row input, .add-row select { font:500 14px 'Onest',sans-serif; border:1.5px solid var(--rule); border-radius:9px; padding:9px 10px; }
+  .add-row .nm-in { flex:1; min-width:150px; }
+  .add-row .rt-in { width:90px; }
+
+  /* Step 4: done */
+  .done-check { width:64px; height:64px; border-radius:99px; background:var(--sand); color:var(--walnut); font-size:28px; display:flex; align-items:center; justify-content:center; margin:6px auto 14px; }
+  .recap { text-align:left; }
+  .recap li { list-style:none; font-size:14px; padding:6px 0 6px 26px; position:relative; }
+  .recap li::before { content:'✓'; position:absolute; left:0; color:var(--ok); font-weight:800; }
+
+  /* nav buttons */
+  .nav { display:flex; gap:10px; margin-top:18px; }
+  .btn { flex:1; border:0; border-radius:12px; padding:15px; font:700 15px 'Onest',sans-serif; cursor:pointer; text-align:center; text-decoration:none; }
+  .btn.primary { background:var(--tan); color:#fff; }
+  .btn.primary:hover { background:var(--walnut); }
+  .btn.primary:disabled { opacity:.55; cursor:wait; }
+  .btn.ghost { background:#fff; color:var(--text); border:1.5px solid var(--rule); flex:0 0 auto; padding:15px 18px; }
+  .skip { display:block; text-align:center; font-size:12.5px; color:var(--muted); margin-top:12px; text-decoration:none; }
+  .skip:hover { color:var(--walnut); }
+  .msg { display:none; font-size:13px; font-weight:600; text-align:center; margin-top:10px; }
+</style>
+</head>
+<body>
+<div class="top"><img src="/assets/paver-portal-logo.svg" alt="Paver Portal"></div>
+<main>
+  <div class="dots"><div class="dot on" id="d0"></div><div class="dot" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div></div>
+
+  <!-- ═══ STEP 1 · BRAND ═══ -->
+  <section class="step on" id="s0">
+    <div class="eyebrow">Step 1 of 4 · Your brand</div>
+    <h1>Make it yours</h1>
+    <p class="lede">Your logo and color go on every proposal, the client portal, and every email. Clients see <b>your</b> company — we stay behind the curtain.</p>
+    <div class="card">
+      <div class="logo-drop" id="logoDrop">
+        <input type="file" id="logoInput" accept="image/*" hidden>
+        <div id="logoEmpty">
+          <div class="big">📷 Tap to add your logo</div>
+          <div class="small">PNG, JPG or SVG · you can change it anytime</div>
+        </div>
+        <div id="logoHas" style="display:none;">
+          <img id="logoPreview" alt="Your logo">
+          <div class="small">Tap to replace</div>
+        </div>
+      </div>
+      <div class="swatches" id="swatches">
+        <div class="swatch sel" data-c="#9c7440" style="background:#9c7440"></div>
+        <div class="swatch" data-c="#5d7e69" style="background:#5d7e69"></div>
+        <div class="swatch" data-c="#3f6fa8" style="background:#3f6fa8"></div>
+        <div class="swatch" data-c="#7a5c9e" style="background:#7a5c9e"></div>
+        <div class="swatch" data-c="#a85454" style="background:#a85454"></div>
+        <div class="swatch" data-c="#33281c" style="background:#33281c"></div>
+      </div>
+      <div class="brand-preview">
+        <img id="pvLogo" src="/assets/paver-portal-icon.svg" alt="">
+        <b id="pvName">Your Company</b>
+        <span class="tag" id="pvTag" style="color:#7d5c31;">Your portal</span>
+      </div>
+    </div>
+    <div class="nav"><button class="btn primary" id="next0" type="button">Looks good →</button></div>
+    <a class="skip" href="#" data-skip="0">Skip for now — I'll add it later</a>
+  </section>
+
+  <!-- ═══ STEP 2 · MATERIALS ═══ -->
+  <section class="step" id="s1">
+    <div class="eyebrow">Step 2 of 4 · Your materials</div>
+    <h1>Which catalogs do you sell from?</h1>
+    <p class="lede">Tap to include a manufacturer's <b>full catalog</b> — photos, specs, colors, the lot. You can always add your own products later.</p>
+    <div class="card" id="mfgList"><div style="text-align:center;color:var(--muted);font-size:13px;padding:14px;">Loading catalogs…</div></div>
+    <div class="nav"><button class="btn ghost" data-back type="button">←</button><button class="btn primary" id="next1" type="button">Include selected →</button></div>
+    <a class="skip" href="#" data-skip="1">Skip — include everything</a>
+  </section>
+
+  <!-- ═══ STEP 3 · PRICING ═══ -->
+  <section class="step" id="s2">
+    <div class="eyebrow">Step 3 of 4 · Your pricing</div>
+    <h1>What do you charge?</h1>
+    <p class="lede">We started you with the common ones — <b>edit the numbers to match your rates.</b> Add anything you sell, from grading to outdoor kitchens.</p>
+    <div class="card">
+      <div id="rateList"><div style="text-align:center;color:var(--muted);font-size:13px;padding:14px;">Loading your rate card…</div></div>
+      <div class="add-row">
+        <input class="nm-in" id="newName" type="text" placeholder="Add a service (e.g. Outdoor kitchen)">
+        <select id="newUnit">
+          <option value="sqft">/sqft</option><option value="lnft">/lnft</option><option value="each">each</option>
+          <option value="hour">/hour</option><option value="load">/load</option><option value="day">/day</option><option value="flat">flat</option>
+        </select>
+        <input class="rt-in" id="newRate" type="number" placeholder="$" min="0" step="0.25">
+        <button class="btn ghost" id="addItem" type="button" style="padding:9px 14px;">Add</button>
+      </div>
+    </div>
+    <div class="nav"><button class="btn ghost" data-back type="button">←</button><button class="btn primary" id="next2" type="button">Save my rates →</button></div>
+    <a class="skip" href="#" data-skip="2">Skip — I'll price later</a>
+  </section>
+
+  <!-- ═══ STEP 4 · DONE ═══ -->
+  <section class="step" id="s3">
+    <div class="eyebrow">You're set up</div>
+    <div class="done-check">✓</div>
+    <h1>Ready to win your first job</h1>
+    <p class="lede">Here's what your workspace has now:</p>
+    <div class="card recap">
+      <li id="rBrand">Your brand on proposals, portal &amp; emails</li>
+      <li id="rMats">Material catalogs loaded</li>
+      <li id="rRates">Your rate card saved</li>
+      <li>Client portal, chat &amp; Ask a Pro — already on</li>
+    </div>
+    <div class="nav"><a class="btn primary" href="/dashboard">Create your first proposal →</a></div>
+    <a class="skip" href="/clients.html">Or explore My Clients first</a>
+  </section>
+
+  <div class="msg" id="msg"></div>
+</main>
+
+<script type="module">
+import { supabase } from '/js/supabase-client.js';
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const showMsg = (t, err=false) => { const m=$('msg'); m.textContent=t; m.style.color=err?'var(--err)':'var(--walnut)'; m.style.display='block'; setTimeout(()=>m.style.display='none', 3500); };
+
+// ── who am I / which company ──
+const { data: { user } } = await supabase.auth.getUser();
+if (!user) window.location.replace('/login.html?redirect=/onboarding.html');
+const { data: prof } = await supabase.from('profiles').select('company_id, role, display_name').eq('id', user.id).maybeSingle();
+if (!prof || !prof.company_id) { document.querySelector('main').innerHTML = '<p style="text-align:center;padding:40px 10px;">Could not load your workspace — <a href="/dashboard">go to your pipeline</a>.</p>'; throw new Error('no profile'); }
+const companyId = prof.company_id;
+const isOwner = prof.role === 'master';
+
+const { data: settings } = await supabase.from('company_settings')
+  .select('company_name, logo_url, primary_color, enabled_manufacturers').eq('company_id', companyId).maybeSingle();
+
+let color = (settings && settings.primary_color) || '#9c7440';
+let logoUrl = (settings && settings.logo_url) || null;
+$('pvName').textContent = (settings && settings.company_name) || 'Your Company';
+$('pvTag').textContent = ((settings && settings.company_name) || 'Your') + ' portal';
+if (logoUrl && !logoUrl.includes('paver-portal-logo')) {
+  $('logoEmpty').style.display='none'; $('logoHas').style.display='block';
+  $('logoPreview').src = logoUrl; $('pvLogo').src = logoUrl; $('logoDrop').classList.add('has');
+}
+document.querySelectorAll('.swatch').forEach(sw => {
+  if (sw.dataset.c === color) { document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('sel')); sw.classList.add('sel'); }
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('sel'));
+    sw.classList.add('sel'); color = sw.dataset.c;
+    $('pvTag').style.color = color;
+  });
+});
+
+// ── steps ──
+let step = 0;
+function go(n) {
+  step = n;
+  document.querySelectorAll('.step').forEach((s,i)=>s.classList.toggle('on', i===n));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on', i<=n));
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',()=>go(step-1)));
+document.querySelectorAll('[data-skip]').forEach(a=>a.addEventListener('click',(e)=>{e.preventDefault(); go(step+1); if(step===2) loadMfgs(); if(step===3) finish(false);}));
+
+// ── STEP 1: logo + color ──
+$('logoDrop').addEventListener('click', () => $('logoInput').click());
+$('logoInput').addEventListener('change', async () => {
+  const f = $('logoInput').files && $('logoInput').files[0];
+  if (!f) return;
+  const ext = (f.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g,'') || 'png';
+  const path = `${companyId}/logo-${Date.now()}.${ext}`;
+  $('logoEmpty').innerHTML = '<div class="big">Uploading…</div>';
+  const { error } = await supabase.storage.from('catalog-media').upload(path, f, { contentType: f.type || 'image/png' });
+  if (error) { showMsg('Upload failed: ' + error.message, true); $('logoEmpty').innerHTML = '<div class="big">📷 Tap to add your logo</div>'; return; }
+  const { data: pub } = supabase.storage.from('catalog-media').getPublicUrl(path);
+  logoUrl = pub.publicUrl;
+  $('logoEmpty').style.display='none'; $('logoHas').style.display='block';
+  $('logoPreview').src = logoUrl; $('pvLogo').src = logoUrl; $('logoDrop').classList.add('has');
+});
+$('next0').addEventListener('click', async () => {
+  const btn = $('next0'); btn.disabled = true;
+  if (isOwner) {
+    const patch = { primary_color: color };
+    if (logoUrl) patch.logo_url = logoUrl;
+    const { error } = await supabase.from('company_settings').update(patch).eq('company_id', companyId);
+    if (error) showMsg('Could not save brand: ' + error.message, true);
+    try { sessionStorage.removeItem('bpb-branding-v1'); } catch(_){}
+  }
+  btn.disabled = false; go(1); loadMfgs();
+});
+
+// ── STEP 2: manufacturers ──
+let mfgsLoaded = false, selected = new Set();
+async function loadMfgs() {
+  if (mfgsLoaded) return; mfgsLoaded = true;
+  const { data, error } = await supabase.from('materials').select('manufacturer').is('company_id', null);
+  const box = $('mfgList');
+  if (error || !data) { box.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;">Could not load catalogs — you can set this later in settings.</div>'; return; }
+  const counts = {};
+  data.forEach(r => { if (r.manufacturer) counts[r.manufacturer] = (counts[r.manufacturer]||0)+1; });
+  const names = Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+  const pre = (settings && settings.enabled_manufacturers) || names; // null → all
+  names.forEach(n => { if (pre.includes(n)) selected.add(n); });
+  box.innerHTML = names.map(n => `
+    <div class="mfg ${selected.has(n)?'sel':''}" data-m="${esc(n)}">
+      <div class="check">${selected.has(n)?'✓':''}</div>
+      <b>${esc(n)}</b>
+      <span class="count">${counts[n]} product${counts[n]===1?'':'s'}</span>
+    </div>`).join('') +
+    '<div style="font-size:11.5px;color:var(--muted);text-align:center;padding-top:8px;">More manufacturer catalogs are being added — and you can upload your own products anytime.</div>';
+  box.querySelectorAll('.mfg').forEach(el => el.addEventListener('click', () => {
+    const m = el.dataset.m;
+    if (selected.has(m)) selected.delete(m); else selected.add(m);
+    el.classList.toggle('sel', selected.has(m));
+    el.querySelector('.check').textContent = selected.has(m) ? '✓' : '';
+  }));
+}
+$('next1').addEventListener('click', async () => {
+  if (isOwner) {
+    const all = document.querySelectorAll('.mfg').length;
+    const val = (selected.size === 0 || selected.size === all) ? null : Array.from(selected);
+    const { error } = await supabase.from('company_settings').update({ enabled_manufacturers: val }).eq('company_id', companyId);
+    if (error) showMsg('Could not save catalogs: ' + error.message, true);
+  }
+  go(2); loadRates();
+});
+
+// ── STEP 3: pricing ──
+let rates = [], ratesLoaded = false;
+async function loadRates() {
+  if (ratesLoaded) return; ratesLoaded = true;
+  const { data, error } = await supabase.from('service_items')
+    .select('id, name, unit, rate').eq('company_id', companyId).order('sort_order');
+  if (error) { $('rateList').innerHTML = '<div style="color:var(--err);font-size:13px;">Could not load: '+esc(error.message)+'</div>'; return; }
+  rates = data || [];
+  renderRates();
+}
+function renderRates() {
+  $('rateList').innerHTML = rates.length ? rates.map((r,i) => `
+    <div class="rate">
+      <span class="nm">${esc(r.name)}</span>
+      <span class="un">$ /${esc(r.unit)}</span>
+      <input type="number" min="0" step="0.25" value="${Number(r.rate)}" data-i="${i}">
+    </div>`).join('')
+    : '<div style="text-align:center;color:var(--muted);font-size:13px;padding:10px;">No services yet — add your first below.</div>';
+  $('rateList').querySelectorAll('input').forEach(inp => inp.addEventListener('input', () => {
+    rates[Number(inp.dataset.i)].rate = parseFloat(inp.value) || 0;
+  }));
+}
+$('addItem').addEventListener('click', async () => {
+  const name = $('newName').value.trim();
+  const rate = parseFloat($('newRate').value) || 0;
+  if (!name) return;
+  const { data, error } = await supabase.from('service_items')
+    .insert({ company_id: companyId, name, unit: $('newUnit').value, rate, sort_order: 100 + rates.length * 10 })
+    .select('id, name, unit, rate').single();
+  if (error) { showMsg('Could not add: ' + error.message, true); return; }
+  rates.push(data); renderRates();
+  $('newName').value = ''; $('newRate').value = '';
+});
+$('next2').addEventListener('click', async () => {
+  const btn = $('next2'); btn.disabled = true; btn.textContent = 'Saving…';
+  for (const r of rates) {
+    await supabase.from('service_items').update({ rate: r.rate }).eq('id', r.id);
+  }
+  btn.disabled = false; btn.textContent = 'Save my rates →';
+  finish(true);
+});
+
+// ── STEP 4 ──
+async function finish(savedRates) {
+  $('rBrand').textContent = logoUrl ? 'Your logo & color on proposals, portal & emails' : 'Brand color set — add your logo anytime in settings';
+  $('rMats').textContent = selected.size ? `${selected.size} manufacturer catalog${selected.size===1?'':'s'} loaded` : 'All manufacturer catalogs loaded';
+  $('rRates').textContent = savedRates && rates.length ? `${rates.length} services priced at your rates` : 'Starter rate card ready to edit';
+  if (isOwner) {
+    await supabase.from('company_settings').update({ onboarded_at: new Date().toISOString() }).eq('company_id', companyId);
+  }
+  go(3);
+}
+</script>
+</body>
+</html>
