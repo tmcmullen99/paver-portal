@@ -13,6 +13,7 @@ import { initBidPdf } from './bid-pdf.js';
 import { initPhotos } from './photos.js';
 import { initPublish } from './publish.js';
 import { initSitePlan } from './site-plan.js';
+import { initBidBuilder } from './bid-builder.js';
 
 let proposalId = null;
 let proposal = null;
@@ -112,6 +113,9 @@ function switchSection(name) {
     case 'bid-pdf':
       initBidPdf({ proposalId, container: sectionContent, onSave: onDataSaved });
       break;
+    case 'bid-builder':
+      initBidBuilder({ proposalId, container: sectionContent, onSave: onDataSaved });
+      break;
     case 'materials':
       initMaterials({ proposalId, container: sectionContent, onSave: touchSave });
       break;
@@ -123,7 +127,7 @@ function switchSection(name) {
       break;
     case 'project-info':
       renderPlaceholder('Project info',
-        'Client name, email, address, Bayside estimate number, Loom walkthrough link.',
+        'Client name, email, address, estimate number, Loom walkthrough link.',
         'Most of these fields are auto-populated when you commit a bid PDF in Section 02. The Loom URL field now lives in Section 06 (Preview & publish), so it can be set right before publishing.');
       break;
     case 'site-plan':
