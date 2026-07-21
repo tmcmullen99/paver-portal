@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Outreach · Paver Portal Operator</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --tan:#9c7440; --walnut:#7d5c31; --gold:#d9a441; --sand:#f1e7d3; --cream:#faf6ee; --espresso:#33281c; --rule:#e5e0d6; --text:#23282f; --muted:#6f6a60; --ok:#2f7a43; --err:#b91c1c; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Onest',sans-serif; background:var(--cream); color:var(--text); }
+  header { display:flex; align-items:center; justify-content:space-between; background:#fff; border-bottom:1px solid var(--rule); padding:0 20px; height:56px; position:sticky; top:0; z-index:5; }
+  header .t { font-weight:700; font-size:15px; }
+  header .sub { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--tan); }
+  header a { color:var(--muted); text-decoration:none; font-size:13px; font-weight:600; }
+  main { max-width:1080px; margin:0 auto; padding:20px 16px 90px; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:16px; }
+  .kpi { background:#fff; border:1px solid var(--rule); border-radius:12px; padding:14px 16px; }
+  .kpi b { font-size:22px; display:block; }
+  .kpi span { font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
+  .kpi.star { background:var(--espresso); border-color:var(--espresso); }
+  .kpi.star b { color:var(--gold); } .kpi.star span { color:#d8cbb4; }
+  .card { background:#fff; border:1px solid var(--rule); border-radius:12px; padding:16px 18px; margin-bottom:14px; }
+  .card h2 { font-size:15px; margin-bottom:10px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
+  .row label { font-size:12px; font-weight:600; color:var(--muted); display:flex; flex-direction:column; gap:3px; }
+  .row input[type=text], .row input[type=number], .row input[type=url] { font:500 13px 'Onest',sans-serif; border:1.5px solid var(--rule); border-radius:8px; padding:8px 10px; }
+  .toggle { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; cursor:pointer; padding:8px 12px; border:1.5px solid var(--rule); border-radius:999px; }
+  .toggle.on { border-color:var(--ok); color:var(--ok); background:#eaf3ea; }
+  .toggle.off { color:var(--err); }
+  .btn { border:0; border-radius:9px; padding:10px 16px; font:600 13px 'Onest',sans-serif; cursor:pointer; background:var(--tan); color:#fff; }
+  .btn:hover { background:var(--walnut); }
+  .btn.ghost { background:#fff; color:var(--text); border:1.5px solid var(--rule); }
+  .btn:disabled { opacity:.55; cursor:wait; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  th { text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--rule); }
+  td { padding:9px 10px; border-bottom:1px solid #f2ecdf; vertical-align:top; }
+  .pill { font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.08em; text-transform:uppercase; padding:3px 8px; border-radius:999px; font-weight:600; background:var(--sand); color:var(--walnut); }
+  .pill.clicked { background:#fbf2dc; color:#a06a12; }
+  .pill.booked, .pill.closed_won { background:#eaf3ea; color:var(--ok); }
+  .pill.dead, .pill.unsubscribed { background:#f4f0e7; color:var(--muted); }
+  .act { font:600 11px 'Onest',sans-serif; border:1px solid var(--rule); background:#fff; border-radius:7px; padding:5px 9px; cursor:pointer; }
+  .act:hover { border-color:var(--tan); color:var(--walnut); }
+  .msg { display:none; font-size:13px; font-weight:600; margin:8px 0; }
+  .loading { color:var(--muted); font-size:13px; padding:14px; }
+</style>
+</head>
+<body>
+<header>
+  <div><div class="t">Outreach engine</div><span class="sub">Scrape → drip → book</span></div>
+  <a href="/admin/tenants.html">← Operator console</a>
+</header>
+<main>
+  <div class="kpis" id="kpis"></div>
+  <div class="msg" id="msg"></div>
+
+  <div class="card">
+    <h2>Controls</h2>
+    <div class="row">
+      <span class="toggle off" id="tScrape" title="Daily automated scraping">Scraping: …</span>
+      <span class="toggle off" id="tSend" title="Daily automated sending">Sending: …</span>
+      <button class="btn" id="runScrape" type="button">Scrape now</button>
+      <button class="btn" id="runSend" type="button">Send due emails now</button>
+      <button class="btn ghost" id="exportCsv" type="button">⬇ Export CSV</button>
+    </div>
+    <div class="row">
+      <label>Scrape/day <input type="number" id="cfgScrapeQ" min="1" max="50" style="width:70px;"></label>
+      <label>Send/day cap <input type="number" id="cfgSendQ" min="1" max="200" style="width:70px;"></label>
+      <label style="flex:1; min-width:220px;">Booking link (Calendly/Zoom) <input type="url" id="cfgBooking" placeholder="https://calendly.com/…"></label>
+    </div>
+    <div class="row">
+      <label>From name <input type="text" id="cfgFromName"></label>
+      <label style="min-width:220px;">From email <input type="text" id="cfgFromEmail"></label>
+      <label style="flex:1; min-width:220px;">Postal address (CAN-SPAM footer) <input type="text" id="cfgPostal"></label>
+    </div>
+    <div class="row"><button class="btn ghost" id="saveCfg" type="button">Save settings</button><span style="font-size:11.5px;color:var(--muted);">Next scrape city: <b id="nextCity">—</b></span></div>
+  </div>
+
+  <div class="card">
+    <h2>Prospects <span id="pCount" style="color:var(--muted);font-weight:500;font-size:12px;"></span></h2>
+    <div id="tableWrap"><div class="loading">Loading…</div></div>
+  </div>
+</main>
+
+<script type="module">
+import { supabase } from '/js/supabase-client.js';
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const showMsg = (t, err=false) => { const m=$('msg'); m.textContent=t; m.style.color=err?'var(--err)':'var(--ok)'; m.style.display='block'; setTimeout(()=>m.style.display='none', 5000); };
+
+// gate: founding master only
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) window.location.replace('/admin/');
+const { data: prof } = await supabase.from('profiles').select('role, is_active, company_id').eq('id', session.user.id).maybeSingle();
+if (!prof || prof.role !== 'master' || !prof.is_active) { document.body.innerHTML = '<p style="padding:40px;text-align:center;">Master account required. <a href="/admin/">Sign in</a></p>'; throw new Error('not master'); }
+
+let cfg = null, prospects = [];
+
+async function loadAll() {
+  const [cfgR, pR, sendsR] = await Promise.all([
+    supabase.from('outreach_config').select('*').eq('id', 1).maybeSingle(),
+    supabase.from('prospects').select('*').order('created_at', { ascending: false }).limit(500),
+    supabase.from('outreach_sends').select('id, prospect_id, step, opened_at, clicked_at'),
+  ]);
+  cfg = cfgR.data; prospects = pR.data || [];
+  const sends = sendsR.data || [];
+
+  // KPIs
+  const totalSends = sends.length;
+  const opened = sends.filter(s => s.opened_at).length;
+  const clicked = new Set(sends.filter(s => s.clicked_at).map(s => s.prospect_id)).size;
+  const booked = prospects.filter(p => ['booked','closed_won'].includes(p.status)).length;
+  const inSeq = prospects.filter(p => ['in_sequence','clicked'].includes(p.status)).length;
+  const withEmail = prospects.filter(p => p.email).length;
+  const touchesPerBook = booked ? (totalSends / booked).toFixed(1) : '—';
+  $('kpis').innerHTML = `
+    <div class="kpi"><b>${prospects.length}</b><span>Prospects</span></div>
+    <div class="kpi"><b>${withEmail}</b><span>With email</span></div>
+    <div class="kpi"><b>${inSeq}</b><span>In sequence</span></div>
+    <div class="kpi"><b>${totalSends}</b><span>Emails sent</span></div>
+    <div class="kpi"><b>${totalSends ? Math.round(opened/totalSends*100) + '%' : '—'}</b><span>Open rate</span></div>
+    <div class="kpi"><b>${clicked}</b><span>Clicked</span></div>
+    <div class="kpi"><b>${booked}</b><span>Calls booked</span></div>
+    <div class="kpi star"><b>${touchesPerBook}</b><span>Touches / booking</span></div>`;
+
+  // controls
+  if (cfg) {
+    setToggle($('tScrape'), 'Scraping', cfg.scraping_enabled);
+    setToggle($('tSend'), 'Sending', cfg.sending_enabled);
+    $('cfgScrapeQ').value = cfg.daily_scrape_quota;
+    $('cfgSendQ').value = cfg.daily_send_quota;
+    $('cfgBooking').value = cfg.booking_url || '';
+    $('cfgFromName').value = cfg.from_name || '';
+    $('cfgFromEmail').value = cfg.from_email || '';
+    $('cfgPostal').value = cfg.postal_address || '';
+    const cities = cfg.target_cities || [];
+    const next = cities.length ? cities[cfg.rotation_index % cities.length] : null;
+    $('nextCity').textContent = next ? `${next.city}, ${next.state}` : '—';
+  }
+
+  // table
+  $('pCount').textContent = `· newest ${prospects.length}`;
+  $('tableWrap').innerHTML = prospects.length ? `
+    <table><thead><tr><th>Company</th><th>Location</th><th>Contact</th><th>Step</th><th>Status</th><th></th></tr></thead>
+    <tbody>${prospects.map(p => `
+      <tr>
+        <td><b>${esc(p.company_name)}</b>${p.website ? `<br><a href="${esc(p.website)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--walnut);">${esc(p.website.replace(/^https?:\\/\\/(www\\.)?/,'').slice(0,34))}</a>` : ''}</td>
+        <td style="font-size:12px;">${esc(p.city || '')}, ${esc(p.state || '')}</td>
+        <td style="font-size:11.5px;">${esc(p.email || '—')}<br>${esc(p.phone || '')}</td>
+        <td>${p.sequence_step} / 6</td>
+        <td><span class="pill ${esc(p.status)}">${esc(p.status.replace('_',' '))}</span></td>
+        <td style="white-space:nowrap;">
+          ${!['booked','closed_won','dead','unsubscribed'].includes(p.status) ? `<button class="act" data-id="${p.id}" data-set="booked">📅 Booked</button>` : ''}
+          ${p.status === 'booked' ? `<button class="act" data-id="${p.id}" data-set="closed_won">🏆 Closed</button>` : ''}
+          ${!['dead','unsubscribed','closed_won'].includes(p.status) ? `<button class="act" data-id="${p.id}" data-set="dead">✕</button>` : ''}
+        </td>
+      </tr>`).join('')}</tbody></table>`
+    : '<div class="loading">No prospects yet — hit "Scrape now" (needs GOOGLE_PLACES_API_KEY in Cloudflare env).</div>';
+
+  document.querySelectorAll('.act[data-set]').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true;
+    const { error } = await supabase.from('prospects')
+      .update({ status: b.dataset.set, updated_at: new Date().toISOString() }).eq('id', b.dataset.id);
+    if (error) showMsg(error.message, true); else loadAll();
+  }));
+}
+
+function setToggle(el, label, on) {
+  el.textContent = `${label}: ${on ? 'ON' : 'OFF'}`;
+  el.className = `toggle ${on ? 'on' : 'off'}`;
+  el.onclick = async () => {
+    const field = label === 'Scraping' ? 'scraping_enabled' : 'sending_enabled';
+    const { error } = await supabase.from('outreach_config')
+      .update({ [field]: !on, updated_at: new Date().toISOString() }).eq('id', 1);
+    if (error) showMsg(error.message, true); else loadAll();
+  };
+}
+
+$('saveCfg').addEventListener('click', async () => {
+  const { error } = await supabase.from('outreach_config').update({
+    daily_scrape_quota: parseInt($('cfgScrapeQ').value) || 10,
+    daily_send_quota: parseInt($('cfgSendQ').value) || 60,
+    booking_url: $('cfgBooking').value.trim() || 'https://paverportal.com/#team',
+    from_name: $('cfgFromName').value.trim() || 'Tim at Paver Portal',
+    from_email: $('cfgFromEmail').value.trim(),
+    postal_address: $('cfgPostal').value.trim(),
+    updated_at: new Date().toISOString(),
+  }).eq('id', 1);
+  showMsg(error ? error.message : '✓ Settings saved', !!error);
+  if (!error) loadAll();
+});
+
+async function callApi(path, btn) {
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Running…';
+  try {
+    const r = await fetch(path, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+    const out = await r.json();
+    if (!r.ok) throw new Error(out.error || 'Failed');
+    showMsg('✓ ' + JSON.stringify(out).slice(0, 180));
+    loadAll();
+  } catch (e) { showMsg(e.message, true); }
+  btn.disabled = false; btn.textContent = orig;
+}
+$('runScrape').addEventListener('click', () => callApi('/api/outreach-scrape', $('runScrape')));
+$('runSend').addEventListener('click', () => callApi('/api/outreach-send', $('runSend')));
+
+$('exportCsv').addEventListener('click', () => {
+  const cols = ['company_name','city','state','phone','email','website','status','sequence_step','created_at'];
+  const csv = [cols.join(',')].concat(prospects.map(p =>
+    cols.map(c => `"${String(p[c] ?? '').replace(/"/g,'""')}"`).join(','))).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = `paver-portal-prospects-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+});
+
+loadAll();
+</script>
+</body>
+</html>
