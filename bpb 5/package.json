@@ -1,0 +1,16 @@
+{
+  "name": "bayside-proposal-builder",
+  "version": "0.1.0",
+  "description": "Internal tool for generating Paver Portal proposal pages. Supabase-backed, Cloudflare Pages hosted.",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler pages dev public --compatibility-date=2024-09-23",
+    "deploy": "wrangler pages deploy public --project-name=bayside-proposal-builder",
+    "tail": "wrangler pages deployment tail"
+  },
+  "devDependencies": {
+    "wrangler": "^3.100.0"
+  },
+  "author": "Tim McMullen",
+  "license": "UNLICENSED"
+}

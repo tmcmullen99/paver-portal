@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log in · Paver Portal Client Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #9c7440;
+      --green-dark: #7d5c31;
+      --green-soft: #f1e7d3;
+      --charcoal: #353535;
+      --tan: #dad7c5;
+      --cream: #faf8f3;
+      --navy: #33281c;
+      --border: #e5e5e5;
+      --muted: #666;
+      --danger: #b04040;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--charcoal);
+      background: #fafafa;
+      line-height: 1.6;
+      font-size: 15px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 44px 40px 40px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .brand-logo {
+      font-size: 32px;
+      margin-bottom: 10px;
+      line-height: 1;
+    }
+    .brand-name {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+      text-align: center;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .form-row { margin-bottom: 18px; }
+    .form-row label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--charcoal);
+      margin-bottom: 6px;
+    }
+    .form-row input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 15px;
+      background: #fff;
+      color: var(--charcoal);
+    }
+    .form-row input:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(93, 126, 105, 0.1);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 13px 18px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .btn:hover { background: var(--green-dark); }
+    .btn:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
+    .status {
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-top: 20px;
+      line-height: 1.5;
+      display: none;
+    }
+    .status.visible { display: block; }
+    .status.success {
+      background: var(--green-soft);
+      color: var(--green-dark);
+    }
+    .status.error {
+      background: #fbe6e6;
+      color: var(--danger);
+    }
+
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .success-state.visible { display: block; }
+    .success-icon {
+      font-size: 44px;
+      margin-bottom: 14px;
+      line-height: 1;
+    }
+    .success-state h2 {
+      font-size: 18px;
+      color: var(--navy);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .success-state p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+    .success-state code {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--cream);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--navy);
+    }
+    .try-again {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .try-again a {
+      color: var(--green-dark);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .footer a {
+      color: var(--green-dark);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="brand">
+    <div class="brand-logo">🧱</div>
+    <div class="brand-name" id="brandName">Paver Portal Client Portal</div>
+  </div>
+
+  <div id="formView">
+    <h1 id="headline">Welcome back</h1>
+    <p class="subtitle" id="subtitle">Enter your email and we'll send you a login link — no password needed.</p>
+
+    <div class="form-row">
+      <label for="email">Email address</label>
+      <input type="email" id="email" autocomplete="email" placeholder="you@example.com" required>
+    </div>
+
+    <button class="btn" id="submitBtn">Send login link</button>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="success-state" id="successView">
+    <div class="success-icon">✉️</div>
+    <h2>Check your email</h2>
+    <p>We sent a login link to <br><code id="sentToEmail"></code></p>
+    <p style="font-size:12px;">Click the link in the email to sign in. It expires in 1 hour.</p>
+    <div class="try-again">
+      Didn't get it? Check your spam folder, or <a id="tryAgainLink">try a different email</a>.
+    </div>
+  </div>
+
+  <div class="footer">
+    Having trouble? Email <a href="mailto:tim@mcmullen.properties">tim@mcmullen.properties</a>
+  </div>
+</div>
+
+<script type="module" src="/client/client-login.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Materials Library · Paver Portal</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+  :root {
+    --bp-green:    #9c7440;
+    --bp-charcoal: #58595b;
+    --bp-tan:      #dad7c5;
+    --bp-cream:    #faf8f3;
+    --bp-text:     #353535;
+    --bp-muted:    #777;
+    --bp-line:     #e8e8e3;
+    --bp-card:     #ffffff;
+    --bp-bg:       #fafafa;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bp-bg); color: var(--bp-text); -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  .eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--bp-green); font-weight: 700; margin-bottom: 8px; }
+  h1 { margin: 0 0 8px; font-size: 36px; font-weight: 600; color: var(--bp-charcoal); letter-spacing: -0.012em; }
+  .lede { margin: 0 0 28px; font-size: 16px; color: var(--bp-muted); max-width: 720px; line-height: 1.55; }
+
+  .filter-bar { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--bp-line); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab { padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--bp-muted); border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; font-family: inherit; cursor: pointer; transition: color 120ms; }
+  .tab:hover { color: var(--bp-charcoal); }
+  .tab.active { color: var(--bp-green); border-bottom-color: var(--bp-green); }
+  .tab .count { display: inline-block; margin-left: 6px; background: var(--bp-cream); color: var(--bp-muted); padding: 1px 7px; border-radius: 999px; font-size: 11px; }
+  .tab.active .count { background: var(--bp-green); color: #fff; }
+  .search { width: 100%; max-width: 480px; padding: 10px 14px; border: 1px solid var(--bp-line); border-radius: 8px; font-size: 14px; font-family: inherit; background: var(--bp-card); color: var(--bp-text); outline: none; transition: border-color 120ms; }
+  .search:focus { border-color: var(--bp-green); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .card { background: var(--bp-card); border: 1px solid var(--bp-line); border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 150ms, transform 150ms, box-shadow 150ms; display: flex; flex-direction: column; }
+  .card:hover { border-color: var(--bp-green); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(93, 126, 105, 0.10); }
+  .thumb { aspect-ratio: 1; background: var(--bp-cream); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb.no-image::before { content: 'No image yet'; color: var(--bp-muted); font-size: 12px; font-style: italic; }
+  .card-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+  .card-mfr { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bp-green); font-weight: 700; }
+  .card-name { font-size: 14px; font-weight: 500; color: var(--bp-charcoal); line-height: 1.3; }
+  .card-color { font-size: 12px; color: var(--bp-muted); }
+
+  .empty-msg, .error-msg, .loading { text-align: center; padding: 60px 20px; color: var(--bp-muted); font-size: 14px; grid-column: 1 / -1; }
+  .error-msg { color: #c0392b; }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); z-index: 1000; align-items: flex-start; justify-content: center; padding: 32px 16px; overflow-y: auto; }
+  .modal-overlay.open { display: flex; }
+  .modal-content { width: 100%; max-width: 720px; background: var(--bp-card); border-radius: 12px; overflow: hidden; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal-close { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.55); color: #fff; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; line-height: 1; cursor: pointer; z-index: 2; display: flex; align-items: center; justify-content: center; }
+  .modal-close:hover { background: rgba(0,0,0,0.75); }
+
+  .m-hero { aspect-ratio: 16/9; background: var(--bp-cream); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .m-hero img { width: 100%; height: 100%; object-fit: cover; }
+  .m-hero.no-image::before { content: 'No image available'; color: var(--bp-muted); font-size: 14px; }
+
+  .m-body { padding: 24px; }
+  .m-title-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+  .m-mfr { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--bp-green); font-weight: 700; }
+  .m-title { margin: 0; font-size: 24px; font-weight: 600; color: var(--bp-charcoal); letter-spacing: -0.01em; line-height: 1.15; }
+  .m-color { font-size: 14px; color: var(--bp-muted); }
+
+  .m-specs { background: var(--bp-cream); border-radius: 8px; padding: 12px 16px; margin-bottom: 18px; font-size: 13px; }
+  .m-specs-row { display: flex; gap: 12px; padding: 4px 0; }
+  .m-specs-row + .m-specs-row { border-top: 1px dotted var(--bp-line); }
+  .m-specs-row .k { width: 100px; color: var(--bp-muted); flex-shrink: 0; }
+  .m-specs-row .v { color: var(--bp-charcoal); font-weight: 500; }
+
+  .m-section { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--bp-line); }
+  .m-section h3 { margin: 0 0 10px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bp-charcoal); font-weight: 700; }
+  .m-section p { margin: 0 0 10px; font-size: 14px; color: var(--bp-text); line-height: 1.6; }
+
+  .m-warranty-card { background: var(--bp-cream); border-left: 3px solid var(--bp-green); border-radius: 4px; padding: 12px 16px; margin-bottom: 10px; }
+  .m-warranty-card .wlabel { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bp-green); font-weight: 700; margin-bottom: 4px; }
+  .m-warranty-card .wsum { font-size: 14px; color: var(--bp-charcoal); margin-bottom: 6px; line-height: 1.45; }
+  .m-warranty-card .wlink { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--bp-green); text-decoration: underline; }
+
+  .m-steps { display: flex; flex-direction: column; gap: 0; counter-reset: step; }
+  .m-step { display: flex; gap: 12px; padding: 10px 0; align-items: flex-start; counter-increment: step; }
+  .m-step + .m-step { border-top: 1px dotted var(--bp-line); }
+  .m-step::before { content: counter(step); display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; background: var(--bp-green); color: #fff; border-radius: 50%; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .m-step-body { flex: 1; font-size: 13px; line-height: 1.45; }
+  .m-step-name { font-weight: 600; color: var(--bp-charcoal); }
+  .m-step-detail { color: var(--bp-muted); }
+
+  .m-guides-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .g-card { border: 1px solid var(--bp-line); border-radius: 8px; overflow: hidden; cursor: pointer; transition: border-color 150ms; background: var(--bp-card); }
+  .g-card:hover { border-color: var(--bp-green); }
+  .g-thumb { aspect-ratio: 16/9; background: #000; position: relative; overflow: hidden; }
+  .g-thumb.pdf, .g-thumb.link { background: var(--bp-tan); display: flex; align-items: center; justify-content: center; }
+  .g-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .g-thumb .play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.92); font-size: 26px; text-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+  .g-thumb .glyph { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: var(--bp-charcoal); background: var(--bp-cream); padding: 8px 14px; border-radius: 6px; }
+  .g-label { padding: 8px 10px; font-size: 11px; line-height: 1.3; }
+  .g-label .gt { font-weight: 600; color: var(--bp-charcoal); }
+  .g-label .gk { color: var(--bp-muted); font-size: 10px; margin-top: 2px; }
+
+  .m-view-all { display: inline-block; margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--bp-green); text-decoration: underline; }
+
+  .applications-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .app-tag { background: var(--bp-cream); color: var(--bp-charcoal); padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 28px; }
+    .wrap { padding: 24px 16px 60px; }
+    .modal-overlay { padding: 16px 8px; }
+    .m-body { padding: 18px; }
+    .m-title { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">PAVER PORTAL · MATERIALS LIBRARY</div>
+    <h1>Every product. Every install. Every warranty.</h1>
+    <p class="lede">
+      Browse every paver, wall, finish, and accessory we install. Click any material for the manufacturer specs, warranty terms, and our ICPI-standard installation process.
+    </p>
+
+    <div class="filter-bar">
+      <div id="tabs" class="tabs"></div>
+      <input id="search" class="search" type="text" placeholder="Search by product, color, or manufacturer…" autocomplete="off" />
+    </div>
+
+    <div id="grid" class="grid">
+      <div class="loading">Loading materials library…</div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">×</button>
+      <div id="modal-body"><div style="padding:40px;text-align:center;color:var(--bp-muted)">Loading…</div></div>
+    </div>
+  </div>
+
+<script>
+  const CATEGORY_LABELS = {
+    pavers: 'Pavers', walls: 'Walls', accessories: 'Accessories',
+    porcelain: 'Porcelain', 'fire-features': 'Fire features',
+    decking: 'Decking', lighting: 'Lighting', other: 'Other', turf: 'Turf',
+  };
+
+  let PRODUCTS = [];
+  let currentCategory = 'all';
+  let currentSearch = '';
+  let searchTimer = null;
+
+  async function init() {
+    try {
+      const resp = await fetch('/api/products');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      PRODUCTS = data.products || [];
+      render();
+    } catch (e) {
+      document.getElementById('grid').innerHTML =
+        '<div class="error-msg">Could not load library: ' + escapeHtml(String(e)) + '</div>';
+    }
+    document.getElementById('search').addEventListener('input', (e) => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        currentSearch = e.target.value.trim().toLowerCase();
+        renderGrid();
+      }, 180);
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  }
+
+  function render() { renderTabs(); renderGrid(); }
+
+  function renderTabs() {
+    const counts = { all: PRODUCTS.length };
+    for (const p of PRODUCTS) counts[p.category] = (counts[p.category] || 0) + 1;
+    const cats = ['all', ...Object.keys(counts).filter(c => c !== 'all').sort()];
+    document.getElementById('tabs').innerHTML = cats.map(c => {
+      const label = c === 'all' ? 'All' : (CATEGORY_LABELS[c] || titleCase(c.replace(/-/g, ' ')));
+      return `<button class="tab ${c === currentCategory ? 'active' : ''}" onclick="selectTab('${escapeAttr(c)}')">${escapeHtml(label)}<span class="count">${counts[c]}</span></button>`;
+    }).join('');
+  }
+
+  function renderGrid() {
+    let filtered = PRODUCTS;
+    if (currentCategory !== 'all') filtered = filtered.filter(p => p.category === currentCategory);
+    if (currentSearch) {
+      const q = currentSearch;
+      filtered = filtered.filter(p =>
+        (p.product_name || '').toLowerCase().includes(q) ||
+        (p.color || '').toLowerCase().includes(q) ||
+        (p.manufacturer || '').toLowerCase().includes(q) ||
+        (p.collection || '').toLowerCase().includes(q) ||
+        (p.product_type || '').toLowerCase().includes(q)
+      );
+    }
+    if (filtered.length === 0) {
+      document.getElementById('grid').innerHTML = '<div class="empty-msg">No materials match.</div>';
+      return;
+    }
+    document.getElementById('grid').innerHTML = filtered.map(renderCard).join('');
+  }
+
+  function renderCard(p) {
+    const img = p.swatch_url || p.primary_image_url || '';
+    const thumb = img
+      ? `<div class="thumb"><img src="${escapeAttr(img)}" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-image'); this.remove();"></div>`
+      : `<div class="thumb no-image"></div>`;
+    return `
+      <div class="card" onclick="openDetail('${escapeAttr(p.id)}')">
+        ${thumb}
+        <div class="card-body">
+          <div class="card-mfr">${escapeHtml(p.manufacturer || '')}</div>
+          <div class="card-name">${escapeHtml(p.product_name || '(unnamed)')}</div>
+          <div class="card-color">${escapeHtml(p.color || '')}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  async function openDetail(id) {
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('modal-body').innerHTML =
+      '<div style="padding:60px;text-align:center;color:var(--bp-muted)">Loading…</div>';
+    try {
+      const resp = await fetch('/api/products?id=' + encodeURIComponent(id));
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      renderDetail(data.detail);
+    } catch (e) {
+      document.getElementById('modal-body').innerHTML =
+        '<div style="padding:40px;text-align:center;color:#c0392b">Failed to load: ' + escapeHtml(String(e)) + '</div>';
+    }
+  }
+
+  function renderDetail(d) {
+    const m = d.material || {};
+    const mfr = d.manufacturer;
+    const bay = d.bayside_standards;
+    const guides = d.install_guides || [];
+    const img = m.swatch_url || m.primary_image_url || '';
+
+    const hero = img
+      ? `<div class="m-hero"><img src="${escapeAttr(img)}" alt="" onerror="this.parentElement.classList.add('no-image'); this.remove();"></div>`
+      : `<div class="m-hero no-image"></div>`;
+
+    const specs = [];
+    if (m.size_spec)     specs.push(['Size', m.size_spec]);
+    if (m.thickness_mm)  specs.push(['Thickness', m.thickness_mm + ' mm']);
+    if (m.product_type)  specs.push(['Type', m.product_type]);
+    if (m.collection)    specs.push(['Collection', m.collection]);
+    if (m.pattern)       specs.push(['Pattern', m.pattern]);
+    const specsHtml = specs.length
+      ? `<div class="m-specs">${specs.map(([k, v]) =>
+          `<div class="m-specs-row"><span class="k">${escapeHtml(k)}</span><span class="v">${escapeHtml(v)}</span></div>`
+        ).join('')}</div>`
+      : '';
+
+    const apps = m.applications || [];
+    const appsHtml = apps.length
+      ? `<div class="applications-row">${apps.map(a =>
+          `<span class="app-tag">${escapeHtml(a.replace(/_/g, ' '))}</span>`
+        ).join('')}</div>`
+      : '';
+
+    let descHtml = '';
+    if (m.description) {
+      descHtml = `<div class="m-section"><h3>About this product</h3><p>${escapeHtml(m.description)}</p>${appsHtml}</div>`;
+    } else if (appsHtml) {
+      descHtml = `<div class="m-section"><h3>Applications</h3>${appsHtml}</div>`;
+    }
+
+    let warrantyHtml = '';
+    if (mfr && (mfr.warranty_summary || mfr.about)) {
+      warrantyHtml += `<div class="m-warranty-card">
+        <div class="wlabel">${escapeHtml(mfr.display_name || mfr.name)} warranty</div>
+        ${mfr.warranty_summary ? `<div class="wsum">${escapeHtml(mfr.warranty_summary)}</div>` : ''}
+        ${mfr.about ? `<div class="wsum" style="color:var(--bp-muted);font-size:12px;">${escapeHtml(mfr.about)}</div>` : ''}
+        ${mfr.warranty_url ? `<a class="wlink" href="${escapeAttr(mfr.warranty_url)}" target="_blank" rel="noopener">View full warranty →</a>` : ''}
+      </div>`;
+    }
+    if (bay && bay.warranty_summary) {
+      warrantyHtml += `<div class="m-warranty-card">
+        <div class="wlabel">${escapeHtml(bay.display_name || 'Paver Portal')} installation warranty</div>
+        <div class="wsum">${escapeHtml(bay.warranty_summary)}</div>
+        ${bay.about ? `<div class="wsum" style="color:var(--bp-muted);font-size:12px;">${escapeHtml(bay.about)}</div>` : ''}
+      </div>`;
+    }
+    const warrantySection = warrantyHtml
+      ? `<div class="m-section"><h3>Warranty</h3>${warrantyHtml}</div>` : '';
+
+    let stepsHtml = '';
+    if (bay && Array.isArray(bay.quality_standards) && bay.quality_standards.length > 0) {
+      stepsHtml = `<div class="m-section"><h3>How we build it</h3>
+        <div class="m-steps">${bay.quality_standards.map(s =>
+          `<div class="m-step"><div class="m-step-body"><span class="m-step-name">${escapeHtml(s.step)}.</span> <span class="m-step-detail">${escapeHtml(s.detail)}</span></div></div>`
+        ).join('')}</div>
+      </div>`;
+    }
+
+    let guidesHtml = '';
+    if (guides.length > 0) {
+      const top = guides.slice(0, 4);
+      guidesHtml = `<div class="m-section"><h3>Installation guides</h3>
+        <div class="m-guides-grid">${top.map(renderGuideCard).join('')}</div>
+        ${guides.length > 4 ? `<a class="m-view-all" href="/account/install-guides.html">View all ${guides.length} install guides →</a>` : `<a class="m-view-all" href="/account/install-guides.html">View full installation library →</a>`}
+      </div>`;
+    } else {
+      guidesHtml = `<div class="m-section"><h3>Installation</h3>
+        <p>Standard Paver Portal installation applies. <a href="/account/install-guides.html" style="color:var(--bp-green);text-decoration:underline;">Browse our full how-to library →</a></p>
+      </div>`;
+    }
+
+    document.getElementById('modal-body').innerHTML = `
+      ${hero}
+      <div class="m-body">
+        <div class="m-title-row">
+          <div class="m-mfr">${escapeHtml(m.manufacturer || '')}</div>
+          <h2 class="m-title">${escapeHtml(m.product_name || '')}</h2>
+          ${m.color ? `<div class="m-color">${escapeHtml(m.color)}</div>` : ''}
+        </div>
+        ${specsHtml}
+        ${descHtml}
+        ${warrantySection}
+        ${stepsHtml}
+        ${guidesHtml}
+      </div>
+    `;
+  }
+
+  function renderGuideCard(g) {
+    const title = g.title || `${g.manufacturer || ''} ${g.category || ''}`.trim() || 'Installation guide';
+    if (g.kind === 'youtube' && g.video_id) {
+      const thumb = g.thumbnail_url || `https://i.ytimg.com/vi/${g.video_id}/hqdefault.jpg`;
+      return `<a class="g-card" href="https://www.youtube.com/watch?v=${escapeAttr(g.video_id)}" target="_blank" rel="noopener">
+        <div class="g-thumb"><img src="${escapeAttr(thumb)}" alt="" loading="lazy"><div class="play">▶</div></div>
+        <div class="g-label"><div class="gt">${escapeHtml(title)}</div><div class="gk">Video</div></div>
+      </a>`;
+    }
+    const isPdf = g.kind === 'pdf';
+    return `<a class="g-card" href="${escapeAttr(g.url)}" target="_blank" rel="noopener">
+      <div class="g-thumb ${isPdf ? 'pdf' : 'link'}"><div class="glyph">${isPdf ? 'PDF' : 'LINK'}</div></div>
+      <div class="g-label"><div class="gt">${escapeHtml(title)}</div><div class="gk">${isPdf ? 'PDF guide' : 'Web guide'}</div></div>
+    </a>`;
+  }
+
+  function selectTab(c) { currentCategory = c; renderTabs(); renderGrid(); }
+
+  function closeModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function titleCase(s) { return (s || '').replace(/\b\w/g, c => c.toUpperCase()); }
+  function escapeHtml(s) { if (s == null) return ''; return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function escapeAttr(s) { return escapeHtml(s); }
+
+  init();
+</script>
+</body>
+</html>

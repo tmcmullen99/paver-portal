@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How we build it · Paver Portal</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+  :root {
+    --bp-green:    #9c7440;
+    --bp-charcoal: #58595b;
+    --bp-tan:      #dad7c5;
+    --bp-cream:    #faf8f3;
+    --bp-text:     #353535;
+    --bp-muted:    #777;
+    --bp-line:     #e8e8e3;
+    --bp-card:     #ffffff;
+    --bp-bg:       #fafafa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bp-bg);
+    color: var(--bp-text);
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--bp-green); font-weight: 700; margin-bottom: 8px; }
+  h1 { margin: 0 0 8px; font-size: 36px; font-weight: 600; color: var(--bp-charcoal); letter-spacing: -0.012em; }
+  .lede { margin: 0 0 28px; font-size: 16px; color: var(--bp-muted); max-width: 720px; line-height: 1.55; }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--bp-line); margin-bottom: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab { padding: 12px 18px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--bp-muted); border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; font-family: inherit; transition: color 120ms; }
+  .tab:hover { color: var(--bp-charcoal); }
+  .tab.active { color: var(--bp-green); border-bottom-color: var(--bp-green); }
+  .tab .count { display: inline-block; margin-left: 6px; background: var(--bp-cream); color: var(--bp-muted); padding: 1px 7px; border-radius: 999px; font-size: 11px; }
+  .tab.active .count { background: var(--bp-green); color: #fff; }
+
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 22px; }
+  .chip { padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--bp-card); color: var(--bp-muted); border: 1px solid var(--bp-line); cursor: pointer; transition: all 120ms; font-family: inherit; }
+  .chip:hover { border-color: var(--bp-green); color: var(--bp-charcoal); }
+  .chip.active { background: var(--bp-charcoal); color: #fff; border-color: var(--bp-charcoal); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+
+  .card { background: var(--bp-card); border: 1px solid var(--bp-line); border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 150ms, transform 150ms, box-shadow 150ms; display: flex; flex-direction: column; }
+  .card:hover { border-color: var(--bp-green); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(93, 126, 105, 0.10); }
+
+  .thumb-wrap { position: relative; aspect-ratio: 16/9; overflow: hidden; }
+  .thumb-wrap.youtube { background: #000; }
+  .thumb-wrap.pdf, .thumb-wrap.link { background: var(--bp-tan); display: flex; align-items: center; justify-content: center; }
+  .thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; border-radius: 50%; background: rgba(93, 126, 105, 0.94); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; padding-left: 4px; line-height: 1; transition: transform 120ms, background 120ms; }
+  .card:hover .play-icon { transform: translate(-50%, -50%) scale(1.06); background: rgba(93, 126, 105, 1); }
+  .doc-glyph { color: var(--bp-charcoal); width: 64px; height: 80px; background: var(--bp-cream); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; letter-spacing: 0.06em; border: 1px solid rgba(0,0,0,0.06); }
+
+  .card-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .card-mfr { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bp-green); font-weight: 700; }
+  .card-title { font-size: 15px; font-weight: 500; color: var(--bp-charcoal); line-height: 1.35; }
+  .card-meta { font-size: 11px; color: var(--bp-muted); margin-top: auto; padding-top: 8px; display: flex; gap: 6px; align-items: center; }
+  .card-meta .kind-pill { background: var(--bp-cream); padding: 2px 8px; border-radius: 999px; font-weight: 600; color: var(--bp-charcoal); }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.88); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal-content { width: 100%; max-width: 960px; aspect-ratio: 16/9; background: #000; position: relative; border-radius: 8px; overflow: hidden; }
+  .modal-content iframe { width: 100%; height: 100%; border: none; }
+  .modal-close { position: absolute; top: -44px; right: -4px; background: none; border: none; color: #fff; font-size: 32px; cursor: pointer; line-height: 1; padding: 4px 10px; }
+
+  .empty-msg, .error-msg, .loading-msg { text-align: center; padding: 60px 20px; color: var(--bp-muted); font-size: 14px; }
+  .error-msg { color: #c0392b; }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 28px; }
+    .wrap { padding: 24px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">PAVER PORTAL · INSTALLATION LIBRARY</div>
+    <h1>How we build it</h1>
+    <p class="lede">
+      Every Paver Portal installation follows ICPI standards — the same techniques our crews use on every project. Browse our process videos and manufacturer installation guides below.
+    </p>
+
+    <div id="tabs"  class="tabs"></div>
+    <div id="chips" class="chips"></div>
+    <div id="grid"  class="grid">
+      <div class="loading-msg">Loading installation library…</div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">×</button>
+      <iframe id="modal-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+
+<script>
+  const CATEGORY_LABELS = {
+    paver:           'Pavers',
+    turf:            'Turf',
+    retaining_wall:  'Retaining walls',
+    deck:            'Decking',
+    drainage:        'Drainage',
+    base_prep:       'Base prep',
+    kitchen:         'Outdoor kitchens',
+    fire_pit:        'Fire pits',
+    wall:            'Walls',
+  };
+
+  let GUIDES = [];
+  let currentCategory = 'all';
+  let currentManufacturer = 'all';
+
+  async function init() {
+    try {
+      const resp = await fetch('/api/install-guides');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      GUIDES = data.guides || [];
+      render();
+    } catch (e) {
+      document.getElementById('grid').innerHTML =
+        '<div class="error-msg">Could not load the library: ' + escapeHtml(String(e)) + '</div>';
+    }
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  }
+
+  function render() { renderTabs(); renderChips(); renderGrid(); }
+
+  function renderTabs() {
+    const counts = { all: GUIDES.length };
+    for (const g of GUIDES) counts[g.category] = (counts[g.category] || 0) + 1;
+    const categories = ['all', ...Object.keys(counts).filter(c => c !== 'all').sort()];
+    document.getElementById('tabs').innerHTML = categories.map(cat => {
+      const label = cat === 'all' ? 'All' : (CATEGORY_LABELS[cat] || titleCase(cat.replace(/_/g, ' ')));
+      return `<button class="tab ${cat === currentCategory ? 'active' : ''}" onclick="selectTab('${escapeAttr(cat)}')">${escapeHtml(label)}<span class="count">${counts[cat] || 0}</span></button>`;
+    }).join('');
+  }
+
+  function renderChips() {
+    const inCat = currentCategory === 'all' ? GUIDES : GUIDES.filter(g => g.category === currentCategory);
+    const mfrs = Array.from(new Set(inCat.map(g => g.manufacturer).filter(Boolean))).sort();
+    if (mfrs.length <= 1) {
+      document.getElementById('chips').innerHTML = '';
+      currentManufacturer = 'all';
+      return;
+    }
+    const all = ['all', ...mfrs];
+    document.getElementById('chips').innerHTML = all.map(m => {
+      const label = m === 'all' ? 'All brands' : m;
+      return `<button class="chip ${m === currentManufacturer ? 'active' : ''}" onclick="selectChip('${escapeAttr(m)}')">${escapeHtml(label)}</button>`;
+    }).join('');
+  }
+
+  function renderGrid() {
+    let filtered = GUIDES;
+    if (currentCategory !== 'all') filtered = filtered.filter(g => g.category === currentCategory);
+    if (currentManufacturer !== 'all') filtered = filtered.filter(g => g.manufacturer === currentManufacturer);
+    if (filtered.length === 0) {
+      document.getElementById('grid').innerHTML = '<div class="empty-msg">No guides in this view yet.</div>';
+      return;
+    }
+    document.getElementById('grid').innerHTML = filtered.map(g => renderCard(g)).join('');
+  }
+
+  function renderCard(g) {
+    const mfr = g.manufacturer || '';
+    const title = g.title || defaultTitle(g);
+    const catLabel = CATEGORY_LABELS[g.category] || titleCase((g.category || '').replace(/_/g, ' '));
+    let thumb, action;
+    if (g.kind === 'youtube' && g.video_id) {
+      const thumbUrl = g.thumbnail_url || `https://i.ytimg.com/vi/${g.video_id}/hqdefault.jpg`;
+      thumb = `<div class="thumb-wrap youtube"><img src="${escapeAttr(thumbUrl)}" alt="" loading="lazy"><div class="play-icon">▶</div></div>`;
+      action = `onclick="openYouTube('${escapeAttr(g.video_id)}')"`;
+    } else if (g.kind === 'pdf') {
+      const thumbHtml = g.thumbnail_url ? `<img src="${escapeAttr(g.thumbnail_url)}" alt="" loading="lazy">` : '<div class="doc-glyph">PDF</div>';
+      thumb = `<div class="thumb-wrap pdf">${thumbHtml}</div>`;
+      action = `onclick="openExternal('${escapeAttr(g.url)}')"`;
+    } else {
+      const thumbHtml = g.thumbnail_url ? `<img src="${escapeAttr(g.thumbnail_url)}" alt="" loading="lazy">` : '<div class="doc-glyph">LINK</div>';
+      thumb = `<div class="thumb-wrap link">${thumbHtml}</div>`;
+      action = `onclick="openExternal('${escapeAttr(g.url)}')"`;
+    }
+    const kindPill = g.kind === 'youtube' ? 'Video' : (g.kind === 'pdf' ? 'PDF' : 'Web guide');
+    return `<div class="card" ${action}>${thumb}<div class="card-body">${mfr ? `<div class="card-mfr">${escapeHtml(mfr)}</div>` : ''}<div class="card-title">${escapeHtml(title)}</div><div class="card-meta"><span class="kind-pill">${kindPill}</span><span>${escapeHtml(catLabel)}</span></div></div></div>`;
+  }
+
+  function defaultTitle(g) {
+    const cat = CATEGORY_LABELS[g.category] || titleCase((g.category || 'installation').replace(/_/g, ' '));
+    const mfr = g.manufacturer || 'Manufacturer';
+    if (g.kind === 'youtube') return `${mfr} ${cat.toLowerCase()} install`;
+    if (g.kind === 'pdf')     return `${mfr} ${cat.toLowerCase()} installation guide`;
+    return `${mfr} ${cat.toLowerCase()} guide`;
+  }
+
+  function selectTab(cat)  { currentCategory = cat; currentManufacturer = 'all'; render(); }
+  function selectChip(m)   { currentManufacturer = m; renderChips(); renderGrid(); }
+  function openYouTube(id) {
+    document.getElementById('modal-iframe').src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function openExternal(url) { window.open(url, '_blank', 'noopener'); }
+  function closeModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    document.getElementById('modal').classList.remove('open');
+    document.getElementById('modal-iframe').src = '';
+    document.body.style.overflow = '';
+  }
+  function titleCase(s) { return (s || '').replace(/\b\w/g, c => c.toUpperCase()); }
+  function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+  init();
+</script>
+</body>
+</html>

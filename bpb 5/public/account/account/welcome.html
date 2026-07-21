@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welcome · Paver Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bp-green: #9c7440; --bp-green-dk: #7d5c31; --bp-green-soft: #f1e7d3;
+    --bp-charcoal: #353535; --bp-tan: #dad7c5; --bp-cream: #faf8f3;
+    --bp-bg: #f4f4ef; --bp-card: #ffffff; --bp-border: #e4e4df;
+    --bp-text: #1f2125; --bp-muted: #70726f;
+    --bp-err: #b91c1c; --bp-err-bg: #fef2f2; --bp-err-bd: #fecaca;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--bp-text); background: var(--bp-bg);
+    background-image: radial-gradient(ellipse 800px 500px at 50% -10%, var(--bp-green-soft), transparent 70%);
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 24px 16px; line-height: 1.5; font-size: 16px;
+  }
+  .ho-wrap { width: 100%; max-width: 460px; }
+  .ho-brand { text-align: center; margin-bottom: 28px; }
+  .ho-brand img { height: 40px; width: auto; }
+  .ho-brand-tag {
+    margin-top: 14px; font-size: 11px; letter-spacing: 0.22em;
+    color: var(--bp-muted); text-transform: uppercase;
+  }
+  .ho-card {
+    background: var(--bp-card); border: 1px solid var(--bp-border);
+    border-radius: 14px; padding: 38px 34px;
+    box-shadow: 0 16px 40px rgba(31, 33, 37, 0.08);
+  }
+  .ho-eyebrow {
+    font-size: 11px; letter-spacing: 0.18em; color: var(--bp-green-dk);
+    text-transform: uppercase; margin-bottom: 10px; font-weight: 700;
+  }
+  .ho-title {
+    font-size: 24px; font-weight: 600; color: var(--bp-text);
+    letter-spacing: -0.012em; line-height: 1.25; margin-bottom: 8px;
+  }
+  .ho-lede { color: var(--bp-muted); font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+  .ho-form { display: flex; flex-direction: column; gap: 16px; }
+  .ho-field { display: flex; flex-direction: column; gap: 6px; }
+  .ho-field-label { font-size: 12px; font-weight: 600; color: var(--bp-charcoal); }
+  .ho-field input {
+    font-family: inherit; font-size: 15px; padding: 12px 14px;
+    border: 1px solid var(--bp-border); border-radius: 10px; background: #fff;
+    color: var(--bp-text); width: 100%;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .ho-field input:focus {
+    outline: none; border-color: var(--bp-green);
+    box-shadow: 0 0 0 3px rgba(93, 126, 105, 0.18);
+  }
+  .ho-actions { display: flex; gap: 10px; margin-top: 8px; }
+  .ho-btn {
+    flex: 1; padding: 13px 20px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: inherit; border: 1px solid transparent;
+    transition: background .15s, transform .12s, box-shadow .15s, opacity .15s;
+  }
+  .ho-btn-primary {
+    background: var(--bp-green); color: #fff;
+    box-shadow: 0 6px 16px rgba(93, 126, 105, 0.22);
+  }
+  .ho-btn-primary:hover {
+    background: var(--bp-green-dk); transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(93, 126, 105, 0.28);
+  }
+  .ho-btn-secondary {
+    background: #fff; color: var(--bp-charcoal);
+    border-color: var(--bp-border);
+  }
+  .ho-btn-secondary:hover { background: var(--bp-cream); }
+  .ho-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+  .ho-status {
+    background: var(--bp-err-bg); color: var(--bp-err);
+    border: 1px solid var(--bp-err-bd); border-radius: 8px;
+    padding: 10px 14px; font-size: 13px; line-height: 1.5; margin-top: 4px;
+  }
+  .ho-status.is-success {
+    background: var(--bp-green-soft); color: var(--bp-green-dk);
+    border-color: #c8d8cc;
+  }
+  .ho-status[hidden] { display: none; }
+  .ho-checking {
+    text-align: center; padding: 30px 0; color: var(--bp-muted);
+  }
+  .ho-spinner {
+    display: inline-block; width: 24px; height: 24px;
+    border: 3px solid var(--bp-border); border-top-color: var(--bp-green);
+    border-radius: 50%; animation: bp-spin 0.8s linear infinite;
+    vertical-align: -7px; margin-right: 10px;
+  }
+  @keyframes bp-spin { to { transform: rotate(360deg); } }
+  .ho-skip {
+    text-align: center; margin-top: 14px;
+  }
+  .ho-skip-link {
+    background: none; border: none; color: var(--bp-muted);
+    font: inherit; font-size: 13px; cursor: pointer;
+    padding: 4px 8px; text-decoration: underline;
+  }
+  .ho-skip-link:hover { color: var(--bp-charcoal); }
+  @media (max-width: 480px) {
+    .ho-card { padding: 30px 22px; }
+    .ho-title { font-size: 20px; }
+    .ho-actions { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="ho-wrap">
+  <div class="ho-brand">
+    <img src="/assets/paver-portal-logo.svg)%20(1).png" alt="Paver Portal">
+    <div class="ho-brand-tag">Creating backyards people love</div>
+  </div>
+
+  <div class="ho-card" id="ho-card">
+    <div class="ho-checking" id="ho-checking">
+      <span class="ho-spinner"></span>Signing you in…
+    </div>
+
+    <div id="ho-content" hidden>
+      <div class="ho-eyebrow">You&#39;re signed in</div>
+      <h1 class="ho-title" id="ho-greeting">Welcome!</h1>
+      <p class="ho-lede">Your portal is ready. Want to set a password so you can sign in with email + password next time? It&#39;s optional — you can always request a fresh sign-in link by email.</p>
+
+      <form class="ho-form" id="ho-pwd-form" novalidate>
+        <label class="ho-field">
+          <span class="ho-field-label">New password (at least 8 characters)</span>
+          <input type="password" name="password" autocomplete="new-password" minlength="8">
+        </label>
+        <label class="ho-field">
+          <span class="ho-field-label">Confirm password</span>
+          <input type="password" name="confirm" autocomplete="new-password" minlength="8">
+        </label>
+        <div class="ho-actions">
+          <button type="submit" class="ho-btn ho-btn-primary" id="ho-save-btn">Set password &amp; continue</button>
+        </div>
+        <div class="ho-skip">
+          <button type="button" class="ho-skip-link" id="ho-skip-btn">Skip for now &rarr;</button>
+        </div>
+      </form>
+
+      <div class="ho-status" id="ho-status" hidden></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+
+const SUPABASE_URL  = 'https://gfgbypcnxkschnfsitfb.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_Ko4LNw2VjhZVFmwJ-i2qtA_XeGgBcew';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+});
+
+const checkingEl = document.getElementById('ho-checking');
+const contentEl  = document.getElementById('ho-content');
+const greetingEl = document.getElementById('ho-greeting');
+const form       = document.getElementById('ho-pwd-form');
+const saveBtn    = document.getElementById('ho-save-btn');
+const skipBtn    = document.getElementById('ho-skip-btn');
+const statusEl   = document.getElementById('ho-status');
+
+function showStatus(msg, type) {
+  statusEl.textContent = msg;
+  statusEl.className = 'ho-status' + (type === 'success' ? ' is-success' : '');
+  statusEl.hidden = false;
+}
+function hideStatus() { statusEl.hidden = true; statusEl.textContent = ''; }
+
+// Wait briefly for Supabase to detect session in URL hash, then check.
+async function waitForSession(maxMs = 4000) {
+  const start = Date.now();
+  while (Date.now() - start < maxMs) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) return session;
+    await new Promise(r => setTimeout(r, 200));
+  }
+  const { data: { session } } = await supabase.auth.getSession();
+  return session;
+}
+
+(async function init() {
+  const session = await waitForSession();
+  if (!session) {
+    // Magic link expired or invalid
+    checkingEl.innerHTML =
+      '<p style="font-size:14px;line-height:1.6;color:#b91c1c;margin-bottom:14px;">' +
+      'Your sign-in link has expired or is invalid.</p>' +
+      '<p style="font-size:13px;line-height:1.6;">' +
+      '<a href="/account/signin.html" style="color:#9c7440;font-weight:600;">Request a new one →</a></p>';
+    return;
+  }
+
+  // Look up clients row for greeting
+  const { data: { user } } = await supabase.auth.getUser();
+  let firstName = '';
+  if (user) {
+    const { data: clientRow } = await supabase
+      .from('clients')
+      .select('name')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (clientRow && clientRow.name) {
+      firstName = clientRow.name.split(' ')[0];
+    }
+  }
+  greetingEl.textContent = firstName ? 'Welcome, ' + firstName + '!' : 'Welcome!';
+
+  checkingEl.hidden = true;
+  contentEl.hidden = false;
+})();
+
+// Set password
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  hideStatus();
+
+  const fd = new FormData(form);
+  const pwd = String(fd.get('password') || '');
+  const confirm = String(fd.get('confirm') || '');
+
+  if (pwd.length < 8) { showStatus('Password must be at least 8 characters.'); return; }
+  if (pwd !== confirm) { showStatus('Passwords don\'t match.'); return; }
+
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving…';
+  try {
+    const { error } = await supabase.auth.updateUser({ password: pwd });
+    if (error) throw error;
+
+    // Clear must_change_password if it's set (legacy records)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase
+        .from('clients')
+        .update({ must_change_password: false })
+        .eq('user_id', user.id);
+    }
+
+    showStatus('Password set. Heading to your portal…', 'success');
+    setTimeout(() => { window.location.replace('/account/'); }, 900);
+  } catch (err) {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Set password & continue';
+    showStatus('Could not save password: ' + ((err && err.message) || 'unknown error'));
+  }
+});
+
+// Skip
+skipBtn.addEventListener('click', async () => {
+  // Just clear must_change_password and redirect
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    await supabase
+      .from('clients')
+      .update({ must_change_password: false })
+      .eq('user_id', user.id)
+      .catch(() => {});
+  }
+  window.location.replace('/account/');
+});
+</script>
+</body>
+</html>

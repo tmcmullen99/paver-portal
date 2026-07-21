@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Paver Portal — The smarter way to sell hardscapes</title>
+<meta name="description" content="Scaled site-map measuring, branded proposals, live client engagement, and built-in expert answers — the sales platform for hardscaping designers. 10-day free trial.">
+<meta property="og:title" content="Paver Portal — The smarter way to sell hardscapes">
+<meta property="og:description" content="Proposals your clients actually read, sign, and share. Know which deals are alive. 10-day free trial, 3 proposals included.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://paverportal.com/">
+<meta property="og:image" content="https://paverportal.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Paver Portal — The smarter way to sell hardscapes">
+<meta name="twitter:description" content="Scaled site-map measuring, branded proposals, live engagement, expert answers in the field. 10-day free trial.">
+<meta name="twitter:image" content="https://paverportal.com/assets/og-image.png">
+<meta name="theme-color" content="#33281c">
+<link rel="icon" href="/assets/paver-portal-icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tan:#9c7440; --walnut:#7d5c31; --gold:#d9a441; --sand:#f1e7d3;
+    --cream:#faf6ee; --espresso:#33281c; --rule:#e7e0d2;
+    --text:#23282f; --muted:#6f6a60; --ok:#2f7a43;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html, body { overflow-x:hidden; max-width:100%; }
+  img, svg { max-width:100%; height:auto; }
+  .m-only { display:none; }
+  html { scroll-behavior:smooth; }
+  body { font-family:'Onest',-apple-system,sans-serif; background:var(--cream); color:var(--text); line-height:1.6; }
+  a { color:var(--walnut); text-decoration:none; }
+  .wrap { max-width:1120px; margin:0 auto; padding:0 22px; }
+  .mono { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; }
+
+  /* Nav */
+  nav { position:sticky; top:0; z-index:100; background:rgba(250,246,238,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--rule); }
+  .nav-in { display:flex; align-items:center; justify-content:space-between; height:62px; }
+  .nav-logo img { height:30px; display:block; }
+  .nav-links { display:flex; align-items:center; gap:22px; }
+  .nav-links a { font-size:13.5px; font-weight:600; color:var(--text); }
+  .nav-links a:hover { color:var(--walnut); }
+  .btn { display:inline-block; background:var(--tan); color:#fff !important; border-radius:999px; padding:11px 22px; font-weight:700; font-size:14px; transition:background .15s, transform .12s; }
+  .btn:hover { background:var(--walnut); transform:translateY(-1px); }
+  .btn.big { padding:15px 30px; font-size:15.5px; }
+  .btn.ghost { background:#fff; color:var(--text) !important; border:1px solid var(--rule); }
+  .btn.ghost:hover { border-color:var(--tan); color:var(--walnut) !important; background:var(--sand); }
+  @media (max-width:720px){ .nav-links a.hide-m { display:none; } }
+
+  /* Hero */
+  .hero { padding-top:74px; padding-bottom:30px; display:grid; grid-template-columns:1.05fr .95fr; gap:44px; align-items:center; }
+  @media (max-width:900px){ .hero { grid-template-columns:1fr; padding-top:44px; } }
+  .hero .mono { color:var(--tan); margin-bottom:14px; display:block; }
+  h1 { font-size:clamp(34px,4.6vw,54px); font-weight:800; letter-spacing:-.025em; line-height:1.08; margin-bottom:18px; }
+  h1 em { font-style:normal; color:var(--tan); }
+  .hero p { font-size:17px; color:var(--muted); max-width:520px; margin-bottom:26px; }
+  .hero-ctas { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:18px; }
+  .badges { display:flex; gap:18px; flex-wrap:wrap; }
+  .badges span { font-size:12.5px; color:var(--muted); font-weight:600; }
+  .badges span::before { content:'✓ '; color:var(--ok); }
+
+  /* Mock cards */
+  .mock { background:#fff; border:1px solid var(--rule); border-radius:16px; box-shadow:0 24px 60px rgba(51,40,28,.12); overflow:hidden; }
+  .mock-bar { display:flex; align-items:center; gap:8px; background:var(--espresso); padding:9px 14px; }
+  .mock-bar i { width:9px; height:9px; border-radius:99px; background:#5a4a37; display:inline-block; }
+  .mock-bar .url { font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#cbb894; margin-left:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; flex:1; }
+  .mock-body { padding:16px 18px 18px; }
+  .mock h4 { font-size:13.5px; font-weight:700; margin-bottom:2px; }
+  .mock .sub { font-size:11px; color:var(--muted); margin-bottom:12px; }
+  .m-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid #f4eee1; font-size:12.5px; }
+  .m-row:last-child { border-bottom:0; }
+  .m-strong { font-weight:700; }
+  .m-dim { color:var(--muted); font-size:11px; }
+  .m-pill { font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; padding:3px 8px; border-radius:999px; font-weight:600; white-space:nowrap; }
+  .m-pill.hot { background:#eef6ef; color:var(--ok); }
+  .m-pill.warm { background:var(--sand); color:var(--walnut); }
+  .m-pill.gold { background:#fbf2dc; color:#a06a12; }
+  .m-stat { text-align:right; }
+  .m-stat b { font-size:16px; display:block; letter-spacing:-.01em; }
+  .m-bars { display:flex; gap:4px; align-items:flex-end; height:44px; margin:8px 0 2px; }
+  .m-bars i { flex:1; background:var(--sand); border-radius:3px 3px 0 0; }
+  .m-bars i.g { background:var(--gold); }
+  .m-bars i.t { background:var(--tan); }
+
+  /* Stat strip */
+  .strip { border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); background:#fff; margin-top:44px; }
+  .strip-in { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; padding-top:26px; padding-bottom:26px; text-align:center; }
+  .strip b { font-size:26px; font-weight:800; letter-spacing:-.02em; display:block; color:var(--espresso); }
+  .strip span { font-size:12px; color:var(--muted); font-weight:600; }
+  .strip-note { text-align:center; font-size:11.5px; color:var(--muted); padding-bottom:18px; }
+
+  /* Feature sections */
+  .features { padding-top:70px; padding-bottom:10px; }
+  .sec-head { text-align:center; max-width:640px; margin:0 auto 54px; }
+  .sec-head .mono { color:var(--tan); display:block; margin-bottom:10px; }
+  h2 { font-size:clamp(26px,3.4vw,38px); font-weight:800; letter-spacing:-.022em; line-height:1.15; }
+  .sec-head p { color:var(--muted); font-size:15.5px; margin-top:12px; }
+  .feat { display:grid; grid-template-columns:1fr 1fr; gap:52px; align-items:center; padding-top:44px; padding-bottom:44px; }
+  .feat:nth-child(even) .feat-copy { order:2; }
+  @media (max-width:860px){ .feat { grid-template-columns:1fr; gap:26px; } .feat:nth-child(even) .feat-copy { order:0; } }
+  .feat-num { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold); font-weight:600; letter-spacing:.2em; margin-bottom:10px; }
+  h3 { font-size:24px; font-weight:800; letter-spacing:-.018em; line-height:1.2; margin-bottom:12px; }
+  .feat-copy p { color:var(--muted); font-size:14.5px; margin-bottom:14px; }
+  .checks { list-style:none; }
+  .checks li { font-size:13.5px; padding:4px 0 4px 24px; position:relative; font-weight:500; }
+  .checks li::before { content:'✓'; position:absolute; left:0; color:var(--ok); font-weight:800; }
+
+  /* Why trio */
+  .why { background:var(--espresso); color:#fff; padding:70px 0; margin-top:60px; }
+  .why h2 { color:#fff; text-align:center; max-width:720px; margin:0 auto 8px; }
+  .why .lede { text-align:center; color:#cbb894; font-size:15px; max-width:620px; margin:0 auto 44px; }
+  .why-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; }
+  .why-card { background:rgba(255,255,255,.05); border:1px solid rgba(217,164,65,.25); border-radius:14px; padding:22px 24px; }
+  .why-card h4 { font-size:16px; font-weight:700; margin-bottom:8px; color:var(--gold); }
+  .why-card p { font-size:13.5px; color:#d8cbb4; line-height:1.6; }
+
+  /* Pricing */
+  .pricing { padding-top:80px; padding-bottom:30px; }
+  .price-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; max-width:820px; margin:0 auto; }
+  .price-card { background:#fff; border:1.5px solid var(--rule); border-radius:18px; padding:28px 28px 26px; position:relative; }
+  .price-card.hot { border-color:var(--tan); box-shadow:0 18px 50px rgba(156,116,64,.14); }
+  .tag { position:absolute; top:-11px; left:24px; background:var(--tan); color:#fff; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; font-weight:600; padding:4px 10px; border-radius:999px; }
+  .price-card .mono { color:var(--walnut); }
+  .amount { font-size:40px; font-weight:800; letter-spacing:-.025em; margin:10px 0 2px; color:var(--espresso); }
+  .amount span { font-size:14px; font-weight:500; color:var(--muted); }
+  .amount em { font-style:normal; font-size:14px; font-weight:700; color:var(--walnut); }
+  .price-sub { font-size:12.5px; color:var(--muted); margin-bottom:16px; font-weight:600; }
+  .price-card .checks { margin-bottom:20px; }
+  .price-card .btn { width:100%; text-align:center; }
+
+  /* Interactive demos */
+  .try-tag { display:inline-flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; font-weight:600; color:#fff; background:var(--tan); border-radius:999px; padding:4px 10px; margin-left:auto; }
+  .try-tag i { width:6px; height:6px; border-radius:99px; background:#fff; display:inline-block; animation:pulse 1.6s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .demo-btn { font:600 12px 'Onest',sans-serif; background:var(--tan); color:#fff; border:0; border-radius:999px; padding:8px 14px; cursor:pointer; transition:background .15s; }
+  .demo-btn:hover { background:var(--walnut); }
+  .demo-btn.ghost { background:#fff; color:var(--text); border:1px solid var(--rule); }
+  .demo-btn.ghost:hover { border-color:var(--tan); color:var(--walnut); background:var(--sand); }
+  .demo-btn:disabled { opacity:.55; cursor:default; }
+  .fade-in { animation:fadeUp .4s ease both; }
+  @keyframes fadeUp { from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none} }
+
+  /* 01 site-map demo */
+  #smSvg { display:block; width:100%; height:auto; touch-action:none; cursor:crosshair; background:#e8e3d4; }
+  #smSvg .vertex { fill:#fff; stroke:var(--tan); stroke-width:2; }
+  .sm-hint { font-size:11.5px; color:var(--walnut); font-weight:600; padding:8px 14px; background:var(--sand); display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .sm-rows { padding:4px 16px 12px; }
+
+  /* chat demos */
+  .d-thread { display:flex; flex-direction:column; gap:8px; padding:12px 14px; min-height:150px; max-height:240px; overflow-y:auto; background:#faf7f0; }
+  .d-msg { max-width:86%; padding:8px 11px; border-radius:11px; font-size:12.5px; line-height:1.5; }
+  .d-msg.me { align-self:flex-end; background:var(--tan); color:#fff; border-bottom-right-radius:4px; }
+  .d-msg.bot { align-self:flex-start; background:#fff; border:1px solid #eee5d2; border-bottom-left-radius:4px; }
+  .d-typing { align-self:flex-start; color:#a89c88; letter-spacing:3px; font-size:14px; padding:2px 10px; }
+  .d-chips { display:flex; flex-wrap:wrap; gap:6px; padding:0 14px 10px; background:#faf7f0; }
+  .d-chips button { font:500 11px 'Onest',sans-serif; color:var(--walnut); background:var(--sand); border:0; border-radius:999px; padding:6px 10px; cursor:pointer; }
+  .d-chips button:hover { background:#e9dcc0; }
+  .d-compose { display:flex; gap:8px; padding:10px 12px; border-top:1px solid #efe8d7; background:#fff; }
+  .d-compose input { flex:1; font:400 12.5px 'Onest',sans-serif; border:1px solid var(--rule); border-radius:9px; padding:8px 11px; }
+
+  /* funnel demo */
+  .fun-bar { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #f4eee1; font-size:12.5px; }
+  .fun-bar:last-child { border-bottom:0; }
+  .fun-label { width:74px; font-weight:600; }
+  .fun-track { flex:1; height:10px; background:#f4eee1; border-radius:99px; overflow:hidden; }
+  .fun-fill { height:100%; background:var(--tan); border-radius:99px; width:0%; transition:width .6s ease; }
+  .fun-fill.gold { background:var(--gold); }
+  .fun-n { width:20px; text-align:right; font-weight:700; }
+  .fun-toast { font-size:11px; color:var(--walnut); font-weight:600; min-height:16px; padding:8px 2px 0; }
+
+  /* brand demo */
+  .brand-form { display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:12px 14px; border-bottom:1px solid #efe8d7; background:#fff; }
+  .brand-form input { flex:1; min-width:150px; font:500 12.5px 'Onest',sans-serif; border:1px solid var(--rule); border-radius:9px; padding:8px 11px; }
+  .swatch { width:24px; height:24px; border-radius:99px; border:2px solid #fff; box-shadow:0 0 0 1px var(--rule); cursor:pointer; }
+  .swatch.sel { box-shadow:0 0 0 2px var(--espresso); }
+
+  /* ═══ TEAM band: inverted palette ═══ */
+  .team-band {
+    background:linear-gradient(180deg, #3a2d1f 0%, #33281c 45%, #241b12 100%);
+    border-top:3px solid var(--gold);
+    border-bottom:3px solid var(--gold);
+    padding-top:64px; padding-bottom:56px;
+    margin-top:56px;
+  }
+  .team-band .sec-head .mono { color:var(--gold); }
+  .team-band h2 { color:#fff; }
+  .team-band .sec-head p { color:#d8cbb4; }
+  .team-band .feat-num { color:var(--gold); }
+  .team-band h3 { color:#fff; }
+  .team-band .feat-copy p { color:#d8cbb4; }
+  .team-band .feat-copy p strong { color:#f1e7d3; }
+  .team-band .checks li { color:#eee5d2; }
+  .team-band .checks li::before { color:var(--gold); }
+  .team-band .feat-copy a:not(.btn) { color:var(--gold); }
+  .team-band .mock { box-shadow:0 24px 70px rgba(0,0,0,.45); }
+  .team-band .btn.primary { background:var(--gold); color:var(--espresso); font-weight:800; }
+  .team-band .btn.primary:hover { background:#e6b656; }
+
+  /* ═══ Scroll-triggered demo attention ═══ */
+  .mock { opacity:0; transform:translateY(18px); transition:opacity .5s ease, transform .5s ease; }
+  .mock.inview { opacity:1; transform:none; }
+
+  /* TRY IT badge flares when its card is on screen */
+  .mock.attn .try-tag {
+    background:var(--gold); color:var(--espresso); transform:scale(1.12);
+    animation:tagFlare 1.6s ease-in-out infinite;
+    transition:transform .25s ease, background .25s ease;
+  }
+  @keyframes tagFlare {
+    0%,100% { box-shadow:0 0 0 0 rgba(217,164,65,.55); }
+    50%     { box-shadow:0 0 0 9px rgba(217,164,65,0); }
+  }
+
+  /* Pulsing gold ring on the card's primary control */
+  .pulse-ring { position:relative; animation:ringPulse 1.8s ease-out infinite; border-radius:inherit; }
+  @keyframes ringPulse {
+    0%   { box-shadow:0 0 0 0 rgba(217,164,65,.65); }
+    70%  { box-shadow:0 0 0 14px rgba(217,164,65,0); }
+    100% { box-shadow:0 0 0 0 rgba(217,164,65,0); }
+  }
+  .pulse-scale { animation:gentleBounce 1.8s ease-in-out infinite; }
+  @keyframes gentleBounce {
+    0%,100% { transform:scale(1); } 50% { transform:scale(1.045); }
+  }
+
+  /* "tap to try" nudge on the site map */
+  .sm-nudge {
+    position:absolute; pointer-events:none; display:flex; align-items:center; gap:8px;
+    background:rgba(51,40,28,.92); color:#f1e7d3; font:600 11.5px 'Onest',sans-serif;
+    border-radius:999px; padding:8px 14px; box-shadow:0 8px 24px rgba(0,0,0,.25);
+    animation:nudgeBob 1.6s ease-in-out infinite;
+  }
+  .sm-nudge .dot { width:9px; height:9px; border-radius:99px; background:var(--gold); animation:tagFlare 1.6s infinite; }
+  @keyframes nudgeBob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mock { opacity:1; transform:none; transition:none; }
+    .mock.attn .try-tag, .pulse-ring, .pulse-scale, .sm-nudge, .sm-nudge .dot { animation:none !important; }
+  }
+
+  /* ═══ MOBILE (dense) ═══ */
+  @media (max-width: 720px) {
+    .d-only { display:none; }
+    .m-only { display:inline; }
+    .wrap { padding:0 18px; }
+    .feat > *, .hero > *, .m-row > *, .mock-bar > *, .fun-bar > * { min-width:0; }
+    .m-row { flex-wrap:wrap; }
+    body { line-height:1.5; }
+
+    /* Contained & centered: nothing slams the screen edges */
+    .hero > div:first-child { max-width:460px; margin:0 auto; text-align:center; }
+    .hero .mono { display:block; }
+    .checks { text-align:left; }
+    .feat-copy { width:100%; max-width:440px; margin:0 auto; }
+    .feat .mock, .hero .mock { width:100%; max-width:440px; margin-left:auto; margin-right:auto; }
+    .why-card, .price-card { width:100%; max-width:420px; margin-left:auto; margin-right:auto; }
+    .strip-in { max-width:440px; margin:0 auto; }
+
+    /* Nav */
+    .nav-in { height:54px; gap:8px; }
+    .nav-logo img { height:22px; }
+    .nav-links { gap:11px; }
+    .nav-links a { font-size:12.5px; white-space:nowrap; }
+    .btn { padding:8px 14px; font-size:12.5px; white-space:nowrap; }
+    .btn.big { padding:13px 20px; font-size:14.5px; }
+
+    /* Hero */
+    .hero { padding-top:16px; padding-bottom:2px; gap:14px; }
+    .hero .mono { margin-bottom:8px; font-size:9px; }
+    h1 { font-size:25px; margin-bottom:8px; line-height:1.14; }
+    .hero p { font-size:13.5px; margin-bottom:12px; line-height:1.45; }
+    .hero-ctas { flex-direction:column; align-items:center; gap:9px; margin-bottom:10px; }
+    .hero-ctas .btn { text-align:center; width:auto; min-width:240px; max-width:100%; padding:13px 32px; }
+    .badges { gap:4px 12px; justify-content:center; }
+    .badges span { font-size:10.5px; }
+
+    /* Proof strip */
+    .strip { margin-top:18px; }
+    .strip-in { grid-template-columns:1fr 1fr; gap:10px 8px; padding-top:14px; padding-bottom:14px; }
+    .strip b { font-size:17px; }
+    .strip span { font-size:10px; }
+    .strip-note { font-size:10px; padding-bottom:10px; }
+
+    /* Features: dense rhythm */
+    .features { padding-top:16px; padding-bottom:2px; }
+    .sec-head { margin-bottom:2px; }
+    .sec-head .mono { margin-bottom:6px; }
+    .sec-head p { font-size:13.5px; margin-top:8px; }
+    h2 { font-size:19px; }
+    h3 { font-size:18px; margin-bottom:8px; }
+    .feat { gap:10px; padding-top:14px; padding-bottom:14px; }
+    .feat-num { margin-bottom:6px; font-size:10px; }
+    .feat-copy p { font-size:12.5px; margin-bottom:7px; line-height:1.45; }
+    .checks li { font-size:12.5px; padding:2.5px 0 2.5px 21px; }
+
+    /* Demo cards */
+    .mock { border-radius:15px; }
+    .mock-bar { padding:7px 11px; }
+    .try-tag { font-size:8px; padding:3px 7px; }
+    .mock-body { padding:12px 13px 13px; }
+    .m-row { padding:7px 0; font-size:12px; }
+    .demo-btn { padding:10px 15px; font-size:12.5px; }
+    .d-chips { padding:0 10px 8px; }
+    .d-chips button { padding:8px 11px; font-size:11.5px; }
+    .d-thread { min-height:120px; max-height:190px; padding:10px 12px; }
+    .d-compose { padding:8px 10px; }
+    .d-compose input, .brand-form input, #smRate {
+      font-size:16px !important;  /* prevents iOS focus-zoom */
+    }
+    .sm-hint { flex-direction:column; align-items:stretch; gap:7px; padding:8px 12px; font-size:11px; }
+    .sm-hint > span:last-child { justify-content:flex-start; gap:7px; }
+    .sm-hint > span:last-child button { margin-left:auto; }
+    .sm-rows { padding:2px 13px 8px; }
+    .fun-label { width:60px; font-size:11px; }
+    .fun-bar { padding:6px 0; font-size:11.5px; }
+    .brand-form { padding:10px 12px; gap:7px; }
+
+    .team-band { padding-top:30px; padding-bottom:26px; margin-top:26px; }
+
+    /* Why / pricing / final */
+    .why { padding:26px 0; margin-top:22px; }
+    .why h2 { margin-bottom:6px; }
+    .why .lede { font-size:13px; margin-bottom:18px; }
+    .why-grid { gap:9px; }
+    .why-card { padding:15px 16px; }
+    .why-card h4 { font-size:14.5px; margin-bottom:5px; }
+    .why-card p { font-size:12.5px; }
+    .pricing { padding-top:28px; padding-bottom:8px; }
+    .price-grid { gap:12px; }
+    .price-card { padding:20px 18px 18px; }
+    .amount { font-size:30px; margin:8px 0 2px; }
+    .price-sub { font-size:11.5px; margin-bottom:12px; }
+    .price-card .checks { margin-bottom:14px; }
+    .final { padding-top:26px; padding-bottom:40px; }
+    .final h2 { font-size:21px; }
+    .final p { font-size:13px; margin-bottom:16px; }
+    footer { padding:16px 0; }
+    .foot-in { justify-content:center; text-align:center; gap:10px; }
+    .foot-links { gap:12px; font-size:12px; }
+  }
+
+  /* Final CTA + footer */
+  .final { text-align:center; padding-top:70px; padding-bottom:80px; }
+  .final h2 { max-width:640px; margin:0 auto 12px; }
+  .final p { color:var(--muted); margin-bottom:24px; }
+  footer { border-top:1px solid var(--rule); background:#fff; padding:26px 0; }
+  .foot-in { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .foot-in img { height:24px; }
+  .foot-links { display:flex; gap:18px; font-size:12.5px; }
+  .foot-copy { font-size:11.5px; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="nav-logo" href="/"><img src="/assets/paver-portal-logo.svg" alt="Paver Portal"></a>
+    <div class="nav-links">
+      <a href="#features" class="hide-m">Features</a>
+      <a href="#team" class="hide-m">Team</a>
+      <a href="#pricing" class="hide-m">Pricing</a>
+      <a href="/login.html">Sign in</a>
+      <a class="btn" href="/signup.html">Start free trial</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ Hero ═══ -->
+<header class="wrap hero">
+  <div>
+    <span class="mono">Built for hardscaping pros</span>
+    <h1>The smarter way to <em>sell hardscapes.</em></h1>
+    <p><span class="d-only">Scaled site-map measuring, branded proposals your clients actually read, live engagement on every deal, and expert answers in the field — one platform, from first measurement to signature.</span><span class="m-only">Measure it, propose it, watch it get read, close it — one platform for hardscaping pros.</span></p>
+    <div class="hero-ctas">
+      <a class="btn big" href="/signup.html">Start your free trial</a>
+      <a class="btn ghost" href="#features">Play with the product ↓</a>
+    </div>
+    <div class="badges">
+      <span>10-day free trial</span>
+      <span>3 proposals included</span>
+      <span>Cancel anytime</span>
+    </div>
+  </div>
+
+  <div class="mock">
+    <div class="mock-bar"><i></i><i></i><i></i><span class="url">paverportal.com/dashboard · live pipeline</span><span class="try-tag"><i></i>Live</span></div>
+    <div class="mock-body">
+      <h4>Your pipeline</h4>
+      <div class="sub">Every open, return visit, and request — captured automatically</div>
+      <div id="heroRows">
+        <div class="m-row">
+          <div><div class="m-strong">1719 Yorktown Rd</div><div class="m-dim" id="heroYorkSub">Viewed 3× today</div></div>
+          <span class="m-pill warm" id="heroYorkPill">Viewed</span>
+          <div class="m-stat"><b>$86,400</b><span class="m-dim">backyard + pool deck</span></div>
+        </div>
+        <div class="m-row">
+          <div><div class="m-strong">40 Sierra Ct</div><div class="m-dim">Substitution requested · 1h ago</div></div>
+          <span class="m-pill gold">Action</span>
+          <div class="m-stat"><b>$42,750</b><span class="m-dim">driveway</span></div>
+        </div>
+        <div class="m-row">
+          <div><div class="m-strong">228 Alder Ln</div><div class="m-dim">Opened 20 min after publish</div></div>
+          <span class="m-pill warm">Viewed</span>
+          <div class="m-stat"><b>$31,200</b><span class="m-dim">patio + walls</span></div>
+        </div>
+      </div>
+      <div class="m-bars" id="heroBars"><i style="height:30%"></i><i style="height:44%" class="t"></i><i style="height:38%"></i><i style="height:62%" class="t"></i><i style="height:52%"></i><i style="height:78%" class="g"></i><i style="height:70%" class="t"></i><i style="height:42%" class="g"></i></div>
+      <div class="m-dim" id="heroFeed">Engagement events · streaming live…</div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ Proof strip ═══ -->
+<div class="strip">
+  <div class="wrap strip-in">
+    <div><b>1,304 sqft</b><span>measured on one real deal — geometry, not guessing</span></div>
+    <div><b>17 / 17</b><span>active days of client engagement captured</span></div>
+    <div><b>Same-hour</b><span>follow-up on engaged buyers beats cold cadence</span></div>
+    <div><b>1 platform</b><span>measure · propose · chat · close</span></div>
+  </div>
+  <div class="wrap strip-note">Built and battle-tested on real paver deals for a year before it became a product.</div>
+</div>
+
+<!-- ═══ Features ═══ -->
+<section class="features wrap" id="features">
+  <div class="sec-head">
+    <span class="mono">How it works</span>
+    <h2><span class="d-only">Most design teams go dark the moment a proposal goes out.<br>Yours won't.</span><span class="m-only">Deals die quiet.<br>Yours won't.</span></h2>
+    <p><span class="d-only">Deals rarely die in a price war. They die because the homeowner went quiet — or the number was off — and nobody knew. Paver Portal makes the invisible visible. <strong>Every card below is live — click, draw, and type.</strong></span><span class="m-only"><strong>Every card below is live — tap, draw, and type.</strong></span></p>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">01 · MEASURE</div>
+      <h3>Accurate pricing starts at the measurement.</h3>
+      <p><span class="d-only">Upload any aerial — Google Earth works — click two points on a known distance, and the whole map locks to scale. Every region you draw returns real square footage. You never type a number; pricing follows the geometry.</span><span class="m-only">Two taps lock the scale. Every region you draw returns real square footage — priced at your rates.</span></p>
+      <ul class="checks">
+        <li>One-time scale calibration per property</li>
+        <li>Draw regions, get instant sqft &amp; linear ft</li>
+        <li>Priced at <strong>your rates</strong> — demo, base, pavers, hauling, each its own $/unit</li>
+      </ul>
+    </div>
+    <div class="mock">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">/editor · site map · try it yourself</span><span class="try-tag"><i></i>Try it</span></div>
+      <svg id="smSvg" viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="lawnG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#a8c084"/><stop offset="1" stop-color="#8fae6b"/>
+          </linearGradient>
+          <linearGradient id="poolG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#7fd4e8"/><stop offset="1" stop-color="#3fa8c9"/>
+          </linearGradient>
+          <linearGradient id="roofG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#8d8578"/><stop offset="1" stop-color="#6e675c"/>
+          </linearGradient>
+          <radialGradient id="treeG" cx=".35" cy=".35" r=".8">
+            <stop offset="0" stop-color="#6f9648"/><stop offset="1" stop-color="#4c7233"/>
+          </radialGradient>
+          <radialGradient id="treeG2" cx=".35" cy=".35" r=".8">
+            <stop offset="0" stop-color="#86a95c"/><stop offset="1" stop-color="#5d8340"/>
+          </radialGradient>
+        </defs>
+
+        <!-- lawn + mowing stripes -->
+        <rect width="600" height="340" fill="url(#lawnG)"/>
+        <g opacity="0.08" fill="#ffffff">
+          <rect x="0" y="0" width="600" height="24"/><rect x="0" y="48" width="600" height="24"/>
+          <rect x="0" y="96" width="600" height="24"/><rect x="0" y="144" width="600" height="24"/>
+          <rect x="0" y="192" width="600" height="24"/><rect x="0" y="240" width="600" height="24"/>
+          <rect x="0" y="288" width="600" height="24"/>
+        </g>
+
+        <!-- street + sidewalk -->
+        <rect x="0" y="0" width="26" height="340" fill="#9b958a"/>
+        <rect x="26" y="0" width="10" height="340" fill="#cfc9bc"/>
+
+        <!-- driveway with joints -->
+        <rect x="330" y="0" width="92" height="176" rx="3" fill="#d6d0c2"/>
+        <g stroke="#bcb5a5" stroke-width="1.5">
+          <line x1="330" y1="44" x2="422" y2="44"/><line x1="330" y1="88" x2="422" y2="88"/>
+          <line x1="330" y1="132" x2="422" y2="132"/><line x1="376" y1="0" x2="376" y2="176"/>
+        </g>
+
+        <!-- house with roof ridges + shadow -->
+        <ellipse cx="185" cy="172" rx="132" ry="20" fill="#000" opacity="0.10"/>
+        <rect x="62" y="34" width="234" height="132" rx="4" fill="url(#roofG)"/>
+        <polygon points="62,100 296,100 296,96 62,96" fill="#5c564c"/>
+        <line x1="179" y1="34" x2="179" y2="166" stroke="#5c564c" stroke-width="3"/>
+        <rect x="90" y="52" width="26" height="18" rx="2" fill="#bfd8e6" stroke="#8fb3c6" stroke-width="1.5"/>
+        <rect x="226" y="120" width="26" height="18" rx="2" fill="#bfd8e6" stroke="#8fb3c6" stroke-width="1.5"/>
+
+        <!-- wood deck off the house -->
+        <rect x="296" y="196" width="88" height="66" rx="4" fill="#c99e6a"/>
+        <g stroke="#b0854f" stroke-width="1.4">
+          <line x1="296" y1="207" x2="384" y2="207"/><line x1="296" y1="218" x2="384" y2="218"/>
+          <line x1="296" y1="229" x2="384" y2="229"/><line x1="296" y1="240" x2="384" y2="240"/>
+          <line x1="296" y1="251" x2="384" y2="251"/>
+        </g>
+        <rect x="306" y="214" width="18" height="12" rx="2" fill="#8a5a3b"/>
+        <rect x="330" y="214" width="18" height="12" rx="2" fill="#8a5a3b"/>
+        <circle cx="358" cy="242" r="9" fill="#e8dcc0" stroke="#c9a86a" stroke-width="2"/>
+
+        <!-- kidney pool + coping -->
+        <ellipse cx="497" cy="248" rx="72" ry="52" fill="#e9e2d1"/>
+        <path d="M450 240 q10 -32 46 -30 q42 2 46 34 q3 30 -30 36 q-16 3 -30 -6 q-14 -8 -24 -4 q-12 4 -8 -30 z" fill="url(#poolG)"/>
+        <path d="M462 244 q8 -20 34 -19" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.55" stroke-linecap="round"/>
+        <rect x="452" y="292" width="34" height="7" rx="3" fill="#d9a441"/>
+
+        <!-- curving stone path -->
+        <g fill="#cfc5ae" stroke="#b3a98f" stroke-width="1">
+          <ellipse cx="312" cy="292" rx="11" ry="7"/><ellipse cx="336" cy="300" rx="11" ry="7"/>
+          <ellipse cx="362" cy="304" rx="11" ry="7"/><ellipse cx="388" cy="302" rx="11" ry="7"/>
+          <ellipse cx="412" cy="295" rx="11" ry="7"/><ellipse cx="432" cy="284" rx="11" ry="7"/>
+        </g>
+
+        <!-- trees (layered) -->
+        <g>
+          <ellipse cx="86" cy="244" rx="40" ry="12" fill="#000" opacity="0.10"/>
+          <circle cx="72" cy="222" r="26" fill="url(#treeG)"/>
+          <circle cx="98" cy="230" r="20" fill="url(#treeG2)"/>
+          <circle cx="84" cy="206" r="16" fill="url(#treeG2)"/>
+        </g>
+        <g>
+          <ellipse cx="540" cy="82" rx="42" ry="12" fill="#000" opacity="0.10"/>
+          <circle cx="526" cy="58" r="28" fill="url(#treeG)"/>
+          <circle cx="556" cy="70" r="20" fill="url(#treeG2)"/>
+          <circle cx="540" cy="40" r="15" fill="url(#treeG2)"/>
+        </g>
+        <circle cx="452" cy="26" r="16" fill="url(#treeG2)"/>
+        <circle cx="150" cy="306" r="17" fill="url(#treeG)"/>
+
+        <!-- flower beds -->
+        <g>
+          <ellipse cx="230" cy="200" rx="52" ry="13" fill="#7e9464"/>
+          <circle cx="208" cy="197" r="4" fill="#e26d6d"/><circle cx="222" cy="202" r="4" fill="#e8b84f"/>
+          <circle cx="238" cy="196" r="4" fill="#d97fb0"/><circle cx="252" cy="201" r="4" fill="#e26d6d"/>
+        </g>
+        <g>
+          <ellipse cx="120" cy="288" rx="40" ry="11" fill="#7e9464"/>
+          <circle cx="104" cy="286" r="3.5" fill="#e8b84f"/><circle cx="120" cy="290" r="3.5" fill="#d97fb0"/>
+          <circle cx="136" cy="285" r="3.5" fill="#e26d6d"/>
+        </g>
+
+        <!-- hedge border top -->
+        <g fill="#5d8340">
+          <circle cx="70" cy="12" r="9"/><circle cx="94" cy="12" r="9"/><circle cx="118" cy="12" r="9"/>
+          <circle cx="142" cy="12" r="9"/><circle cx="166" cy="12" r="9"/><circle cx="190" cy="12" r="9"/>
+          <circle cx="214" cy="12" r="9"/><circle cx="238" cy="12" r="9"/><circle cx="262" cy="12" r="9"/>
+        </g>
+
+        <!-- scale reference -->
+        <g>
+          <rect x="318" y="184" width="128" height="34" rx="6" fill="#33281c" opacity="0.85"/>
+          <line x1="332" y1="196" x2="422" y2="196" stroke="#f1e7d3" stroke-width="2" stroke-dasharray="5 4"/>
+          <circle cx="332" cy="196" r="3.5" fill="#d9a441"/><circle cx="422" cy="196" r="3.5" fill="#d9a441"/>
+          <text x="382" y="212" font-family="monospace" font-size="9.5" fill="#f1e7d3" text-anchor="middle">A→B = 24 ft · scale locked ✓</text>
+        </g>
+
+        <g id="smDrawing"></g>
+      </svg>
+      <div class="sm-hint">
+        <span id="smHint">👆 Click around the yard to outline a patio — tap your first point again to close it</span>
+        <span style="display:flex; align-items:center; gap:6px; white-space:nowrap;">
+          <label for="smRate" style="font-weight:600;">Your rate $</label>
+          <input id="smRate" type="number" value="24" min="1" max="500" style="width:58px; font:600 12px 'Onest',sans-serif; border:1px solid var(--rule); border-radius:8px; padding:5px 7px;">/sqft
+          <button class="demo-btn ghost" id="smReset" type="button">Reset</button>
+        </span>
+      </div>
+      <div class="sm-rows" id="smRows">
+        <div class="m-row"><span>Main paver area <span class="m-dim">(pre-measured)</span></span><b>872 sqft</b></div>
+        <div class="m-row"><span class="m-strong">Total measured scope</span><b class="m-strong" id="smTotal">872 sqft</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">02 · PROPOSE</div>
+      <h3>Fits the workflow you already have. Replaces it when you're ready.</h3>
+      <p><span class="d-only">Keep building bids in the software you know — then <strong>drag &amp; drop the PDF</strong> into Paver Portal and it becomes an interactive proposal automatically. No retraining, no migration. And when you're ready to go end-to-end, build the bid right here: every service you sell — demo, grading, tree removal, hauling, pavers, outdoor kitchens — with <strong>your line items at your rates</strong>.</span><span class="m-only">Drag the PDF from your current bidding software — it becomes an interactive proposal. Ready to switch? Build bids end-to-end here, <strong>your line items at your rates</strong>.</span></p>
+      <ul class="checks">
+        <li>Drag &amp; drop the PDF from your current bidding software</li>
+        <li>Or build bids start-to-finish — custom line items, your $/unit rates</li>
+        <li>Publish to a private link — no client login required</li>
+      </ul>
+    </div>
+    <div class="mock">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">/editor · bid parsing</span><span class="try-tag"><i></i>Try it</span></div>
+      <div class="mock-body">
+        <h4 id="bidTitle">GreenScape_Bid_Final.pdf</h4>
+        <div class="sub" id="bidSub">Contractor bid, 2 pages · ready to parse</div>
+        <div id="bidRows" style="min-height:170px;">
+          <div style="text-align:center; padding:34px 10px;">
+            <button class="demo-btn" id="bidParseBtn" type="button">⚡ Parse this bid</button>
+            <div class="m-dim" style="margin-top:8px;">Watch 4 line items extract themselves — no retyping</div>
+          </div>
+        </div>
+        <div class="m-row" id="bidTotalRow" style="display:none;"><span class="m-strong">Project total</span><b class="m-strong" id="bidTotal">$0</b></div>
+        <div id="bidSwap" style="display:none; padding-top:10px;">
+          <span class="m-dim">Client wants a different paver? Swap it — pricing follows:</span><br>
+          <button class="demo-btn ghost" id="bidSwapBtn" type="button" style="margin-top:6px;">Swap Catalina Slate → Walnut Blend (+$1.40/sqft)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">03 · ENGAGE</div>
+      <h3>Give every client a portal worth coming back to.</h3>
+      <p><span class="d-only">Your client gets a branded space with their proposal, materials, a step-by-step look at how their project gets built, direct chat with you, and one-tap requests for material swaps or redesigns. Every conversation in one place — no lost texts, no buried emails.</span><span class="m-only">Every client gets a branded portal: proposal, materials, chat, one-tap change requests. No lost texts.</span></p>
+      <ul class="checks">
+        <li>Chat with automatic email fallback</li>
+        <li>Substitution &amp; redesign requests, tracked</li>
+        <li>Print-to-mark-up plans and a referral program built in</li>
+      </ul>
+    </div>
+    <div class="mock">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">client portal · chat with designer</span><span class="try-tag"><i></i>Try it</span></div>
+      <div class="mock-body" style="padding-bottom:0;">
+        <h4>Sarah &amp; Mike Torres</h4>
+        <div class="sub">1719 Yorktown Rd · you're the homeowner — say something</div>
+      </div>
+      <div class="d-thread" id="portalThread">
+        <div class="d-msg bot">Hi Sarah! The updated proposal is live — the seating wall now wraps the fire pit like we talked about. 🔥</div>
+      </div>
+      <div class="d-chips" id="portalChips">
+        <button type="button">Could we see the walnut blend instead?</button>
+        <button type="button">Love the seating wall placement 👏</button>
+        <button type="button">What's the timeline once we sign?</button>
+      </div>
+      <div class="d-compose">
+        <input id="portalInput" type="text" placeholder="Message your designer…">
+        <button class="demo-btn" id="portalSend" type="button">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">04 · CLOSE</div>
+      <h3>Know which deals are alive — and call at the right moment.</h3>
+      <p><span class="d-only">Every page open, return visit, share, and request moves the deal through your pipeline automatically: Draft → Sent → Viewed → Engaged → Signed. When a homeowner re-reads the proposal three times on a Tuesday night, you'll know Wednesday morning.</span><span class="m-only">Opens, re-reads, and shares move deals through your pipeline automatically. Re-read 3× Tuesday night? You'll know Wednesday morning.</span></p>
+      <ul class="checks">
+        <li>Automatic stage progression from real behavior</li>
+        <li>Open value, win rate, and closed totals at a glance</li>
+        <li>Follow up on signal, not gut feel</li>
+      </ul>
+    </div>
+    <div class="mock">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">/dashboard · funnel</span><span class="try-tag"><i></i>Try it</span></div>
+      <div class="mock-body">
+        <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px;">
+          <div><h4>This month</h4><div class="sub">Open value <b id="funValue">$214,300</b> · win rate <b id="funRate">38%</b></div></div>
+          <button class="demo-btn" id="funRun" type="button">▶ Publish a proposal</button>
+        </div>
+        <div class="fun-bar"><span class="fun-label">Draft</span><div class="fun-track"><div class="fun-fill" id="fb0" style="width:40%"></div></div><b class="fun-n" id="fn0">4</b></div>
+        <div class="fun-bar"><span class="fun-label">Sent</span><div class="fun-track"><div class="fun-fill" id="fb1" style="width:60%"></div></div><b class="fun-n" id="fn1">6</b></div>
+        <div class="fun-bar"><span class="fun-label">Viewed</span><div class="fun-track"><div class="fun-fill" id="fb2" style="width:50%"></div></div><b class="fun-n" id="fn2">5</b></div>
+        <div class="fun-bar"><span class="fun-label">Engaged</span><div class="fun-track"><div class="fun-fill gold" id="fb3" style="width:30%"></div></div><b class="fun-n" id="fn3">3</b></div>
+        <div class="fun-bar"><span class="fun-label">Signed</span><div class="fun-track"><div class="fun-fill gold" id="fb4" style="width:20%"></div></div><b class="fun-n" id="fn4">2</b></div>
+        <div class="fun-toast" id="funToast">Watch a deal move through the pipeline on real behavior →</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">05 · IN THE FIELD</div>
+      <h3>An expert in your pocket, standing in the yard.</h3>
+      <p><span class="d-only"><strong>Ask a Pro</strong> answers the questions that come up on-site — base depths, drainage, ICPI standards, even county permit rules with live code lookups. The mobile field kit captures photos, notes, and measurements straight onto the client record, two taps from your phone.</span><span class="m-only"><strong>Ask a Pro</strong> answers install &amp; county-code questions on-site. The field kit captures photos, notes &amp; measurements from your phone.</span></p>
+      <ul class="checks">
+        <li>Expert answers on materials, installs &amp; local codes</li>
+        <li>Camera-first photos, notes &amp; labeled measurements</li>
+        <li>Everything lands on the client record instantly</li>
+      </ul>
+    </div>
+    <div class="mock">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">🛠 Ask a Pro</span><span class="try-tag"><i></i>Try it</span></div>
+      <div class="d-thread" id="proThread">
+        <div class="d-msg bot">Standing in a yard with a question? Pick one — watch how fast you'd get an answer on-site.</div>
+      </div>
+      <div class="d-chips" id="proChips">
+        <button type="button">Permit for a 4-ft retaining wall in Contra Costa County?</button>
+        <button type="button">Base depth for a driveway in clay soil?</button>
+        <button type="button">Best jointing sand for a pool deck?</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">06 · YOUR BRAND</div>
+      <h3>Your name on the door. Everywhere.</h3>
+      <p><span class="d-only">Your logo, your colors, your company name — on the proposal, the client portal, and every email that goes out. Your clients see <em>your</em> brand delivering a big-company experience. Paver Portal stays behind the curtain.</span><span class="m-only">Your logo, colors, and name on everything clients see. We stay behind the curtain.</span></p>
+      <ul class="checks">
+        <li>Custom branding on both plans</li>
+        <li>Your catalog too — add your own products, photos &amp; pricing beside the major manufacturers</li>
+        <li>Clients experience your company, not our software</li>
+      </ul>
+    </div>
+    <div class="mock">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url" id="brandUrl">your-company · client email</span><span class="try-tag"><i></i>Try it</span></div>
+      <div class="brand-form">
+        <input id="brandName" type="text" maxlength="28" placeholder="Type YOUR company name…">
+        <span class="swatch sel" data-c="#9c7440" style="background:#9c7440" title="Tan"></span>
+        <span class="swatch" data-c="#9c7440" style="background:#9c7440" title="Sage"></span>
+        <span class="swatch" data-c="#7a5c9e" style="background:#7a5c9e" title="Plum"></span>
+        <span class="swatch" data-c="#3f6fa8" style="background:#3f6fa8" title="Slate blue"></span>
+      </div>
+      <div class="mock-body">
+        <h4 id="brandH">💬 New message from Alex · <span id="brandCo1" style="color:#9c7440">Summit Hardscapes</span></h4>
+        <div class="sub">from <span id="brandCo2">Summit Hardscapes</span> Portal · reply goes to alex@…</div>
+        <div class="m-row"><div><div class="m-strong">"Updated the pool deck with the travertine you liked —"</div><div class="m-dim">View &amp; reply in <span id="brandCo3">Summit</span> Portal →</div></div><span class="m-pill warm" id="brandPill" style="background:#f1e7d3;color:#7d5c31;">Your brand</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Why ═══ -->
+
+<!-- ═══ TEAM / OWNER CONSOLE ═══ -->
+<section class="team-band" id="team">
+<div class="wrap">
+  <div class="sec-head">
+    <div class="mono">FOR OWNERS · TEAM</div>
+    <h2><span class="d-only">You can't run what you can't see.<br>Now you see everything.</span><span class="m-only">See everything.<br>Run everything.</span></h2>
+    <p><span class="d-only">Every draft bid, every client conversation, every designer's numbers — one owner console. Transparency into all the things that actually run a home-improvement company, without hovering over shoulders.</span><span class="m-only"><strong>Every bid, every conversation, every number — one owner screen.</strong></span></p>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">07 · RUN THE CREW</div>
+      <h3>The owner console.</h3>
+      <p><span class="d-only">An admin account with full visibility into the daily workflow: all draft &amp; active bids across every designer, every client conversation, and a <strong>daily digest email</strong> with the team's sales stats waiting in your inbox each morning.</span><span class="m-only">Full visibility: every designer's bids, client chats, and a daily stats digest in your inbox.</span></p>
+      <ul class="checks">
+        <li>All draft &amp; active bids, team-wide, live</li>
+        <li>Every client conversation, readable in one place</li>
+        <li>Daily digest email — pipeline, wins &amp; hot leads at 7am</li>
+      </ul>
+    </div>
+    <div class="mock">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">/owner · team console</span><span class="try-tag"><i></i>Try it</span></div>
+      <div class="mock-body" style="padding-bottom:8px;">
+        <div style="display:flex; gap:6px; margin-bottom:10px;" id="teamTabs">
+          <button class="demo-btn" data-tab="pipeline" type="button">Team pipeline</button>
+          <button class="demo-btn ghost" data-tab="stats" type="button">Designer stats</button>
+          <button class="demo-btn ghost" data-tab="approve" type="button">Approvals <span id="apBadge" style="background:#b91c1c;color:#fff;border-radius:99px;padding:0 6px;font-size:10px;">1</span></button>
+        </div>
+
+        <div id="teamPanePipeline">
+          <div class="m-row"><div><div class="m-strong">Marcus · 1719 Yorktown Rd</div><div class="m-dim">Draft · edited 20 min ago</div></div><span class="m-pill warm">Draft</span><div class="m-stat"><b>$86,400</b></div></div>
+          <div class="m-row"><div><div class="m-strong">Dana · 40 Sierra Ct</div><div class="m-dim">Client asked for substitution · 1h ago</div></div><span class="m-pill gold">Action</span><div class="m-stat"><b>$42,750</b></div></div>
+          <div class="m-row"><div><div class="m-strong">Marcus · 228 Alder Ln</div><div class="m-dim">Chat: "can we start before June?"</div></div><span class="m-pill hot">Engaged</span><div class="m-stat"><b>$31,200</b></div></div>
+          <div class="m-dim" style="padding-top:8px;">📧 Daily digest: <b>$214k open · 2 hot leads · 1 bid needs review</b> — in your inbox at 7am</div>
+        </div>
+
+        <div id="teamPaneStats" style="display:none;">
+          <div class="m-row"><div><div class="m-strong">Marcus R.</div><div class="m-dim">Last login: today 7:42am</div></div><div class="m-stat"><b>$117,600</b><span class="m-dim">open · 2 hot</span></div><div class="m-stat"><b>41%</b><span class="m-dim">win rate</span></div></div>
+          <div class="m-row"><div><div class="m-strong">Dana K.</div><div class="m-dim">Last login: today 6:15am</div></div><div class="m-stat"><b>$96,700</b><span class="m-dim">open · 1 hot</span></div><div class="m-stat"><b>36%</b><span class="m-dim">win rate</span></div></div>
+          <div class="m-row"><div><div class="m-strong">Luis M.</div><div class="m-dim">Last login: yesterday 4:03pm</div></div><div class="m-stat"><b>$58,900</b><span class="m-dim">open · 0 hot</span></div><div class="m-stat"><b>29%</b><span class="m-dim">win rate</span></div></div>
+          <div class="m-dim" style="padding-top:8px;">Sales, hot leads, logins, win rates — per designer, always current.</div>
+        </div>
+
+        <div id="teamPaneApprove" style="display:none;">
+          <div class="m-row"><div><div class="m-strong">@you — Dana K.</div><div class="m-dim">"Review the Sierra number before I send? Margin looks thin at $42,750 — client is pushing on the wall."</div></div></div>
+          <div style="display:flex; gap:8px; padding:10px 0 6px;" id="apActions">
+            <button class="demo-btn" id="apApprove" type="button">✓ Approve at $42,750</button>
+            <button class="demo-btn ghost" id="apBump" type="button">Request +$1,900</button>
+          </div>
+          <div class="m-dim" id="apResult" style="min-height:16px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feat">
+    <div class="mock">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">white-glove setup · week one</span></div>
+      <div class="mock-body">
+        <h4>We set your team up. Personally.</h4>
+        <div class="sub">Hand-held onboarding, included with every Team plan</div>
+        <div class="m-row"><span>✓ Your brand, logo &amp; colors configured</span><span class="m-pill hot">Day 1</span></div>
+        <div class="m-row"><span>✓ Your catalogs loaded &amp; rate card built with you</span><span class="m-pill hot">Day 2</span></div>
+        <div class="m-row"><span>✓ Every designer onboarded, live on a real bid</span><span class="m-pill warm">Week 1</span></div>
+        <div class="m-row"><span>✓ Owner console &amp; daily digest tuned to you</span><span class="m-pill warm">Week 1</span></div>
+      </div>
+    </div>
+    <div class="feat-copy">
+      <div class="feat-num">08 · ZERO-LIFT START</div>
+      <h3>Hand-held onboarding. We do the setup.</h3>
+      <p><span class="d-only">Your crew doesn't have time to learn software — so the Paver Portal team does the full setup with you: brand, catalogs, rates, every designer seat, live on real bids inside week one. The 3-month minimum exists because that's how long it takes transparency to change how you run the company — and we're invested in getting you there.</span><span class="m-only">We configure everything and get every designer live inside week one.</span></p>
+      <ul class="checks">
+        <li>Full setup done <strong>with</strong> you — brand, catalogs, rates, seats</li>
+        <li>$99/mo + $19/designer · 3-month minimum</li>
+        <li>Cancel anytime after — the transparency usually sells itself</li>
+      </ul>
+      <a class="btn primary" href="/signup.html?plan=team" style="margin-top:6px; display:inline-block;">Set up my team →</a>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="why">
+  <div class="wrap">
+    <h2>Deals don't usually die in a price war.<br>They die quiet.</h2>
+    <p class="lede">Paver Portal exists so that never happens to a deal you're already working.</p>
+    <div class="why-grid">
+      <div class="why-card"><h4>One consistent experience</h4><p>No more designer-by-designer formats — emailed PDFs for one client, paper printouts for another. Every homeowner gets the same polished, branded experience.</p></div>
+      <div class="why-card"><h4>The instrument panel stays lit</h4><p>Opens, re-reads, shares, requests — captured automatically after every send. "Should I call today?" stops being guesswork.</p></div>
+      <div class="why-card"><h4>Pricing that keeps up</h4><p>A centralized catalog means today's proposal carries today's number — even when suppliers push a mid-quarter rate change.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Pricing ═══ -->
+<section class="pricing wrap" id="pricing">
+  <div class="sec-head">
+    <span class="mono">Pricing</span>
+    <h2>Simple pricing that scales with your crew.</h2>
+    <p>Start solo, bring the team when you're ready. No contracts, no per-proposal fees.</p>
+  </div>
+  <div class="price-grid">
+    <div class="price-card hot">
+      <span class="tag">Most popular</span>
+      <span class="mono">Individual designer</span>
+      <div class="amount">$49<span>/mo</span></div>
+      <div class="price-sub">10-day free trial · create &amp; share up to 3 proposals on us</div>
+      <ul class="checks">
+        <li>Full designer access — nothing held back</li>
+        <li>Unlimited clients &amp; unlimited proposals after trial</li>
+        <li>Site-map measuring, bid parsing, client portal</li>
+        <li>Ask a Pro + mobile field kit</li>
+        <li>Custom branding on everything clients see</li>
+      </ul>
+      <a class="btn" href="/signup.html">Start your free trial</a>
+    </div>
+    <div class="price-card">
+      <span class="mono">Team</span>
+      <div class="amount">$99<span>/mo</span> <em>+ $19/designer</em></div>
+      <div class="price-sub">Hand-held onboarding — we set your whole team up · 3-month minimum</div>
+      <ul class="checks">
+        <li>Owner console — every bid, every client conversation, live</li>
+        <li>Daily digest email with team sales stats</li>
+        <li>Designer analytics — sales, hot leads, logins</li>
+        <li>@mention the owner for reviews &amp; overrides</li>
+        <li>Hand-held onboarding — we do the full setup</li>
+      </ul>
+      <a class="btn ghost" href="#team">See the owner console ↓</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Final CTA ═══ -->
+<section class="final wrap">
+  <h2>Your next proposal could be the one that tells you when it's being read.</h2>
+  <p>Full application access · 3 client proposals on the free trial · set up in minutes.</p>
+  <a class="btn big" href="/signup.html">Start your free trial</a>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <img src="/assets/paver-portal-logo.svg" alt="Paver Portal">
+    <div class="foot-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="mailto:tim@mcmullen.properties">Contact</a>
+    </div>
+    <div class="foot-copy">© 2026 Paver Portal</div>
+  </div>
+</footer>
+
+
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const money = (n) => '$' + Math.round(n).toLocaleString('en-US');
+
+  /* ═══ HERO: live engagement stream ═══ */
+  (function heroLive() {
+    const feed = $('heroFeed'); if (!feed) return;
+    const events = [
+      ['Sarah opened the Yorktown proposal', 'york'],
+      ['Yorktown proposal shared with spouse', 'york'],
+      ['228 Alder Ln — materials tab, 3 min', null],
+      ['Yorktown re-read · 4th view today', 'york'],
+      ['40 Sierra Ct — substitution note added', null],
+      ['Yorktown → moved to Engaged', 'promote'],
+    ];
+    let i = 0, views = 3;
+    setInterval(() => {
+      const [text, kind] = events[i % events.length];
+      feed.textContent = '● ' + text + ' · just now';
+      feed.classList.remove('fade-in'); void feed.offsetWidth; feed.classList.add('fade-in');
+      if (kind === 'york') { views++; const el = $('heroYorkSub'); if (el) el.textContent = 'Viewed ' + views + '× today'; }
+      if (kind === 'promote') {
+        const p = $('heroYorkPill'); if (p) { p.textContent = 'Engaged'; p.className = 'm-pill hot'; }
+        views = 3; setTimeout(() => { const p2=$('heroYorkPill'); if(p2){p2.textContent='Viewed'; p2.className='m-pill warm';} }, 5200);
+      }
+      const bars = $('heroBars'); if (bars) {
+        const b = bars.children[Math.floor(Math.random() * bars.children.length)];
+        b.style.height = (35 + Math.random() * 60) + '%';
+      }
+      i++;
+    }, 2600);
+  })();
+
+  /* ═══ 01 MEASURE: draw-a-region ═══ */
+  (function siteMap() {
+    const svg = $('smSvg'); if (!svg) return;
+    const layer = $('smDrawing'), hint = $('smHint'), rows = $('smRows'), totalEl = $('smTotal');
+    const PX_PER_FT = 90 / 24;             // scale line: 90px = 24ft
+    const rateInput = document.getElementById('smRate');
+    const RATE = () => Math.max(1, parseFloat(rateInput && rateInput.value) || 24);
+    let pts = [], poly = null, line = null, regionN = 1, total = 872;
+
+    function svgPoint(evt) {
+      const pt = svg.createSVGPoint();
+      const t = evt.touches ? evt.touches[0] : evt;
+      pt.x = t.clientX; pt.y = t.clientY;
+      return pt.matrixTransform(svg.getScreenCTM().inverse());
+    }
+    function redraw(previewPt) {
+      layer.innerHTML = '';
+      if (!pts.length) return;
+      const d = pts.map((p,i)=> (i?'L':'M') + p.x + ' ' + p.y).join(' ');
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d', d + (previewPt ? ' L' + previewPt.x + ' ' + previewPt.y : ''));
+      path.setAttribute('fill','rgba(217,164,65,.28)');
+      path.setAttribute('stroke','#9c7440'); path.setAttribute('stroke-width','2.5');
+      layer.appendChild(path);
+      pts.forEach((p,i) => {
+        const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        c.setAttribute('cx',p.x); c.setAttribute('cy',p.y); c.setAttribute('r', i===0?7:5);
+        c.setAttribute('class','vertex');
+        layer.appendChild(c);
+      });
+    }
+    function area(ptsArr) {  // shoelace, px² → sqft
+      let a = 0;
+      for (let i = 0; i < ptsArr.length; i++) {
+        const j = (i + 1) % ptsArr.length;
+        a += ptsArr[i].x * ptsArr[j].y - ptsArr[j].x * ptsArr[i].y;
+      }
+      return Math.abs(a / 2) / (PX_PER_FT * PX_PER_FT);
+    }
+    function finish() {
+      if (pts.length < 3) return;
+      const sqft = Math.round(area(pts));
+      const closed = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+      closed.setAttribute('points', pts.map(p => p.x + ',' + p.y).join(' '));
+      closed.setAttribute('fill','rgba(217,164,65,.34)');
+      closed.setAttribute('stroke','#7d5c31'); closed.setAttribute('stroke-width','2.5');
+      layer.innerHTML=''; layer.appendChild(closed);
+      const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+      const cx = pts.reduce((s,p)=>s+p.x,0)/pts.length, cy = pts.reduce((s,p)=>s+p.y,0)/pts.length;
+      label.setAttribute('x',cx); label.setAttribute('y',cy);
+      label.setAttribute('text-anchor','middle'); label.setAttribute('font-family','monospace');
+      label.setAttribute('font-size','13'); label.setAttribute('font-weight','700'); label.setAttribute('fill','#33281c');
+      label.textContent = sqft.toLocaleString() + ' sqft';
+      layer.appendChild(label);
+
+      total += sqft;
+      const row = document.createElement('div');
+      row.className = 'm-row fade-in';
+      row.innerHTML = '<span>Your region ' + regionN++ + ' <span class="m-dim">≈ ' + money(sqft*RATE()) + ' at your rate</span></span><b>' + sqft.toLocaleString() + ' sqft</b>';
+      rows.insertBefore(row, rows.lastElementChild);
+      totalEl.textContent = total.toLocaleString() + ' sqft';
+      hint.textContent = '✓ ' + sqft.toLocaleString() + ' sqft measured — geometry did the math. Draw another, or imagine this on a real aerial.';
+      pts = [];
+    }
+    svg.addEventListener('click', (e) => {
+      const p = svgPoint(e);
+      if (pts.length >= 3) {
+        const d0 = Math.hypot(p.x - pts[0].x, p.y - pts[0].y);
+        if (d0 < 14) { finish(); return; }
+      }
+      pts.push({ x: p.x, y: p.y });
+      if (pts.length === 1) hint.textContent = 'Keep clicking to outline the shape…';
+      if (pts.length === 3) hint.textContent = 'Nice — tap your FIRST point to close the region and get square footage.';
+      redraw();
+    });
+    svg.addEventListener('dblclick', (e) => { e.preventDefault(); finish(); });
+    $('smReset').addEventListener('click', () => {
+      pts = []; regionN = 1; total = 872; layer.innerHTML = '';
+      rows.querySelectorAll('.m-row').forEach((r,i,all) => { if (i>0 && i<all.length-1) r.remove(); });
+      totalEl.textContent = '872 sqft';
+      hint.textContent = '👆 Click around the yard to outline a patio — tap your first point again to close it';
+    });
+  })();
+
+  /* ═══ 02 PROPOSE: parse the bid ═══ */
+  (function bid() {
+    const btn = $('bidParseBtn'); if (!btn) return;
+    const items = [
+      ['Demo & excavation', 6850],
+      ['Base prep · Class II, 6" compacted', 9120],
+      ['Belgard Catalina Slate · 872 sqft', 21780, true],
+      ['Seating wall · Weston Stone', 4940],
+    ];
+    let swapped = false;
+    btn.addEventListener('click', () => {
+      btn.disabled = true; btn.textContent = 'Parsing…';
+      $('bidSub').textContent = 'Reading pages · extracting line items…';
+      setTimeout(() => {
+        const box = $('bidRows'); box.innerHTML = ''; box.style.minHeight = '0';
+        let total = 0;
+        items.forEach((it, i) => {
+          setTimeout(() => {
+            total += it[1];
+            const row = document.createElement('div');
+            row.className = 'm-row fade-in';
+            row.innerHTML = '<span' + (it[2] ? ' id="bidPaverName"' : '') + '>✓ ' + it[0] + '</span><b' + (it[2] ? ' id="bidPaverPrice"' : '') + '>' + money(it[1]) + '</b>';
+            box.appendChild(row);
+            $('bidTotalRow').style.display = 'flex';
+            $('bidTotal').textContent = money(total);
+            if (i === items.length - 1) {
+              $('bidSub').textContent = '4 line items extracted in seconds · review & publish';
+              $('bidSwap').style.display = 'block';
+            }
+          }, 420 * (i + 1));
+        });
+      }, 700);
+    });
+    $('bidSwapBtn').addEventListener('click', () => {
+      const name = $('bidPaverName'), price = $('bidPaverPrice');
+      if (!name) return;
+      swapped = !swapped;
+      const newPrice = swapped ? 21780 + Math.round(872 * 1.4) : 21780;
+      name.textContent = swapped ? '✓ Belgard Walnut Blend · 872 sqft' : '✓ Belgard Catalina Slate · 872 sqft';
+      price.textContent = money(newPrice);
+      price.classList.remove('fade-in'); void price.offsetWidth; price.classList.add('fade-in');
+      $('bidTotal').textContent = money(6850 + 9120 + newPrice + 4940);
+      $('bidSwapBtn').textContent = swapped ? 'Swap back → Catalina Slate' : 'Swap Catalina Slate → Walnut Blend (+$1.40/sqft)';
+    });
+  })();
+
+  /* ═══ shared chat helper ═══ */
+  function chatDemo(threadId, replyFor) {
+    const thread = $(threadId); if (!thread) return null;
+    let busy = false;
+    return function send(text) {
+      if (busy || !text) return;
+      busy = true;
+      const me = document.createElement('div');
+      me.className = 'd-msg me fade-in'; me.textContent = text;
+      thread.appendChild(me); thread.scrollTop = thread.scrollHeight;
+      const typing = document.createElement('div');
+      typing.className = 'd-typing'; typing.textContent = '•••';
+      setTimeout(() => { thread.appendChild(typing); thread.scrollTop = thread.scrollHeight; }, 350);
+      const reply = replyFor(text);
+      setTimeout(() => {
+        typing.remove();
+        const bot = document.createElement('div');
+        bot.className = 'd-msg bot'; thread.appendChild(bot);
+        let i = 0;
+        const t = setInterval(() => {
+          bot.textContent = reply.slice(0, i += 3);
+          thread.scrollTop = thread.scrollHeight;
+          if (i >= reply.length) { clearInterval(t); busy = false; }
+        }, 18);
+      }, 1300);
+    };
+  }
+
+  /* ═══ 03 ENGAGE: client portal chat ═══ */
+  (function portal() {
+    const send = chatDemo('portalThread', (q) => {
+      const s = q.toLowerCase();
+      if (s.includes('walnut') || s.includes('blend')) return "Absolutely — I've added the Walnut Blend as an option. It runs about $1.40/sqft more; your updated total is on the proposal now. Want me to order a sample board for the site visit?";
+      if (s.includes('timeline') || s.includes('sign')) return "Once you sign, we pull permits within a week, materials land in ~10 days, and this scope is a 6–8 day install. I'll pin the full schedule to your portal.";
+      if (s.includes('love') || s.includes('👏')) return "That one's my favorite too — wrapping the fire pit makes the whole space. I'll lock that placement into the final plan. 🙌";
+      return "Great question — I've noted it on your project and updated the proposal. You'll see the change reflected in your portal, and it's saved to our thread so nothing gets lost.";
+    });
+    if (!send) return;
+    document.querySelectorAll('#portalChips button').forEach(b =>
+      b.addEventListener('click', () => send(b.textContent)));
+    $('portalSend').addEventListener('click', () => { const v = $('portalInput').value.trim(); $('portalInput').value=''; send(v); });
+    $('portalInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { const v = e.target.value.trim(); e.target.value=''; send(v); } });
+  })();
+
+  /* ═══ 04 CLOSE: publish-a-proposal funnel run ═══ */
+  (function funnel() {
+    const run = $('funRun'); if (!run) return;
+    const base = [4, 6, 5, 3, 2];
+    const widths = [40, 60, 50, 30, 20];
+    let value = 214300, rate = 38;
+    const beats = [
+      [0,   'Draft published → Sent · private link delivered', [-1, +1, 0, 0, 0]],
+      [1600,'Opened 20 minutes after publish → Viewed', [0, -1, +1, 0, 0]],
+      [3200,'Re-read 3× + shared with spouse → Engaged', [0, 0, -1, +1, 0]],
+      [4800,'✍️ Signed — $38,400 · win rate ticks up', [0, 0, 0, -1, +1]],
+    ];
+    run.addEventListener('click', () => {
+      run.disabled = true;
+      const counts = base.slice();
+      beats.forEach(([delay, msg, delta], bi) => {
+        setTimeout(() => {
+          $('funToast').textContent = '● ' + msg;
+          $('funToast').classList.remove('fade-in'); void $('funToast').offsetWidth; $('funToast').classList.add('fade-in');
+          delta.forEach((d, i) => {
+            counts[i] += d;
+            $('fn' + i).textContent = counts[i];
+            $('fb' + i).style.width = Math.max(8, widths[i] + d * 10 + (counts[i]-base[i])*10) + '%';
+          });
+          if (bi === beats.length - 1) {
+            rate += 3; value -= 38400;
+            $('funRate').textContent = rate + '%';
+            $('funValue').textContent = money(value);
+            setTimeout(() => { run.disabled = false; run.textContent = '▶ Publish another'; }, 900);
+          }
+        }, delay);
+      });
+    });
+  })();
+
+  /* ═══ 05 ASK A PRO ═══ */
+  (function pro() {
+    const answers = {
+      'permit': "Yes — in Contra Costa County, walls over 4 ft measured from the bottom of the footing require a permit and engineered plans. Under 4 ft with no surcharge (slope or driveway above) is typically exempt. Always confirm with the county building department — parcels vary. (In the real product, I check current county code live.)",
+      'base': "For a driveway over expansive clay: excavate 10–12\", lay woven geotextile, then 8–10\" of Class II base in 3–4\" compacted lifts at 95%+, 1\" bedding sand, then pavers. Clay moves — the fabric and deep base are what keep it flat in year five.",
+      'sand': "Polymeric sand rated for wide joints — G2-class holds up best around pools. Sweep in bone-dry, compact, sweep again, then a controlled soak. Avoid cheap poly blends; chlorinated splash breaks them down and you'll be redoing joints in two seasons.",
+    };
+    const send = chatDemo('proThread', (q) => {
+      const s = q.toLowerCase();
+      if (s.includes('permit') || s.includes('wall')) return answers.permit;
+      if (s.includes('base') || s.includes('clay') || s.includes('driveway')) return answers.base;
+      return answers.sand;
+    });
+    if (!send) return;
+    document.querySelectorAll('#proChips button').forEach(b =>
+      b.addEventListener('click', () => send(b.textContent)));
+  })();
+
+  /* ═══ 06 BRAND switcher ═══ */
+  (function brand() {
+    const input = $('brandName'); if (!input) return;
+    let color = '#9c7440';
+    function apply() {
+      const name = input.value.trim() || 'Summit Hardscapes';
+      const short = name.split(/\s+/)[0];
+      $('brandCo1').textContent = name; $('brandCo1').style.color = color;
+      $('brandCo2').textContent = name;
+      $('brandCo3').textContent = short;
+      $('brandUrl').textContent = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + ' · client email';
+      $('brandPill').style.color = color;
+    }
+    input.addEventListener('input', apply);
+    document.querySelectorAll('.swatch').forEach(sw => sw.addEventListener('click', () => {
+      document.querySelectorAll('.swatch').forEach(x => x.classList.remove('sel'));
+      sw.classList.add('sel'); color = sw.dataset.c; apply();
+    }));
+  })();
+})();
+</script>
+
+
+
+
+<script>
+// Scroll-triggered attention: each demo card rises in, its TRY IT badge
+// flares, and its primary control pulses until the visitor interacts.
+(function () {
+  'use strict';
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.mock').forEach(function (m) { m.classList.add('inview'); });
+    return;
+  }
+
+  // primary control(s) per card, located by a distinctive descendant
+  function primaryControls(card) {
+    var sels = ['#bidParseBtn', '#funRun', '#smSvg', '#portalChips button', '#proChips button', '#brandName', '#teamTabs button'];
+    var out = [];
+    sels.forEach(function (sel) {
+      card.querySelectorAll(sel).forEach(function (el) { out.push(el); });
+    });
+    return out;
+  }
+
+  var interacted = new WeakSet();
+
+  function calm(card) {
+    interacted.add(card);
+    card.classList.remove('attn');
+    card.querySelectorAll('.pulse-ring, .pulse-scale').forEach(function (el) {
+      el.classList.remove('pulse-ring', 'pulse-scale');
+    });
+    var n = card.querySelector('.sm-nudge');
+    if (n) n.remove();
+  }
+
+  function excite(card) {
+    if (interacted.has(card)) return;
+    card.classList.add('attn');
+    primaryControls(card).forEach(function (el) {
+      if (el.tagName === 'BUTTON' || el.tagName === 'INPUT') {
+        el.classList.add('pulse-ring');
+        if (el.tagName === 'BUTTON') el.classList.add('pulse-scale');
+      }
+    });
+    // site map: floating "tap the yard" nudge over the SVG
+    var svg = card.querySelector('#smSvg');
+    if (svg && !card.querySelector('.sm-nudge')) {
+      var wrap = svg.parentElement;
+      if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+      var n = document.createElement('div');
+      n.className = 'sm-nudge';
+      n.innerHTML = '<span class="dot"></span> Tap the yard to draw &amp; measure';
+      n.style.left = '50%'; n.style.top = '46%'; n.style.transform = 'translate(-50%,-50%)';
+      wrap.appendChild(n);
+    }
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('inview');
+        excite(e.target);
+      } else {
+        e.target.classList.remove('attn');
+      }
+    });
+  }, { threshold: 0.45 });
+
+  document.querySelectorAll('.mock').forEach(function (card) {
+    io.observe(card);
+    ['pointerdown', 'focusin'].forEach(function (evt) {
+      card.addEventListener(evt, function () { calm(card); }, { once: true });
+    });
+  });
+
+  // hero card is already "live" — let it rise in but skip the pulses
+  var hero = document.querySelector('.hero .mock');
+  if (hero) interacted.add(hero);
+})();
+</script>
+
+<script>
+// Owner-console demo: tab switching + the @mention approval beat
+(function () {
+  'use strict';
+  var tabs = document.getElementById('teamTabs');
+  if (!tabs) return;
+  var panes = {
+    pipeline: document.getElementById('teamPanePipeline'),
+    stats: document.getElementById('teamPaneStats'),
+    approve: document.getElementById('teamPaneApprove'),
+  };
+  tabs.querySelectorAll('button[data-tab]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabs.querySelectorAll('button[data-tab]').forEach(function (b) {
+        b.classList.add('ghost');
+      });
+      btn.classList.remove('ghost');
+      Object.keys(panes).forEach(function (k) {
+        panes[k].style.display = k === btn.dataset.tab ? 'block' : 'none';
+      });
+    });
+  });
+  function resolve(text) {
+    var badge = document.getElementById('apBadge');
+    if (badge) badge.remove();
+    document.getElementById('apActions').style.display = 'none';
+    var res = document.getElementById('apResult');
+    res.textContent = text;
+    res.classList.add('fade-in');
+  }
+  var ap = document.getElementById('apApprove');
+  var bump = document.getElementById('apBump');
+  if (ap) ap.addEventListener('click', function () {
+    resolve('✓ Approved — Dana notified. Bid unlocked to send at $42,750.');
+  });
+  if (bump) bump.addEventListener('click', function () {
+    resolve('↗ Sent back to Dana: "Bump the wall line +$1,900 — Weston Stone ran up." Logged on the bid.');
+  });
+})();
+</script>
+</body>
+</html>

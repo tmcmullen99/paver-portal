@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Print your plan · Paver Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ═══════════════════════════════════════════════════════════════════════
+     Phase 4.0d — Homeowner "Print to mark up" page (Sprint 14C.10).
+     ────────────────────────────────────────────────────────────────────
+     This is Path A of the redesign-modification sprint. The homeowner
+     sees their construction drawing rendered with numbered region
+     overlays plus a writeable notes section sized for handwriting.
+     They print, mark it up by hand, photograph it, and send via the
+     existing /account messenger. Designer manually re-prices and
+     republishes — no real-time-pricing infrastructure needed.
+     ────────────────────────────────────────────────────────────────────
+     Path B (the in-browser interactive polygon editor) builds on top of
+     this page architecture in subsequent sprints (14C.11 and beyond).
+     ═══════════════════════════════════════════════════════════════════ */
+  :root {
+    --bp-green:      #9c7440;
+    --bp-green-dk:   #7d5c31;
+    --bp-charcoal:   #353535;
+    --bp-tan:        #dad7c5;
+    --bp-cream:      #faf8f3;
+    --bp-bg:         #f4f4ef;
+    --bp-card:       #ffffff;
+    --bp-border:     #e4e4df;
+    --bp-text:       #1f2125;
+    --bp-muted:      #70726f;
+    --bp-err:        #b91c1c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--bp-text);
+    background: var(--bp-bg);
+    line-height: 1.5;
+    font-size: 14px;
+    /* Force color printing of the region overlays in WebKit/Blink. Some
+       printer setups strip backgrounds + colors by default; without
+       this, the colored polygon fills disappear and the legend numbers
+       lose their color cue. */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ─── Screen-only toolbar ────────────────────────────────────────── */
+  .pp-toolbar {
+    background: #fff;
+    border-bottom: 1px solid var(--bp-border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .pp-toolbar-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .pp-toolbar-back {
+    color: var(--bp-charcoal); text-decoration: none;
+    font-size: 13px; font-weight: 500;
+    padding: 6px 12px;
+    border: 1px solid var(--bp-border);
+    border-radius: 999px;
+    transition: border-color .15s, color .15s;
+  }
+  .pp-toolbar-back:hover { border-color: var(--bp-charcoal); }
+  .pp-toolbar-eyebrow {
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--bp-muted); font-weight: 600;
+  }
+  .pp-toolbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .pp-print-btn {
+    background: var(--bp-green); color: #fff;
+    border: none; cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font: inherit; font-size: 13px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: background .15s, transform .15s;
+  }
+  .pp-print-btn:hover { background: var(--bp-green-dk); transform: translateY(-1px); }
+  .pp-print-btn:disabled { background: #a8b5ac; cursor: not-allowed; transform: none; }
+  .pp-instructions-banner {
+    background: var(--bp-cream);
+    border-bottom: 1px solid var(--bp-border);
+    padding: 14px 24px;
+    font-size: 13px; color: var(--bp-charcoal);
+    line-height: 1.55;
+  }
+  .pp-instructions-banner strong { color: var(--bp-text); font-weight: 600; }
+  .pp-instructions-banner code {
+    background: #fff; border: 1px solid var(--bp-border);
+    padding: 1px 6px; border-radius: 4px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+  }
+
+  /* ─── Status / loading / error states ───────────────────────────── */
+  .pp-status {
+    max-width: 640px; margin: 80px auto;
+    padding: 28px 32px;
+    background: #fff; border-radius: 12px;
+    border: 1px solid var(--bp-border);
+    text-align: center;
+  }
+  .pp-status h2 {
+    font-size: 18px; font-weight: 600;
+    margin-bottom: 10px; color: var(--bp-text);
+  }
+  .pp-status p { color: var(--bp-muted); margin-bottom: 16px; }
+  .pp-status a {
+    color: var(--bp-green-dk); font-weight: 600; text-decoration: none;
+  }
+  .pp-status.error h2 { color: var(--bp-err); }
+
+  /* ─── Pages — letter portrait, screen preview ───────────────────── */
+  .pp-pages-wrap {
+    padding: 24px 16px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 24px;
+  }
+  .pp-page {
+    width: 8.5in;
+    min-height: 11in;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    padding: 0.5in;
+    /* Two-column grid is rare here — keep page as single column with
+       header / body / footer rows so each part can flex correctly when
+       region count varies. */
+    display: flex; flex-direction: column;
+    color: var(--bp-text);
+    /* Force each page to render at exact letter geometry on screen so
+       the preview matches what the printer will output 1:1. */
+    font-size: 12px;
+  }
+
+  .pp-page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 14px; margin-bottom: 18px;
+    border-bottom: 1.5px solid var(--bp-charcoal);
+    gap: 16px;
+  }
+  .pp-page-header-left { display: flex; align-items: center; gap: 12px; }
+  .pp-page-header-logo {
+    width: 36px; height: 36px;
+    background: var(--bp-green); color: #fff;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 18px;
+    letter-spacing: -0.02em;
+  }
+  .pp-page-header-brand {
+    font-size: 14px; font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--bp-text);
+  }
+  .pp-page-header-tag {
+    font-size: 9px; letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bp-muted);
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .pp-page-header-meta {
+    text-align: right;
+    font-size: 10px; line-height: 1.4;
+    color: var(--bp-muted);
+  }
+  .pp-page-header-meta strong {
+    display: block;
+    font-size: 12px; color: var(--bp-text);
+    font-weight: 600;
+    margin-bottom: 1px;
+  }
+
+  /* Eyebrow + section title — match the published-proposal vibe so
+     it's clearly Paver Portal-branded. */
+  .pp-section-eyebrow {
+    font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--bp-green); font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .pp-page h1 {
+    font-size: 22px; font-weight: 600;
+    letter-spacing: -0.018em;
+    margin-bottom: 8px;
+    color: var(--bp-text);
+  }
+  .pp-page-lede {
+    font-size: 12px; line-height: 1.55;
+    color: var(--bp-muted);
+    max-width: 5.5in;
+    margin-bottom: 14px;
+  }
+
+  /* ─── Plan view (page 1) ────────────────────────────────────────── */
+  .pp-plan-frame {
+    border: 1px solid var(--bp-border);
+    border-radius: 8px;
+    background: #f4f4ef;
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+  .pp-plan-svg {
+    width: 100%; height: auto;
+    display: block;
+    border-radius: 4px;
+  }
+  .pp-plan-caption {
+    font-size: 10px;
+    color: var(--bp-muted);
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  /* ─── Legend (page 1) ───────────────────────────────────────────── */
+  .pp-legend-heading {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bp-text);
+    border-bottom: 1px solid var(--bp-border);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+  .pp-legend-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 24px;
+  }
+  .pp-legend-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--bp-border);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .pp-legend-num {
+    flex: 0 0 auto;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    color: #fff;
+    font-weight: 700;
+    font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .pp-legend-body { flex: 1; min-width: 0; }
+  .pp-legend-name {
+    font-weight: 600;
+    color: var(--bp-text);
+    margin-bottom: 2px;
+    overflow-wrap: break-word;
+  }
+  .pp-legend-meta {
+    font-size: 10px;
+    color: var(--bp-muted);
+    margin-bottom: 2px;
+  }
+  .pp-legend-mats {
+    font-size: 10px;
+    color: var(--bp-muted);
+    font-style: italic;
+    overflow-wrap: break-word;
+  }
+
+  /* ─── Page 2 — markup form ──────────────────────────────────────── */
+  .pp-modify-list { margin-bottom: 14px; }
+  .pp-modify-item {
+    border-bottom: 1px solid var(--bp-border);
+    padding: 10px 0;
+  }
+  .pp-modify-item:last-child { border-bottom: none; }
+  .pp-modify-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 6px;
+  }
+  .pp-modify-num {
+    flex: 0 0 auto;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pp-modify-name {
+    font-weight: 600;
+    font-size: 12px;
+    flex: 1;
+  }
+  .pp-modify-current {
+    font-size: 10px;
+    color: var(--bp-muted);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .pp-modify-fields {
+    display: grid;
+    grid-template-columns: auto 1fr auto 1fr;
+    gap: 8px 12px;
+    align-items: center;
+    margin-bottom: 6px;
+    padding-left: 32px;
+    font-size: 10px;
+  }
+  .pp-modify-field-label {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bp-muted);
+    font-weight: 600;
+  }
+  .pp-modify-field-line {
+    border-bottom: 1px solid var(--bp-charcoal);
+    height: 18px;
+    /* Wider lines for handwritten numbers — sqft can be 4 digits. */
+  }
+  .pp-modify-notes-label {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bp-muted);
+    font-weight: 600;
+    margin-bottom: 4px;
+    padding-left: 32px;
+  }
+  .pp-modify-notes-lines {
+    padding-left: 32px;
+  }
+  .pp-modify-notes-line {
+    border-bottom: 1px solid var(--bp-border);
+    height: 16px;
+    margin-bottom: 4px;
+  }
+
+  /* Free-form "Other changes" notes box. */
+  .pp-other-heading {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bp-text);
+    border-bottom: 1px solid var(--bp-border);
+    padding-bottom: 6px;
+    margin: 10px 0 10px;
+  }
+  .pp-other-lines { display: flex; flex-direction: column; gap: 4px; }
+  .pp-other-line {
+    border-bottom: 1px solid var(--bp-border);
+    height: 18px;
+  }
+
+  /* ─── Submit instructions (footer of page 2) ────────────────────── */
+  .pp-submit-box {
+    margin-top: auto;
+    background: var(--bp-cream);
+    border: 1px solid var(--bp-tan);
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-size: 10px;
+    line-height: 1.6;
+    color: var(--bp-charcoal);
+  }
+  .pp-submit-heading {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bp-green-dk);
+    margin-bottom: 6px;
+  }
+  .pp-submit-list {
+    margin: 0; padding: 0;
+    list-style: none;
+    counter-reset: submit-step;
+  }
+  .pp-submit-list li {
+    counter-increment: submit-step;
+    padding-left: 24px;
+    position: relative;
+    margin-bottom: 4px;
+  }
+  .pp-submit-list li::before {
+    content: counter(submit-step);
+    position: absolute;
+    left: 0; top: 0;
+    width: 18px; height: 18px;
+    background: var(--bp-green);
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .pp-page-footer {
+    margin-top: 14px;
+    padding-top: 8px;
+    border-top: 1px solid var(--bp-border);
+    display: flex; justify-content: space-between;
+    font-size: 9px;
+    color: var(--bp-muted);
+    letter-spacing: 0.06em;
+  }
+
+  /* ─── Print rules ───────────────────────────────────────────────── */
+  @page {
+    size: letter portrait;
+    margin: 0.5in;
+  }
+  @media print {
+    body { background: #fff; }
+    .pp-toolbar, .pp-instructions-banner { display: none !important; }
+    .pp-pages-wrap { padding: 0; gap: 0; }
+    .pp-page {
+      width: auto;
+      min-height: auto;
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+      page-break-after: always;
+      break-after: page;
+    }
+    .pp-page:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+    /* Backgrounds + colors must print exactly. Required for the legend
+       number badges and submit-box cream fill to render. */
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+  }
+
+  /* ─── Mobile screen tweaks (preview only — print is unaffected) ── */
+  @media screen and (max-width: 900px) {
+    .pp-page {
+      width: 100%;
+      padding: 0.4in;
+      font-size: 11px;
+    }
+    .pp-legend-list { grid-template-columns: 1fr; }
+    .pp-modify-fields { grid-template-columns: auto 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Screen-only toolbar — hidden on print. -->
+<div class="pp-toolbar">
+  <div class="pp-toolbar-left">
+    <a href="/account/" class="pp-toolbar-back">← Back to dashboard</a>
+    <span class="pp-toolbar-eyebrow">Print plan to mark up</span>
+  </div>
+  <div class="pp-toolbar-actions">
+    <button id="ppPrintBtn" class="pp-print-btn" disabled>
+      🖨️  Print this page
+    </button>
+  </div>
+</div>
+
+<!-- Brief instructions banner — also hidden on print. -->
+<div class="pp-instructions-banner">
+  <strong>How this works:</strong> Click <em>Print this page</em> (or press
+  <code>⌘P</code> / <code>Ctrl+P</code>) to print on letter paper. Mark up
+  the plan and notes with a pen, take a clear photo of both pages, then
+  open <a href="/account/">your messenger</a> and send the photo to your
+  designer. They'll respond with a revised quote within 1–2 business days.
+</div>
+
+<!-- Status panel (loading / error / not-found). Replaced once data loads. -->
+<div id="ppStatus" class="pp-status">
+  <h2>Loading your plan…</h2>
+  <p>Pulling your project details and rendering the printable layout.</p>
+</div>
+
+<!-- Print pages mount here once data loads. -->
+<div id="ppPages" class="pp-pages-wrap" style="display: none;"></div>
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+
+  // ─── Supabase config (matches /account/index.html) ─────────────────────
+  const SUPABASE_URL  = 'https://gfgbypcnxkschnfsitfb.supabase.co';
+  const SUPABASE_ANON = 'sb_publishable_Ko4LNw2VjhZVFmwJ-i2qtA_XeGgBcew';
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+  });
+
+  // ─── Region color palette — matches publish.js REGION_LEGEND_COLORS ───
+  // Same 10-color rotation used on the published proposal page so the
+  // colors a homeowner sees on /p/<slug> match what they see on their
+  // printout. If publish.js changes, update both lists.
+  const REGION_COLORS = [
+    '#9c7440', '#3b82f6', '#f59e0b', '#a855f7', '#ec4899',
+    '#14b8a6', '#f97316', '#06b6d4', '#84cc16', '#ef4444',
+  ];
+
+  const statusEl = document.getElementById('ppStatus');
+  const pagesEl  = document.getElementById('ppPages');
+  const printBtn = document.getElementById('ppPrintBtn');
+
+  printBtn.addEventListener('click', () => window.print());
+
+  // ─── Boot ─────────────────────────────────────────────────────────────
+  (async function boot() {
+    try {
+      const proposalId = new URLSearchParams(location.search).get('id');
+      if (!proposalId || !/^[0-9a-f-]{36}$/i.test(proposalId)) {
+        return showError('Missing proposal ID',
+          'This link doesn\'t include a valid proposal ID. Go back to your dashboard and click "Print plan to mark up" on the proposal you want to print.');
+      }
+
+      // Auth: must be a signed-in homeowner whose client row links to this proposal.
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        const here = encodeURIComponent(location.pathname + location.search);
+        location.replace(`/account/signin.html?return=${here}`);
+        return;
+      }
+
+      const { data: client, error: clientErr } = await supabase
+        .from('clients')
+        .select('id, name')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (clientErr) return showError('Could not load your account', clientErr.message);
+      if (!client)  return showError('Wrong account type',
+        'This page is for homeowner accounts. If you\'re a designer, sign in to your team account at /login.html.');
+
+      // Verify ownership of this proposal via client_proposals.
+      const { data: link } = await supabase
+        .from('client_proposals')
+        .select('proposal_id')
+        .eq('client_id', client.id)
+        .eq('proposal_id', proposalId)
+        .maybeSingle();
+      if (!link) return showError('Proposal not found',
+        'This proposal isn\'t linked to your account. If you think this is a mistake, contact your designer.');
+
+      // Load proposal + regions in parallel.
+      const [propRes, regionsRes] = await Promise.all([
+        supabase.from('proposals')
+          .select('id, project_address, project_city, project_state, site_plan_backdrop_url, site_plan_backdrop_width, site_plan_backdrop_height, construction_drawing_url')
+          .eq('id', proposalId)
+          .maybeSingle(),
+        supabase.from('proposal_regions')
+          .select('id, name, polygon, area_sqft, area_lnft, display_order')
+          .eq('proposal_id', proposalId)
+          .order('display_order', { ascending: true }),
+      ]);
+      if (propRes.error)    return showError('Could not load proposal', propRes.error.message);
+      if (regionsRes.error) return showError('Could not load regions', regionsRes.error.message);
+      if (!propRes.data)    return showError('Proposal not found', 'The proposal record was not found.');
+
+      const proposal = propRes.data;
+      const regions  = (regionsRes.data || []).filter(r => Array.isArray(r.polygon) && r.polygon.length >= 3);
+
+      // Load region → material assignments. Two hops: region_materials
+      // → proposal_materials → materials, so we get the human-friendly
+      // product name + color even when the row goes through the override
+      // columns instead of pointing at the catalog. Single round-trip.
+      const regionIds = regions.map(r => r.id);
+      const materialsByRegion = new Map();
+      if (regionIds.length) {
+        const { data: rms } = await supabase
+          .from('proposal_region_materials')
+          .select(`
+            region_id, display_order,
+            proposal_material:proposal_materials(
+              id,
+              override_product_name,
+              override_color,
+              application_area,
+              material:materials(product_name, color, manufacturer)
+            )
+          `)
+          .in('region_id', regionIds)
+          .order('display_order', { ascending: true });
+        for (const rm of (rms || [])) {
+          if (!materialsByRegion.has(rm.region_id)) materialsByRegion.set(rm.region_id, []);
+          materialsByRegion.get(rm.region_id).push(rm.proposal_material);
+        }
+      }
+
+      render({ proposal, regions, materialsByRegion, client });
+      printBtn.disabled = false;
+    } catch (err) {
+      console.error('[print.html] boot failed:', err);
+      showError('Something went wrong', err.message || 'Unexpected error.');
+    }
+  })();
+
+  // ─── Render ───────────────────────────────────────────────────────────
+  function render({ proposal, regions, materialsByRegion, client }) {
+    const addressLine = formatAddress(proposal);
+    const dateLine    = formatDate(new Date());
+
+    pagesEl.innerHTML =
+        renderPageOne({ proposal, regions, materialsByRegion, addressLine, dateLine })
+      + renderPageTwo({ proposal, regions, addressLine, dateLine });
+
+    statusEl.style.display = 'none';
+    pagesEl.style.display  = 'flex';
+
+    // Update document title so the print dialog filename is sensible.
+    document.title = `Print plan · ${addressLine || 'Paver Portal'}`;
+  }
+
+  function renderPageOne({ proposal, regions, materialsByRegion, addressLine, dateLine }) {
+    const planSvg = renderPlanSvg(proposal, regions);
+    const legend  = regions.length
+      ? `
+        <div class="pp-legend-heading">Legend · ${regions.length} ${regions.length === 1 ? 'region' : 'regions'}</div>
+        <ol class="pp-legend-list">
+          ${regions.map((r, idx) => renderLegendItem(r, idx, materialsByRegion)).join('')}
+        </ol>
+      `
+      : `
+        <div class="pp-legend-heading">Project plan</div>
+        <p class="pp-page-lede">No regions are defined for this proposal yet — your designer will add them shortly.</p>
+      `;
+
+    return `
+      <div class="pp-page">
+        ${renderHeader(addressLine, dateLine)}
+        <div class="pp-section-eyebrow">01 · Site plan</div>
+        <h1>Your project plan</h1>
+        <p class="pp-page-lede">
+          Each highlighted area corresponds to a part of the scope. Use this page
+          to identify what's planned, then turn the page over to mark up changes
+          you'd like.
+        </p>
+        ${planSvg
+          ? `<div class="pp-plan-frame">${planSvg}</div>
+             <div class="pp-plan-caption">Highlighted areas show the scope of work for this project.</div>`
+          : `<div class="pp-page-lede"><em>Your site plan image isn't available yet — your designer is finalizing it.</em></div>`}
+        ${legend}
+        <div class="pp-page-footer">
+          <span>Page 1 of 2 · Continued on next page →</span>
+          <span>portal-baysidepavers.com/account</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderPageTwo({ proposal, regions, addressLine, dateLine }) {
+    const modifyList = regions.length
+      ? regions.map((r, idx) => renderModifyItem(r, idx)).join('')
+      : `<p class="pp-page-lede">No regions to modify yet.</p>`;
+
+    return `
+      <div class="pp-page">
+        ${renderHeader(addressLine, dateLine)}
+        <div class="pp-section-eyebrow">02 · Mark up your changes</div>
+        <h1>Request modifications</h1>
+        <p class="pp-page-lede">
+          For each numbered area, write the new size you want — leave it blank
+          if you don't want to change that area. Add notes for anything we
+          should know about that section. Use the bottom box for any other
+          requests not tied to a specific area.
+        </p>
+
+        <div class="pp-modify-list">
+          ${modifyList}
+        </div>
+
+        <div class="pp-other-heading">Other changes or requests</div>
+        <div class="pp-other-lines">
+          ${Array.from({ length: 8 }, () => '<div class="pp-other-line"></div>').join('')}
+        </div>
+
+        <div class="pp-submit-box">
+          <div class="pp-submit-heading">How to submit your changes</div>
+          <ol class="pp-submit-list">
+            <li>Take a clear photo (or scan) of both pages of this printout.</li>
+            <li>Sign in to your account at <strong>portal-baysidepavers.com/account</strong>.</li>
+            <li>Open your messenger and attach the photo with a brief note.</li>
+            <li>Your designer will reply with a revised quote within 1–2 business days.</li>
+          </ol>
+        </div>
+
+        <div class="pp-page-footer">
+          <span>Page 2 of 2 · Paver Portal</span>
+          <span>portal-baysidepavers.com/account</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderHeader(addressLine, dateLine) {
+    return `
+      <div class="pp-page-header">
+        <div class="pp-page-header-left">
+          <div class="pp-page-header-logo">B</div>
+          <div>
+            <div class="pp-page-header-brand">Paver Portal</div>
+            <div class="pp-page-header-tag">Project plan · Mark up</div>
+          </div>
+        </div>
+        <div class="pp-page-header-meta">
+          <strong>${escapeHtml(addressLine || 'Your project')}</strong>
+          Printed ${escapeHtml(dateLine)}
+        </div>
+      </div>
+    `;
+  }
+
+  // ─── Plan SVG ─────────────────────────────────────────────────────────
+  // Build an inline SVG with the backdrop image plus a numbered colored
+  // overlay per region. Mirrors publish.js renderBackdropWithRegions
+  // geometry: polygons stored as fractional 0..1 coords, multiplied by
+  // backdrop pixel dimensions. preserveAspectRatio keeps the print
+  // ratio correct on letter paper regardless of backdrop dimensions.
+  function renderPlanSvg(proposal, regions) {
+    const url = proposal.site_plan_backdrop_url || proposal.construction_drawing_url;
+    const W = proposal.site_plan_backdrop_width  || 1600;
+    const H = proposal.site_plan_backdrop_height || 1000;
+    if (!url) return '';
+
+    const polys = regions.map((r, idx) => {
+      const color = REGION_COLORS[idx % REGION_COLORS.length];
+      const points = r.polygon
+        .map(v => `${(Number(v.x) * W).toFixed(1)},${(Number(v.y) * H).toFixed(1)}`)
+        .join(' ');
+      const c = polygonCentroid(r.polygon, W, H);
+      // Number badge size scales with backdrop dimension so it looks
+      // proportionate at any resolution. ~3.2% of the smaller dimension
+      // works well across the 1442×908 → 1906×1172 range we have today.
+      const badgeR = Math.max(18, Math.round(Math.min(W, H) * 0.032));
+      const fontSize = Math.round(badgeR * 1.05);
+      return `
+        <polygon points="${points}"
+          fill="${color}" fill-opacity="0.28"
+          stroke="${color}" stroke-width="${Math.max(2, Math.round(W * 0.0018))}"
+          stroke-linejoin="round" />
+        <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="${badgeR}"
+          fill="${color}" stroke="#fff" stroke-width="3"/>
+        <text x="${c.x.toFixed(1)}" y="${c.y.toFixed(1)}"
+          text-anchor="middle" dominant-baseline="central"
+          font-size="${fontSize}" font-weight="700" fill="#fff"
+          font-family="'Onest', sans-serif">${idx + 1}</text>
+      `;
+    }).join('');
+
+    return `
+      <svg class="pp-plan-svg" viewBox="0 0 ${W} ${H}"
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg">
+        <image href="${escapeAttr(url)}" x="0" y="0" width="${W}" height="${H}"
+               preserveAspectRatio="xMidYMid meet"/>
+        ${polys}
+      </svg>
+    `;
+  }
+
+  // Approximate centroid of a polygon — fine for label placement.
+  // Uses arithmetic mean of vertices, which biases toward dense
+  // vertex clusters but handles convex + most concave shapes well
+  // enough for a number badge that only needs to land inside the polygon.
+  function polygonCentroid(polygon, W, H) {
+    let sx = 0, sy = 0;
+    for (const v of polygon) { sx += Number(v.x); sy += Number(v.y); }
+    return { x: (sx / polygon.length) * W, y: (sy / polygon.length) * H };
+  }
+
+  // ─── Legend item (page 1) ────────────────────────────────────────────
+  function renderLegendItem(region, idx, materialsByRegion) {
+    const color = REGION_COLORS[idx % REGION_COLORS.length];
+    const sqft = region.area_sqft != null && Number(region.area_sqft) > 0
+      ? `${Number(region.area_sqft).toLocaleString('en-US')} sqft` : '';
+    const lnft = region.area_lnft != null && Number(region.area_lnft) > 0
+      ? `${Number(region.area_lnft).toLocaleString('en-US')} lnft` : '';
+    const meta = [sqft, lnft].filter(Boolean).join(' · ') || 'Size pending';
+
+    const mats = materialsByRegion.get(region.id) || [];
+    const matLabels = mats.map(formatMaterialLabel).filter(Boolean);
+    const matsLine = matLabels.length
+      ? matLabels.slice(0, 2).join(' · ')
+        + (matLabels.length > 2 ? ` · +${matLabels.length - 2} more` : '')
+      : '';
+
+    return `
+      <li class="pp-legend-item">
+        <span class="pp-legend-num" style="background:${color};">${idx + 1}</span>
+        <div class="pp-legend-body">
+          <div class="pp-legend-name">${escapeHtml(region.name || `Region ${idx + 1}`)}</div>
+          <div class="pp-legend-meta">${escapeHtml(meta)}</div>
+          ${matsLine ? `<div class="pp-legend-mats">${escapeHtml(matsLine)}</div>` : ''}
+        </div>
+      </li>
+    `;
+  }
+
+  // ─── Modify item (page 2) ────────────────────────────────────────────
+  function renderModifyItem(region, idx) {
+    const color = REGION_COLORS[idx % REGION_COLORS.length];
+    const currentSqft = region.area_sqft != null && Number(region.area_sqft) > 0
+      ? `${Number(region.area_sqft).toLocaleString('en-US')} sqft` : '— sqft';
+    const currentLnft = region.area_lnft != null && Number(region.area_lnft) > 0
+      ? `${Number(region.area_lnft).toLocaleString('en-US')} lnft` : '— lnft';
+
+    return `
+      <div class="pp-modify-item">
+        <div class="pp-modify-row">
+          <span class="pp-modify-num" style="background:${color};">${idx + 1}</span>
+          <span class="pp-modify-name">${escapeHtml(region.name || `Region ${idx + 1}`)}</span>
+          <span class="pp-modify-current">Current: ${escapeHtml(currentSqft)} · ${escapeHtml(currentLnft)}</span>
+        </div>
+        <div class="pp-modify-fields">
+          <span class="pp-modify-field-label">New sqft</span>
+          <div class="pp-modify-field-line"></div>
+          <span class="pp-modify-field-label">New lnft</span>
+          <div class="pp-modify-field-line"></div>
+        </div>
+        <div class="pp-modify-notes-label">Notes for this area</div>
+        <div class="pp-modify-notes-lines">
+          <div class="pp-modify-notes-line"></div>
+          <div class="pp-modify-notes-line"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ─── Helpers ──────────────────────────────────────────────────────────
+  function formatMaterialLabel(pm) {
+    if (!pm) return '';
+    const productName = pm.override_product_name
+      || (pm.material && pm.material.product_name)
+      || '';
+    const color = pm.override_color || (pm.material && pm.material.color) || '';
+    if (!productName) return color || '';
+    if (!color) return productName;
+    return `${productName} ${color}`;
+  }
+
+  function formatAddress(p) {
+    const street = p.project_address || '';
+    const city   = p.project_city || '';
+    const state  = p.project_state || '';
+    if (!street) return '';
+    if (city && state) return `${street}, ${city}, ${state}`;
+    if (city) return `${street}, ${city}`;
+    return street;
+  }
+
+  function formatDate(d) {
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+
+  function showError(title, message) {
+    statusEl.classList.add('error');
+    statusEl.innerHTML = `
+      <h2>${escapeHtml(title)}</h2>
+      <p>${escapeHtml(message || '')}</p>
+      <p><a href="/account/">← Back to your dashboard</a></p>
+    `;
+  }
+</script>
+
+</body>
+</html>

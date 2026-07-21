@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Dashboard · Paver Portal Client Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #9c7440;
+      --green-dark: #7d5c31;
+      --green-soft: #f1e7d3;
+      --charcoal: #353535;
+      --tan: #dad7c5;
+      --cream: #faf8f3;
+      --navy: #33281c;
+      --border: #e5e5e5;
+      --muted: #666;
+      --danger: #b04040;
+      --warn-soft: #fff4d4;
+      --warn-text: #7a5a10;
+      --gold: #b78b3a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Onest', -apple-system, sans-serif;
+      color: var(--charcoal);
+      background: #fafafa;
+      line-height: 1.6;
+      font-size: 15px;
+      min-height: 100vh;
+    }
+    a { color: var(--green-dark); }
+
+    /* Header */
+    .portal-header {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .portal-header-brand { display: flex; align-items: center; gap: 10px; }
+    .portal-logo { font-size: 22px; line-height: 1; }
+    .portal-name { font-size: 15px; font-weight: 600; color: var(--navy); }
+    .portal-name small {
+      display: block;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .portal-header-actions { display: flex; align-items: center; gap: 18px; font-size: 13px; }
+    .portal-header-actions .user-email {
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+    .portal-header-actions .signout {
+      color: var(--muted); cursor: pointer; background: none; border: none;
+      font-family: inherit; font-size: 13px; padding: 6px 10px; border-radius: 5px;
+    }
+    .portal-header-actions .signout:hover { background: #f0f0f0; color: var(--navy); }
+
+    .shell { max-width: 1100px; margin: 0 auto; padding: 40px 32px; }
+
+    .hero { margin-bottom: 36px; }
+    .hero h1 {
+      font-size: 30px; font-weight: 600; color: var(--navy);
+      letter-spacing: -0.01em; margin-bottom: 6px;
+    }
+    .hero p { color: var(--muted); font-size: 15px; }
+
+    /* ── Refer & Earn block (Phase 1, prominent placement) ──────────────── */
+    .refer-card {
+      background: linear-gradient(135deg, #faf8f3 0%, #f4ecd9 100%);
+      border: 1px solid rgba(183,139,58,0.18);
+      border-radius: 14px;
+      padding: 28px 30px;
+      margin-bottom: 36px;
+      box-shadow: 0 4px 20px rgba(183,139,58,0.06);
+    }
+    .refer-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .refer-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      line-height: 1.18;
+      color: var(--navy);
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .refer-headline em { color: var(--gold); font-style: italic; }
+    .refer-headline strong { color: var(--gold); font-weight: 700; }
+    .refer-sub {
+      font-size: 15px;
+      color: var(--charcoal);
+      margin-bottom: 22px;
+      line-height: 1.5;
+      max-width: 580px;
+    }
+
+    .refer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+    @media (max-width: 720px) { .refer-grid { grid-template-columns: 1fr; } }
+
+    .refer-balance {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px 22px;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .refer-balance-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .refer-balance-amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+    .refer-balance-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .refer-progress {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .refer-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), #d6a956);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .refer-progress-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    .refer-link-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px 22px;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .refer-link-row {
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .refer-link-input {
+      flex: 1;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: #fafafa;
+      color: var(--charcoal);
+      min-width: 0;
+      text-overflow: ellipsis;
+    }
+    .refer-link-input:focus { outline: none; border-color: var(--green); background: #fff; }
+    .refer-btn {
+      padding: 10px 14px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .refer-btn:hover:not(:disabled) { background: var(--green-dark); }
+    .refer-btn.copied { background: var(--gold); }
+    .refer-share-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .refer-share-btn {
+      flex: 1;
+      padding: 9px 12px;
+      background: #fff;
+      color: var(--charcoal);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-width: 110px;
+    }
+    .refer-share-btn:hover {
+      border-color: var(--green);
+      color: var(--green-dark);
+      background: var(--cream);
+    }
+
+    .refer-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+    .refer-step { font-size: 13px; line-height: 1.5; color: var(--charcoal); }
+    .refer-step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .refer-step-text strong { color: var(--navy); font-weight: 600; }
+
+    .refer-list {
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+    .refer-list-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .refer-list-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: #fff;
+      border-radius: 7px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .refer-list-name { color: var(--navy); font-weight: 600; }
+    .refer-list-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-left: 8px;
+    }
+    .refer-list-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 10px;
+    }
+    .refer-list-status.sent { background: #f0f0f0; color: var(--muted); }
+    .refer-list-status.scheduled { background: var(--warn-soft); color: var(--warn-text); }
+    .refer-list-status.completed { background: var(--green-soft); color: var(--green-dark); }
+    .refer-list-status.credited { background: var(--gold); color: #fff; }
+    .refer-list-empty {
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      background: #fff;
+      border-radius: 7px;
+      border: 1px dashed var(--border);
+    }
+
+    /* ── Proposals section (existing) ───────────────────────────────────── */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-header h2 { font-size: 17px; font-weight: 600; color: var(--navy); }
+    .section-header .count {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .proposals-grid { display: grid; gap: 14px; }
+    .proposal-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 26px;
+      transition: all 0.15s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .proposal-card:hover {
+      border-color: var(--green);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .proposal-card-info { flex: 1; min-width: 220px; }
+    .proposal-card-address {
+      font-size: 17px; font-weight: 600; color: var(--navy); margin-bottom: 4px;
+    }
+    .proposal-card-meta {
+      font-size: 12px; color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      display: flex; gap: 14px; flex-wrap: wrap;
+    }
+    .proposal-card-actions {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .status-badge.draft { background: #f0f0f0; color: var(--muted); }
+    .status-badge.sent, .status-badge.viewed { background: var(--green-soft); color: var(--green-dark); }
+    .status-badge.signed { background: var(--green); color: #fff; }
+    .status-badge.in_progress { background: var(--warn-soft); color: var(--warn-text); }
+    .status-badge.complete { background: var(--navy); color: #fff; }
+
+    .btn {
+      padding: 10px 18px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.15s ease;
+    }
+    .btn:hover:not(:disabled) { background: var(--green-dark); }
+    .btn:disabled { cursor: not-allowed; }
+    .btn-secondary {
+      background: #fff;
+      color: var(--charcoal);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--cream);
+      border-color: var(--green);
+      color: var(--green-dark);
+    }
+    .proposal-pdf-btn { font-size: 13px; padding: 9px 14px; }
+
+    .empty-state {
+      background: #fff;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 60px 32px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .empty-state-icon { font-size: 38px; line-height: 1; margin-bottom: 14px; }
+    .empty-state h3 { font-size: 17px; color: var(--navy); font-weight: 600; margin-bottom: 6px; }
+    .empty-state p { font-size: 14px; }
+
+    .loading { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .loading-spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border); border-top-color: var(--green);
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .admin-banner {
+      background: var(--warn-soft); color: var(--warn-text);
+      padding: 10px 18px; text-align: center; font-size: 13px;
+      border-bottom: 1px solid var(--warn-text);
+    }
+    .admin-banner a { color: var(--warn-text); text-decoration: underline; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<div id="adminBanner" class="admin-banner" style="display:none;">
+  You're viewing the client dashboard as an admin preview. <a href="/admin/clients.html">Back to admin</a>
+</div>
+
+<header class="portal-header">
+  <div class="portal-header-brand">
+    <div class="portal-logo">🧱</div>
+    <div class="portal-name">
+      Paver Portal Client Portal
+      <small>Your project hub</small>
+    </div>
+  </div>
+  <div class="portal-header-actions">
+    <span class="user-email" id="userEmail"></span>
+    <button class="signout" id="signOutBtn">Sign out</button>
+  </div>
+</header>
+
+<main class="shell">
+  <div id="loadingState" class="loading">
+    <div class="loading-spinner"></div>
+    <div>Loading your dashboard…</div>
+  </div>
+
+  <div id="contentState" style="display:none;">
+    <div class="hero">
+      <h1 id="welcomeTitle">Welcome back</h1>
+      <p id="welcomeSubtitle">Here's the latest on your projects with Paver Portal.</p>
+    </div>
+
+    <!-- ── Refer & Earn block (Phase 1) ─────────────────────────── -->
+    <section class="refer-card" id="referCard" style="display:none;">
+      <div class="refer-eyebrow">Refer & Earn</div>
+      <h2 class="refer-headline">Earn <strong>$500</strong> for every neighbor you send to Paver Portal.</h2>
+      <p class="refer-sub">Share your personal link with friends. When they book a free design consultation with Paver Portal, <strong>you get $500 credit</strong> toward your next project — no cap, every referral counts.</p>
+
+      <div class="refer-grid">
+        <div class="refer-balance">
+          <div class="refer-balance-label">Your credit balance</div>
+          <div class="refer-balance-amount" id="creditAmount">$0</div>
+          <div class="refer-balance-meta" id="referralCount">0 referrals · 0 completed</div>
+          <div class="refer-progress"><div class="refer-progress-fill" id="referProgress"></div></div>
+          <div class="refer-progress-label" id="progressLabel">$0 of $2,500 toward your next project</div>
+        </div>
+
+        <div class="refer-link-card">
+          <div class="refer-balance-label">Your referral link</div>
+          <div class="refer-link-row">
+            <input class="refer-link-input" id="referLinkInput" type="text" readonly>
+            <button class="refer-btn" id="copyLinkBtn">📋 Copy</button>
+          </div>
+          <div class="refer-share-row">
+            <a class="refer-share-btn" id="shareEmail">✉️ Email</a>
+            <a class="refer-share-btn" id="shareSms">💬 Text</a>
+            <button class="refer-share-btn" id="shareNative">🔗 Share…</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="refer-steps">
+        <div class="refer-step">
+          <div class="refer-step-num">01 · SHARE</div>
+          <div class="refer-step-text">Send your link to <strong>friends and neighbors</strong> thinking about a hardscape project.</div>
+        </div>
+        <div class="refer-step">
+          <div class="refer-step-num">02 · THEY BOOK</div>
+          <div class="refer-step-text">They book a <strong>free design consultation</strong> with Paver Portal through your link.</div>
+        </div>
+        <div class="refer-step">
+          <div class="refer-step-num">03 · YOU EARN</div>
+          <div class="refer-step-text">Once their appointment happens, <strong>$500 credit</strong> lands in your account automatically.</div>
+        </div>
+      </div>
+
+      <div class="refer-list">
+        <div class="refer-list-title">Your referrals</div>
+        <div id="referralList"></div>
+      </div>
+    </section>
+
+    <div class="section-header">
+      <h2>Your Proposals</h2>
+      <span class="count" id="proposalsCount"></span>
+    </div>
+
+    <div id="proposalsGrid" class="proposals-grid"></div>
+  </div>
+</main>
+
+<script type="module" src="/client/client-dashboard.js"></script>
+
+</body>
+</html>

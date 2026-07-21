@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Clients · Paver Portal Proposal Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ═════════════════════════════════════════════════════════════════════
+     SPRINT 1.5B — Designer Clients Workspace
+     Designer-app replacement for the /admin/ client tools that were
+     walled off in Sprint 1. Every query on this page runs through the
+     browser Supabase client under RLS, which (after the 1.5B migration)
+     scopes designers to clients they created or clients linked to their
+     own proposals. Masters see all clients here — same page, same code,
+     the scope difference lives entirely in the database.
+     ═════════════════════════════════════════════════════════════════════ */
+  :root {
+    --bp-green: #9c7440; --bp-green-dark: #7d5c31; --bp-green-soft: #f1e7d3;
+    --bp-charcoal: #353535; --bp-cream: #faf8f3; --bp-cream-shade: #f1eee6;
+    --bp-navy: #33281c; --rule: #e5e5e5;
+    --text: #23282f; --text-muted: #666; --text-faint: #9aa0a6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bp-cream); color: var(--text); min-height: 100vh;
+  }
+  a { color: var(--bp-green-dark); }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fff; border-bottom: 1px solid var(--rule);
+    padding: 0 20px; height: 60px; position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  .back-link {
+    text-decoration: none; font-size: 13px; font-weight: 600;
+    color: var(--text-muted); padding: 6px 10px; border-radius: 6px;
+  }
+  .back-link:hover { background: var(--bp-cream-shade); color: var(--text); }
+  .page-title { font-size: 16px; font-weight: 700; }
+  .page-sub {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--bp-green);
+    display: block; margin-top: 1px;
+  }
+
+  .layout {
+    display: grid; grid-template-columns: 300px 1fr;
+    min-height: calc(100vh - 60px);
+  }
+
+  /* ── Client list (left) ── */
+  .clist {
+    background: #fff; border-right: 1px solid var(--rule);
+    display: flex; flex-direction: column;
+    position: sticky; top: 60px; height: calc(100vh - 60px); overflow: hidden;
+  }
+  .clist-search { padding: 14px 14px 10px; border-bottom: 1px solid var(--rule); }
+  .clist-search input {
+    width: 100%; padding: 9px 12px; border: 1px solid var(--rule);
+    border-radius: 8px; font: inherit; font-size: 13px; background: var(--bp-cream);
+  }
+  .clist-search input:focus { outline: 2px solid var(--bp-green-soft); border-color: var(--bp-green); }
+  .clist-items { overflow-y: auto; flex: 1; }
+  .clist-item {
+    width: 100%; text-align: left; background: transparent; border: 0;
+    border-bottom: 1px solid var(--bp-cream-shade); border-left: 3px solid transparent;
+    padding: 12px 14px; cursor: pointer; font: inherit; display: block;
+  }
+  .clist-item:hover { background: var(--bp-cream); }
+  .clist-item.active { background: var(--bp-green-soft); border-left-color: var(--bp-green); }
+  .clist-name { font-size: 13.5px; font-weight: 600; color: var(--text); }
+  .clist-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .clist-empty { padding: 30px 18px; font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+  /* ── Detail (right) ── */
+  .detail { padding: 22px 26px 60px; max-width: 980px; }
+  .detail-empty { padding: 60px 30px; color: var(--text-muted); font-size: 14px; }
+  .d-header { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 4px; }
+  .d-name { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+  .d-contact { font-size: 13px; color: var(--text-muted); margin: 4px 0 18px; line-height: 1.6; }
+  .d-contact a { text-decoration: none; }
+
+  .d-section { background: #fff; border: 1px solid var(--rule); border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; }
+  .d-section-title {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--bp-green);
+    margin-bottom: 12px;
+  }
+  .d-empty-line { font-size: 13px; color: var(--text-faint); }
+
+  /* proposals */
+  .prop-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--bp-cream-shade);
+  }
+  .prop-row:last-child { border-bottom: 0; }
+  .prop-label { font-size: 13.5px; font-weight: 600; }
+  .prop-meta { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .prop-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .mini-btn {
+    font: inherit; font-size: 12px; font-weight: 600; text-decoration: none;
+    padding: 6px 12px; border-radius: 999px; border: 1px solid var(--rule);
+    background: #fff; color: var(--text); cursor: pointer;
+  }
+  .mini-btn:hover { border-color: var(--bp-green); color: var(--bp-green-dark); background: var(--bp-green-soft); }
+  .status-pill {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 999px;
+    background: var(--bp-cream-shade); color: var(--text-muted);
+  }
+  .status-pill.pending { background: #fdf3e3; color: #a06a12; }
+  .status-pill.signed  { background: var(--bp-green-soft); color: var(--bp-green-dark); }
+
+  /* requests */
+  .req-card { border: 1px solid var(--bp-cream-shade); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+  .req-card:last-child { margin-bottom: 0; }
+  .req-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .req-kind { font-size: 12.5px; font-weight: 700; }
+  .req-note { font-size: 13px; color: var(--text); line-height: 1.5; background: var(--bp-cream); border-radius: 8px; padding: 9px 12px; margin: 6px 0 8px; }
+  .req-when { font-size: 11.5px; color: var(--text-faint); }
+  .req-respond { display: none; margin-top: 8px; }
+  .req-respond.open { display: block; }
+  .req-respond textarea {
+    width: 100%; min-height: 68px; font: inherit; font-size: 13px;
+    border: 1px solid var(--rule); border-radius: 8px; padding: 9px 12px; resize: vertical;
+  }
+  .req-respond .mini-btn { margin-top: 8px; }
+  .req-response-done { font-size: 12.5px; color: var(--bp-green-dark); background: var(--bp-green-soft); border-radius: 8px; padding: 8px 12px; margin-top: 6px; line-height: 1.45; }
+
+  /* chat */
+  .chat-thread { max-height: 420px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 2px 10px; }
+  .msg { max-width: 78%; padding: 9px 13px; border-radius: 12px; font-size: 13.5px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+  .msg.staff { align-self: flex-end; background: var(--bp-green); color: #fff; border-bottom-right-radius: 4px; }
+  .msg.homeowner { align-self: flex-start; background: var(--bp-cream-shade); color: var(--text); border-bottom-left-radius: 4px; }
+  .msg-when { font-size: 10px; opacity: 0.75; margin-top: 4px; }
+  .chat-compose { display: flex; gap: 10px; margin-top: 12px; }
+  .chat-compose textarea {
+    flex: 1; min-height: 46px; max-height: 140px; font: inherit; font-size: 13.5px;
+    border: 1px solid var(--rule); border-radius: 10px; padding: 11px 13px; resize: vertical;
+  }
+  .chat-compose textarea:focus { outline: 2px solid var(--bp-green-soft); border-color: var(--bp-green); }
+  .send-btn {
+    background: var(--bp-green); color: #fff; border: 0; border-radius: 10px;
+    padding: 0 20px; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer;
+    align-self: stretch;
+  }
+  .send-btn:hover { background: var(--bp-green-dark); }
+  .send-btn:disabled { opacity: 0.6; cursor: wait; }
+  .chat-hint { font-size: 11.5px; color: var(--text-faint); margin-top: 8px; line-height: 1.5; }
+
+  .askpro-btn {
+    background: #33281c; color: #fff; border: 0; border-radius: 999px;
+    padding: 9px 16px; font: 600 13px 'Onest', sans-serif; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; white-space: nowrap;
+    transition: background .15s, transform .12s;
+  }
+  .askpro-btn:hover { background: #9c7440; transform: scale(1.03); }
+
+  /* Field kit */
+  .fk-toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .fk-tool {
+    font: 600 12px 'Onest', sans-serif; cursor: pointer;
+    border: 1px solid var(--rule); background: #fff; color: var(--text);
+    border-radius: 999px; padding: 8px 14px; display: inline-flex; gap: 6px; align-items: center;
+  }
+  .fk-tool:hover { border-color: var(--bp-green); color: var(--bp-green-dark); background: var(--bp-green-soft); }
+  .fk-note-box { display: flex; gap: 8px; margin-bottom: 12px; }
+  .fk-note-box textarea {
+    flex: 1; min-height: 40px; font: inherit; font-size: 13px;
+    border: 1px solid var(--rule); border-radius: 10px; padding: 9px 12px; resize: vertical;
+  }
+  .fk-measure { display: none; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .fk-measure.open { display: flex; }
+  .fk-measure input {
+    font: inherit; font-size: 13px; border: 1px solid var(--rule);
+    border-radius: 10px; padding: 9px 12px; flex: 1; min-width: 130px;
+  }
+  .fk-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--bp-cream-shade); align-items: flex-start; }
+  .fk-item:last-child { border-bottom: 0; }
+  .fk-thumb { width: 74px; height: 74px; object-fit: cover; border-radius: 10px; border: 1px solid var(--rule); flex-shrink: 0; cursor: pointer; }
+  .fk-kind {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--bp-green-dark); font-weight: 600;
+  }
+  .fk-body { font-size: 13.5px; line-height: 1.5; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+  .fk-when { font-size: 11px; color: var(--text-faint); margin-top: 3px; }
+  .fk-measure-val { font-size: 15px; font-weight: 700; color: var(--bp-green-dark); }
+  @media (max-width: 860px) {
+    .detail { padding: 16px 14px 90px; }
+    .chat-compose textarea, .fk-note-box textarea { font-size: 16px; } /* prevent iOS zoom */
+    .askpro-btn { padding: 9px 13px; }
+  }
+
+  .banner-err {
+    background: #fbeaea; border: 1px solid #e6b8b8; color: #8a2b2b;
+    border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px;
+  }
+  .hidden { display: none !important; }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .clist { position: static; height: auto; max-height: 40vh; border-right: 0; border-bottom: 1px solid var(--rule); }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="/dashboard" class="back-link">← Pipeline</a>
+    <div>
+      <div class="page-title">My Clients</div>
+      <span class="page-sub">clients · field kit · messages</span>
+    </div>
+  </div>
+  <button class="askpro-btn" id="askProBtn" type="button">🛠 Ask a Pro</button>
+</header>
+
+<div class="layout">
+  <aside class="clist">
+    <div class="clist-search">
+      <input type="search" id="clSearch" placeholder="Search name, email, address…" autocomplete="off">
+    </div>
+    <div class="clist-items" id="clItems">
+      <div class="clist-empty">Loading clients…</div>
+    </div>
+  </aside>
+
+  <main class="detail" id="detail">
+    <div class="detail-empty" id="detailEmpty">Select a client to see their proposals, requests, and messages.</div>
+
+    <div id="detailBody" class="hidden">
+      <div id="detailBanner"></div>
+      <div class="d-header"><div class="d-name" id="dName">…</div></div>
+      <div class="d-contact" id="dContact"></div>
+
+      <section class="d-section">
+        <div class="d-section-title">Field kit — photos, notes &amp; measurements</div>
+        <div class="fk-toolbar">
+          <button class="fk-tool" id="fkPhotoBtn" type="button">📷 Add photo</button>
+          <button class="fk-tool" id="fkMeasureBtn" type="button">📐 Add measurement</button>
+          <input type="file" id="fkPhotoInput" accept="image/*" capture="environment" hidden>
+        </div>
+        <div class="fk-measure" id="fkMeasureRow">
+          <input type="text" id="fkMeasureLabel" placeholder="What (e.g. Back patio width)">
+          <input type="text" id="fkMeasureValue" placeholder="Measurement (e.g. 14 ft 6 in)">
+          <button class="fk-tool" id="fkMeasureSave" type="button">Save</button>
+        </div>
+        <div class="fk-note-box">
+          <textarea id="fkNoteInput" placeholder="Field note — soil conditions, access, client preferences…"></textarea>
+          <button class="mini-btn" id="fkNoteSave" type="button">Save note</button>
+        </div>
+        <div id="fkList"><div class="d-empty-line">Loading…</div></div>
+      </section>
+
+      <section class="d-section">
+        <div class="d-section-title">Proposals</div>
+        <div id="dProposals"><div class="d-empty-line">Loading…</div></div>
+      </section>
+
+      <section class="d-section">
+        <div class="d-section-title">Requests — substitutions &amp; redesigns</div>
+        <div id="dRequests"><div class="d-empty-line">Loading…</div></div>
+      </section>
+
+      <section class="d-section">
+        <div class="d-section-title">Messages</div>
+        <div class="chat-thread" id="dThread"><div class="d-empty-line">Loading…</div></div>
+        <div class="chat-compose">
+          <textarea id="chatInput" placeholder="Write a message…"></textarea>
+          <button class="send-btn" id="chatSend">Send</button>
+        </div>
+        <div class="chat-hint">If this client hasn't activated their portal account yet, your message is also emailed to them automatically with a sign-in link.</div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+// auth-util import: gives helpers AND installs the transparent bearer-token
+// fetch wrapper (Sprint 1.5A) that /api/send-chat-message requires.
+import { supabase } from '/js/supabase-client.js';
+import { getCurrentUser, getProfile } from '/js/auth-util.js';
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => (s == null ? '' : String(s))
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const fmtWhen = (ts) => ts ? new Date(ts).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
+const fmtUSD = (n) => n == null ? '' : '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+let profile = null;
+let clients = [];
+let activeClientId = null;
+let chatPollTimer = null;
+
+// ── Boot: designer OR master may use this page (designer app, single scope
+//    per user via RLS — the page code has no role branches for data).
+(async function boot() {
+  const user = await getCurrentUser();
+  if (!user) { window.location.replace('/login.html?redirect=%2Fclients.html'); return; }
+  profile = await getProfile(user);
+  if (!profile || profile.is_active === false || !['master','designer'].includes(profile.role)) {
+    window.location.replace('/'); return;
+  }
+  await loadClients();
+})();
+
+async function loadClients() {
+  // RLS decides visibility: designers get their own clients, master gets all.
+  const { data, error } = await supabase
+    .from('clients')
+    .select('id, name, email, phone, address, created_at')
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false });
+
+  const box = $('clItems');
+  if (error) {
+    box.innerHTML = '<div class="clist-empty">Could not load clients: ' + esc(error.message) + '</div>';
+    return;
+  }
+  clients = data || [];
+  renderClientList();
+}
+
+function renderClientList() {
+  const q = ($('clSearch').value || '').trim().toLowerCase();
+  const filtered = q
+    ? clients.filter(c => [c.name, c.email, c.address].some(v => (v || '').toLowerCase().includes(q)))
+    : clients;
+
+  const box = $('clItems');
+  if (!filtered.length) {
+    box.innerHTML = '<div class="clist-empty">' + (q
+      ? 'No clients match “' + esc(q) + '”.'
+      : 'No clients yet. Create one from <strong>+ New proposal</strong> on your Pipeline.') + '</div>';
+    return;
+  }
+  box.innerHTML = filtered.map(c => `
+    <button class="clist-item${c.id === activeClientId ? ' active' : ''}" data-id="${esc(c.id)}">
+      <div class="clist-name">${esc(c.name || '(unnamed)')}</div>
+      <div class="clist-meta">${esc(c.email || '')}${c.address ? ' · ' + esc(c.address) : ''}</div>
+    </button>
+  `).join('');
+  box.querySelectorAll('.clist-item').forEach(el =>
+    el.addEventListener('click', () => selectClient(el.dataset.id)));
+}
+
+$('clSearch').addEventListener('input', renderClientList);
+
+async function selectClient(id) {
+  activeClientId = id;
+  renderClientList();
+  const c = clients.find(x => x.id === id);
+  if (!c) return;
+
+  $('detailEmpty').classList.add('hidden');
+  $('detailBody').classList.remove('hidden');
+  $('detailBanner').innerHTML = '';
+  $('dName').textContent = c.name || '(unnamed)';
+  $('dContact').innerHTML = [
+    c.email ? `<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>` : null,
+    c.phone ? esc(c.phone) : null,
+    c.address ? esc(c.address) : null,
+  ].filter(Boolean).join(' &nbsp;·&nbsp; ');
+
+  $('dProposals').innerHTML = '<div class="d-empty-line">Loading…</div>';
+  $('dRequests').innerHTML = '<div class="d-empty-line">Loading…</div>';
+  $('dThread').innerHTML = '<div class="d-empty-line">Loading…</div>';
+
+  await Promise.all([loadProposals(id), loadRequests(id), loadThread(id, true), loadFieldNotes(id)]);
+
+  if (chatPollTimer) clearInterval(chatPollTimer);
+  chatPollTimer = setInterval(() => { if (activeClientId === id) loadThread(id, false); }, 20000);
+}
+
+// ── Proposals ──────────────────────────────────────────────────────────────
+async function loadProposals(clientId) {
+  const { data, error } = await supabase
+    .from('client_proposals')
+    .select('proposal_id, status, sent_at, signed_at, proposals ( id, project_label, project_address, project_city, status, bid_total_amount, canonical_slug )')
+    .eq('client_id', clientId)
+    .order('created_at', { ascending: false });
+
+  const box = $('dProposals');
+  if (error) { box.innerHTML = '<div class="d-empty-line">Could not load proposals: ' + esc(error.message) + '</div>'; return; }
+
+  const rows = (data || []).filter(r => r.proposals);
+  if (!rows.length) { box.innerHTML = '<div class="d-empty-line">No proposals linked to this client yet.</div>'; return; }
+
+  box.innerHTML = rows.map(r => {
+    const p = r.proposals;
+    const label = p.project_label || p.project_address || 'Proposal';
+    const meta = [p.project_city, p.bid_total_amount ? fmtUSD(p.bid_total_amount) : null].filter(Boolean).join(' · ');
+    const st = (p.status || r.status || 'draft');
+    const stClass = st === 'signed' || st === 'completed' ? 'signed' : (st === 'draft' ? '' : 'pending');
+    const viewLink = p.canonical_slug ? `<a class="mini-btn" href="/p/${esc(p.canonical_slug)}" target="_blank" rel="noopener">View</a>` : '';
+    return `
+      <div class="prop-row">
+        <div>
+          <div class="prop-label">${esc(label)} <span class="status-pill ${stClass}">${esc(st)}</span></div>
+          ${meta ? `<div class="prop-meta">${esc(meta)}</div>` : ''}
+        </div>
+        <div class="prop-actions">
+          <a class="mini-btn" href="/editor?id=${esc(p.id)}">Edit</a>
+          ${viewLink}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Requests (substitutions + redesigns) ──────────────────────────────────
+async function loadRequests(clientId) {
+  const [subs, redesigns] = await Promise.all([
+    supabase.from('proposal_substitutions')
+      .select('id, proposal_id, status, homeowner_note, designer_response, created_at')
+      .eq('client_id', clientId).order('created_at', { ascending: false }),
+    supabase.from('proposal_redesign_requests')
+      .select('id, proposal_id, status, homeowner_note, designer_response, photo_url, created_at')
+      .eq('client_id', clientId).order('created_at', { ascending: false }),
+  ]);
+
+  const box = $('dRequests');
+  const errs = [subs.error, redesigns.error].filter(Boolean);
+  if (errs.length) { box.innerHTML = '<div class="d-empty-line">Could not load requests: ' + esc(errs[0].message) + '</div>'; return; }
+
+  const items = [
+    ...(subs.data || []).map(r => ({ ...r, kind: 'Substitution', table: 'proposal_substitutions' })),
+    ...(redesigns.data || []).map(r => ({ ...r, kind: 'Redesign', table: 'proposal_redesign_requests' })),
+  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  if (!items.length) { box.innerHTML = '<div class="d-empty-line">No substitution or redesign requests from this client.</div>'; return; }
+
+  box.innerHTML = items.map(r => {
+    const pending = !r.designer_response && (r.status || 'pending') !== 'responded';
+    return `
+      <div class="req-card" data-table="${esc(r.table)}" data-id="${esc(r.id)}">
+        <div class="req-top">
+          <span class="req-kind">${esc(r.kind)} <span class="status-pill ${pending ? 'pending' : ''}">${esc(r.status || 'pending')}</span></span>
+          <span class="req-when">${esc(fmtWhen(r.created_at))}</span>
+        </div>
+        ${r.homeowner_note ? `<div class="req-note">${esc(r.homeowner_note)}</div>` : ''}
+        ${r.photo_url ? `<div style="margin:4px 0 8px;"><a class="mini-btn" href="${esc(r.photo_url)}" target="_blank" rel="noopener">View attached markup</a></div>` : ''}
+        ${r.designer_response
+          ? `<div class="req-response-done"><strong>Your response:</strong> ${esc(r.designer_response)}</div>`
+          : `<button class="mini-btn req-open-btn" type="button">Respond</button>
+             <div class="req-respond">
+               <textarea placeholder="Write your response — the client sees this in their portal…"></textarea>
+               <button class="mini-btn req-send-btn" type="button">Save response</button>
+             </div>`}
+      </div>`;
+  }).join('');
+
+  box.querySelectorAll('.req-open-btn').forEach(btn =>
+    btn.addEventListener('click', () => btn.nextElementSibling.classList.toggle('open')));
+  box.querySelectorAll('.req-send-btn').forEach(btn =>
+    btn.addEventListener('click', () => submitRequestResponse(btn)));
+}
+
+async function submitRequestResponse(btn) {
+  const card = btn.closest('.req-card');
+  const text = card.querySelector('textarea').value.trim();
+  if (!text) return;
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const user = await getCurrentUser();
+  const { error } = await supabase
+    .from(card.dataset.table)
+    .update({
+      designer_response: text,
+      status: 'responded',
+      reviewed_by: user ? user.id : null,
+      reviewed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', card.dataset.id);
+
+  if (error) {
+    btn.disabled = false; btn.textContent = 'Save response';
+    showBanner('Could not save response: ' + error.message);
+    return;
+  }
+  await loadRequests(activeClientId);
+}
+
+// ── Messages ───────────────────────────────────────────────────────────────
+async function loadThread(clientId, scroll) {
+  const { data, error } = await supabase
+    .from('client_messages')
+    .select('id, sender_role, body, created_at')
+    .eq('client_id', clientId)
+    .order('created_at', { ascending: true })
+    .limit(200);
+
+  const box = $('dThread');
+  if (error) { box.innerHTML = '<div class="d-empty-line">Could not load messages: ' + esc(error.message) + '</div>'; return; }
+  if (!data || !data.length) { box.innerHTML = '<div class="d-empty-line">No messages yet — start the conversation below.</div>'; return; }
+
+  box.innerHTML = data.map(m => {
+    const mine = m.sender_role === 'designer' || m.sender_role === 'master';
+    return `<div class="msg ${mine ? 'staff' : 'homeowner'}">${esc(m.body)}<div class="msg-when">${esc(fmtWhen(m.created_at))}</div></div>`;
+  }).join('');
+  if (scroll) box.scrollTop = box.scrollHeight;
+}
+
+$('chatSend').addEventListener('click', sendMessage);
+$('chatInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) sendMessage();
+});
+
+async function sendMessage() {
+  const input = $('chatInput');
+  const text = input.value.trim();
+  if (!text || !activeClientId) return;
+
+  const btn = $('chatSend');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    // The auth-util fetch wrapper attaches the bearer token automatically;
+    // the server derives sender identity from the JWT and (for designers)
+    // verifies this client is theirs.
+    const resp = await fetch('/api/send-chat-message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client_id: activeClientId, body: text }),
+    });
+    const out = await resp.json().catch(() => ({}));
+    if (!resp.ok || !out.ok) throw new Error(out.error || ('HTTP ' + resp.status));
+    input.value = '';
+    await loadThread(activeClientId, true);
+    if (out.fallback_path === 'email') {
+      showBanner(out.email_sent
+        ? 'Client hasn’t activated their portal yet — your message was also emailed to them with a sign-in link.'
+        : 'Saved in the portal, but the fallback email could not be sent.', !out.email_sent);
+    }
+  } catch (e) {
+    showBanner('Could not send: ' + (e.message || e));
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send';
+  }
+}
+
+// ── Ask a Pro (field expert chat) ──────────────────────────────────────────
+document.getElementById('askProBtn').addEventListener('click', () => {
+  import('/js/help-chat.js')
+    .then(m => m.openHelpChat('pro'))
+    .catch(err => console.error('Ask a Pro failed to load:', err));
+});
+
+// ── Field kit: photos, notes, measurements ─────────────────────────────────
+const fkPhotoBtn = $('fkPhotoBtn'), fkPhotoInput = $('fkPhotoInput');
+const fkMeasureBtn = $('fkMeasureBtn'), fkMeasureRow = $('fkMeasureRow');
+
+fkPhotoBtn.addEventListener('click', () => { if (activeClientId) fkPhotoInput.click(); });
+fkMeasureBtn.addEventListener('click', () => fkMeasureRow.classList.toggle('open'));
+
+fkPhotoInput.addEventListener('change', async () => {
+  const file = fkPhotoInput.files && fkPhotoInput.files[0];
+  fkPhotoInput.value = '';
+  if (!file || !activeClientId) return;
+  fkPhotoBtn.disabled = true; fkPhotoBtn.textContent = 'Uploading…';
+  try {
+    const path = await uploadClientPhoto(activeClientId, file);
+    await insertFieldNote({ kind: 'photo', photo_path: path });
+  } catch (e) {
+    showBanner('Photo upload failed: ' + (e.message || e));
+  } finally {
+    fkPhotoBtn.disabled = false; fkPhotoBtn.textContent = '📷 Add photo';
+  }
+});
+
+$('fkMeasureSave').addEventListener('click', async () => {
+  const label = $('fkMeasureLabel').value.trim();
+  const value = $('fkMeasureValue').value.trim();
+  if (!label || !value || !activeClientId) return;
+  try {
+    await insertFieldNote({ kind: 'measurement', measure_label: label, measure_value: value });
+    $('fkMeasureLabel').value = ''; $('fkMeasureValue').value = '';
+    fkMeasureRow.classList.remove('open');
+  } catch (e) { showBanner('Could not save measurement: ' + (e.message || e)); }
+});
+
+$('fkNoteSave').addEventListener('click', async () => {
+  const body = $('fkNoteInput').value.trim();
+  if (!body || !activeClientId) return;
+  try {
+    await insertFieldNote({ kind: 'note', body });
+    $('fkNoteInput').value = '';
+  } catch (e) { showBanner('Could not save note: ' + (e.message || e)); }
+});
+
+async function uploadClientPhoto(clientId, file) {
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const path = `${clientId}/${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage.from('client-media')
+    .upload(path, file, { contentType: file.type || 'image/jpeg', upsert: false });
+  if (error) throw error;
+  return path;
+}
+
+async function insertFieldNote(fields) {
+  const user = await getCurrentUser();
+  const { error } = await supabase.from('client_field_notes').insert({
+    client_id: activeClientId,
+    author_user_id: user.id,
+    ...fields,
+  });
+  if (error) throw error;
+  await loadFieldNotes(activeClientId);
+}
+
+async function loadFieldNotes(clientId) {
+  const box = $('fkList');
+  const { data, error } = await supabase
+    .from('client_field_notes')
+    .select('id, kind, body, photo_path, measure_label, measure_value, created_at')
+    .eq('client_id', clientId)
+    .order('created_at', { ascending: false })
+    .limit(100);
+  if (error) { box.innerHTML = '<div class="d-empty-line">Could not load field notes: ' + esc(error.message) + '</div>'; return; }
+  if (!data || !data.length) { box.innerHTML = '<div class="d-empty-line">No field notes yet — snap a photo or jot a note from the yard.</div>'; return; }
+
+  // Signed URLs for photos (private bucket)
+  const photoPaths = data.filter(n => n.photo_path).map(n => n.photo_path);
+  const urlMap = {};
+  if (photoPaths.length) {
+    const { data: signed } = await supabase.storage.from('client-media').createSignedUrls(photoPaths, 3600);
+    (signed || []).forEach(s => { if (s.signedUrl) urlMap[s.path] = s.signedUrl; });
+  }
+
+  box.innerHTML = data.map(n => {
+    const thumb = n.photo_path && urlMap[n.photo_path]
+      ? `<a href="${esc(urlMap[n.photo_path])}" target="_blank" rel="noopener"><img class="fk-thumb" src="${esc(urlMap[n.photo_path])}" alt=""></a>` : '';
+    let content = '';
+    if (n.kind === 'measurement') {
+      content = `<div class="fk-body">${esc(n.measure_label || '')}: <span class="fk-measure-val">${esc(n.measure_value || '')}</span></div>`;
+    } else if (n.body) {
+      content = `<div class="fk-body">${esc(n.body)}</div>`;
+    }
+    return `
+      <div class="fk-item">
+        ${thumb}
+        <div style="min-width:0;flex:1;">
+          <div class="fk-kind">${esc(n.kind)}</div>
+          ${content}
+          <div class="fk-when">${esc(fmtWhen(n.created_at))}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function showBanner(msg, isError = true) {
+  $('detailBanner').innerHTML = `<div class="banner-err" style="${isError ? '' : 'background:#f6efe0;border-color:#dcc9a4;color:#6b4f24;'}">${esc(msg)}</div>`;
+  setTimeout(() => { $('detailBanner').innerHTML = ''; }, 6000);
+}
+</script>
+</body>
+</html>

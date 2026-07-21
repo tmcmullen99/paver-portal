@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pipeline · Paver Portal Proposal Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    /* Sprint 6.4 — Designer Dashboard (Pipeline Command Center)
+       All rules prefixed with .dd-* to avoid colliding with /styles.css. */
+    :root {
+      --dd-hot: #d97757;
+      --dd-hot-soft: #fbe9e0;
+      --dd-warm: #c5a050;
+      --dd-warm-soft: #fbf2dc;
+      --dd-cold: #7a9eb8;
+      --dd-cold-soft: #e7eef4;
+    }
+    body { background: var(--bp-cream); }
+
+    .dd-topbar-right { display: flex; align-items: center; gap: 14px; }
+    .dd-user-block { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .dd-user-name { font-weight: 600; color: var(--bp-charcoal); }
+    .dd-signout-btn {
+      background: transparent; border: 1px solid var(--rule);
+      border-radius: 999px; padding: 5px 12px;
+      font: inherit; font-size: 12px; font-weight: 600;
+      color: var(--text-muted); cursor: pointer;
+      transition: all 0.15s;
+    }
+    .dd-signout-btn:hover { background: var(--text); color: #fff; border-color: var(--text); }
+
+    .dd-layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 60px); }
+    .dd-sidebar {
+      background: #fff; border-right: 1px solid var(--rule);
+      padding: 20px 0; display: flex; flex-direction: column;
+      position: sticky; top: 60px;
+      height: calc(100vh - 60px); overflow-y: auto;
+    }
+    .dd-sb-section-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--text-faint); padding: 12px 20px 6px;
+    }
+    .dd-sb-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 20px;
+      font-size: 13px; font-weight: 500;
+      color: var(--text-muted); cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.12s;
+      text-decoration: none; background: transparent;
+      border-top: 0; border-right: 0; border-bottom: 0;
+      width: 100%; font-family: inherit; text-align: left;
+    }
+    .dd-sb-item:hover { background: var(--bp-cream-shade); color: var(--text); text-decoration: none; }
+    .dd-sb-item.active {
+      background: var(--bp-green-soft); color: var(--bp-green-dark);
+      border-left-color: var(--bp-green); font-weight: 600;
+    }
+    .dd-sb-item .ico { font-size: 14px; width: 18px; }
+    .dd-sb-spacer { flex: 1; }
+    .dd-new-btn {
+      margin: 12px 16px;
+      background: var(--bp-green); color: #fff;
+      border: 0; border-radius: 8px; padding: 10px 14px;
+      font: inherit; font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: background 0.15s;
+    }
+    .dd-new-btn:hover { background: var(--bp-green-dark); }
+    .dd-new-btn:disabled { opacity: 0.6; cursor: wait; }
+
+    .dd-main { padding: 28px 36px 80px; max-width: 1280px; }
+
+    .dd-heading-row {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 6px; flex-wrap: wrap; gap: 12px;
+    }
+    .dd-h-eyebrow {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--bp-green); margin-bottom: 6px;
+    }
+    .dd-h-title {
+      font-size: 26px; font-weight: 600;
+      letter-spacing: -0.018em; color: var(--text);
+    }
+    .dd-h-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+
+    .dd-stat-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px; margin-bottom: 28px;
+    }
+    .dd-stat-card { background: #fff; border: 1px solid var(--rule-soft); border-radius: 10px; padding: 16px 18px; }
+    .dd-stat-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-faint); margin-bottom: 6px;
+    }
+    .dd-stat-value {
+      font-size: 24px; font-weight: 600;
+      color: var(--text); letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .dd-stat-detail { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+    .dd-funnel { background: #fff; border: 1px solid var(--rule-soft); border-radius: 12px; padding: 24px 28px; margin-bottom: 28px; }
+    .dd-funnel-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 16px; }
+    .dd-funnel-stages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .dd-fs {
+      padding: 14px 14px 16px; border-radius: 8px; cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.15s;
+      background: transparent; border: 0; font-family: inherit; text-align: left; width: 100%;
+    }
+    .dd-fs:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+    .dd-fs.active { box-shadow: 0 0 0 2px var(--bp-green); }
+    .dd-fs.draft { background: #f5f3ec; }
+    .dd-fs.sent { background: var(--dd-cold-soft); }
+    .dd-fs.viewed { background: var(--dd-warm-soft); }
+    .dd-fs.engaged { background: var(--dd-hot-soft); }
+    .dd-fs.signed { background: var(--bp-green-soft); }
+    .dd-fs-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 6px;
+    }
+    .dd-fs-count { font-size: 28px; font-weight: 600; color: var(--text); line-height: 1; font-variant-numeric: tabular-nums; }
+    .dd-fs-amount { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
+    .dd-funnel-hint { text-align: center; color: var(--text-faint); font-size: 12px; margin-top: 12px; }
+
+    .dd-stage-wrap { margin-top: 8px; }
+    .dd-stage-header {
+      display: flex; align-items: baseline; gap: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--rule-soft);
+      margin-bottom: 14px;
+    }
+    .dd-stage-header h3 { font-size: 16px; font-weight: 600; color: var(--text); }
+    .dd-stage-header .meta { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .dd-stage-cards {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;
+    }
+    .dd-deal {
+      background: #fff; border: 1px solid var(--rule-soft);
+      border-radius: 10px; padding: 16px 18px;
+      cursor: pointer; transition: all 0.15s;
+      position: relative;
+      text-align: left; font-family: inherit; width: 100%;
+    }
+    .dd-deal:hover { border-color: var(--bp-green); box-shadow: 0 4px 12px rgba(93, 126, 105, 0.1); transform: translateY(-1px); }
+    .dd-deal.hot::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--dd-hot), var(--dd-warm));
+      border-radius: 10px 10px 0 0;
+    }
+    .dd-deal-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 2px; line-height: 1.3; }
+    .dd-deal-addr { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+    .dd-deal-mid { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .dd-deal-amount { font-size: 18px; font-weight: 600; color: var(--text); letter-spacing: -0.012em; font-variant-numeric: tabular-nums; }
+    .dd-deal-engagement { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; }
+    .dd-deal-engagement.hot { color: var(--dd-hot); }
+    .dd-deal-engagement.warm { color: var(--dd-warm); }
+    .dd-deal-engagement.cold { color: var(--dd-cold); }
+    .dd-deal-engagement.none { color: var(--text-faint); }
+    .dd-deal-meta {
+      display: flex; align-items: center; gap: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--rule-soft);
+      font-size: 11px; color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+    .dd-deal-pill {
+      display: inline-block;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 2px 7px; border-radius: 999px;
+    }
+    .dd-deal-pill.sub { background: var(--dd-hot-soft); color: var(--dd-hot); }
+    .dd-deal-pill.redesign { background: var(--dd-warm-soft); color: var(--dd-warm); }
+
+    .dd-stage-empty {
+      padding: 48px 28px; text-align: center;
+      background: #fff; border: 1px dashed var(--rule);
+      border-radius: 10px; color: var(--text-muted); font-size: 13px;
+    }
+
+    .dd-loading-shimmer {
+      background: linear-gradient(90deg, #f0ede4 0%, #f7f4eb 50%, #f0ede4 100%);
+      background-size: 200% 100%;
+      animation: dd-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px; color: transparent;
+    }
+    @keyframes dd-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    .dd-banner {
+      padding: 14px 18px; border-radius: 8px; margin-bottom: 20px;
+      font-size: 13px; line-height: 1.5;
+    }
+    .dd-banner.error { background: #fbeeee; border-left: 3px solid #b91c1c; color: #b91c1c; }
+
+    @media (max-width: 900px) {
+      .dd-layout { grid-template-columns: 1fr; }
+      .dd-sidebar {
+        position: static; height: auto; border-right: 0;
+        border-bottom: 1px solid var(--rule); padding: 16px 0;
+      }
+      .dd-funnel-stages { grid-template-columns: repeat(3, 1fr); }
+      .dd-fs.signed { grid-column: 1 / -1; }
+    }
+    @media (max-width: 600px) {
+      .dd-main { padding: 20px 16px 60px; }
+      .dd-funnel-stages { grid-template-columns: 1fr 1fr; }
+      .dd-fs.signed { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="/" class="topbar-brand">
+    <img data-brand="logo" src="/assets/paver-portal-logo.svg" alt="" class="topbar-logo">
+    <span class="brand-text">
+      <span class="brand-title" data-brand="product">Proposal Builder</span>
+      <span class="brand-sub" id="ddBrandSub">dashboard</span>
+    </span>
+  </a>
+  <div class="dd-topbar-right">
+    <div class="dd-user-block">
+      <span class="dd-user-name" id="ddUserName">…</span>
+    </div>
+    <button class="dd-signout-btn" id="ddSignoutBtn">Sign out</button>
+  </div>
+</header>
+
+<div class="dd-layout">
+
+  <nav class="dd-sidebar">
+    <!-- SPRINT 1 (Decouple): all /admin/* links removed from the designer
+         sidebar. The admin area is master-only; these links were the main
+         path by which designers wandered into company-wide data. Designer-
+         scoped versions of Clients / Substitutions / Redesigns ship in the
+         follow-up sprint. -->
+    <div class="dd-sb-section-label">Sales</div>
+    <button class="dd-sb-item active" id="ddNavPipeline"><span class="ico">◉</span><span>Pipeline</span></button>
+    <button class="dd-sb-item" id="ddNavReports"><span class="ico">◑</span><span>Reports</span></button>
+
+    <div class="dd-sb-section-label">Clients</div>
+    <!-- SPRINT 1.5B: designer-scoped workspace — clients, requests, and
+         messages, all filtered by RLS to this designer's own book. -->
+    <a class="dd-sb-item" href="/clients.html"><span class="ico">◈</span><span>My Clients</span></a>
+
+    <div class="dd-sb-section-label">Library</div>
+    <button class="dd-sb-item" id="ddNavDesigns"><span class="ico">▤</span><span>Designs</span></button>
+
+    <!-- Master-only navigation link. Hidden by default; dashboard.js
+         reveals it after the profile loads when role === 'master'.
+         Pure navigation — renders no data. -->
+    <a class="dd-sb-item" href="/admin/" id="ddNavAdmin" hidden><span class="ico">⚙</span><span>Admin console</span></a>
+
+    <div class="dd-sb-spacer"></div>
+    <button class="dd-new-btn" id="ddNewBtn">＋ New proposal</button>
+  </nav>
+
+  <main class="dd-main">
+
+    <div id="ddBanner"></div>
+
+    <div class="dd-heading-row">
+      <div>
+        <div class="dd-h-eyebrow" id="ddHeaderEyebrow">Pipeline</div>
+        <h1 class="dd-h-title" id="ddHeaderTitle">Your book</h1>
+      </div>
+    </div>
+    <div class="dd-h-sub" id="ddHeaderSub">Click any stage to drill into its deals. Hot deals get a colored top-bar.</div>
+
+    <div class="dd-stat-row" id="ddStatRow">
+      <div class="dd-stat-card"><div class="dd-stat-label">Open value</div><div class="dd-stat-value dd-loading-shimmer">$ ——</div></div>
+      <div class="dd-stat-card"><div class="dd-stat-label">Closed total</div><div class="dd-stat-value dd-loading-shimmer">$ ——</div></div>
+      <div class="dd-stat-card"><div class="dd-stat-label">Win rate</div><div class="dd-stat-value dd-loading-shimmer">——%</div></div>
+      <div class="dd-stat-card"><div class="dd-stat-label">Active deals</div><div class="dd-stat-value dd-loading-shimmer">—</div></div>
+    </div>
+
+    <div class="dd-funnel" id="ddFunnel">
+      <div class="dd-funnel-title">Active proposals · funnel</div>
+      <div class="dd-funnel-stages" id="ddFunnelStages">
+        <button class="dd-fs draft" data-stage="draft"><div class="dd-fs-label">Draft</div><div class="dd-fs-count">—</div><div class="dd-fs-amount">$—</div></button>
+        <button class="dd-fs sent" data-stage="sent"><div class="dd-fs-label">Sent</div><div class="dd-fs-count">—</div><div class="dd-fs-amount">$—</div></button>
+        <button class="dd-fs viewed" data-stage="viewed"><div class="dd-fs-label">Viewed</div><div class="dd-fs-count">—</div><div class="dd-fs-amount">$—</div></button>
+        <button class="dd-fs engaged active" data-stage="engaged"><div class="dd-fs-label">Engaged</div><div class="dd-fs-count">—</div><div class="dd-fs-amount">$—</div></button>
+        <button class="dd-fs signed" data-stage="signed"><div class="dd-fs-label">Signed</div><div class="dd-fs-count">—</div><div class="dd-fs-amount">$—</div></button>
+      </div>
+      <div class="dd-funnel-hint">Click any stage to filter the cards below.</div>
+    </div>
+
+    <div class="dd-stage-wrap">
+      <div class="dd-stage-header">
+        <h3 id="ddStageTitle">Engaged</h3>
+        <span class="meta" id="ddStageMeta">loading…</span>
+      </div>
+      <div id="ddStageCards"></div>
+    </div>
+
+  </main>
+</div>
+
+<script type="module" src="/js/dashboard.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,2385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your account · Paver Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bp-green:    #9c7440;
+    --bp-green-dk: #7d5c31;
+    --bp-green-soft: #f1e7d3;
+    --bp-charcoal: #353535;
+    --bp-tan:      #dad7c5;
+    --bp-cream:    #faf8f3;
+    --bp-bg:       #f4f4ef;
+    --bp-card:     #ffffff;
+    --bp-border:   #e4e4df;
+    --bp-text:     #1f2125;
+    --bp-muted:    #70726f;
+    --bp-err:      #b91c1c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--bp-text);
+    background: var(--bp-bg);
+    line-height: 1.5; font-size: 15px;
+  }
+  .ho-nav {
+    background: #fff;
+    border-bottom: 1px solid var(--bp-border);
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .ho-nav-brand-link {
+    display: flex; align-items: center; gap: 14px;
+    text-decoration: none; color: inherit;
+    transition: opacity .15s;
+  }
+  .ho-nav-brand-link:hover { opacity: 0.78; }
+  .ho-nav-brand { display: flex; align-items: center; gap: 14px; }
+  .ho-nav-brand img { height: 32px; width: auto; }
+  .ho-nav-brand-divider { width: 1px; height: 22px; background: var(--bp-border); }
+  .ho-nav-brand-tag {
+    font-size: 11px; letter-spacing: 0.18em;
+    color: var(--bp-muted); text-transform: uppercase; font-weight: 600;
+  }
+  .ho-nav-user { display: flex; align-items: center; gap: 14px; font-size: 13px; }
+  .ho-nav-name { font-weight: 600; color: var(--bp-text); }
+  .ho-nav-out {
+    background: transparent;
+    border: 1px solid var(--bp-border);
+    color: var(--bp-charcoal);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .ho-nav-out:hover { background: var(--bp-text); color: #fff; border-color: var(--bp-text); }
+  .ho-subnav {
+    position: sticky; top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--bp-border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ho-subnav::-webkit-scrollbar { display: none; }
+  .ho-subnav-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 8px 24px;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .ho-subnav a {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--bp-muted);
+    text-decoration: none;
+    transition: background .15s, color .15s;
+    white-space: nowrap;
+  }
+  .ho-subnav a:hover { color: var(--bp-text); background: var(--bp-cream); }
+  .ho-subnav a.is-active {
+    color: var(--bp-green-dk);
+    background: var(--bp-green-soft);
+  }
+  section[id] { scroll-margin-top: 70px; }
+  .ho-page { max-width: 1080px; margin: 0 auto; padding: 36px 24px 80px; }
+  .ho-hero {
+    background: linear-gradient(135deg, var(--bp-green) 0%, var(--bp-green-dk) 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 36px 36px 32px;
+    margin-bottom: 28px;
+    box-shadow: 0 12px 32px rgba(93, 126, 105, 0.18);
+  }
+  .ho-hero-eyebrow {
+    font-size: 11px; letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+    font-weight: 600; margin-bottom: 8px;
+  }
+  .ho-hero-title {
+    font-size: 28px; font-weight: 600;
+    letter-spacing: -0.014em;
+    margin-bottom: 10px; line-height: 1.2;
+  }
+  .ho-hero-lede {
+    font-size: 15px; line-height: 1.6;
+    color: rgba(255, 255, 255, 0.86);
+    max-width: 680px;
+    margin-bottom: 18px;
+  }
+  .ho-hero-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #fff; color: var(--bp-green-dk);
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+    text-decoration: none;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .ho-hero-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+  }
+  .ho-section { margin-bottom: 32px; }
+  .ho-section-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 14px; gap: 12px; flex-wrap: wrap;
+  }
+  .ho-section h2 {
+    font-size: 17px; font-weight: 600;
+    color: var(--bp-text); letter-spacing: -0.005em;
+  }
+  .ho-section-meta {
+    font-size: 12px; color: var(--bp-muted);
+    letter-spacing: 0.04em;
+  }
+  .ho-section-sub {
+    font-size: 13px; color: var(--bp-muted);
+    margin-bottom: 14px;
+    max-width: 640px;
+    line-height: 1.6;
+  }
+  .ho-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .ho-prop-card {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+    display: flex; flex-direction: column;
+  }
+  .ho-prop-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(31, 33, 37, 0.08);
+    border-color: var(--bp-green);
+  }
+  .ho-prop-cover {
+    height: 168px;
+    background: var(--bp-cream) center/cover no-repeat;
+    border-bottom: 1px solid var(--bp-border);
+    position: relative;
+  }
+  .ho-prop-cover-fallback {
+    height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--bp-green-soft) 0%, var(--bp-cream) 100%);
+    color: var(--bp-green-dk); font-weight: 600;
+    font-size: 13px; letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .ho-prop-status {
+    position: absolute; top: 12px; left: 12px;
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--bp-charcoal);
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .ho-prop-status-signed { background: var(--bp-green); color: #fff; }
+  .ho-prop-status-sent  { background: #fff; color: var(--bp-green-dk); }
+  .ho-prop-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+  .ho-prop-addr { font-size: 16px; font-weight: 600; color: var(--bp-text); margin-bottom: 6px; line-height: 1.3; }
+  .ho-prop-meta { font-size: 12px; color: var(--bp-muted); margin-bottom: 12px; }
+  .ho-prop-total { font-size: 22px; font-weight: 600; color: var(--bp-green-dk); margin-bottom: 18px; letter-spacing: -0.012em; }
+  .ho-prop-cta {
+    display: inline-block;
+    background: var(--bp-green); color: #fff;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: background .15s;
+    margin-top: auto;
+  }
+  .ho-prop-cta:hover { background: var(--bp-green-dk); }
+  .ho-prop-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+  }
+  .ho-prop-actions .ho-prop-cta { margin-top: 0; }
+  .ho-prop-cta-alt {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    gap: 6px;
+    background: #fff; color: var(--bp-charcoal);
+    border: 1px solid var(--bp-border);
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .ho-prop-cta-alt:hover {
+    background: var(--bp-cream);
+    border-color: var(--bp-charcoal);
+    color: var(--bp-text);
+  }
+  .ho-empty {
+    background: #fff;
+    border: 1px dashed var(--bp-border);
+    border-radius: 12px;
+    padding: 38px 28px;
+    text-align: center;
+    color: var(--bp-muted);
+  }
+  .ho-empty-icon { font-size: 36px; margin-bottom: 12px; color: var(--bp-green); opacity: 0.6; }
+  .ho-empty h3 { font-size: 16px; font-weight: 600; color: var(--bp-text); margin-bottom: 6px; }
+  .ho-empty p { font-size: 13px; line-height: 1.6; max-width: 420px; margin: 0 auto 18px; }
+  .ho-empty-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bp-green); color: #fff;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+    text-decoration: none;
+    transition: background .15s;
+  }
+  .ho-empty-cta:hover { background: var(--bp-green-dk); }
+  .ho-qs-card {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    transition: border-color .15s;
+  }
+  .ho-qs-card:hover { border-color: var(--bp-green); }
+  .ho-qs-card[open] { border-color: var(--bp-green); }
+  .ho-qs-summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 18px 22px;
+    display: flex; align-items: center; gap: 14px;
+    user-select: none;
+  }
+  .ho-qs-summary::-webkit-details-marker { display: none; }
+  .ho-qs-num {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--bp-green-soft);
+    color: var(--bp-green-dk);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .ho-qs-card[open] .ho-qs-num { background: var(--bp-green); color: #fff; }
+  .ho-qs-title-wrap { flex: 1; min-width: 0; }
+  .ho-qs-title {
+    font-size: 15px; font-weight: 600;
+    color: var(--bp-text); line-height: 1.3;
+  }
+  .ho-qs-tagline {
+    font-size: 12px; color: var(--bp-muted);
+    margin-top: 2px;
+  }
+  .ho-qs-arrow {
+    flex-shrink: 0;
+    color: var(--bp-muted);
+    font-size: 18px;
+    transition: transform .2s;
+  }
+  .ho-qs-card[open] .ho-qs-arrow { transform: rotate(90deg); color: var(--bp-green-dk); }
+  .ho-qs-body {
+    padding: 0 22px 22px;
+    font-size: 14px; line-height: 1.7;
+    color: var(--bp-charcoal);
+  }
+  .ho-qs-body p { margin-bottom: 12px; }
+  .ho-qs-body p:last-child { margin-bottom: 0; }
+
+  /* NEW · Sprint 28 · PDF warranty CTA inside accordion #5 */
+  .ho-qs-warranty-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 9px 16px;
+    background: var(--bp-green);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background .15s, transform .15s;
+  }
+  .ho-qs-warranty-cta:hover { background: var(--bp-green-dk); transform: translateY(-1px); }
+
+  /* NEW · Sprint 28 · Installation videos sub-section under "How we build" */
+  .ho-iv-section {
+    background: var(--bp-cream);
+    border: 1px solid var(--bp-border);
+    border-radius: 12px;
+    padding: 22px 22px 26px;
+    margin-top: 18px;
+  }
+  .ho-iv-head { margin-bottom: 14px; }
+  .ho-iv-head h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--bp-text);
+    margin-bottom: 4px;
+  }
+  .ho-iv-head p {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--bp-muted);
+    max-width: 540px;
+  }
+  .ho-iv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+  .ho-iv-card {
+    display: block;
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 8px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+  }
+  .ho-iv-card:hover {
+    border-color: var(--bp-green);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(93,126,105,0.10);
+  }
+  .ho-iv-thumb {
+    position: relative;
+    aspect-ratio: 16/9;
+    background: #000;
+    overflow: hidden;
+  }
+  .ho-iv-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ho-iv-thumb.pdf {
+    background: var(--bp-tan);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bp-charcoal);
+    font-size: 13px; font-weight: 700; letter-spacing: 0.1em;
+  }
+  .ho-iv-play {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.94);
+    font-size: 28px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.55);
+    pointer-events: none;
+  }
+  .ho-iv-label {
+    padding: 8px 10px 10px;
+    font-size: 11px;
+    line-height: 1.35;
+    color: var(--bp-text);
+    font-weight: 500;
+  }
+
+  .ho-credit-card {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 12px;
+    padding: 26px 28px;
+    display: flex; flex-direction: column;
+    max-width: 540px;
+  }
+  .ho-credit-eyebrow {
+    font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--bp-muted); font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .ho-credit-amount {
+    font-size: 32px; font-weight: 600;
+    color: var(--bp-green-dk);
+    letter-spacing: -0.018em; margin-bottom: 4px;
+  }
+  .ho-credit-cap { font-size: 13px; color: var(--bp-muted); margin-bottom: 16px; }
+  .ho-credit-bar {
+    background: var(--bp-cream);
+    border-radius: 999px; height: 8px;
+    overflow: hidden; margin-bottom: 16px;
+  }
+  .ho-credit-bar-fill {
+    background: linear-gradient(90deg, var(--bp-green) 0%, var(--bp-green-dk) 100%);
+    height: 100%; border-radius: 999px;
+    transition: width .4s ease;
+  }
+  .ho-credit-desc { font-size: 13px; line-height: 1.55; color: var(--bp-charcoal); margin-bottom: 18px; }
+  .ho-credit-cta {
+    background: var(--bp-green); color: #fff;
+    border: none; border-radius: 8px;
+    padding: 11px 20px;
+    font: inherit; font-weight: 600; font-size: 13px;
+    cursor: pointer;
+    transition: background .15s;
+    align-self: flex-start;
+  }
+  .ho-credit-cta:hover { background: var(--bp-green-dk); }
+  .ho-credit-cta:disabled { background: var(--bp-text); opacity: 0.6; cursor: not-allowed; }
+  .ho-share-block {
+    background: var(--bp-cream);
+    border: 1px solid var(--bp-border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+  }
+  .ho-share-block-label {
+    font-size: 10px; font-weight: 700;
+    color: var(--bp-charcoal);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .ho-share-row { display: flex; gap: 8px; align-items: stretch; }
+  .ho-share-input {
+    flex: 1; min-width: 0;
+    font-family: inherit; font-size: 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--bp-border);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--bp-text);
+  }
+  .ho-share-input:focus {
+    outline: none;
+    border-color: var(--bp-green);
+    box-shadow: 0 0 0 2px rgba(93, 126, 105, 0.16);
+  }
+  .ho-share-copy-btn {
+    background: var(--bp-green); color: #fff;
+    border: none; border-radius: 6px;
+    padding: 0 16px;
+    font: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s;
+  }
+  .ho-share-copy-btn:hover { background: var(--bp-green-dk); }
+  .ho-share-copy-btn.copied { background: var(--bp-charcoal); }
+  .ho-share-help {
+    font-size: 11px; color: var(--bp-muted);
+    margin-top: 8px; line-height: 1.5;
+  }
+  .ho-share-divider {
+    text-align: center;
+    font-size: 10px; color: var(--bp-muted);
+    margin: 14px 0;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    position: relative;
+    font-weight: 600;
+  }
+  .ho-share-divider span { background: #fff; padding: 0 12px; position: relative; z-index: 1; }
+  .ho-share-divider::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 50%;
+    height: 1px; background: var(--bp-border); z-index: 0;
+  }
+  .ho-ref-list { display: flex; flex-direction: column; gap: 8px; }
+  .ho-ref-row {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex; justify-content: space-between;
+    gap: 14px; flex-wrap: wrap;
+    align-items: center;
+    transition: border-color .15s;
+  }
+  .ho-ref-row:hover { border-color: var(--bp-green); }
+  .ho-ref-info { flex: 1; min-width: 200px; }
+  .ho-ref-name { font-size: 14px; font-weight: 600; color: var(--bp-text); margin-bottom: 2px; line-height: 1.3; }
+  .ho-ref-meta { font-size: 12px; color: var(--bp-muted); }
+  .ho-ref-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .ho-ref-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .ho-ref-pill-sent      { background: #eef3f8; color: #2b4a73; }
+  .ho-ref-pill-scheduled { background: #fff4d4; color: #7a5a10; }
+  .ho-ref-pill-completed { background: var(--bp-green-soft); color: var(--bp-green-dk); }
+  .ho-ref-pill-credited  { background: var(--bp-green-soft); color: var(--bp-green-dk); }
+  .ho-ref-resend-btn {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    color: var(--bp-charcoal);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font: inherit; font-size: 11px; font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .ho-ref-resend-btn:hover { background: var(--bp-green); color: #fff; border-color: var(--bp-green); }
+  .ho-ref-resend-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #fff; color: var(--bp-charcoal); }
+  .ho-ref-empty {
+    background: #fff;
+    border: 1px dashed var(--bp-border);
+    border-radius: 10px;
+    padding: 22px 24px;
+    text-align: center;
+    color: var(--bp-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .ho-ref-toast {
+    background: var(--bp-green-soft);
+    color: var(--bp-green-dk);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  .ho-ref-toast.error { background: #fef2f2; color: var(--bp-err); }
+  .ho-ref-toast[hidden] { display: none; }
+  .ho-loading {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 12px;
+    padding: 28px;
+    text-align: center;
+    color: var(--bp-muted);
+    font-size: 13px;
+  }
+  .ho-error-msg {
+    background: #fef2f2;
+    color: var(--bp-err);
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .ho-mat-section {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 12px;
+    padding: 22px 22px 26px;
+  }
+  .ho-mat-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .ho-mat-head h3 {
+    margin-right: auto;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--bp-text);
+  }
+  .ho-mat-search {
+    flex: 1; max-width: 280px; min-width: 180px;
+    padding: 9px 14px;
+    border: 1px solid var(--bp-border);
+    border-radius: 999px;
+    background: var(--bp-cream);
+    font: inherit;
+    font-size: 13px;
+    color: var(--bp-text);
+    transition: background .15s, border-color .15s;
+  }
+  .ho-mat-search::placeholder { color: var(--bp-muted); }
+  .ho-mat-search:focus {
+    outline: none;
+    border-color: var(--bp-green);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(93,126,105,0.14);
+  }
+  .ho-mat-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px 0 14px;
+    border-bottom: 1px solid var(--bp-border);
+    margin-bottom: 18px;
+  }
+  .ho-mat-tabs::-webkit-scrollbar { display: none; }
+  .ho-mat-tab {
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--bp-muted);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .12s, color .12s, border-color .12s;
+    white-space: nowrap;
+  }
+  .ho-mat-tab:hover { color: var(--bp-text); background: var(--bp-cream); }
+  .ho-mat-tab.is-active { background: var(--bp-green); color: #fff; border-color: var(--bp-green); }
+  .ho-mat-tab-count {
+    background: rgba(0,0,0,0.06);
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .ho-mat-tab.is-active .ho-mat-tab-count { background: rgba(255,255,255,0.22); color: #fff; }
+  .ho-mat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  @media (max-width: 480px) {
+    .ho-mat-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  }
+  .ho-mat-card {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .12s, box-shadow .15s, border-color .15s;
+    display: flex; flex-direction: column;
+    text-align: left;
+    font: inherit;
+    padding: 0;
+    color: inherit;
+  }
+  .ho-mat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(31,33,37,0.08);
+    border-color: var(--bp-green);
+  }
+  .ho-mat-card-img {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    background: var(--bp-cream) center/cover no-repeat;
+    border-bottom: 1px solid var(--bp-border);
+  }
+  .ho-mat-card-img-fallback {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-bottom: 1px solid var(--bp-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bp-green-soft) 0%, var(--bp-cream) 100%);
+    color: var(--bp-green-dk);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 8px;
+  }
+  .ho-mat-card-body {
+    padding: 9px 12px 12px;
+    flex: 1;
+    display: flex; flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .ho-mat-card-mfr {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bp-muted);
+  }
+  .ho-mat-card-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bp-text);
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .ho-mat-card-color { font-size: 11px; color: var(--bp-muted); margin-top: 1px; }
+  .ho-mat-state {
+    grid-column: 1 / -1;
+    padding: 36px 20px;
+    text-align: center;
+    color: var(--bp-muted);
+    font-size: 13px;
+    background: var(--bp-cream);
+    border-radius: 8px;
+  }
+  .ho-mat-show-more { margin-top: 18px; text-align: center; }
+  .ho-mat-show-more-btn {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 999px;
+    padding: 9px 22px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--bp-charcoal);
+    cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .ho-mat-show-more-btn:hover {
+    background: var(--bp-cream);
+    border-color: var(--bp-green);
+    color: var(--bp-green-dk);
+  }
+  .ho-mat-modal {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+    max-width: 620px; width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .ho-mat-modal-img-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background: var(--bp-cream) center/cover no-repeat;
+    border-bottom: 1px solid var(--bp-border);
+    flex-shrink: 0;
+  }
+  /* Sprint 28 · Switched modal hero from background-image to <img> so onerror fallback works.
+     Previously primary_image_url (often Belgard CDN with hotlink protection) blocked silently;
+     now we fall back to swatch_url, then to manufacturer text. Fixes the Cambridge Cobble blank-modal bug. */
+  .ho-mat-modal-img {
+    width: 100%; height: 100%;
+    overflow: hidden;
+  }
+  .ho-mat-modal-img img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  .ho-mat-modal-img-fallback {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--bp-green-soft) 0%, var(--bp-cream) 100%);
+    color: var(--bp-green-dk);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .ho-mat-modal-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    border: none;
+    width: 32px; height: 32px;
+    border-radius: 999px;
+    font: inherit; font-size: 16px; line-height: 1;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+  .ho-mat-modal-close:hover { background: rgba(0,0,0,0.78); }
+  .ho-mat-modal-body { padding: 22px 26px 26px; overflow-y: auto; }
+  .ho-mat-modal-mfr {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--bp-muted);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .ho-mat-modal-name {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--bp-text);
+    letter-spacing: -0.014em;
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .ho-mat-modal-color { font-size: 14px; color: var(--bp-charcoal); margin-bottom: 16px; }
+  .ho-mat-modal-color-swatch {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0,0.08);
+    vertical-align: -1px;
+    margin-right: 6px;
+  }
+  .ho-mat-modal-desc {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--bp-charcoal);
+    margin-bottom: 18px;
+  }
+  .ho-mat-modal-specs {
+    background: var(--bp-cream);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+  }
+  .ho-mat-modal-spec-row {
+    display: flex;
+    gap: 12px;
+    padding: 5px 0;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(31,33,37,0.04);
+  }
+  .ho-mat-modal-spec-row:last-child { border-bottom: none; }
+  .ho-mat-modal-spec-label { color: var(--bp-muted); font-weight: 600; flex-shrink: 0; width: 110px; }
+  .ho-mat-modal-spec-val { color: var(--bp-text); flex: 1; word-break: break-word; }
+  .ho-mat-modal-section-label {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bp-muted);
+    font-weight: 700;
+    margin-bottom: 8px;
+    margin-top: 14px;
+  }
+  .ho-mat-modal-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .ho-mat-modal-chip {
+    background: var(--bp-green-soft);
+    color: var(--bp-green-dk);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: capitalize;
+  }
+  .ho-mat-modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--bp-border);
+  }
+  .ho-mat-modal-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border: 1px solid var(--bp-border);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--bp-charcoal);
+    text-decoration: none;
+    background: #fff;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .ho-mat-modal-action:hover {
+    background: var(--bp-cream);
+    border-color: var(--bp-green);
+    color: var(--bp-green-dk);
+  }
+
+  /* NEW · Sprint 28 · Warranty + install guides inside material modal */
+  .ho-mat-modal-warranty-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .ho-mat-modal-warranty-card {
+    background: var(--bp-cream);
+    border-left: 3px solid var(--bp-tan);
+    border-radius: 6px;
+    padding: 11px 14px;
+  }
+  .ho-mat-modal-warranty-card.bayside {
+    border-left-color: var(--bp-green);
+    background: var(--bp-green-soft);
+  }
+  .ho-mat-modal-warranty-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bp-charcoal);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .ho-mat-modal-warranty-card.bayside .ho-mat-modal-warranty-label { color: var(--bp-green-dk); }
+  .ho-mat-modal-warranty-text {
+    font-size: 13px;
+    color: var(--bp-text);
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  .ho-mat-modal-warranty-text:last-child { margin-bottom: 0; }
+  .ho-mat-modal-warranty-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--bp-green-dk);
+    text-decoration: underline;
+  }
+  .ho-mat-modal-guides {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .ho-mat-modal-guide-card {
+    display: block;
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 6px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .15s, transform .15s;
+  }
+  .ho-mat-modal-guide-card:hover { border-color: var(--bp-green); transform: translateY(-1px); }
+  .ho-mat-modal-guide-thumb {
+    position: relative;
+    aspect-ratio: 16/9;
+    background: #000;
+    overflow: hidden;
+  }
+  .ho-mat-modal-guide-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ho-mat-modal-guide-thumb.pdf {
+    background: var(--bp-tan);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bp-charcoal);
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  }
+  .ho-mat-modal-guide-play {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.94);
+    font-size: 18px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.55);
+    pointer-events: none;
+  }
+  .ho-mat-modal-guide-title {
+    padding: 6px 8px 8px;
+    font-size: 10px;
+    line-height: 1.3;
+    color: var(--bp-text);
+    font-weight: 500;
+  }
+  .ho-mat-modal-process-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 6px 0 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--bp-green-dk);
+    text-decoration: underline;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+  }
+  .ho-mat-modal-process-cta:hover { color: var(--bp-green); }
+
+  .ho-modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(31, 33, 37, 0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; padding: 20px;
+  }
+  .ho-modal-backdrop[hidden] { display: none; }
+  .ho-modal {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+    max-width: 480px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .ho-modal-head {
+    background: linear-gradient(135deg, var(--bp-green) 0%, var(--bp-green-dk) 100%);
+    color: #fff;
+    padding: 22px 26px 18px;
+    border-radius: 14px 14px 0 0;
+    position: relative;
+  }
+  .ho-modal-head h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .ho-modal-head p { font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, 0.85); }
+  .ho-modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: rgba(255, 255, 255, 0.18);
+    border: none; color: #fff;
+    width: 28px; height: 28px;
+    border-radius: 999px;
+    font: inherit; font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+  }
+  .ho-modal-close:hover { background: rgba(255, 255, 255, 0.3); }
+  .ho-modal-body { padding: 24px 26px 26px; }
+  .ho-modal-form { display: flex; flex-direction: column; gap: 14px; }
+  .ho-modal-field { display: flex; flex-direction: column; gap: 5px; }
+  .ho-modal-field label { font-size: 12px; font-weight: 600; color: var(--bp-charcoal); }
+  .ho-modal-field label em { color: var(--bp-err); font-style: normal; margin-left: 2px; }
+  .ho-modal-field input {
+    font-family: inherit; font-size: 14px;
+    padding: 11px 13px;
+    border: 1px solid var(--bp-border);
+    border-radius: 8px; background: #fff;
+    color: var(--bp-text);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .ho-modal-field input:focus {
+    outline: none;
+    border-color: var(--bp-green);
+    box-shadow: 0 0 0 3px rgba(93, 126, 105, 0.16);
+  }
+  .ho-modal-perk {
+    background: var(--bp-cream);
+    border-left: 3px solid var(--bp-green);
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 12px; line-height: 1.55;
+    color: var(--bp-charcoal);
+    margin-bottom: 4px;
+  }
+  .ho-modal-actions { display: flex; gap: 10px; margin-top: 6px; }
+  .ho-modal-btn {
+    flex: 1;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    border: 1px solid transparent;
+    transition: background .15s, opacity .15s;
+  }
+  .ho-modal-btn-primary { background: var(--bp-green); color: #fff; }
+  .ho-modal-btn-primary:hover { background: var(--bp-green-dk); }
+  .ho-modal-btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+  .ho-modal-btn-ghost {
+    background: transparent;
+    color: var(--bp-charcoal);
+    border-color: var(--bp-border);
+  }
+  .ho-modal-btn-ghost:hover { background: var(--bp-cream); }
+  .ho-modal-error {
+    background: #fef2f2; color: var(--bp-err);
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 12px; line-height: 1.5;
+  }
+  .ho-modal-error[hidden] { display: none; }
+  .ho-modal-success { text-align: center; padding: 14px 0; }
+  .ho-modal-success-icon { font-size: 36px; color: var(--bp-green); margin-bottom: 10px; }
+  .ho-modal-success h3 { font-size: 16px; font-weight: 600; color: var(--bp-text); margin-bottom: 6px; }
+  .ho-modal-success p { font-size: 13px; line-height: 1.6; color: var(--bp-muted); }
+  .ho-footer {
+    background: var(--bp-charcoal);
+    color: rgba(255,255,255,0.85);
+    padding: 56px 24px 28px;
+    margin-top: 60px;
+  }
+  .ho-footer-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 36px;
+  }
+  @media (max-width: 760px) {
+    .ho-footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
+  }
+  @media (max-width: 480px) {
+    .ho-footer-inner { grid-template-columns: 1fr; gap: 24px; }
+  }
+  .ho-footer-brand-block img { height: 38px; width: auto; margin-bottom: 14px; display: block; }
+  .ho-footer-brand-tagline {
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+    max-width: 320px;
+  }
+  .ho-footer-col h4 {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 12px;
+  }
+  .ho-footer-col ul { list-style: none; padding: 0; margin: 0; }
+  .ho-footer-col li { margin-bottom: 8px; font-size: 13px; line-height: 1.5; }
+  .ho-footer-col a { color: rgba(255,255,255,0.85); text-decoration: none; transition: color .15s; }
+  .ho-footer-col a:hover { color: #fff; text-decoration: underline; }
+  .ho-footer-col span.ho-footer-soft { color: rgba(255,255,255,0.7); }
+  .ho-footer-bottom {
+    max-width: 1080px;
+    margin: 40px auto 0;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+  }
+  .ho-footer-bottom a { color: rgba(255,255,255,0.7); text-decoration: none; }
+  .ho-footer-bottom a:hover { color: #fff; }
+  @media (max-width: 540px) {
+    .ho-page { padding: 24px 16px 60px; }
+    .ho-hero { padding: 28px 22px 26px; }
+    .ho-hero-title { font-size: 22px; }
+    .ho-hero-lede { font-size: 14px; }
+    .ho-nav-brand-divider, .ho-nav-brand-tag { display: none; }
+    .ho-mat-modal-spec-label { width: 90px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="ho-nav">
+  <a class="ho-nav-brand-link" href="https://baysidepavers.com" target="_blank" rel="noopener" aria-label="Visit baysidepavers.com">
+    <span class="ho-nav-brand">
+      <img src="https://baysidepavers.com/wp-content/uploads/2023/03/baysidepavers-logo-light-scaled.png" alt="Paver Portal">
+      <span class="ho-nav-brand-divider"></span>
+      <span class="ho-nav-brand-tag">Your Account</span>
+    </span>
+  </a>
+  <div class="ho-nav-user">
+    <span class="ho-nav-name" id="ho-nav-name">…</span>
+    <button type="button" class="ho-nav-out" id="ho-nav-out">Sign out</button>
+  </div>
+</nav>
+
+<div class="ho-subnav" id="ho-subnav">
+  <div class="ho-subnav-inner">
+    <a href="#welcome" data-anchor="welcome">Welcome</a>
+    <a href="#proposals" data-anchor="proposals">Proposals</a>
+    <a href="#messages" data-anchor="messages">Messages</a>
+    <a href="#materials" data-anchor="materials">Materials</a>
+    <a href="#how-we-build" data-anchor="how-we-build">How we build</a>
+    <a href="#refer" data-anchor="refer">Refer &amp; earn</a>
+  </div>
+</div>
+
+<main class="ho-page">
+  <div id="ho-error-banner" class="ho-error-msg" style="display:none;"></div>
+
+  <section id="welcome" class="ho-hero">
+    <div class="ho-hero-eyebrow">Welcome</div>
+    <h1 class="ho-hero-title" id="ho-hero-title">…</h1>
+    <p class="ho-hero-lede" id="ho-hero-lede">Loading your account…</p>
+    <a class="ho-hero-cta" id="ho-schedule-cta" href="https://baysidepaversfreeconsultation.as.me/" target="_blank" rel="noopener">📅 Schedule a free design appointment</a>
+  </section>
+
+  <section id="messages" class="ho-section">
+    <div id="ho-chat-section"></div>
+  </section>
+
+  <section id="proposals" class="ho-section">
+    <div class="ho-section-head">
+      <h2>Your proposals</h2>
+      <span class="ho-section-meta" id="ho-prop-count"></span>
+    </div>
+    <div id="ho-prop-area">
+      <div class="ho-loading">Loading your proposals…</div>
+    </div>
+  </section>
+
+  <section id="materials" class="ho-section">
+    <div class="ho-section-head">
+      <h2>Browse our materials</h2>
+      <span class="ho-section-meta" id="ho-mat-meta"></span>
+    </div>
+    <p class="ho-section-sub">
+      Every paver, slab, wall block, and accessory we install — searchable, tabbed by category.
+      Tap any product for full specs, applications, warranty, and matching install videos.
+    </p>
+
+    <div class="ho-mat-section">
+      <div class="ho-mat-head">
+        <h3>Catalog</h3>
+        <input type="search" class="ho-mat-search" id="ho-mat-search" placeholder="Search by name, color, or use…" autocomplete="off">
+      </div>
+      <div class="ho-mat-tabs" id="ho-mat-tabs"></div>
+      <div class="ho-mat-grid" id="ho-mat-grid">
+        <div class="ho-mat-state">Loading materials catalog…</div>
+      </div>
+      <div class="ho-mat-show-more" id="ho-mat-show-more" hidden>
+        <button type="button" class="ho-mat-show-more-btn" id="ho-mat-show-more-btn">Show all</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-we-build" class="ho-section">
+    <div class="ho-section-head">
+      <h2>Our quality standards</h2>
+    </div>
+    <p class="ho-section-sub">
+      Here's what your project actually goes through, from the day we walk your yard to the day we hand
+      you the keys. Tap any phase to see the detail.
+    </p>
+
+    <details class="ho-qs-card">
+      <summary class="ho-qs-summary">
+        <span class="ho-qs-num">01</span>
+        <span class="ho-qs-title-wrap">
+          <span class="ho-qs-title">Site preparation</span>
+          <span class="ho-qs-tagline">Where every long-lasting hardscape begins</span>
+        </span>
+        <span class="ho-qs-arrow">›</span>
+      </summary>
+      <div class="ho-qs-body">
+        <p>Before a single paver lands, we set the stage. Our crew excavates to the right depth for your soil type and project category — patios, driveways, and pool decks each have their own minimum specs. We mark utilities, set up edge lines, and confirm grading so water flows away from your house, not toward it.</p>
+        <p>This is the unglamorous part of the project, but it's the difference between a hardscape that looks great for 5 years and one that looks great for 30. Most failures we get called in to fix come from someone skipping this phase.</p>
+      </div>
+    </details>
+
+    <details class="ho-qs-card">
+      <summary class="ho-qs-summary">
+        <span class="ho-qs-num">02</span>
+        <span class="ho-qs-title-wrap">
+          <span class="ho-qs-title">Base &amp; drainage</span>
+          <span class="ho-qs-tagline">The foundation under your finished surface</span>
+        </span>
+        <span class="ho-qs-arrow">›</span>
+      </summary>
+      <div class="ho-qs-body">
+        <p>The foundation is built in lifts of compacted aggregate — typically 2 to 4 inches at a time — to the standard your project demands. Patios get at least 4 inches; driveways get 8 inches; pool decks and parking get more. Every lift is compacted with the right equipment so the base reaches 98% Standard Proctor density before we move on.</p>
+        <p>Drainage is engineered in at this phase, not bolted on later. Surfaces are sloped a minimum of 2% away from structures, and where the project calls for it, perforated pipe and free-draining backfill carry water out before it can pool, freeze, or heave.</p>
+      </div>
+    </details>
+
+    <details class="ho-qs-card">
+      <summary class="ho-qs-summary">
+        <span class="ho-qs-num">03</span>
+        <span class="ho-qs-title-wrap">
+          <span class="ho-qs-title">Surface installation</span>
+          <span class="ho-qs-tagline">Pavers, porcelain, and finish work</span>
+        </span>
+        <span class="ho-qs-arrow">›</span>
+      </summary>
+      <div class="ho-qs-body">
+        <p>Concrete pavers go down on a precisely screeded one-inch bedding-sand layer, with edge restraints staked into the compacted base. Joints get tight tolerances (1/16 to 3/16 inch) and proper polymeric jointing sand to lock everything together and resist weed and insect intrusion.</p>
+        <p>Porcelain is a different beast — slabs are heavier, more brittle, and require pre-compacted bedding sand and 4mm plastic spacers between every unit. Porcelain is never compacted with a plate compactor after install (a common mistake that breaks slabs); we hand-set, level, and verify alignment instead.</p>
+      </div>
+    </details>
+
+    <details class="ho-qs-card">
+      <summary class="ho-qs-summary">
+        <span class="ho-qs-num">04</span>
+        <span class="ho-qs-title-wrap">
+          <span class="ho-qs-title">Walls &amp; vertical features</span>
+          <span class="ho-qs-tagline">Retaining walls, fire features, seat walls</span>
+        </span>
+        <span class="ho-qs-arrow">›</span>
+      </summary>
+      <div class="ho-qs-body">
+        <p>Retaining walls are engineered, not stacked. We start with a leveling pad of compacted aggregate, lay the first course slightly below grade for stability, and build up using running-bond patterns with proper backfill drainage and (where required) geosynthetic reinforcement layers based on soil type and wall height.</p>
+        <p>Fire features and seat walls get the same care — proper bases, weather-resistant adhesives where they belong, gas lines run by licensed plumbers when applicable, and finish caps mortared in to last.</p>
+      </div>
+    </details>
+
+    <details class="ho-qs-card">
+      <summary class="ho-qs-summary">
+        <span class="ho-qs-num">05</span>
+        <span class="ho-qs-title-wrap">
+          <span class="ho-qs-title">Finishing &amp; warranty</span>
+          <span class="ho-qs-tagline">Polymeric sand, sealing, and what we stand behind</span>
+        </span>
+        <span class="ho-qs-arrow">›</span>
+      </summary>
+      <div class="ho-qs-body">
+        <p>The last day is when most homeowners notice everything coming together. Polymeric jointing sand goes in, gets activated with water, and locks every joint. Where the design calls for sealing, we use the right sealer for the surface — penetrating for natural stone, joint-stabilizing for concrete pavers, none for some porcelain — and apply only after the install has fully cured.</p>
+        <p>Belgard's transferable lifetime limited warranty covers the materials, and we stand behind the workmanship. Adherence to ICPI (Interlocking Concrete Paver Institute) standards isn't optional for us — it's how we keep that warranty intact and how we sleep at night.</p>
+        <a href="/assets/paver-portal-logo.svg)_compressed%20(1).pdf" target="_blank" rel="noopener" class="ho-qs-warranty-cta">📄 View full warranty PDF →</a>
+      </div>
+    </details>
+
+    <div class="ho-iv-section">
+      <div class="ho-iv-head">
+        <h3>Installation videos</h3>
+        <p>See exactly how we build. Click any video to watch on YouTube.</p>
+      </div>
+      <div class="ho-iv-grid" id="ho-iv-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--bp-muted);font-size:13px;">Loading videos…</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="refer" class="ho-section">
+    <div class="ho-credit-card">
+      <div class="ho-credit-eyebrow">Referral credit</div>
+      <div class="ho-credit-amount" id="ho-credit-amount">$0</div>
+      <div class="ho-credit-cap" id="ho-credit-cap">of $2,500 max</div>
+      <div class="ho-credit-bar"><div class="ho-credit-bar-fill" id="ho-credit-fill" style="width: 0%;"></div></div>
+      <p class="ho-credit-desc">
+        Refer a neighbor to Paver Portal. When they complete a design appointment, you both earn $500 off your next project.
+      </p>
+      <button type="button" class="ho-credit-cta" id="ho-credit-cta">Refer a neighbor →</button>
+    </div>
+  </section>
+
+  <section class="ho-section" id="ho-ref-section" hidden>
+    <div class="ho-section-head">
+      <h2>Your referrals</h2>
+      <span class="ho-section-meta" id="ho-ref-count"></span>
+    </div>
+    <div class="ho-ref-toast" id="ho-ref-toast" hidden></div>
+    <div id="ho-ref-area"></div>
+  </section>
+</main>
+
+<div class="ho-modal-backdrop" id="ho-refer-backdrop" hidden>
+  <div class="ho-modal" role="dialog" aria-modal="true" aria-labelledby="ho-refer-title">
+    <div class="ho-modal-head">
+      <button type="button" class="ho-modal-close" id="ho-refer-close" aria-label="Close">×</button>
+      <h2 id="ho-refer-title">Refer a neighbor</h2>
+      <p>Send a personal $500-off invitation. They get the perk, you earn $500 toward your next project when they complete a design appointment.</p>
+    </div>
+    <div class="ho-modal-body">
+      <div id="ho-refer-form-wrap">
+        <div class="ho-share-block">
+          <span class="ho-share-block-label">📋 Your shareable link</span>
+          <div class="ho-share-row">
+            <input type="text" class="ho-share-input" id="ho-share-input" readonly>
+            <button type="button" class="ho-share-copy-btn" id="ho-share-copy">Copy</button>
+          </div>
+          <p class="ho-share-help">Share by text, social, or anywhere — friends who click and sign up earn you both $500.</p>
+        </div>
+        <div class="ho-share-divider"><span>or send a personalized invite</span></div>
+        <p class="ho-modal-perk">
+          We'll send the invite from <strong>tim@mcmullen.properties</strong> with your name on it. Replies go straight to your email.
+        </p>
+        <form class="ho-modal-form" id="ho-refer-form" novalidate>
+          <div class="ho-modal-field">
+            <label>Their name <em>*</em></label>
+            <input type="text" id="ho-refer-name" required maxlength="120" placeholder="Sarah Chen">
+          </div>
+          <div class="ho-modal-field">
+            <label>Their email <em>*</em></label>
+            <input type="email" id="ho-refer-email" required placeholder="sarah@example.com" autocapitalize="off" autocorrect="off" spellcheck="false">
+          </div>
+          <div class="ho-modal-field">
+            <label>Their phone (optional)</label>
+            <input type="tel" id="ho-refer-phone" placeholder="(415) 555-0182">
+          </div>
+          <div class="ho-modal-error" id="ho-refer-error" hidden></div>
+          <div class="ho-modal-actions">
+            <button type="button" class="ho-modal-btn ho-modal-btn-ghost" id="ho-refer-cancel">Cancel</button>
+            <button type="submit" class="ho-modal-btn ho-modal-btn-primary" id="ho-refer-submit">Send invite</button>
+          </div>
+        </form>
+      </div>
+      <div class="ho-modal-success" id="ho-refer-success" hidden>
+        <div class="ho-modal-success-icon">✓</div>
+        <h3>Invite sent!</h3>
+        <p id="ho-refer-success-msg">We sent the invite. You'll see this referral show up in your dashboard once they accept and complete a design appointment.</p>
+        <div class="ho-modal-actions" style="margin-top:18px;">
+          <button type="button" class="ho-modal-btn ho-modal-btn-ghost" id="ho-refer-another">Refer someone else</button>
+          <button type="button" class="ho-modal-btn ho-modal-btn-primary" id="ho-refer-done">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ho-modal-backdrop" id="ho-mat-modal-backdrop" hidden>
+  <div class="ho-mat-modal" role="dialog" aria-modal="true" aria-labelledby="ho-mat-modal-name">
+    <div class="ho-mat-modal-img-wrap">
+      <div class="ho-mat-modal-img" id="ho-mat-modal-img"></div>
+      <button type="button" class="ho-mat-modal-close" id="ho-mat-modal-close" aria-label="Close">×</button>
+    </div>
+    <div class="ho-mat-modal-body" id="ho-mat-modal-body"></div>
+  </div>
+</div>
+
+<footer class="ho-footer">
+  <div class="ho-footer-inner">
+    <div class="ho-footer-brand-block">
+      <img src="https://baysidepavers.com/wp-content/uploads/2023/03/baysidepavers-logo-light-scaled.png" alt="Paver Portal" style="filter: brightness(0) invert(1);">
+      <p class="ho-footer-brand-tagline">
+        The Bay Area's hardscape specialists. Custom paver patios, driveways, pool decks,
+        retaining walls, fire features, and outdoor living — built to last.
+      </p>
+    </div>
+    <div class="ho-footer-col">
+      <h4>Visit</h4>
+      <ul>
+        <li><a href="https://baysidepavers.com" target="_blank" rel="noopener">baysidepavers.com</a></li>
+        <li><a href="https://baysidepavers.com/portfolio" target="_blank" rel="noopener">Project gallery</a></li>
+        <li><a href="https://baysidepavers.com/about" target="_blank" rel="noopener">About us</a></li>
+        <li><a href="https://baysidepaversfreeconsultation.as.me/" target="_blank" rel="noopener">Schedule a design</a></li>
+      </ul>
+    </div>
+    <div class="ho-footer-col">
+      <h4>Reach us</h4>
+      <ul>
+        <li><a href="https://baysidepavers.com/contact" target="_blank" rel="noopener">Contact form</a></li>
+        <li><a href="mailto:info@baysidepavers.com">info@baysidepavers.com</a></li>
+        <li><span class="ho-footer-soft" id="ho-footer-phone">Phone via baysidepavers.com</span></li>
+      </ul>
+    </div>
+    <div class="ho-footer-col">
+      <h4>Service area</h4>
+      <ul>
+        <li><span class="ho-footer-soft">San Francisco</span></li>
+        <li><span class="ho-footer-soft">East Bay</span></li>
+        <li><span class="ho-footer-soft">Peninsula</span></li>
+        <li><span class="ho-footer-soft">South Bay</span></li>
+        <li><span class="ho-footer-soft">Marin / North Bay</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ho-footer-bottom">
+    <span>© <span id="ho-footer-year">2026</span> Paver Portal · Licensed CA contractor</span>
+    <span><a href="https://baysidepavers.com" target="_blank" rel="noopener">baysidepavers.com</a></span>
+  </div>
+</footer>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+
+// ── Supabase client + constants ───────────────────────────────────────
+const SUPABASE_URL  = 'https://gfgbypcnxkschnfsitfb.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_Ko4LNw2VjhZVFmwJ-i2qtA_XeGgBcew';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+});
+
+const REFERRAL_CAP_CENTS  = 250000;
+const RESEND_COOLDOWN_MS  = 3 * 24 * 60 * 60 * 1000;
+const MAT_DEFAULT_LIMIT   = 30;
+const MAT_TAB_ORDER = [
+  { slug: 'pavers',         label: 'Pavers' },
+  { slug: 'porcelain',      label: 'Porcelain' },
+  { slug: 'walls',          label: 'Walls' },
+  { slug: 'fire-features',  label: 'Fire features' },
+  { slug: 'accessories',    label: 'Accessories' },
+  { slug: 'lighting',       label: 'Lighting' },
+  { slug: 'decking',        label: 'Decking' },
+  { slug: 'other',          label: 'Other' },
+];
+
+// ── DOM refs ──────────────────────────────────────────────────────────
+// Sprint 14C.16 hotfix: ALL const lookups happen here, BEFORE the
+// auth-gate await below. Sprint 28 adds ivGridEl for the new install
+// videos sub-section under "How we build".
+const navName       = document.getElementById('ho-nav-name');
+const navOut        = document.getElementById('ho-nav-out');
+const heroTitle     = document.getElementById('ho-hero-title');
+const heroLede      = document.getElementById('ho-hero-lede');
+const scheduleCta   = document.getElementById('ho-schedule-cta');
+const propCount     = document.getElementById('ho-prop-count');
+const propArea      = document.getElementById('ho-prop-area');
+const creditAmount  = document.getElementById('ho-credit-amount');
+const creditCap     = document.getElementById('ho-credit-cap');
+const creditFill    = document.getElementById('ho-credit-fill');
+const creditCta     = document.getElementById('ho-credit-cta');
+const errorBanner   = document.getElementById('ho-error-banner');
+const refSection    = document.getElementById('ho-ref-section');
+const refCount      = document.getElementById('ho-ref-count');
+const refArea       = document.getElementById('ho-ref-area');
+const refToast      = document.getElementById('ho-ref-toast');
+const referBackdrop = document.getElementById('ho-refer-backdrop');
+const referFormWrap = document.getElementById('ho-refer-form-wrap');
+const referSuccess  = document.getElementById('ho-refer-success');
+const referForm     = document.getElementById('ho-refer-form');
+const referError    = document.getElementById('ho-refer-error');
+const referSubmit   = document.getElementById('ho-refer-submit');
+const matTabsEl        = document.getElementById('ho-mat-tabs');
+const matGridEl        = document.getElementById('ho-mat-grid');
+const matSearchEl      = document.getElementById('ho-mat-search');
+const matMetaEl        = document.getElementById('ho-mat-meta');
+const matShowMore      = document.getElementById('ho-mat-show-more');
+const matShowMoreBtn   = document.getElementById('ho-mat-show-more-btn');
+const matModalBackdrop = document.getElementById('ho-mat-modal-backdrop');
+const matModalClose    = document.getElementById('ho-mat-modal-close');
+const matModalImg      = document.getElementById('ho-mat-modal-img');
+const matModalBody     = document.getElementById('ho-mat-modal-body');
+const ivGridEl         = document.getElementById('ho-iv-grid');
+
+// ── Mutable state ─────────────────────────────────────────────────────
+let currentClient = null;
+let MATERIALS_CACHE = null;
+let MANUFACTURERS_CACHE = null;
+let INSTALL_GUIDES_CACHE = null;
+let matCurrentCategory = 'pavers';
+let matSearchQuery = '';
+let matShowAllForCurrent = false;
+
+// ── Window helpers (for inline handlers) ──────────────────────────────
+// Sprint 28 · onerror fallback for the modal hero image. Tries swatch_url
+// when primary_image_url fails (Belgard CDN sometimes hotlink-blocks).
+window.bpHandleModalImgError = function(img) {
+  const fb = img.getAttribute('data-fallback');
+  const mfr = img.getAttribute('data-mfr') || 'Paver Portal';
+  if (fb && img.src !== fb) {
+    img.src = fb;
+    return;
+  }
+  const parent = img.parentElement;
+  if (parent) parent.innerHTML = '<div class="ho-mat-modal-img-fallback">' + (mfr.replace(/[<>"]/g, '')) + '</div>';
+};
+window.bpScrollToHowWeBuild = function() {
+  closeMatModal();
+  setTimeout(() => {
+    const el = document.getElementById('how-we-build');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 80);
+};
+
+// ── Event listeners (all wired before any await) ──────────────────────
+navOut.addEventListener('click', async () => {
+  try { await supabase.auth.signOut(); } catch (_) {}
+  window.location.replace('/account/signin.html');
+});
+creditCta.addEventListener('click', () => {
+  if (creditCta.disabled) return;
+  openReferModal();
+});
+document.getElementById('ho-refer-close').addEventListener('click', () => closeReferModal());
+document.getElementById('ho-refer-cancel').addEventListener('click', () => closeReferModal());
+document.getElementById('ho-refer-done').addEventListener('click', () => { closeReferModal(); reloadReferrals(); });
+document.getElementById('ho-refer-another').addEventListener('click', () => resetReferForm());
+referBackdrop.addEventListener('click', (e) => { if (e.target === referBackdrop) closeReferModal(); });
+document.getElementById('ho-share-copy').addEventListener('click', async () => {
+  const btn   = document.getElementById('ho-share-copy');
+  const input = document.getElementById('ho-share-input');
+  if (!input || !input.value) return;
+  let copied = false;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(input.value);
+      copied = true;
+    }
+  } catch (_) {}
+  if (!copied) {
+    try { input.focus(); input.select(); copied = document.execCommand('copy'); } catch (_) {}
+  }
+  const original = btn.textContent;
+  btn.textContent = copied ? 'Copied!' : 'Press Cmd+C';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+});
+referForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  referError.hidden = true;
+  const payload = {
+    referred_name:  document.getElementById('ho-refer-name').value.trim(),
+    referred_email: document.getElementById('ho-refer-email').value.trim(),
+  };
+  const phone = document.getElementById('ho-refer-phone').value.trim();
+  if (phone) payload.referred_phone = phone;
+  if (!payload.referred_name || !payload.referred_email) {
+    referError.textContent = 'Name and email are both required.';
+    referError.hidden = false;
+    return;
+  }
+  referSubmit.disabled = true;
+  referSubmit.textContent = 'Sending…';
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('Your session expired. Refresh and sign in again.');
+    const resp = await fetch('/api/send-referral-invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify(payload),
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok || !data.ok) throw new Error(data.error || ('Server returned ' + resp.status));
+    document.getElementById('ho-refer-success-msg').textContent = data.email_sent
+      ? `We sent the invite to ${payload.referred_email}. You'll see this referral progress in your dashboard.`
+      : `Referral created, but the email didn't send. Reach out to ${payload.referred_email} directly with this link: ${data.landing_url}`;
+    referFormWrap.hidden = true;
+    referSuccess.hidden = false;
+  } catch (err) {
+    referSubmit.disabled = false;
+    referSubmit.textContent = 'Send invite';
+    referError.textContent = (err && err.message) || 'Could not send invite.';
+    referError.hidden = false;
+  }
+});
+matShowMoreBtn.addEventListener('click', () => { matShowAllForCurrent = true; renderMatGrid(); });
+matSearchEl.addEventListener('input', () => {
+  matSearchQuery = matSearchEl.value;
+  matShowAllForCurrent = false;
+  renderMatGrid();
+});
+matModalClose.addEventListener('click', closeMatModal);
+matModalBackdrop.addEventListener('click', (e) => {
+  if (e.target === matModalBackdrop) closeMatModal();
+});
+
+// ── Sub-nav active-section highlight ──────────────────────────────────
+const subnavLinks = document.querySelectorAll('.ho-subnav a[data-anchor]');
+const sectionEls = Array.from(document.querySelectorAll('main section[id]'));
+if (sectionEls.length > 0 && 'IntersectionObserver' in window) {
+  const obs = new IntersectionObserver((entries) => {
+    let best = null;
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
+    }
+    if (!best) return;
+    const id = best.target.id;
+    subnavLinks.forEach(a => {
+      a.classList.toggle('is-active', a.getAttribute('data-anchor') === id);
+    });
+  }, { rootMargin: '-90px 0px -50% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] });
+  sectionEls.forEach(s => obs.observe(s));
+}
+document.getElementById('ho-footer-year').textContent = String(new Date().getFullYear());
+
+// ── Auth gate + init ──────────────────────────────────────────────────
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
+  window.location.replace('/account/signin.html');
+} else {
+  await loadAccount();
+}
+
+// ── Function declarations (hoisted) ───────────────────────────────────
+function showError(msg) {
+  errorBanner.textContent = msg;
+  errorBanner.style.display = 'block';
+}
+function openReferModal() {
+  resetReferForm();
+  referBackdrop.hidden = false;
+  setTimeout(() => document.getElementById('ho-refer-name').focus(), 50);
+}
+function closeReferModal() { referBackdrop.hidden = true; }
+function resetReferForm() {
+  referForm.reset();
+  referError.hidden = true;
+  referError.textContent = '';
+  referFormWrap.hidden = false;
+  referSuccess.hidden = true;
+  referSubmit.disabled = false;
+  referSubmit.textContent = 'Send invite';
+}
+
+async function loadAccount() {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: client, error: clientErr } = await supabase
+    .from('clients')
+    .select('id, name, email, phone, refer_code, must_change_password, referral_credit_cents, referral_credit_used_cents')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (clientErr) {
+    showError('Could not load your account: ' + clientErr.message);
+    heroTitle.textContent = 'Welcome';
+    heroLede.textContent = '';
+    return;
+  }
+  if (!client) {
+    showError('This dashboard is for homeowner accounts. Sign in to your team account at /login.html.');
+    heroTitle.textContent = 'Wrong account type';
+    heroLede.textContent = '';
+    propArea.innerHTML = '';
+    return;
+  }
+  if (client.must_change_password) {
+    window.location.replace('/account/set-password.html');
+    return;
+  }
+  currentClient = client;
+  const firstName = (client.name || '').split(/[\s,&]+/)[0] || 'there';
+  navName.textContent = client.name || client.email;
+  heroTitle.textContent = `Welcome, ${firstName}`;
+  heroLede.textContent =
+    'Your project lives here. Schedule appointments, review your proposal, explore materials, and refer neighbors to earn credit toward your next project.';
+  const nameParts = (client.name || '').trim().split(/\s+/);
+  const acuityParams = new URLSearchParams();
+  if (nameParts[0]) acuityParams.set('firstName', nameParts[0]);
+  if (nameParts.length > 1) acuityParams.set('lastName', nameParts.slice(1).join(' '));
+  if (client.email) acuityParams.set('email', client.email);
+  if (client.phone) acuityParams.set('phone', client.phone);
+  scheduleCta.href = 'https://baysidepaversfreeconsultation.as.me/?' + acuityParams.toString();
+  applyCreditState(client);
+  applyShareLink(client);
+  await Promise.all([
+    loadProposals(client.id),
+    loadReferrals(client.id),
+    loadMaterials(),
+    loadManufacturers(),
+    loadInstallGuides(),
+  ]);
+}
+
+function applyShareLink(client) {
+  const shareInput = document.getElementById('ho-share-input');
+  if (!shareInput) return;
+  if (client.refer_code) {
+    shareInput.value = `${window.location.origin}/refer/?code=${client.refer_code}`;
+  } else {
+    shareInput.value = '';
+    shareInput.placeholder = 'Generating your share link…';
+  }
+}
+
+function applyCreditState(client) {
+  const totalEarned    = Number(client.referral_credit_cents || 0);
+  const totalUsed      = Number(client.referral_credit_used_cents || 0);
+  const availableCents = Math.max(0, totalEarned - totalUsed);
+  creditAmount.textContent = formatUSD(availableCents);
+  creditCap.textContent = `of ${formatUSD(REFERRAL_CAP_CENTS)} max`;
+  const pct = Math.min(100, Math.round((totalEarned / REFERRAL_CAP_CENTS) * 100));
+  requestAnimationFrame(() => { creditFill.style.width = pct + '%'; });
+  if (totalEarned >= REFERRAL_CAP_CENTS) {
+    creditCta.disabled = true;
+    creditCta.textContent = '$2,500 cap reached';
+  } else {
+    creditCta.disabled = false;
+    creditCta.textContent = 'Refer a neighbor →';
+  }
+}
+
+async function loadProposals(clientId) {
+  const { data: links, error: linksErr } = await supabase
+    .from('client_proposals')
+    .select('proposal_id, status, sent_at, first_viewed_at, signed_at')
+    .eq('client_id', clientId)
+    .order('sent_at', { ascending: false });
+  if (linksErr) {
+    propArea.innerHTML = `<div class="ho-error-msg">Could not load proposals: ${escapeHtml(linksErr.message)}</div>`;
+    return;
+  }
+  if (!links || links.length === 0) {
+    propArea.innerHTML = `
+      <div class="ho-empty">
+        <div class="ho-empty-icon">📐</div>
+        <h3>No proposals yet</h3>
+        <p>Your designer will publish your custom project proposal here when it's ready. Want to get started? Schedule a free design appointment.</p>
+        <a class="ho-empty-cta" href="${scheduleCta.href}" target="_blank" rel="noopener">📅 Schedule design appointment →</a>
+      </div>`;
+    propCount.textContent = '';
+    return;
+  }
+  const proposalIds = links.map(l => l.proposal_id);
+  const { data: proposals, error: propsErr } = await supabase
+    .from('proposals')
+    .select('id, project_address, project_city, project_state, bid_total_amount, generated_html_slug')
+    .in('id', proposalIds);
+  if (propsErr) {
+    propArea.innerHTML = `<div class="ho-error-msg">Could not load proposal details: ${escapeHtml(propsErr.message)}</div>`;
+    return;
+  }
+  const propMap = new Map((proposals || []).map(p => [p.id, p]));
+  const { data: pubs, error: pubsErr } = await supabase
+    .from('published_proposals')
+    .select('proposal_id, slug, title, project_address, total_amount, published_at')
+    .in('proposal_id', proposalIds);
+  if (pubsErr) console.warn('published_proposals load failed:', pubsErr);
+  const pubMap = new Map();
+  (pubs || []).forEach(pub => {
+    const existing = pubMap.get(pub.proposal_id);
+    if (!existing || new Date(pub.published_at) > new Date(existing.published_at)) {
+      pubMap.set(pub.proposal_id, pub);
+    }
+  });
+  propCount.textContent = `${links.length} ${links.length === 1 ? 'proposal' : 'proposals'}`;
+  const html = links.map(link => {
+    const prop = propMap.get(link.proposal_id);
+    const pub  = pubMap.get(link.proposal_id);
+    const address = (pub && pub.project_address) || (prop && prop.project_address) || 'Your project';
+    const cityState = prop && prop.project_city
+      ? `${prop.project_city}${prop.project_state ? ', ' + prop.project_state : ''}`
+      : '';
+    const totalCents = pub && pub.total_amount != null
+      ? Math.round(Number(pub.total_amount) * 100)
+      : (prop && prop.bid_total_amount != null
+        ? Math.round(Number(prop.bid_total_amount) * 100)
+        : null);
+    const totalDisplay = totalCents != null ? formatUSD(totalCents) : '—';
+    const slug = (pub && pub.slug) || (prop && prop.generated_html_slug) || null;
+    const viewUrl = slug ? `/p/${slug}` : null;
+    const status = link.status || 'sent';
+    const statusLabel = formatStatus(status);
+    const statusClass = status === 'signed' ? 'ho-prop-status-signed'
+                       : status === 'sent' || status === 'viewed' ? 'ho-prop-status-sent'
+                       : '';
+    return `
+      <div class="ho-prop-card">
+        <div class="ho-prop-cover">
+          <div class="ho-prop-cover-fallback">Paver Portal</div>
+          <span class="ho-prop-status ${statusClass}">${escapeHtml(statusLabel)}</span>
+        </div>
+        <div class="ho-prop-body">
+          <div class="ho-prop-addr">${escapeHtml(address)}</div>
+          ${cityState ? `<div class="ho-prop-meta">${escapeHtml(cityState)}</div>` : ''}
+          <div class="ho-prop-total">${totalDisplay}</div>
+          <div class="ho-prop-actions">
+            ${viewUrl
+              ? `<a class="ho-prop-cta" href="${viewUrl}" target="_blank" rel="noopener">View proposal</a>`
+              : `<button class="ho-prop-cta" disabled style="background:#a8b5ac;cursor:not-allowed;">Not published yet</button>`}
+            ${viewUrl
+              ? `<a class="ho-prop-cta-alt" href="/account/print.html?id=${encodeURIComponent(link.proposal_id)}" title="Print a marked-up copy of your plan to send to your designer">🖨️ Print plan to mark up</a>`
+              : ''}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+  propArea.innerHTML = `<div class="ho-grid">${html}</div>`;
+}
+
+async function loadReferrals(clientId) {
+  const { data, error } = await supabase
+    .from('referrals')
+    .select('id, referred_name, referred_email, status, invite_sent_at, scheduled_at, appointment_completed_at, credit_awarded_at, credit_amount_cents')
+    .eq('referrer_client_id', clientId)
+    .order('invite_sent_at', { ascending: false });
+  if (error) {
+    refArea.innerHTML = `<div class="ho-error-msg">Could not load your referrals: ${escapeHtml(error.message)}</div>`;
+    refSection.hidden = false;
+    return;
+  }
+  const referrals = data || [];
+  const earned = Number((currentClient && currentClient.referral_credit_cents) || 0);
+  if (referrals.length === 0 && earned === 0) {
+    refSection.hidden = true;
+    return;
+  }
+  refSection.hidden = false;
+  refCount.textContent = referrals.length === 0
+    ? ''
+    : `${referrals.length} ${referrals.length === 1 ? 'referral' : 'referrals'}`;
+  if (referrals.length === 0) {
+    refArea.innerHTML = `<div class="ho-ref-empty">You don't have any active referrals right now. Refer a neighbor above to start earning credit.</div>`;
+    return;
+  }
+  refArea.innerHTML = `<div class="ho-ref-list">${referrals.map(renderReferralRow).join('')}</div>`;
+  attachResendHandlers();
+}
+
+function renderReferralRow(r) {
+  const status = r.status || 'sent';
+  const refeeName = r.referred_name || r.referred_email || '(unknown)';
+  const refeeEmail = r.referred_email || '';
+  const pillMap = {
+    sent:      { cls: 'ho-ref-pill-sent',      label: 'Invite sent' },
+    scheduled: { cls: 'ho-ref-pill-scheduled', label: 'Appt scheduled' },
+    completed: { cls: 'ho-ref-pill-completed', label: 'Complete (cap reached)' },
+    credited:  { cls: 'ho-ref-pill-credited',  label: '✓ Credited $500' },
+  };
+  const pill = pillMap[status] || { cls: 'ho-ref-pill-sent', label: status };
+  let resendBtn = '';
+  if (status === 'sent' && r.invite_sent_at) {
+    const elapsed = Date.now() - new Date(r.invite_sent_at).getTime();
+    if (elapsed >= RESEND_COOLDOWN_MS) {
+      resendBtn = `<button type="button" class="ho-ref-resend-btn" data-referral-id="${escapeAttr(r.id)}">Resend invite</button>`;
+    }
+  }
+  const dateLine = r.credit_awarded_at
+    ? `Credited ${formatDate(r.credit_awarded_at)}`
+    : r.appointment_completed_at
+      ? `Completed ${formatDate(r.appointment_completed_at)}`
+      : r.scheduled_at
+        ? `Scheduled ${formatDate(r.scheduled_at)}`
+        : r.invite_sent_at
+          ? `Sent ${formatDate(r.invite_sent_at)}`
+          : '';
+  return `
+    <div class="ho-ref-row">
+      <div class="ho-ref-info">
+        <div class="ho-ref-name">${escapeHtml(refeeName)}</div>
+        <div class="ho-ref-meta">${escapeHtml(refeeEmail)}${dateLine ? ' · ' + escapeHtml(dateLine) : ''}</div>
+      </div>
+      <div class="ho-ref-actions">
+        <span class="ho-ref-pill ${pill.cls}">${escapeHtml(pill.label)}</span>
+        ${resendBtn}
+      </div>
+    </div>`;
+}
+
+function attachResendHandlers() {
+  refArea.querySelectorAll('.ho-ref-resend-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const referralId = e.currentTarget.dataset.referralId;
+      await handleResend(referralId, e.currentTarget);
+    });
+  });
+}
+
+async function handleResend(referralId, btn) {
+  btn.disabled = true;
+  const originalText = btn.textContent;
+  btn.textContent = 'Resending…';
+  refToast.hidden = true;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('Your session expired. Refresh and sign in again.');
+    const resp = await fetch('/api/resend-referral-invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ referral_id: referralId }),
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(data.error || ('Server returned ' + resp.status));
+    showRefToast('success', data.email_sent
+      ? 'Reminder email sent. The button will reappear in 3 days if they still haven\'t responded.'
+      : 'Referral updated, but the email did not send. ' + (data.email_error || ''));
+    await reloadReferrals();
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    showRefToast('error', (err && err.message) || 'Could not resend invite.');
+  }
+}
+
+async function reloadReferrals() {
+  if (!currentClient) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: refreshed } = await supabase
+    .from('clients')
+    .select('id, name, email, phone, refer_code, referral_credit_cents, referral_credit_used_cents')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (refreshed) {
+    currentClient = refreshed;
+    applyCreditState(refreshed);
+  }
+  await loadReferrals(currentClient.id);
+}
+
+function showRefToast(type, msg) {
+  refToast.className = 'ho-ref-toast' + (type === 'error' ? ' error' : '');
+  refToast.textContent = msg;
+  refToast.hidden = false;
+  if (type === 'success') {
+    setTimeout(() => { if (refToast.textContent === msg) refToast.hidden = true; }, 6000);
+  }
+}
+
+async function loadMaterials() {
+  try {
+    const { data, error } = await supabase
+      .from('materials')
+      .select('id, manufacturer, product_name, collection, color, pattern, size_spec, description, category, product_type, primary_image_url, swatch_url, spec_pdf_url, cut_sheet_url, applications, features, thickness_mm')
+      .order('category', { ascending: true })
+      .order('manufacturer', { ascending: true })
+      .order('product_name', { ascending: true });
+    if (error) {
+      matGridEl.innerHTML = `<div class="ho-mat-state">Could not load materials: ${escapeHtml(error.message)}</div>`;
+      return;
+    }
+    MATERIALS_CACHE = data || [];
+    const firstWithItems = MAT_TAB_ORDER.find(t => MATERIALS_CACHE.some(m => m.category === t.slug));
+    if (firstWithItems) matCurrentCategory = firstWithItems.slug;
+    renderMatTabs();
+    renderMatGrid();
+    matMetaEl.textContent = `${MATERIALS_CACHE.length} products`;
+  } catch (err) {
+    console.error('[loadMaterials]', err);
+    if (matGridEl) {
+      matGridEl.innerHTML = `<div class="ho-mat-state">Could not load materials. Refresh to try again.</div>`;
+    }
+  }
+}
+
+// Sprint 28 · Manufacturer warranty + brand metadata
+async function loadManufacturers() {
+  try {
+    const { data, error } = await supabase
+      .from('manufacturer_info')
+      .select('name, display_name, logo_url, website_url, about, warranty_summary, warranty_url, quality_standards')
+      .eq('is_active', true);
+    if (error) {
+      console.warn('[loadManufacturers]', error);
+      MANUFACTURERS_CACHE = [];
+      return;
+    }
+    MANUFACTURERS_CACHE = data || [];
+  } catch (err) {
+    console.warn('[loadManufacturers]', err);
+    MANUFACTURERS_CACHE = [];
+  }
+}
+
+// Sprint 28 · Install guides (YouTube videos + PDFs + links)
+async function loadInstallGuides() {
+  try {
+    const { data, error } = await supabase
+      .from('install_guides')
+      .select('id, kind, video_id, url, title, description, category, manufacturer, thumbnail_url, sort_order')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
+    if (error) {
+      console.warn('[loadInstallGuides]', error);
+      INSTALL_GUIDES_CACHE = [];
+      ivGridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--bp-muted);font-size:13px;">Videos coming soon.</div>';
+      return;
+    }
+    INSTALL_GUIDES_CACHE = data || [];
+    renderInstallVideosGrid();
+  } catch (err) {
+    console.warn('[loadInstallGuides]', err);
+    INSTALL_GUIDES_CACHE = [];
+    if (ivGridEl) {
+      ivGridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--bp-muted);font-size:13px;">Videos coming soon.</div>';
+    }
+  }
+}
+
+function renderInstallVideosGrid() {
+  if (!ivGridEl || !INSTALL_GUIDES_CACHE) return;
+  if (INSTALL_GUIDES_CACHE.length === 0) {
+    ivGridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--bp-muted);font-size:13px;">Videos coming soon.</div>';
+    return;
+  }
+  ivGridEl.innerHTML = INSTALL_GUIDES_CACHE.map(renderInstallVideoCard).join('');
+}
+
+function renderInstallVideoCard(g) {
+  const title = g.title || (g.manufacturer ? `${g.manufacturer} install guide` : 'Installation guide');
+  if (g.kind === 'youtube' && g.video_id) {
+    const thumb = g.thumbnail_url || `https://i.ytimg.com/vi/${g.video_id}/hqdefault.jpg`;
+    return `<a class="ho-iv-card" href="https://www.youtube.com/watch?v=${escapeAttr(g.video_id)}" target="_blank" rel="noopener">
+      <div class="ho-iv-thumb"><img src="${escapeAttr(thumb)}" alt="" loading="lazy"><div class="ho-iv-play">▶</div></div>
+      <div class="ho-iv-label">${escapeHtml(title)}</div>
+    </a>`;
+  }
+  const kindLabel = g.kind === 'pdf' ? 'PDF' : 'LINK';
+  return `<a class="ho-iv-card" href="${escapeAttr(g.url || '#')}" target="_blank" rel="noopener">
+    <div class="ho-iv-thumb pdf"><span>${kindLabel}</span></div>
+    <div class="ho-iv-label">${escapeHtml(title)}</div>
+  </a>`;
+}
+
+// Sprint 28 · Returns matched install guides ranked by relevance
+function filterGuidesForMaterial(m, max) {
+  if (!INSTALL_GUIDES_CACHE || INSTALL_GUIDES_CACHE.length === 0) return [];
+  const mfrName = (m && m.manufacturer) || '';
+  const cat = (m && m.category) || '';
+  const ranked = INSTALL_GUIDES_CACHE.map(g => {
+    let rank = 9;
+    if (g.manufacturer === mfrName) rank = 0;
+    else if (g.manufacturer === 'Paver Portal' && g.category === cat) rank = 1;
+    else if (g.category === cat) rank = 2;
+    else if (g.manufacturer === 'Paver Portal') rank = 3;
+    return { g, rank };
+  }).filter(x => x.rank < 9);
+  ranked.sort((a, b) => a.rank - b.rank || (a.g.sort_order || 0) - (b.g.sort_order || 0));
+  const top = ranked.map(x => x.g);
+  return typeof max === 'number' ? top.slice(0, max) : top;
+}
+
+function findManufacturerForMaterial(m) {
+  if (!MANUFACTURERS_CACHE || !m || !m.manufacturer) return null;
+  return MANUFACTURERS_CACHE.find(x => x.name === m.manufacturer) || null;
+}
+function findPaver Portal() {
+  if (!MANUFACTURERS_CACHE) return null;
+  return MANUFACTURERS_CACHE.find(x => x.name === 'Paver Portal') || null;
+}
+
+function renderMatTabs() {
+  if (!MATERIALS_CACHE) return;
+  const counts = new Map();
+  for (const m of MATERIALS_CACHE) {
+    counts.set(m.category, (counts.get(m.category) || 0) + 1);
+  }
+  matTabsEl.innerHTML = MAT_TAB_ORDER
+    .filter(t => counts.get(t.slug) > 0)
+    .map(t => {
+      const isActive = t.slug === matCurrentCategory;
+      return `
+        <button type="button" class="ho-mat-tab ${isActive ? 'is-active' : ''}" data-cat="${escapeAttr(t.slug)}">
+          ${escapeHtml(t.label)}
+          <span class="ho-mat-tab-count">${counts.get(t.slug) || 0}</span>
+        </button>`;
+    })
+    .join('');
+  matTabsEl.querySelectorAll('[data-cat]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const slug = btn.getAttribute('data-cat');
+      if (slug === matCurrentCategory) return;
+      matCurrentCategory = slug;
+      matShowAllForCurrent = false;
+      matTabsEl.querySelectorAll('.ho-mat-tab').forEach(t => {
+        t.classList.toggle('is-active', t.getAttribute('data-cat') === slug);
+      });
+      renderMatGrid();
+    });
+  });
+}
+
+function getFilteredMaterials() {
+  if (!MATERIALS_CACHE) return [];
+  const q = matSearchQuery.trim().toLowerCase();
+  let list = MATERIALS_CACHE.filter(m => m.category === matCurrentCategory);
+  if (q) {
+    list = list.filter(m => {
+      const haystack = [
+        m.product_name, m.manufacturer, m.collection, m.color, m.pattern,
+        m.product_type, m.description,
+        Array.isArray(m.applications) ? m.applications.join(' ') : '',
+        Array.isArray(m.features) ? m.features.join(' ') : '',
+      ].filter(Boolean).join(' ').toLowerCase();
+      return haystack.includes(q);
+    });
+  }
+  return list;
+}
+
+function renderMatGrid() {
+  const list = getFilteredMaterials();
+  if (list.length === 0) {
+    matGridEl.innerHTML = `<div class="ho-mat-state">No materials match your search in this category.</div>`;
+    matShowMore.hidden = true;
+    return;
+  }
+  const isSearching = matSearchQuery.trim().length > 0;
+  const limit = (matShowAllForCurrent || isSearching) ? list.length : MAT_DEFAULT_LIMIT;
+  const visible = list.slice(0, limit);
+  matGridEl.innerHTML = visible.map(renderMatCard).join('');
+  matGridEl.querySelectorAll('[data-mat-id]').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.getAttribute('data-mat-id');
+      const material = MATERIALS_CACHE.find(m => m.id === id);
+      if (material) openMatModal(material);
+    });
+  });
+  if (!matShowAllForCurrent && !isSearching && list.length > MAT_DEFAULT_LIMIT) {
+    matShowMore.hidden = false;
+    matShowMoreBtn.textContent = `Show all ${list.length}`;
+  } else {
+    matShowMore.hidden = true;
+  }
+}
+
+function renderMatCard(m) {
+  const img = m.swatch_url || m.primary_image_url || '';
+  const imgHtml = img
+    ? `<div class="ho-mat-card-img" style="background-image:url('${escapeAttr(img)}');"></div>`
+    : `<div class="ho-mat-card-img-fallback">${escapeHtml(m.manufacturer || 'Paver Portal')}</div>`;
+  const colorLine = m.color || m.collection || m.pattern || '';
+  return `
+    <button type="button" class="ho-mat-card" data-mat-id="${escapeAttr(m.id)}">
+      ${imgHtml}
+      <div class="ho-mat-card-body">
+        <div class="ho-mat-card-mfr">${escapeHtml(m.manufacturer || '')}</div>
+        <div class="ho-mat-card-name">${escapeHtml(m.product_name || 'Unnamed')}</div>
+        ${colorLine ? `<div class="ho-mat-card-color">${escapeHtml(colorLine)}</div>` : ''}
+      </div>
+    </button>`;
+}
+
+// Sprint 28 · openMatModal extended: hero image with <img> + onerror fallback (fixes Cambridge Cobble bug),
+// + manufacturer warranty card + Paver Portal installation warranty card with PDF link + matching install guides.
+function openMatModal(m) {
+  const primary = m.primary_image_url || '';
+  const swatch  = m.swatch_url || '';
+  if (primary || swatch) {
+    const first = primary || swatch;
+    const fallback = (primary && swatch && primary !== swatch) ? swatch : '';
+    matModalImg.innerHTML = `<img src="${escapeAttr(first)}" alt="${escapeAttr(m.product_name || '')}" data-fallback="${escapeAttr(fallback)}" data-mfr="${escapeAttr(m.manufacturer || 'Paver Portal')}" onerror="window.bpHandleModalImgError(this)">`;
+  } else {
+    matModalImg.innerHTML = `<div class="ho-mat-modal-img-fallback">${escapeHtml(m.manufacturer || 'Paver Portal')}</div>`;
+  }
+
+  const specRows = [
+    m.color        && ['Color',      m.color],
+    m.collection   && ['Collection', m.collection],
+    m.product_type && ['Type',       m.product_type],
+    m.size_spec    && ['Size',       m.size_spec],
+    m.pattern      && ['Pattern',    m.pattern],
+    m.thickness_mm && ['Thickness',  m.thickness_mm + 'mm'],
+  ].filter(Boolean);
+  const applications = Array.isArray(m.applications) ? m.applications.filter(Boolean) : [];
+  const features     = Array.isArray(m.features)     ? m.features.filter(Boolean)     : [];
+  const actions = [];
+  if (m.spec_pdf_url)  actions.push({ label: '📄 Spec sheet', href: m.spec_pdf_url });
+  if (m.cut_sheet_url) actions.push({ label: '📐 Cut sheet',  href: m.cut_sheet_url });
+  const colorLine = m.color
+    ? `<span class="ho-mat-modal-color-swatch" style="background:${guessColorHex(m.color)};"></span>${escapeHtml(m.color)}`
+    : (m.collection || '');
+
+  // Sprint 28 · warranty cards
+  const mfrInfo = findManufacturerForMaterial(m);
+  const bayInfo = findPaver Portal();
+  let warrantyHtml = '';
+  const hasMfrWarranty = mfrInfo && (mfrInfo.warranty_summary || mfrInfo.warranty_url);
+  const hasBayWarranty = bayInfo && (bayInfo.warranty_summary || bayInfo.warranty_url);
+  if (hasMfrWarranty || hasBayWarranty) {
+    warrantyHtml += '<div class="ho-mat-modal-section-label">Warranty</div><div class="ho-mat-modal-warranty-block">';
+    if (hasMfrWarranty) {
+      warrantyHtml += `
+        <div class="ho-mat-modal-warranty-card">
+          <div class="ho-mat-modal-warranty-label">${escapeHtml(mfrInfo.display_name || mfrInfo.name)} warranty</div>
+          ${mfrInfo.warranty_summary ? `<div class="ho-mat-modal-warranty-text">${escapeHtml(mfrInfo.warranty_summary)}</div>` : ''}
+          ${mfrInfo.warranty_url ? `<a class="ho-mat-modal-warranty-link" href="${escapeAttr(mfrInfo.warranty_url)}" target="_blank" rel="noopener">View full warranty →</a>` : ''}
+        </div>`;
+    }
+    if (hasBayWarranty) {
+      warrantyHtml += `
+        <div class="ho-mat-modal-warranty-card bayside">
+          <div class="ho-mat-modal-warranty-label">Paver Portal installation warranty</div>
+          ${bayInfo.warranty_summary ? `<div class="ho-mat-modal-warranty-text">${escapeHtml(bayInfo.warranty_summary)}</div>` : ''}
+          ${bayInfo.warranty_url ? `<a class="ho-mat-modal-warranty-link" href="${escapeAttr(bayInfo.warranty_url)}" target="_blank" rel="noopener">View full warranty PDF →</a>` : ''}
+        </div>`;
+    }
+    warrantyHtml += '</div>';
+  }
+
+  // Sprint 28 · install guides matched to this material
+  const guides = filterGuidesForMaterial(m, 4);
+  let guidesHtml = '';
+  if (guides.length > 0) {
+    guidesHtml = `
+      <div class="ho-mat-modal-section-label">How we install this</div>
+      <div class="ho-mat-modal-guides">
+        ${guides.map(renderModalGuideCard).join('')}
+      </div>
+      <button type="button" class="ho-mat-modal-process-cta" onclick="window.bpScrollToHowWeBuild()">See all install videos &amp; our 5-phase process →</button>
+    `;
+  } else {
+    guidesHtml = `
+      <div class="ho-mat-modal-section-label">Installation</div>
+      <button type="button" class="ho-mat-modal-process-cta" onclick="window.bpScrollToHowWeBuild()">See our 5-phase install process →</button>
+    `;
+  }
+
+  matModalBody.innerHTML = `
+    <div class="ho-mat-modal-mfr">${escapeHtml(m.manufacturer || '')}</div>
+    <h3 class="ho-mat-modal-name" id="ho-mat-modal-name">${escapeHtml(m.product_name || 'Unnamed')}</h3>
+    ${colorLine ? `<div class="ho-mat-modal-color">${colorLine}</div>` : ''}
+    ${m.description ? `<div class="ho-mat-modal-desc">${escapeHtml(m.description)}</div>` : ''}
+    ${specRows.length > 0 ? `
+      <div class="ho-mat-modal-specs">
+        ${specRows.map(([k, v]) => `
+          <div class="ho-mat-modal-spec-row">
+            <span class="ho-mat-modal-spec-label">${escapeHtml(k)}</span>
+            <span class="ho-mat-modal-spec-val">${escapeHtml(String(v))}</span>
+          </div>`).join('')}
+      </div>` : ''}
+    ${applications.length > 0 ? `
+      <div class="ho-mat-modal-section-label">Applications</div>
+      <div class="ho-mat-modal-chips">
+        ${applications.map(a => `<span class="ho-mat-modal-chip">${escapeHtml(a)}</span>`).join('')}
+      </div>` : ''}
+    ${features.length > 0 ? `
+      <div class="ho-mat-modal-section-label">Features</div>
+      <div class="ho-mat-modal-chips">
+        ${features.map(f => `<span class="ho-mat-modal-chip">${escapeHtml(f)}</span>`).join('')}
+      </div>` : ''}
+    ${warrantyHtml}
+    ${guidesHtml}
+    ${actions.length > 0 ? `
+      <div class="ho-mat-modal-actions">
+        ${actions.map(a => `<a class="ho-mat-modal-action" href="${escapeAttr(a.href)}" target="_blank" rel="noopener">${escapeHtml(a.label)}</a>`).join('')}
+      </div>` : ''}
+  `;
+  matModalBackdrop.hidden = false;
+  document.addEventListener('keydown', onMatEscClose);
+}
+
+function renderModalGuideCard(g) {
+  const title = g.title || (g.manufacturer ? `${g.manufacturer} install guide` : 'Installation guide');
+  if (g.kind === 'youtube' && g.video_id) {
+    const thumb = g.thumbnail_url || `https://i.ytimg.com/vi/${g.video_id}/hqdefault.jpg`;
+    return `<a class="ho-mat-modal-guide-card" href="https://www.youtube.com/watch?v=${escapeAttr(g.video_id)}" target="_blank" rel="noopener">
+      <div class="ho-mat-modal-guide-thumb"><img src="${escapeAttr(thumb)}" alt="" loading="lazy"><div class="ho-mat-modal-guide-play">▶</div></div>
+      <div class="ho-mat-modal-guide-title">${escapeHtml(title)}</div>
+    </a>`;
+  }
+  const kindLabel = g.kind === 'pdf' ? 'PDF' : 'LINK';
+  return `<a class="ho-mat-modal-guide-card" href="${escapeAttr(g.url || '#')}" target="_blank" rel="noopener">
+    <div class="ho-mat-modal-guide-thumb pdf"><span>${kindLabel}</span></div>
+    <div class="ho-mat-modal-guide-title">${escapeHtml(title)}</div>
+  </a>`;
+}
+
+function closeMatModal() {
+  matModalBackdrop.hidden = true;
+  document.removeEventListener('keydown', onMatEscClose);
+}
+function onMatEscClose(e) { if (e.key === 'Escape') closeMatModal(); }
+
+function guessColorHex(name) {
+  const k = String(name || '').toLowerCase();
+  const map = {
+    'black':       '#1a1a1a',
+    'charcoal':    '#3a3a3a',
+    'gray':        '#9a9a9a', 'grey': '#9a9a9a',
+    'white':       '#f5f3ee',
+    'cream':       '#ebe1cb',
+    'tan':         '#cbb98e',
+    'brown':       '#7a5535',
+    'red':         '#9a3a2a',
+    'rust':        '#a35631',
+    'sandstone':   '#c8a96e',
+    'natural':     '#c0a677',
+    'beach':       '#d8c79e',
+    'desert':      '#caa97a',
+    'autumn':      '#a85f30',
+    'almond':      '#d2b78f',
+  };
+  for (const key of Object.keys(map)) {
+    if (k.includes(key)) return map[key];
+  }
+  return '#c8a96e';
+}
+
+function formatUSD(cents) {
+  const dollars = (Number(cents) || 0) / 100;
+  return dollars.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: dollars % 1 === 0 ? 0 : 2,
+  });
+}
+function formatDate(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+  });
+}
+function formatStatus(s) {
+  const map = { draft: 'Draft', sent: 'Sent', viewed: 'Viewed', signed: 'Signed', in_progress: 'In progress', complete: 'Complete' };
+  return map[s] || s;
+}
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function escapeAttr(s) { return escapeHtml(s); }
+</script>
+<script type="module" src="/account/account-chat.js"></script>
+<script type="module" src="/account/account-build.js"></script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reset password · Paver Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bp-green:    #9c7440;
+    --bp-green-dk: #7d5c31;
+    --bp-green-soft: #f1e7d3;
+    --bp-charcoal: #353535;
+    --bp-tan:      #dad7c5;
+    --bp-cream:    #faf8f3;
+    --bp-bg:       #f4f4ef;
+    --bp-card:     #ffffff;
+    --bp-border:   #e4e4df;
+    --bp-text:     #1f2125;
+    --bp-muted:    #70726f;
+    --bp-err:      #b91c1c;
+    --bp-err-bg:   #fef2f2;
+    --bp-err-bd:   #fecaca;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--bp-text);
+    background: var(--bp-bg);
+    background-image: radial-gradient(ellipse 800px 500px at 50% -10%, var(--bp-green-soft), transparent 70%);
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px 16px;
+    line-height: 1.5; font-size: 16px;
+  }
+  .ho-wrap { width: 100%; max-width: 440px; }
+  .ho-brand { text-align: center; margin-bottom: 28px; }
+  .ho-brand img { height: 40px; width: auto; }
+  .ho-brand-tag {
+    margin-top: 14px; font-size: 11px; letter-spacing: 0.22em;
+    color: var(--bp-muted); text-transform: uppercase;
+  }
+  .ho-card {
+    background: var(--bp-card);
+    border: 1px solid var(--bp-border);
+    border-radius: 14px;
+    padding: 38px 34px;
+    box-shadow: 0 16px 40px rgba(31, 33, 37, 0.08);
+  }
+  .ho-eyebrow {
+    font-size: 11px; letter-spacing: 0.18em;
+    color: var(--bp-muted); text-transform: uppercase;
+    margin-bottom: 10px; font-weight: 600;
+  }
+  .ho-title {
+    font-size: 24px; font-weight: 600;
+    color: var(--bp-text); letter-spacing: -0.012em;
+    line-height: 1.25; margin-bottom: 8px;
+  }
+  .ho-lede {
+    color: var(--bp-muted);
+    font-size: 14px; line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  .ho-form { display: flex; flex-direction: column; gap: 16px; }
+  .ho-form[hidden] { display: none; }
+  .ho-field { display: flex; flex-direction: column; gap: 6px; }
+  .ho-field-label { font-size: 12px; font-weight: 600; color: var(--bp-charcoal); }
+  .ho-field input {
+    font-family: inherit; font-size: 15px;
+    padding: 12px 14px;
+    border: 1px solid var(--bp-border);
+    border-radius: 10px; background: #fff;
+    color: var(--bp-text); width: 100%;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .ho-field input:focus {
+    outline: none;
+    border-color: var(--bp-green);
+    box-shadow: 0 0 0 3px rgba(93, 126, 105, 0.18);
+  }
+  .ho-btn {
+    padding: 13px 20px;
+    border-radius: 10px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    border: 1px solid transparent;
+    transition: background .15s, transform .12s, box-shadow .15s, opacity .15s;
+  }
+  .ho-btn-primary {
+    background: var(--bp-green); color: #fff;
+    box-shadow: 0 6px 16px rgba(93, 126, 105, 0.22);
+  }
+  .ho-btn-primary:hover {
+    background: var(--bp-green-dk);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(93, 126, 105, 0.28);
+  }
+  .ho-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+  .ho-foot { text-align: center; margin-top: 8px; }
+  .ho-link {
+    background: none; border: none;
+    color: var(--bp-green-dk);
+    font: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; padding: 6px 10px; border-radius: 6px;
+    transition: color .12s, background .12s;
+    text-decoration: none; display: inline-block;
+  }
+  .ho-link:hover { color: var(--bp-green); background: var(--bp-green-soft); }
+  .ho-error {
+    background: var(--bp-err-bg); color: var(--bp-err);
+    border: 1px solid var(--bp-err-bd);
+    border-radius: 8px; padding: 10px 14px;
+    font-size: 13px; line-height: 1.5; margin-top: 4px;
+  }
+  .ho-error[hidden] { display: none; }
+  .ho-state { text-align: center; }
+  .ho-state[hidden] { display: none; }
+  .ho-state-icon {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--bp-green-soft);
+    color: var(--bp-green-dk);
+    font-size: 32px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 4px auto 18px;
+  }
+  .ho-state h2 {
+    font-size: 22px; font-weight: 600;
+    color: var(--bp-text); letter-spacing: -0.012em;
+    margin-bottom: 10px;
+  }
+  .ho-state p {
+    color: var(--bp-muted);
+    font-size: 14px; line-height: 1.6;
+    margin-bottom: 8px;
+  }
+  .ho-state .ho-state-email { font-weight: 600; color: var(--bp-charcoal); }
+  @media (max-width: 480px) {
+    .ho-card { padding: 30px 22px; }
+    .ho-title { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="ho-wrap">
+  <div class="ho-brand">
+    <img src="/assets/paver-portal-logo.svg)%20(1).png" alt="Paver Portal">
+    <div class="ho-brand-tag">Creating backyards people love</div>
+  </div>
+
+  <div class="ho-card">
+    <div class="ho-eyebrow" id="ho-eyebrow">Reset password</div>
+    <h1 class="ho-title" id="ho-title">Forgot your password?</h1>
+    <p class="ho-lede" id="ho-lede">Enter your account email — we'll send a recovery link to set a new password.</p>
+
+    <form class="ho-form" id="ho-forgot-form" novalidate>
+      <label class="ho-field">
+        <span class="ho-field-label">Email</span>
+        <input type="email" name="email" required autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" autofocus>
+      </label>
+      <button type="submit" class="ho-btn ho-btn-primary" id="ho-forgot-submit">Send recovery link</button>
+      <div class="ho-foot">
+        <a class="ho-link" href="/account/signin.html">Back to sign in</a>
+      </div>
+    </form>
+
+    <div class="ho-state" id="ho-sent" hidden>
+      <div class="ho-state-icon">✉️</div>
+      <h2>Check your inbox</h2>
+      <p>We sent a recovery link to <span class="ho-state-email" id="ho-sent-email"></span>.</p>
+      <p>Click the link to set a new password. Didn't get it? Check your spam folder, then <button type="button" class="ho-link" id="ho-sent-retry">try again</button>.</p>
+    </div>
+
+    <div class="ho-error" id="ho-error" hidden></div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+
+const SUPABASE_URL  = 'https://gfgbypcnxkschnfsitfb.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_Ko4LNw2VjhZVFmwJ-i2qtA_XeGgBcew';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+});
+
+const eyebrowEl = document.getElementById('ho-eyebrow');
+const titleEl   = document.getElementById('ho-title');
+const ledeEl    = document.getElementById('ho-lede');
+const form      = document.getElementById('ho-forgot-form');
+const submitBtn = document.getElementById('ho-forgot-submit');
+const errorEl   = document.getElementById('ho-error');
+const sentEl    = document.getElementById('ho-sent');
+const sentEmail = document.getElementById('ho-sent-email');
+const sentRetry = document.getElementById('ho-sent-retry');
+
+function showError(msg) { errorEl.textContent = msg; errorEl.hidden = false; }
+function hideError()     { errorEl.hidden = true; errorEl.textContent = ''; }
+
+// Detect recovery flow (Supabase password reset link → ?type=recovery in URL).
+// If present, the user has been authenticated with a temporary recovery session;
+// route them to set-password where they'll set their new password.
+const { data: { session } } = await supabase.auth.getSession();
+if (session && /[#&]type=recovery\b/.test(window.location.hash || '')) {
+  // Recovery flow: temporary session is active. Set must_change_password
+  // back to true so set-password.html accepts them, then route there.
+  const { data: { user } } = await supabase.auth.getUser();
+  await supabase
+    .from('clients')
+    .update({ must_change_password: true })
+    .eq('user_id', user.id);
+  window.location.replace('/account/set-password.html');
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  hideError();
+
+  const fd = new FormData(form);
+  const email = String(fd.get('email') || '').trim().toLowerCase();
+  if (!email) { showError('Email is required.'); return; }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending…';
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      // Land them back on this same page; the recovery-detection block above
+      // will route to set-password.html with the temporary session active.
+      redirectTo: window.location.origin + '/account/forgot.html',
+    });
+    if (error) throw error;
+    eyebrowEl.textContent = 'Recovery link sent';
+    titleEl.textContent = 'Check your email';
+    ledeEl.hidden = true;
+    form.hidden = true;
+    sentEmail.textContent = email;
+    sentEl.hidden = false;
+  } catch (err) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send recovery link';
+    showError((err && err.message) || 'Could not send recovery link.');
+  }
+});
+
+sentRetry.addEventListener('click', () => {
+  sentEl.hidden = true;
+  form.hidden = false;
+  ledeEl.hidden = false;
+  eyebrowEl.textContent = 'Reset password';
+  titleEl.textContent = 'Forgot your password?';
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Send recovery link';
+  hideError();
+  form.email.focus();
+});
+</script>
+</body>
+</html>

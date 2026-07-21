@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Materials we install · Paver Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bp-green:    #9c7440;
+    --bp-green-dk: #7d5c31;
+    --bp-green-soft: #f1e7d3;
+    --bp-charcoal: #353535;
+    --bp-tan:      #dad7c5;
+    --bp-cream:    #faf8f3;
+    --bp-bg:       #f4f4ef;
+    --bp-card:     #ffffff;
+    --bp-border:   #e4e4df;
+    --bp-text:     #1f2125;
+    --bp-muted:    #70726f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--bp-text);
+    background: var(--bp-bg);
+    line-height: 1.5; font-size: 15px;
+  }
+
+  .ho-nav {
+    background: #fff;
+    border-bottom: 1px solid var(--bp-border);
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .ho-nav-brand { display: flex; align-items: center; gap: 14px; }
+  .ho-nav-brand img { height: 32px; width: auto; }
+  .ho-nav-brand-divider { width: 1px; height: 22px; background: var(--bp-border); }
+  .ho-nav-brand-tag {
+    font-size: 11px; letter-spacing: 0.18em;
+    color: var(--bp-muted); text-transform: uppercase; font-weight: 600;
+  }
+  .ho-nav-back {
+    background: transparent;
+    border: 1px solid var(--bp-border);
+    color: var(--bp-charcoal);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .ho-nav-back:hover { background: var(--bp-text); color: #fff; border-color: var(--bp-text); }
+
+  .ho-page { max-width: 1200px; margin: 0 auto; padding: 36px 24px 80px; }
+
+  .ho-page-head { margin-bottom: 32px; }
+  .ho-eyebrow {
+    display: inline-block;
+    font-size: 11px; letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--bp-green-dk);
+    background: var(--bp-green-soft);
+    padding: 6px 14px; border-radius: 999px;
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .ho-page-title {
+    font-size: 32px; font-weight: 600;
+    letter-spacing: -0.018em;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .ho-page-lede {
+    font-size: 15px; line-height: 1.65;
+    color: var(--bp-muted);
+    max-width: 640px;
+  }
+
+  .ho-section { margin-bottom: 40px; }
+  .ho-section-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 14px; gap: 12px; flex-wrap: wrap;
+  }
+  .ho-section h2 {
+    font-size: 18px; font-weight: 600;
+    color: var(--bp-text); letter-spacing: -0.005em;
+  }
+  .ho-section-sub { font-size: 13px; color: var(--bp-muted); margin-bottom: 14px; }
+  .ho-section-meta { font-size: 12px; color: var(--bp-muted); letter-spacing: 0.04em; }
+
+  .ho-tools {
+    display: flex; flex-direction: column; gap: 12px;
+    margin-bottom: 18px;
+  }
+  .ho-search {
+    width: 100%;
+    font-family: inherit; font-size: 15px;
+    padding: 12px 16px;
+    border: 1px solid var(--bp-border);
+    border-radius: 10px; background: #fff;
+    color: var(--bp-text);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .ho-search:focus {
+    outline: none;
+    border-color: var(--bp-green);
+    box-shadow: 0 0 0 3px rgba(93, 126, 105, 0.18);
+  }
+
+  .ho-pill-row {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .ho-pill-row[hidden] { display: none; }
+  .ho-pill {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    color: var(--bp-charcoal);
+    padding: 7px 14px;
+    border-radius: 999px;
+    font: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .ho-pill:hover { border-color: var(--bp-green); color: var(--bp-green-dk); }
+  .ho-pill.active {
+    background: var(--bp-green); color: #fff;
+    border-color: var(--bp-green);
+  }
+  .ho-pill-mfr {
+    background: var(--bp-cream);
+    border-color: transparent;
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+  .ho-pill-mfr:hover { background: #fff; border-color: var(--bp-green); }
+  .ho-pill-mfr.active {
+    background: var(--bp-charcoal); color: #fff; border-color: var(--bp-charcoal);
+  }
+  .ho-pill-mfr-label {
+    font-size: 11px; color: var(--bp-muted);
+    align-self: center; margin-right: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  .ho-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .ho-mat-card {
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+    display: flex; flex-direction: column;
+    text-align: left; font: inherit; color: inherit; padding: 0;
+  }
+  .ho-mat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(31, 33, 37, 0.08);
+    border-color: var(--bp-green);
+  }
+  .ho-mat-img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: var(--bp-cream) center/cover no-repeat;
+    border-bottom: 1px solid var(--bp-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bp-muted); font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; font-weight: 600;
+  }
+  .ho-mat-body { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .ho-mat-mfr {
+    font-size: 10px; font-weight: 600;
+    color: var(--bp-muted);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .ho-mat-name {
+    font-size: 14px; font-weight: 600;
+    color: var(--bp-text);
+    line-height: 1.3;
+  }
+  .ho-mat-meta {
+    font-size: 11px; color: var(--bp-muted);
+    letter-spacing: 0.02em;
+  }
+  .ho-mat-tag {
+    display: inline-block;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--bp-green-dk);
+    background: var(--bp-green-soft);
+    padding: 2px 8px; border-radius: 999px;
+    margin-top: 4px;
+    align-self: flex-start;
+  }
+  .ho-mat-dots {
+    display: flex; gap: 3px; margin-top: 8px;
+  }
+  .ho-mat-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--bp-cream) center/cover no-repeat;
+    border: 1px solid var(--bp-border);
+    flex-shrink: 0;
+  }
+  .ho-mat-dots-extra {
+    font-size: 10px; color: var(--bp-muted);
+    margin-left: 2px; align-self: center;
+    font-weight: 600;
+  }
+
+  .ho-empty, .ho-loading {
+    background: #fff;
+    border: 1px dashed var(--bp-border);
+    border-radius: 12px;
+    padding: 38px 28px;
+    text-align: center;
+    color: var(--bp-muted);
+    font-size: 14px;
+  }
+
+  /* Modal */
+  .ho-modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(31, 33, 37, 0.6);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+  }
+  .ho-modal-backdrop[hidden] { display: none; }
+  .ho-modal {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+    max-width: 760px; width: 100%;
+    max-height: 92vh; overflow-y: auto;
+    position: relative;
+  }
+
+  /* Gallery: main image + thumbnail row */
+  .ho-gallery {
+    background: var(--bp-cream);
+    border-radius: 14px 14px 0 0;
+    padding: 0;
+  }
+  .ho-gallery-main {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--bp-cream) center/cover no-repeat;
+    border-radius: 14px 14px 0 0;
+    transition: background-image .25s ease;
+  }
+  .ho-gallery-thumbs {
+    display: flex; gap: 8px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background: #fff;
+    border-bottom: 1px solid var(--bp-border);
+  }
+  .ho-gallery-thumbs[hidden] { display: none; }
+  .ho-gallery-thumbs::-webkit-scrollbar { height: 6px; }
+  .ho-gallery-thumbs::-webkit-scrollbar-thumb { background: var(--bp-border); border-radius: 3px; }
+  .ho-gallery-thumb {
+    flex-shrink: 0;
+    width: 70px; height: 50px;
+    border-radius: 6px;
+    background: var(--bp-cream) center/cover no-repeat;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color .15s, transform .12s;
+    padding: 0;
+  }
+  .ho-gallery-thumb:hover { transform: translateY(-1px); }
+  .ho-gallery-thumb.active {
+    border-color: var(--bp-green);
+    box-shadow: 0 0 0 2px var(--bp-green-soft);
+  }
+
+  .ho-modal-body { padding: 24px 30px 28px; }
+  .ho-modal-close {
+    position: absolute; top: 14px; right: 14px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid var(--bp-border);
+    color: var(--bp-charcoal);
+    width: 32px; height: 32px;
+    border-radius: 999px;
+    font: inherit; font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+    z-index: 1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  .ho-modal-close:hover { background: var(--bp-text); color: #fff; border-color: var(--bp-text); }
+  .ho-modal-eyebrow {
+    font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--bp-muted); font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .ho-modal-title {
+    font-size: 26px; font-weight: 600;
+    letter-spacing: -0.014em;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .ho-modal-desc {
+    font-size: 14px; line-height: 1.6;
+    color: var(--bp-charcoal);
+    margin: 14px 0 0;
+  }
+
+  /* Color picker — Belgard pattern: separate from main gallery */
+  .ho-color-block {
+    background: var(--bp-cream);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 20px 0 22px;
+  }
+  .ho-color-label-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 10px; margin-bottom: 14px;
+  }
+  .ho-color-label {
+    font-size: 11px; font-weight: 600;
+    color: var(--bp-muted);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .ho-color-current {
+    font-size: 14px; font-weight: 600;
+    color: var(--bp-text);
+  }
+  .ho-color-swatches {
+    display: flex; flex-wrap: wrap; gap: 10px;
+  }
+  .ho-swatch-btn {
+    background: transparent; border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 6px;
+    width: 60px;
+    transition: transform .12s;
+  }
+  .ho-swatch-btn:hover { transform: translateY(-2px); }
+  .ho-swatch-img {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--bp-cream) center/cover no-repeat;
+    border: 2px solid transparent;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .ho-swatch-btn:hover .ho-swatch-img { border-color: var(--bp-green-dk); }
+  .ho-swatch-btn.active .ho-swatch-img {
+    border-color: var(--bp-green-dk);
+    box-shadow: 0 0 0 2px var(--bp-green-soft);
+  }
+  .ho-swatch-name {
+    font-size: 10px;
+    color: var(--bp-muted);
+    text-align: center;
+    line-height: 1.25;
+    word-break: break-word;
+    max-width: 60px;
+  }
+  .ho-swatch-btn.active .ho-swatch-name {
+    color: var(--bp-text);
+    font-weight: 600;
+  }
+
+  .ho-modal-specs {
+    background: var(--bp-cream);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+  }
+  .ho-modal-specs dl {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 8px 16px;
+    font-size: 13px;
+  }
+  .ho-modal-specs dt {
+    color: var(--bp-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    align-self: center;
+  }
+  .ho-modal-specs dd { color: var(--bp-text); }
+  .ho-modal-actions {
+    display: flex; gap: 10px;
+    flex-wrap: wrap;
+  }
+  .ho-modal-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .ho-modal-btn-primary { background: var(--bp-green); color: #fff; }
+  .ho-modal-btn-primary:hover { background: var(--bp-green-dk); }
+  .ho-modal-btn-ghost {
+    background: transparent; color: var(--bp-charcoal);
+    border-color: var(--bp-border);
+  }
+  .ho-modal-btn-ghost:hover { background: var(--bp-cream); border-color: var(--bp-green); }
+  .ho-modal-applications {
+    margin-top: 16px; font-size: 13px; color: var(--bp-muted);
+  }
+  .ho-modal-applications strong {
+    color: var(--bp-charcoal); font-weight: 600;
+    text-transform: uppercase; font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+  .ho-modal-applications-list {
+    margin-top: 6px;
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .ho-modal-app-chip {
+    background: var(--bp-green-soft);
+    color: var(--bp-green-dk);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  @media (max-width: 540px) {
+    .ho-page { padding: 24px 16px 60px; }
+    .ho-page-title { font-size: 24px; }
+    .ho-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .ho-mat-body { padding: 12px 14px 14px; }
+    .ho-modal-body { padding: 20px 20px 24px; }
+    .ho-modal-title { font-size: 20px; }
+    .ho-modal-specs dl { grid-template-columns: 1fr; gap: 8px 0; }
+    .ho-modal-specs dt { margin-top: 6px; }
+    .ho-nav-brand-divider, .ho-nav-brand-tag { display: none; }
+    .ho-gallery-thumb { width: 60px; height: 44px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="ho-nav">
+  <div class="ho-nav-brand">
+    <img src="https://baysidepavers.com/wp-content/uploads/2023/03/baysidepavers-logo-light-scaled.png" alt="Paver Portal">
+    <span class="ho-nav-brand-divider"></span>
+    <span class="ho-nav-brand-tag">Materials Catalog</span>
+  </div>
+  <a class="ho-nav-back" href="/account/">← Back to your account</a>
+</nav>
+
+<main class="ho-page">
+  <div class="ho-page-head">
+    <span class="ho-eyebrow">Browse the catalog</span>
+    <h1 class="ho-page-title">Materials we install</h1>
+    <p class="ho-page-lede">
+      Every product we work with — pavers, porcelain, walls, fire features, and more. Click any
+      material to view its lifestyle gallery, available colors, and cut-sheets.
+    </p>
+  </div>
+
+  <section class="ho-section" id="ho-featured-section" hidden>
+    <div class="ho-section-head">
+      <h2>In your project</h2>
+      <span class="ho-section-meta" id="ho-featured-count"></span>
+    </div>
+    <p class="ho-section-sub">These are the materials your designer specified for your build.</p>
+    <div class="ho-grid" id="ho-featured-grid"></div>
+  </section>
+
+  <section class="ho-section">
+    <div class="ho-section-head">
+      <h2>Full catalog</h2>
+      <span class="ho-section-meta" id="ho-catalog-count">Loading…</span>
+    </div>
+
+    <div class="ho-tools">
+      <input type="search" class="ho-search" id="ho-search" placeholder="Search by product, color, or size…" autocapitalize="off" autocorrect="off" spellcheck="false">
+
+      <div class="ho-pill-row" id="ho-cats">
+        <button type="button" class="ho-pill" data-cat="all">All</button>
+      </div>
+
+      <div class="ho-pill-row" id="ho-mfrs" hidden>
+        <span class="ho-pill-mfr-label">Manufacturer:</span>
+      </div>
+    </div>
+
+    <div id="ho-catalog-area">
+      <div class="ho-loading">Loading materials…</div>
+    </div>
+  </section>
+</main>
+
+<!-- Material detail modal -->
+<div class="ho-modal-backdrop" id="ho-modal-backdrop" hidden>
+  <div class="ho-modal" role="dialog" aria-modal="true" aria-labelledby="ho-modal-title">
+    <button type="button" class="ho-modal-close" id="ho-modal-close" aria-label="Close">×</button>
+
+    <!-- Product gallery: main image + thumbnail rail (Belgard pattern) -->
+    <div class="ho-gallery">
+      <div class="ho-gallery-main" id="ho-gallery-main"></div>
+      <div class="ho-gallery-thumbs" id="ho-gallery-thumbs"></div>
+    </div>
+
+    <div class="ho-modal-body">
+      <div class="ho-modal-eyebrow" id="ho-modal-eyebrow">Material</div>
+      <h2 class="ho-modal-title" id="ho-modal-title"></h2>
+      <p class="ho-modal-desc" id="ho-modal-desc"></p>
+
+      <div class="ho-color-block" id="ho-color-block" hidden>
+        <div class="ho-color-label-row">
+          <span class="ho-color-label">Available colors</span>
+          <span class="ho-color-current" id="ho-color-current"></span>
+        </div>
+        <div class="ho-color-swatches" id="ho-color-swatches"></div>
+      </div>
+
+      <div class="ho-modal-specs" id="ho-modal-specs-wrap">
+        <dl id="ho-modal-specs"></dl>
+      </div>
+
+      <div class="ho-modal-applications" id="ho-modal-applications-wrap" hidden>
+        <strong>Applications</strong>
+        <div class="ho-modal-applications-list" id="ho-modal-applications-list"></div>
+      </div>
+
+      <div class="ho-modal-actions" id="ho-modal-actions"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+
+const SUPABASE_URL  = 'https://gfgbypcnxkschnfsitfb.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_Ko4LNw2VjhZVFmwJ-i2qtA_XeGgBcew';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+});
+
+const featuredSection = document.getElementById('ho-featured-section');
+const featuredCount   = document.getElementById('ho-featured-count');
+const featuredGrid    = document.getElementById('ho-featured-grid');
+const catalogCount    = document.getElementById('ho-catalog-count');
+const catalogArea     = document.getElementById('ho-catalog-area');
+const searchInp       = document.getElementById('ho-search');
+const catsWrap        = document.getElementById('ho-cats');
+const mfrsWrap        = document.getElementById('ho-mfrs');
+
+// State
+let allMaterials     = [];
+let groupedProducts  = []; // [{ key, name, manufacturer, category, variants, gallery }]
+let featuredKeys     = new Map(); // product_name → preferred color from proposal
+let currentCategory  = 'pavers';
+let currentMfr       = 'all';
+
+// Auth gate
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
+  window.location.replace('/account/signin.html');
+} else {
+  await loadCatalog();
+  await loadFeatured();
+}
+
+// ─── Group materials + product images ───────────────────────────────────
+function groupCatalog(materials, productImages) {
+  // Build product_images lookup keyed by mfr|product
+  const imgsByKey = new Map();
+  (productImages || []).forEach(img => {
+    const key = (img.manufacturer || '?') + '|' + (img.product_name || '?');
+    if (!imgsByKey.has(key)) imgsByKey.set(key, []);
+    imgsByKey.get(key).push(img);
+  });
+
+  const map = new Map();
+  materials.forEach(r => {
+    const key = (r.manufacturer || '?') + '|' + (r.product_name || '?');
+    if (!map.has(key)) {
+      map.set(key, {
+        key,
+        name: r.product_name || 'Unnamed',
+        manufacturer: r.manufacturer || '',
+        category: r.category || '',
+        variants: [],
+        gallery: [],
+      });
+    }
+    map.get(key).variants.push(r);
+  });
+
+  // For each product, build its gallery: product_images first; if empty,
+  // dedupe variants' primary_image_url as fallback.
+  for (const g of map.values()) {
+    g.variants.sort((a, b) => (a.color || '').localeCompare(b.color || ''));
+    const customImgs = imgsByKey.get(g.key) || [];
+    if (customImgs.length > 0) {
+      g.gallery = customImgs.map(i => i.image_url);
+    } else {
+      const seen = new Set();
+      g.gallery = [];
+      g.variants.forEach(v => {
+        const url = v.primary_image_url;
+        if (url && !seen.has(url)) { seen.add(url); g.gallery.push(url); }
+      });
+      // No primary images at all? Try swatch_url last so card still shows something.
+      if (g.gallery.length === 0) {
+        g.variants.forEach(v => {
+          const url = v.swatch_url;
+          if (url && !seen.has(url)) { seen.add(url); g.gallery.push(url); }
+        });
+      }
+    }
+  }
+
+  return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+}
+
+async function loadCatalog() {
+  const [matsResp, imgsResp] = await Promise.all([
+    supabase.from('materials')
+      .select('id, manufacturer, product_name, collection, color, pattern, size_spec, description, category, primary_image_url, swatch_url, spec_pdf_url, cut_sheet_url, applications, features, thickness_mm'),
+    supabase.from('product_images')
+      .select('manufacturer, product_name, image_url, display_order')
+      .order('display_order', { ascending: true }),
+  ]);
+
+  if (matsResp.error) {
+    catalogArea.innerHTML = '<div class="ho-empty">Could not load catalog: ' + escapeHtml(matsResp.error.message) + '</div>';
+    catalogCount.textContent = '';
+    return;
+  }
+
+  allMaterials = matsResp.data || [];
+  groupedProducts = groupCatalog(allMaterials, imgsResp.data || []);
+
+  buildCategoryPills();
+  renderCatalog();
+}
+
+function buildCategoryPills() {
+  const cats = [...new Set(allMaterials.map(m => m.category).filter(Boolean))].sort();
+  const labels = {
+    pavers: 'Pavers', porcelain: 'Porcelain', walls: 'Walls',
+    accessories: 'Accessories', 'fire-features': 'Fire features',
+    decking: 'Decking', lighting: 'Lighting', other: 'Other',
+  };
+  catsWrap.querySelector('[data-cat="all"]').classList.toggle('active', currentCategory === 'all');
+  cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ho-pill';
+    if (cat === currentCategory) btn.classList.add('active');
+    btn.dataset.cat = cat;
+    btn.textContent = labels[cat] || cat;
+    catsWrap.appendChild(btn);
+  });
+
+  catsWrap.addEventListener('click', (e) => {
+    const btn = e.target.closest('.ho-pill');
+    if (!btn) return;
+    catsWrap.querySelectorAll('.ho-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCategory = btn.dataset.cat;
+    currentMfr = 'all';
+    renderCatalog();
+  });
+}
+
+function buildManufacturerPills() {
+  const inCat = currentCategory === 'all'
+    ? groupedProducts
+    : groupedProducts.filter(g => g.category === currentCategory);
+  const mfrs = [...new Set(inCat.map(g => g.manufacturer).filter(Boolean))].sort();
+
+  if (mfrs.length <= 1) {
+    mfrsWrap.hidden = true;
+    return;
+  }
+  mfrsWrap.hidden = false;
+  mfrsWrap.querySelectorAll('.ho-pill-mfr').forEach(b => b.remove());
+
+  const allBtn = document.createElement('button');
+  allBtn.type = 'button';
+  allBtn.className = 'ho-pill ho-pill-mfr' + (currentMfr === 'all' ? ' active' : '');
+  allBtn.dataset.mfr = 'all';
+  allBtn.textContent = 'All';
+  mfrsWrap.appendChild(allBtn);
+
+  mfrs.forEach(mfr => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ho-pill ho-pill-mfr' + (currentMfr === mfr ? ' active' : '');
+    btn.dataset.mfr = mfr;
+    btn.textContent = mfr;
+    mfrsWrap.appendChild(btn);
+  });
+}
+
+mfrsWrap.addEventListener('click', (e) => {
+  const btn = e.target.closest('.ho-pill-mfr');
+  if (!btn) return;
+  mfrsWrap.querySelectorAll('.ho-pill-mfr').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentMfr = btn.dataset.mfr;
+  renderCatalog();
+});
+
+let searchDebounce = null;
+searchInp.addEventListener('input', () => {
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(renderCatalog, 120);
+});
+
+function renderCatalog() {
+  buildManufacturerPills();
+
+  const q = searchInp.value.trim().toLowerCase();
+  const filtered = groupedProducts.filter(g => {
+    if (currentCategory !== 'all' && g.category !== currentCategory) return false;
+    if (currentMfr !== 'all' && g.manufacturer !== currentMfr) return false;
+    if (!q) return true;
+    const hay = [
+      g.name, g.manufacturer,
+      ...g.variants.map(v => [v.color, v.collection, v.size_spec, v.pattern].filter(Boolean).join(' '))
+    ].filter(Boolean).join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+
+  catalogCount.textContent = filtered.length + (filtered.length === 1 ? ' product' : ' products');
+
+  if (filtered.length === 0) {
+    catalogArea.innerHTML = '<div class="ho-empty">No materials match your search. Try a different term, manufacturer, or category.</div>';
+    return;
+  }
+
+  catalogArea.innerHTML = '<div class="ho-grid">' +
+    filtered.map(g => renderCard(g, {})).join('') +
+    '</div>';
+  attachCardClickHandlers(catalogArea);
+}
+
+function renderCard(g, opts) {
+  const cardImg = g.gallery[0];
+  const imgStyle = cardImg ? 'background-image:url(' + escapeAttr(cardImg) + ');' : '';
+  const variantCount = g.variants.length;
+  const variantLabel = variantCount === 1 ? '1 color' : variantCount + ' colors';
+
+  // Mini swatch dots row
+  const dotMax = 5;
+  const dotsHtml = g.variants.slice(0, dotMax).map(v => {
+    const dotImg = v.swatch_url || v.primary_image_url;
+    const ds = dotImg ? 'background-image:url(' + escapeAttr(dotImg) + ');' : '';
+    return '<span class="ho-mat-dot" style="' + ds + '"></span>';
+  }).join('');
+  const extraDots = variantCount > dotMax
+    ? '<span class="ho-mat-dots-extra">+' + (variantCount - dotMax) + '</span>'
+    : '';
+
+  const tag = opts.featured && opts.applicationArea
+    ? '<span class="ho-mat-tag">' + escapeHtml(opts.applicationArea) + '</span>'
+    : '';
+
+  const sizeBit = g.variants[0] && g.variants[0].size_spec
+    ? ' · ' + escapeHtml(g.variants[0].size_spec)
+    : '';
+
+  return '<button type="button" class="ho-mat-card" data-key="' + escapeAttr(g.key) + '">' +
+    '<div class="ho-mat-img" style="' + imgStyle + '">' + (cardImg ? '' : escapeHtml((g.name || '?').slice(0, 2).toUpperCase())) + '</div>' +
+    '<div class="ho-mat-body">' +
+      (g.manufacturer ? '<div class="ho-mat-mfr">' + escapeHtml(g.manufacturer) + '</div>' : '') +
+      '<div class="ho-mat-name">' + escapeHtml(g.name) + '</div>' +
+      '<div class="ho-mat-meta">' + escapeHtml(variantLabel) + sizeBit + '</div>' +
+      tag +
+      (variantCount > 1 ? '<div class="ho-mat-dots">' + dotsHtml + extraDots + '</div>' : '') +
+    '</div>' +
+  '</button>';
+}
+
+function attachCardClickHandlers(container) {
+  container.querySelectorAll('.ho-mat-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const key = card.dataset.key;
+      const group = groupedProducts.find(g => g.key === key);
+      if (group) {
+        const preferredColor = featuredKeys.get(group.name);
+        const startIdx = preferredColor
+          ? Math.max(0, group.variants.findIndex(v => v.color === preferredColor))
+          : 0;
+        openModal(group, startIdx);
+      }
+    });
+  });
+}
+
+// ─── Featured ──────────────────────────────────────────────────────────
+async function loadFeatured() {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: client } = await supabase
+    .from('clients').select('id').eq('user_id', user.id).maybeSingle();
+  if (!client) return;
+
+  const { data: links } = await supabase
+    .from('client_proposals').select('proposal_id').eq('client_id', client.id);
+  const proposalIds = (links || []).map(l => l.proposal_id);
+  if (proposalIds.length === 0) return;
+
+  const { data: pmRows } = await supabase
+    .from('proposal_materials')
+    .select('material_id, application_area')
+    .in('proposal_id', proposalIds)
+    .not('material_id', 'is', null);
+
+  if (!pmRows || pmRows.length === 0) return;
+
+  const appByMatId = new Map();
+  pmRows.forEach(r => {
+    if (r.material_id && !appByMatId.has(r.material_id) && r.application_area) {
+      appByMatId.set(r.material_id, r.application_area);
+    }
+  });
+
+  const matIdSet = new Set(pmRows.map(r => r.material_id).filter(Boolean));
+  const featuredGroups = [];
+  groupedProducts.forEach(g => {
+    const hit = g.variants.find(v => matIdSet.has(v.id));
+    if (hit) {
+      featuredGroups.push({
+        group: g,
+        applicationArea: appByMatId.get(hit.id) || null,
+        preferredColor: hit.color || null,
+      });
+      if (hit.color) featuredKeys.set(g.name, hit.color);
+    }
+  });
+
+  if (featuredGroups.length === 0) return;
+
+  featuredSection.hidden = false;
+  featuredCount.textContent = featuredGroups.length + ' ' + (featuredGroups.length === 1 ? 'material' : 'materials');
+  featuredGrid.innerHTML = featuredGroups.map(({ group, applicationArea }) =>
+    renderCard(group, { featured: true, applicationArea })
+  ).join('');
+  attachCardClickHandlers(featuredGrid);
+}
+
+// ─── Modal ─────────────────────────────────────────────────────────────
+const modalBackdrop = document.getElementById('ho-modal-backdrop');
+const galleryMain   = document.getElementById('ho-gallery-main');
+const galleryThumbs = document.getElementById('ho-gallery-thumbs');
+const modalEyebrow  = document.getElementById('ho-modal-eyebrow');
+const modalTitle    = document.getElementById('ho-modal-title');
+const modalDesc     = document.getElementById('ho-modal-desc');
+const modalSpecsWrap = document.getElementById('ho-modal-specs-wrap');
+const modalSpecs    = document.getElementById('ho-modal-specs');
+const modalAppsWrap = document.getElementById('ho-modal-applications-wrap');
+const modalAppsList = document.getElementById('ho-modal-applications-list');
+const modalActions  = document.getElementById('ho-modal-actions');
+const colorBlock    = document.getElementById('ho-color-block');
+const colorSwatches = document.getElementById('ho-color-swatches');
+const colorCurrent  = document.getElementById('ho-color-current');
+
+document.getElementById('ho-modal-close').addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modalBackdrop.hidden) closeModal(); });
+
+let activeGroup = null;
+let activeIdx = 0;
+let activeGalleryIdx = 0;
+let activeMainSource = 'gallery'; // 'gallery' = lifestyle photo at activeGalleryIdx; 'swatch' = enlarged swatch of variants[activeIdx]
+
+function openModal(group, startIdx) {
+  activeGroup = group;
+  activeIdx = Math.max(0, Math.min(startIdx || 0, group.variants.length - 1));
+  activeGalleryIdx = 0;
+  activeMainSource = 'gallery';
+
+  modalEyebrow.textContent = (group.manufacturer || 'Material').toUpperCase();
+  modalTitle.textContent   = group.name;
+
+  // Description: from the active variant; fall back to any variant with one
+  const variantsWithDesc = group.variants.filter(v => v.description);
+  modalDesc.textContent = (group.variants[activeIdx].description) ||
+                          (variantsWithDesc[0] && variantsWithDesc[0].description) ||
+                          '';
+  modalDesc.style.display = modalDesc.textContent ? 'block' : 'none';
+
+  // Build product gallery (main + thumbs)
+  renderGallery();
+
+  // Build color swatches
+  if (group.variants.length > 1) {
+    colorSwatches.innerHTML = group.variants.map((v, i) => {
+      const sw = v.swatch_url || v.primary_image_url;
+      const bg = sw ? 'background-image:url(' + escapeAttr(sw) + ');' : '';
+      return '<button type="button" class="ho-swatch-btn' + (i === activeIdx ? ' active' : '') + '" data-idx="' + i + '" title="' + escapeAttr(v.color || 'Variant') + '">' +
+        '<span class="ho-swatch-img" style="' + bg + '"></span>' +
+        '<span class="ho-swatch-name">' + escapeHtml(v.color || '—') + '</span>' +
+      '</button>';
+    }).join('');
+    colorBlock.hidden = false;
+  } else {
+    colorBlock.hidden = true;
+  }
+
+  renderActiveVariant();
+
+  modalBackdrop.hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+
+function renderGallery() {
+  if (!activeGroup) return;
+  const gallery = activeGroup.gallery || [];
+
+  // Decide what fills the main image slot.
+  // 'swatch' mode: enlarge the active variant's swatch (or primary fallback).
+  // 'gallery' mode: show the lifestyle photo at activeGalleryIdx.
+  let mainUrl = null;
+  if (activeMainSource === 'swatch') {
+    const v = activeGroup.variants[activeIdx];
+    mainUrl = (v && (v.swatch_url || v.primary_image_url)) || null;
+  }
+  if (!mainUrl && gallery.length > 0) {
+    mainUrl = gallery[activeGalleryIdx];
+  }
+
+  if (mainUrl) {
+    galleryMain.style.background = 'url(' + mainUrl + ') center/cover no-repeat';
+  } else {
+    galleryMain.style.background = 'var(--bp-cream)';
+  }
+
+  // Show the thumbnail rail when there's >1 lifestyle photo, OR when we're in swatch
+  // mode with at least 1 lifestyle photo (so the user has a way back to lifestyle).
+  const showThumbs = gallery.length > 1 || (activeMainSource === 'swatch' && gallery.length >= 1);
+  if (showThumbs) {
+    galleryThumbs.hidden = false;
+    galleryThumbs.innerHTML = gallery.map((url, i) => {
+      const isActive = activeMainSource === 'gallery' && i === activeGalleryIdx;
+      return '<button type="button" class="ho-gallery-thumb' + (isActive ? ' active' : '') + '" data-gi="' + i + '" style="background-image:url(' + escapeAttr(url) + ');" aria-label="Image ' + (i + 1) + '"></button>';
+    }).join('');
+  } else {
+    galleryThumbs.hidden = true;
+    galleryThumbs.innerHTML = '';
+  }
+}
+
+galleryThumbs.addEventListener('click', (e) => {
+  const btn = e.target.closest('.ho-gallery-thumb');
+  if (!btn) return;
+  const i = Number(btn.dataset.gi);
+  if (Number.isNaN(i)) return;
+  activeGalleryIdx = i;
+  activeMainSource = 'gallery';
+  renderGallery();
+});
+
+function renderActiveVariant() {
+  if (!activeGroup) return;
+  const v = activeGroup.variants[activeIdx];
+
+  colorCurrent.textContent = v.color || '';
+
+  // Specs (per-variant)
+  const specs = [];
+  if (v.color)        specs.push(['Color',      v.color]);
+  if (v.size_spec)    specs.push(['Size',       v.size_spec]);
+  if (v.pattern)      specs.push(['Pattern',    v.pattern]);
+  if (v.thickness_mm) specs.push(['Thickness',  v.thickness_mm + ' mm']);
+  if (v.collection)   specs.push(['Collection', titleCase(v.collection)]);
+  if (activeGroup.category) specs.push(['Category', titleCase(activeGroup.category)]);
+
+  if (specs.length > 0) {
+    modalSpecs.innerHTML = specs.map(([k, val]) =>
+      '<dt>' + escapeHtml(k) + '</dt><dd>' + escapeHtml(String(val)) + '</dd>'
+    ).join('');
+    modalSpecsWrap.hidden = false;
+  } else {
+    modalSpecsWrap.hidden = true;
+  }
+
+  // Applications (per-variant)
+  if (Array.isArray(v.applications) && v.applications.length > 0) {
+    modalAppsList.innerHTML = v.applications
+      .map(a => '<span class="ho-modal-app-chip">' + escapeHtml(String(a)) + '</span>').join('');
+    modalAppsWrap.hidden = false;
+  } else {
+    modalAppsWrap.hidden = true;
+  }
+
+  // Actions: cut sheet + spec PDF (per-variant)
+  const acts = [];
+  if (v.cut_sheet_url) {
+    acts.push('<a class="ho-modal-btn ho-modal-btn-primary" href="' + escapeAttr(v.cut_sheet_url) + '" target="_blank" rel="noopener">📄 View cut sheet</a>');
+  }
+  if (v.spec_pdf_url && v.spec_pdf_url !== v.cut_sheet_url) {
+    acts.push('<a class="ho-modal-btn ho-modal-btn-ghost" href="' + escapeAttr(v.spec_pdf_url) + '" target="_blank" rel="noopener">📋 Spec PDF</a>');
+  }
+  if (acts.length === 0) {
+    acts.push('<p style="font-size:13px;color:var(--bp-muted);margin:0;">Detailed cut-sheets coming as we add them to the catalog.</p>');
+  }
+  modalActions.innerHTML = acts.join('');
+}
+
+colorSwatches.addEventListener('click', (e) => {
+  const btn = e.target.closest('.ho-swatch-btn');
+  if (!btn) return;
+  const idx = Number(btn.dataset.idx);
+  if (Number.isNaN(idx)) return;
+  activeIdx = idx;
+  colorSwatches.querySelectorAll('.ho-swatch-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // If this variant has a swatch (or primary) image, switch the main slot to enlarge
+  // it. Otherwise stay in gallery mode and only update color name + specs.
+  const v = activeGroup.variants[idx];
+  if (v && (v.swatch_url || v.primary_image_url)) {
+    activeMainSource = 'swatch';
+    renderGallery();
+  }
+  renderActiveVariant();
+});
+
+function closeModal() {
+  modalBackdrop.hidden = true;
+  document.body.style.overflow = '';
+  activeGroup = null;
+}
+
+function titleCase(s) {
+  return String(s || '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function escapeAttr(s) { return escapeHtml(s); }
+</script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Paver Portal Portal</title>
+<!-- Capture invite hash BEFORE supabase-js parses & clears it -->
+<script>window.__inviteFlow = /[#&]type=invite/.test(window.location.hash || '');</script>
+<style>
+  :root{
+    --bg:#f7f6f3; --surface:#ffffff; --line:#e7e4dd;
+    --ink:#1f2421; --muted:#6b7280; --faint:#9ca3af;
+    --accent:#9c7440; --accent-ink:#6b4f24; --accent-soft:#eef3ef;
+    --ok:#065f46; --okbg:#ecfdf5;
+    --shadow:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.05);
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .hidden{display:none!important}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--line);padding:16px 28px;display:flex;align-items:center;gap:14px}
+  .brand{font-weight:700;font-size:17px;letter-spacing:-.01em}
+  .brand .dot{color:var(--accent)}
+  .topbar .spacer{flex:1}
+  .topbar .who{font-size:13px;color:var(--muted)}
+  .topbar a{color:var(--muted);font-size:13px;text-decoration:none;cursor:pointer}
+  .topbar a:hover{color:var(--ink)}
+  .shell{max-width:780px;margin:0 auto;padding:34px 24px 80px}
+
+  /* Auth views */
+  .auth-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:36px 32px;box-shadow:var(--shadow);max-width:420px;margin:60px auto}
+  .auth-card h1{font-size:22px;margin:0 0 6px;font-weight:650}
+  .auth-card p{color:var(--muted);margin:0 0 22px;font-size:14px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:5px;font-weight:550}
+  .field input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
+  .field input:focus{outline:none;border-color:var(--accent)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:14.5px;font-weight:600;cursor:pointer;font-family:inherit;width:100%}
+  .btn:hover{background:#faf9f6}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{filter:brightness(1.05)}
+  .or-row{text-align:center;color:var(--faint);font-size:12px;margin:14px 0}
+  .auth-msg{margin-top:14px;font-size:13px;text-align:center;min-height:18px}
+  .auth-msg.err{color:#dc2626} .auth-msg.ok{color:var(--ok)}
+
+  /* Dashboard */
+  .hero{padding:14px 0 22px}
+  .hero h1{font-size:32px;margin:0 0 8px;font-weight:650;letter-spacing:-.02em}
+  .hero p{color:var(--muted);font-size:16px;margin:0;max-width:560px}
+  .status-banner{background:var(--accent-soft);border:1px solid #d9e4dc;border-radius:14px;padding:18px 22px;margin:8px 0 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .status-pulse{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 rgba(93,126,105,.5);animation:pulse 2s infinite;flex:none}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(93,126,105,.45)}70%{box-shadow:0 0 0 9px rgba(93,126,105,0)}100%{box-shadow:0 0 0 0 rgba(93,126,105,0)}}
+  .status-text strong{font-weight:650}
+  .status-text small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:14px}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 14px;font-weight:650}
+  .kv{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px}
+  .kv .k{color:var(--muted)} .kv .v{font-weight:550;text-align:right;max-width:65%}
+  .designer{display:flex;align-items:center;gap:14px}
+  .designer .avatar{width:50px;height:50px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:650;font-size:18px;flex:none}
+  .designer .info{flex:1}
+  .designer .info .nm{font-weight:650;font-size:15.5px}
+  .designer .info .role{font-size:13px;color:var(--muted)}
+  .designer .info a{color:var(--accent-ink);font-size:13px;text-decoration:none}
+  .tl-step{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .tl-step:last-child{border-bottom:none}
+  .tl-icon{flex:none;width:38px;height:38px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-size:17px}
+  .tl-main{flex:1}
+  .tl-title{font-weight:600;font-size:14.5px}
+  .tl-when{font-size:12.5px;color:var(--muted)}
+  .tl-blurb{font-size:13.5px;color:var(--muted);margin-top:3px}
+  .prop-ready{background:linear-gradient(135deg,#9c7440,#3f5d4b);color:#fff;border-radius:14px;padding:28px;text-align:center;margin-bottom:14px}
+  .prop-ready h2{color:#fff;text-transform:none;letter-spacing:0;font-size:22px;margin:0 0 8px;font-weight:650}
+  .prop-ready p{margin:0 0 16px;opacity:.9}
+  .prop-ready .btn{background:#fff;color:var(--accent-ink);border-color:#fff;width:auto;padding:11px 22px;text-decoration:none}
+  .footer{text-align:center;font-size:12.5px;color:var(--faint);padding:30px 0 10px}
+  @media (max-width:600px){
+    .topbar{padding:14px 18px} .shell{padding:24px 16px 60px}
+    .hero h1{font-size:26px} .card{padding:18px}
+  }
+</style>
+</head>
+<body>
+
+<div id="topbar" class="topbar hidden">
+  <span class="brand">Paver Portal<span class="dot">.</span> Pavers</span>
+  <span class="spacer"></span>
+  <span class="who" id="who"></span>
+  <a id="sign-out">Sign out</a>
+</div>
+
+<div id="signin" class="shell hidden">
+  <div class="auth-card">
+    <h1>Your Paver Portal Portal</h1>
+    <p>Sign in with the email you gave your Paver Portal designer.</p>
+    <div class="field"><label>Email</label><input id="si-email" type="email" autocomplete="email"></div>
+    <div class="field"><label>Password</label><input id="si-pass" type="password" autocomplete="current-password"></div>
+    <button class="btn primary" id="si-go">Sign in</button>
+    <div class="or-row">— or —</div>
+    <button class="btn" id="si-magic">Email me a sign-in link</button>
+    <div class="auth-msg" id="si-msg"></div>
+  </div>
+</div>
+
+<div id="setpw" class="shell hidden">
+  <div class="auth-card">
+    <h1>Welcome to your portal</h1>
+    <p>Pick a password so you can come back any time.</p>
+    <div class="field"><label>Choose a password</label><input id="pw-new" type="password" autocomplete="new-password" placeholder="At least 8 characters"></div>
+    <button class="btn primary" id="pw-go">Save and continue</button>
+    <div class="auth-msg" id="pw-msg"></div>
+  </div>
+</div>
+
+<div id="dashboard" class="shell hidden">
+  <div class="hero">
+    <h1 id="d-greeting">Welcome</h1>
+    <p id="d-sub"></p>
+  </div>
+  <div id="d-status" class="status-banner hidden">
+    <span class="status-pulse"></span>
+    <div class="status-text"><strong>Design in progress</strong><small id="d-completion"></small></div>
+  </div>
+  <div id="d-prop" class="prop-ready hidden">
+    <h2>Your proposal is ready</h2>
+    <p>Your custom design has landed.</p>
+    <a class="btn" id="d-prop-link" href="#">Open proposal →</a>
+  </div>
+  <div class="card">
+    <h2>Your project</h2>
+    <div class="kv"><span class="k">Address</span><span class="v" id="d-addr">—</span></div>
+    <div class="kv"><span class="k">Project type</span><span class="v" id="d-type">—</span></div>
+    <div class="kv"><span class="k">Discovery</span><span class="v" id="d-discovery">—</span></div>
+  </div>
+  <div class="card">
+    <h2>Your designer</h2>
+    <div class="designer">
+      <div class="avatar" id="d-avatar">—</div>
+      <div class="info">
+        <div class="nm" id="d-designer">—</div>
+        <div class="role">Paver Portal</div>
+        <a id="d-designer-email" href="#">—</a>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="d-timeline-card">
+    <h2>What's next</h2>
+    <div id="d-timeline"></div>
+  </div>
+  <div class="footer">Paver Portal · portal-baysidepavers.com</div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+// ════════ CONFIG — same anon key you used in admin/index.html ════════
+const SUPABASE_URL      = 'https://gfgbypcnxkschnfsitfb.supabase.co';
+const SUPABASE_ANON_KEY = 'PASTE_YOUR_ANON_PUBLIC_KEY_HERE';
+// ════════════════════════════════════════════════════════════════════
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const $ = id => document.getElementById(id);
+const escHTML = s => (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function fmtDate(ts){ if(!ts) return '—'; return new Date(ts).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}); }
+function fmtDay(ts){ if(!ts) return '—'; return new Date(ts).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}); }
+function relDay(ts){ if(!ts) return ''; const d=Math.round((new Date(ts)-new Date())/864e5); if(d===0)return 'today'; if(d===1)return 'tomorrow'; if(d===-1)return 'yesterday'; if(d>1)return `in ${d} days`; return `${Math.abs(d)} days ago`; }
+
+const KIND_INFO = {
+  portal_installation_preview: { title:'Installation walk-through', icon:'🔨', blurb:'A peek at how we actually build a project like yours' },
+  portal_materials_preview:    { title:'Materials wishlist',         icon:'🎨', blurb:'Browse and favorite finishes for your project' },
+  portal_design_ready:         { title:'Your design is ready',       icon:'✨', blurb:'Your custom proposal lands in your portal' },
+};
+
+async function boot(){
+  const { data:{ session } } = await supabase.auth.getSession();
+  if (session) {
+    if (window.__inviteFlow) showSetPassword();
+    else showDashboard();
+  } else {
+    showSignIn();
+  }
+}
+function showSignIn(){ ['topbar','setpw','dashboard'].forEach(i=>$(i).classList.add('hidden')); $('signin').classList.remove('hidden'); }
+function showSetPassword(){ ['topbar','signin','dashboard'].forEach(i=>$(i).classList.add('hidden')); $('setpw').classList.remove('hidden'); }
+async function showDashboard(){
+  ['signin','setpw'].forEach(i=>$(i).classList.add('hidden'));
+  $('topbar').classList.remove('hidden'); $('dashboard').classList.remove('hidden');
+  if (window.location.hash) history.replaceState(null,'',window.location.pathname + window.location.search);
+  await loadDashboard();
+}
+
+$('si-go').onclick = async () => {
+  const msg=$('si-msg'); msg.textContent='';
+  const email=$('si-email').value.trim(), password=$('si-pass').value;
+  if (!email||!password) { msg.className='auth-msg err'; msg.textContent='Enter your email and password.'; return; }
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) { msg.className='auth-msg err'; msg.textContent=error.message; return; }
+  showDashboard();
+};
+$('si-magic').onclick = async () => {
+  const msg=$('si-msg'); msg.textContent='';
+  const email=$('si-email').value.trim();
+  if (!email) { msg.className='auth-msg err'; msg.textContent='Enter your email first.'; return; }
+  const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo: window.location.href } });
+  if (error) { msg.className='auth-msg err'; msg.textContent=error.message; return; }
+  msg.className='auth-msg ok'; msg.textContent='Check your email for the sign-in link.';
+};
+$('pw-go').onclick = async () => {
+  const msg=$('pw-msg'); msg.textContent='';
+  const password=$('pw-new').value;
+  if (!password || password.length<8) { msg.className='auth-msg err'; msg.textContent='Pick a password with at least 8 characters.'; return; }
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) { msg.className='auth-msg err'; msg.textContent=error.message; return; }
+  showDashboard();
+};
+$('sign-out').onclick = async () => { await supabase.auth.signOut(); showSignIn(); };
+
+async function loadDashboard(){
+  const { data, error } = await supabase.rpc('get_homeowner_dashboard');
+  if (error || !data || data.error) {
+    $('dashboard').innerHTML = `<div class="card"><h2>Hmm</h2><p>We couldn't load your project right now. Please reach out to your designer if this keeps happening.</p></div>`;
+    return;
+  }
+  const c = data.client, d = data.designer || {};
+  $('who').textContent = c.first_name;
+  $('d-greeting').textContent = `Welcome, ${c.first_name}`;
+
+  if (data.has_proposal) {
+    $('d-sub').textContent = 'Your custom design is ready in your portal.';
+    $('d-status').classList.add('hidden');
+    $('d-prop').classList.remove('hidden');
+    $('d-prop-link').href = `/p/${data.proposal.slug}`;
+    $('d-timeline-card').classList.add('hidden');
+  } else {
+    $('d-sub').textContent = `${d.name || 'Your designer'} is working on the design for your ${(c.project_type_label||'project').toLowerCase()}. Here's everything you need while you wait.`;
+    $('d-status').classList.remove('hidden');
+    $('d-completion').textContent = data.expected_design_completion
+      ? `Expected: ${fmtDate(data.expected_design_completion)} (${relDay(data.expected_design_completion)})`
+      : 'Your designer will let you know when it\'s ready.';
+  }
+
+  $('d-addr').textContent = c.project_address || '—';
+  $('d-type').textContent = c.project_type_label || '—';
+  $('d-discovery').textContent = `${fmtDay(c.created_at)} (${relDay(c.created_at)})`;
+
+  $('d-designer').textContent = d.name || '—';
+  $('d-avatar').textContent = (d.name || '?').charAt(0).toUpperCase();
+  if (d.email) { $('d-designer-email').textContent = d.email; $('d-designer-email').href = `mailto:${d.email}`; }
+
+  const items = data.timeline || [];
+  if (items.length && !data.has_proposal) {
+    $('d-timeline-card').classList.remove('hidden');
+    $('d-timeline').innerHTML = items.map(it => {
+      const info = KIND_INFO[it.kind] || { title: it.kind, icon:'•', blurb:'' };
+      return `<div class="tl-step"><div class="tl-icon">${info.icon}</div><div class="tl-main"><div class="tl-title">${escHTML(info.title)}</div><div class="tl-blurb">${escHTML(info.blurb)}</div><div class="tl-when">${escHTML(fmtDay(it.scheduled_for))} (${escHTML(relDay(it.scheduled_for))})</div></div></div>`;
+    }).join('');
+  } else {
+    $('d-timeline-card').classList.add('hidden');
+  }
+}
+boot();
+</script>
+</body>
+</html>
