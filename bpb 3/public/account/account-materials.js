@@ -212,7 +212,7 @@ function findManufacturer(name) {
   const lc = name.toLowerCase();
   return MANUFACTURERS.find(m => (m.manufacturer || '').toLowerCase() === lc) || null;
 }
-function findBayside() {
+function findPaver Portal() {
   return MANUFACTURERS.find(m =>
     (m.manufacturer || '').toLowerCase().includes('bayside')
   ) || null;
@@ -323,7 +323,7 @@ function openModal(mid) {
   if (!m) return;
   closeModal();
   const mfr = findManufacturer(m.manufacturer);
-  const bayside = findBayside();
+  const bayside = findPaver Portal();
   const guides = filterGuidesForMaterial(m);
   const heroImg = pickImageUrl(m);
   const heroBlock = heroImg
@@ -356,7 +356,7 @@ function openModal(mid) {
         ${bayside ? `
           <div class="vm-warranty">
             <div class="vm-warranty-label">Installation</div>
-            <div class="vm-warranty-text">${escapeHtml(bayside.warranty_summary || '25-year installation warranty on all Bayside-installed work.')}</div>
+            <div class="vm-warranty-text">${escapeHtml(bayside.warranty_summary || '25-year installation warranty on all Paver Portal-installed work.')}</div>
             ${bayside.warranty_url ? `<a class="vm-warranty-link" href="${escapeAttr(bayside.warranty_url)}" target="_blank" rel="noopener">View full warranty PDF →</a>` : ''}
           </div>
         ` : ''}

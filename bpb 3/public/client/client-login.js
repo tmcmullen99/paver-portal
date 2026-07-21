@@ -37,7 +37,7 @@ const isAdminMode = params.get('admin') === '1';
 
 // Adapt copy for admin mode
 if (isAdminMode) {
-  brandName.textContent = 'Bayside Proposal Builder';
+  brandName.textContent = 'Paver Portal Proposal Builder';
   headline.textContent = 'Admin Login';
   subtitle.textContent = 'Enter your admin email to manage clients and proposals.';
 }

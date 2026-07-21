@@ -3,7 +3,7 @@
 
    Homeowner chat module loaded by /account/index.html. Mounts an inline
    chat panel that lets the homeowner read and send messages with their
-   assigned Bayside designer.
+   assigned Paver Portal designer.
 
    Sprint 10e additions (on top of 10d):
      - Composer file picker (📎) + chips queue
@@ -18,7 +18,7 @@
    Per-client threading (Sprint 10a): one thread per client. Reads/writes
    client_messages and client_message_attachments via Supabase RLS.
 
-   Staff senders are shown as "Bayside Pavers" — no need to expose
+   Staff senders are shown as "Paver Portal" — no need to expose
    individual designer names from a homeowner-scoped session.
    ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -122,7 +122,7 @@ function renderShell(mount) {
       <span class="ho-section-meta" id="hochat-status"></span>
     </div>
     <p class="ho-section-sub">
-      Direct line to your designer at Bayside Pavers. Questions, requests,
+      Direct line to your designer at Paver Portal. Questions, requests,
       or photos — send them here. We aim to respond within one business day.
     </p>
     <div class="hochat-card">
@@ -186,7 +186,7 @@ function renderMessages() {
 
 function renderOne(message) {
   const isOutbound = message.sender_user_id === _userId;
-  const senderName = isOutbound ? 'You' : 'Bayside Pavers';
+  const senderName = isOutbound ? 'You' : 'Paver Portal';
   const time = formatTime(message.created_at);
   const bodyHtml = message.body ? escapeHtml(message.body).replace(/\n/g, '<br>') : '';
 

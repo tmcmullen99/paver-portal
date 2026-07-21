@@ -167,7 +167,7 @@ async function injectAuthPill() {
     '  background: #fff; border: 1px solid #e5e5e5;' +
     '  border-radius: 999px; padding: 6px 6px 6px 16px;' +
     "  font: 500 12px/1.2 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;" +
-    '  color: #1a1f2e;' +
+    '  color: #33281c;' +
     '  display: inline-flex; align-items: center; gap: 12px;' +
     '  box-shadow: 0 4px 14px rgba(0,0,0,0.08);' +
     '  max-width: calc(100vw - 28px);' +
@@ -176,7 +176,7 @@ async function injectAuthPill() {
     '#bpb-auth-pill .bpb-auth-role {' +
     "  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;" +
     '  font-size: 9px; letter-spacing: 0.18em;' +
-    '  color: #5d7e69; text-transform: uppercase; font-weight: 600;' +
+    '  color: #9c7440; text-transform: uppercase; font-weight: 600;' +
     '}' +
     '#bpb-auth-pill .bpb-auth-logout {' +
     '  background: #f5f5f5; border: none;' +
@@ -185,7 +185,7 @@ async function injectAuthPill() {
     '  color: #353535; cursor: pointer;' +
     '  transition: background 0.15s, color 0.15s;' +
     '}' +
-    '#bpb-auth-pill .bpb-auth-logout:hover { background: #1a1f2e; color: #fff; }' +
+    '#bpb-auth-pill .bpb-auth-logout:hover { background: #33281c; color: #fff; }' +
     '@media (max-width: 540px) {' +
     '  #bpb-auth-pill { padding: 5px 5px 5px 12px; gap: 8px; font-size: 11px; }' +
     '  #bpb-auth-pill .bpb-auth-name { max-width: 120px; }' +

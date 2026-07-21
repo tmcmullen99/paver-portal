@@ -1,7 +1,7 @@
 {
   "name": "bayside-proposal-builder",
   "version": "0.1.0",
-  "description": "Internal tool for generating Bayside Pavers proposal pages. Supabase-backed, Cloudflare Pages hosted.",
+  "description": "Internal tool for generating Paver Portal proposal pages. Supabase-backed, Cloudflare Pages hosted.",
   "private": true,
   "scripts": {
     "dev": "wrangler pages dev public --compatibility-date=2024-09-23",

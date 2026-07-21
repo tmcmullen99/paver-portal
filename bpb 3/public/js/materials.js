@@ -329,7 +329,7 @@ function renderBackfillStyles() {
       .bf-banner {
         margin: 0 0 20px;
         padding: 14px 18px;
-        background: linear-gradient(135deg, #e8eee9, #faf8f3);
+        background: linear-gradient(135deg, #f1e7d3, #faf8f3);
         border: 1px solid #c9d3cb;
         border-radius: 10px;
         display: flex;
@@ -339,9 +339,9 @@ function renderBackfillStyles() {
         flex-wrap: wrap;
       }
       .bf-banner-text { font-size: 14px; color: #353535; line-height: 1.4; }
-      .bf-banner-text strong { color: #4a6654; font-weight: 700; }
+      .bf-banner-text strong { color: #7d5c31; font-weight: 700; }
       .bf-banner-btn {
-        background: #5d7e69;
+        background: #9c7440;
         color: #fff;
         border: none;
         padding: 9px 16px;
@@ -351,11 +351,11 @@ function renderBackfillStyles() {
         cursor: pointer;
         white-space: nowrap;
       }
-      .bf-banner-btn:hover { background: #4a6654; }
+      .bf-banner-btn:hover { background: #7d5c31; }
 
       .bf-modal { max-width: 760px; }
       .bf-modal-header { padding: 24px 28px 16px; border-bottom: 1px solid #e5e5e5; }
-      .bf-modal-header h3 { margin: 0 0 6px; font-size: 20px; color: #1a1f2e; }
+      .bf-modal-header h3 { margin: 0 0 6px; font-size: 20px; color: #33281c; }
       .bf-modal-sub { color: #666; font-size: 14px; }
 
       .bf-phase-body { padding: 24px 28px; }
@@ -372,7 +372,7 @@ function renderBackfillStyles() {
         border-radius: 8px;
         text-align: center;
       }
-      .bf-stat-num { font-size: 28px; font-weight: 700; color: #4a6654; }
+      .bf-stat-num { font-size: 28px; font-weight: 700; color: #7d5c31; }
       .bf-stat-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
 
       .bf-idle-cost {
@@ -385,7 +385,7 @@ function renderBackfillStyles() {
         display: block;
         width: 100%;
         padding: 14px;
-        background: #5d7e69;
+        background: #9c7440;
         color: #fff;
         border: none;
         border-radius: 6px;
@@ -393,7 +393,7 @@ function renderBackfillStyles() {
         font-size: 15px;
         cursor: pointer;
       }
-      .bf-run-btn:hover { background: #4a6654; }
+      .bf-run-btn:hover { background: #7d5c31; }
       .bf-run-btn:disabled { background: #999; cursor: not-allowed; }
 
       .bf-analyzing {
@@ -403,7 +403,7 @@ function renderBackfillStyles() {
       .bf-analyzing-spinner {
         width: 40px; height: 40px;
         border: 3px solid #e5e5e5;
-        border-top-color: #5d7e69;
+        border-top-color: #9c7440;
         border-radius: 50%;
         animation: bfspin 0.8s linear infinite;
         margin: 0 auto 16px;
@@ -429,7 +429,7 @@ function renderBackfillStyles() {
         cursor: pointer;
         font-weight: 600;
       }
-      .bf-bulk-btn:hover { background: #e8eee9; }
+      .bf-bulk-btn:hover { background: #f1e7d3; }
 
       .bf-review-list { padding: 0 28px 20px; max-height: 60vh; overflow-y: auto; }
 
@@ -468,7 +468,7 @@ function renderBackfillStyles() {
       }
 
       .bf-match-body { display: flex; flex-direction: column; gap: 8px; }
-      .bf-match-material { font-size: 15px; font-weight: 600; color: #1a1f2e; }
+      .bf-match-material { font-size: 15px; font-weight: 600; color: #33281c; }
       .bf-match-meta {
         display: flex;
         align-items: center;
@@ -520,14 +520,14 @@ function renderBackfillStyles() {
         font-weight: 600;
         cursor: pointer;
       }
-      .bf-approve-btn { background: #5d7e69; color: #fff; }
-      .bf-approve-btn:hover { background: #4a6654; }
+      .bf-approve-btn { background: #9c7440; color: #fff; }
+      .bf-approve-btn:hover { background: #7d5c31; }
       .bf-approve-btn:disabled { background: #999; cursor: default; }
       .bf-reject-btn { background: #fff; color: #888; border: 1px solid #ddd; }
       .bf-reject-btn:hover { background: #f5f5f5; }
 
       .bf-match-status { font-size: 12px; font-weight: 600; }
-      .bf-match-status.ok { color: #4a6654; }
+      .bf-match-status.ok { color: #7d5c31; }
       .bf-match-status.err { color: #b04040; }
 
       .bf-non-matches {
@@ -545,7 +545,7 @@ function renderBackfillStyles() {
         text-align: center;
         padding: 40px 20px;
       }
-      .bf-done-icon { font-size: 48px; color: #5d7e69; margin-bottom: 12px; }
+      .bf-done-icon { font-size: 48px; color: #9c7440; margin-bottom: 12px; }
       .bf-done-summary {
         color: #666;
         font-size: 14px;
@@ -1163,7 +1163,7 @@ function renderBackfillReview() {
     <div class="bf-review-header">
       <div>
         <strong>${validMatches.length}</strong> match${validMatches.length === 1 ? '' : 'es'} ·
-        <span style="color:#4a6654;">${approved} approved</span> ·
+        <span style="color:#7d5c31;">${approved} approved</span> ·
         <span style="color:#888;">${rejected} rejected</span> ·
         <span>${pending} pending</span>
       </div>
@@ -1175,7 +1175,7 @@ function renderBackfillReview() {
     ${nonMatchSummary}
     ${pending === 0 ? `
       <div style="padding: 16px 28px; border-top: 1px solid #e5e5e5; text-align: right;">
-        <button class="bf-bulk-btn" id="bfFinish" style="background:#5d7e69; color:#fff; border-color:#5d7e69;">
+        <button class="bf-bulk-btn" id="bfFinish" style="background:#9c7440; color:#fff; border-color:#9c7440;">
           Finish
         </button>
       </div>
@@ -1267,7 +1267,7 @@ function renderBackfillDone() {
     <div class="bf-phase-body">
       <div class="bf-done">
         <div class="bf-done-icon">✓</div>
-        <div style="font-size:18px; font-weight:600; color:#1a1f2e; margin-bottom:8px;">
+        <div style="font-size:18px; font-weight:600; color:#33281c; margin-bottom:8px;">
           Backfill complete
         </div>
         <div class="bf-done-summary">
@@ -1275,7 +1275,7 @@ function renderBackfillDone() {
           The catalog is updated. Next time you select these materials on any proposal,
           the images will be there automatically.
         </div>
-        <button class="bf-run-btn" id="bfClose" style="background:#5d7e69;">Close</button>
+        <button class="bf-run-btn" id="bfClose" style="background:#9c7440;">Close</button>
       </div>
     </div>
   `;

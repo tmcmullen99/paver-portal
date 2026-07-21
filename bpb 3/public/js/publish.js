@@ -19,7 +19,7 @@
 //      • When a Belgard material's category has a mapped install guide
 //        section, the button links to the master PDF at the relevant page
 //        ({BELGARD_MASTER_PDF}#page=N).
-//      • Falls back to the generic Bayside install guide if the material's
+//      • Falls back to the generic Paver Portal install guide if the material's
 //        category isn't mapped (preserves prior behavior — no regressions
 //        for materials without section linkage).
 //
@@ -152,7 +152,7 @@
 //      unchanged.
 //
 //  13. [Phase 1B.5] Quality Standards section redesigned as a
-//      horizontally scrollable rail showcasing every category Bayside
+//      horizontally scrollable rail showcasing every category Paver Portal
 //      installs, not just the categories present in this specific bid.
 //      Two data-layer changes feed it: loadInstallGuideData now
 //      fetches every row from installation_guide_sections (instead of
@@ -224,7 +224,7 @@
 
 import { supabase } from './supabase-client.js';
 
-// Bayside-branded installation guide PDF — remains the bottom footer CTA.
+// Paver Portal-branded installation guide PDF — remains the bottom footer CTA.
 // This is the client-facing "Here's how we install" document.
 const INSTALL_GUIDE_URL = '/account/';
 
@@ -240,7 +240,7 @@ const BELGARD_MASTER_INSTALL_GUIDE_URL = 'https://www.belgard.com/wp-content/upl
 const EVERGRASS_INSTALL_GUIDE_URL = 'https://cdn.msisurfaces.com/files/flyers/evergrass-artificial-turf-pavers.pdf';
 const TRU_SCAPES_PRODUCT_GUIDE_URL = 'https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69e99762031d43f432f14cde_Tru%20Scapes-compressed.pdf';
 
-const BAYSIDE_LOGO_URL = '/assets/paver-portal-logo.svg';
+const PAVER PORTAL_LOGO_URL = '/assets/paver-portal-logo.svg';
 const TIM_PHONE = '415-691-9272';
 const TIM_PHONE_HREF = '+14156919272';
 const TIM_EMAIL = 'tim@mcmullen.properties';
@@ -429,7 +429,7 @@ async function reload() {
 async function loadInstallGuideData(belgardRows) {
   // Phase 1B.4 — fetch ALL install guide sections for the Quality
   // Standards rail. The section is now a showcase of every category
-  // Bayside installs, not just what's in this bid, so the unfiltered
+  // Paver Portal installs, not just what's in this bid, so the unfiltered
   // sections feed renderWhyPrepSection. categoryToSection (built below)
   // remains bid-filtered because it powers the deep-link from each
   // per-material "Installation guide" button to its matching section.
@@ -1716,7 +1716,7 @@ function buildHtmlSnapshot({ proposal, sections, materials, photos, installSecti
   }
   /* Phase 1B.7 — material type eyebrow above the product name.
      Mono caps tracking matches the section-level eyebrow rhythm; green-dark
-     ties the card identity to the Bayside palette without competing with
+     ties the card identity to the Paver Portal palette without competing with
      the navy product name. */
   .pub-material-card-type {
     font-family: 'JetBrains Mono', monospace;
@@ -2759,7 +2759,7 @@ function buildHtmlSnapshot({ proposal, sections, materials, photos, installSecti
 </head>
 <body>
   <header class="pub-header">
-    <img src="${escapeAttr(BAYSIDE_LOGO_URL)}" alt="Paver Portal" class="pub-header-logo">
+    <img src="${escapeAttr(PAVER PORTAL_LOGO_URL)}" alt="Paver Portal" class="pub-header-logo">
     <span class="pub-header-date">${escapeHtml(dateStr)}</span>
   </header>
 
@@ -3813,7 +3813,7 @@ function groupMaterialsByArea(materials) {
 function extractMaterialInfo(m, categoryToSection) {
   // Look up a page-anchored deep link to the master Belgard install guide
   // PDF based on the material's category. If no section is mapped, fall
-  // back to the generic Bayside install guide URL when installation_guide_id
+  // back to the generic Paver Portal install guide URL when installation_guide_id
   // is set (preserves Sprint 1 behavior for unmapped materials).
   const lookupInstallGuide = (catalogRow) => {
     if (categoryToSection && catalogRow.category_id) {
@@ -3877,7 +3877,7 @@ function extractMaterialInfo(m, categoryToSection) {
 //   • Turf products (explicit turf/grass terms OR known MSI turf product
 //     names — Summer Gold, Platinum Spring, Arizona Platinum)
 //     → EVERGRASS_INSTALL_GUIDE_URL
-//   • Anything else with installation_guide_id set → generic Bayside guide
+//   • Anything else with installation_guide_id set → generic Paver Portal guide
 //   • Otherwise no link (card renders without the "See installation" button,
 //     same as pre-Sprint-3E behavior for unknown products)
 //
@@ -3956,7 +3956,7 @@ function renderWhyPrepSection(installSections, sections, materials) {
 
   const belgardCount = Array.isArray(installSections) ? installSections.length : 0;
   // Phase 1B.4 — third-party cards now always render (turf + lighting),
-  // so the rail showcases every category Bayside installs regardless of
+  // so the rail showcases every category Paver Portal installs regardless of
   // what's in this specific bid. The proposalHasTurf / Lighting predicates
   // are no longer consulted here.
   const thirdPartyCardsHtml = renderThirdPartyPrepCards(sections, materials, belgardCount);
@@ -4068,7 +4068,7 @@ function renderDynamicPrepCards(installSections) {
 //
 // Phase 1B.4 — these always render now (turf + lighting), regardless of
 // what's in this specific bid. The Quality Standards rail showcases every
-// category Bayside installs to demonstrate breadth + expertise; gating
+// category Paver Portal installs to demonstrate breadth + expertise; gating
 // these cards by proposalHasTurf / proposalHasTruScapesLighting was
 // appropriate when the section was bid-scoped, but the new framing is
 // "here's what we install across the board." The detection helpers are

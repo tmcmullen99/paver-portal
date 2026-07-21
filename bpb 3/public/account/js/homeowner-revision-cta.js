@@ -306,7 +306,7 @@ function openDesignRetainerPopup(state, mount) {
           <div class="bp-hrc-pitch-amount">$2,500</div>
           <div class="bp-hrc-pitch-amount-sub">
             <strong>Fully credited toward your final payment</strong> if you choose
-            Bayside Pavers to build your project. Most clients who sign the retainer
+            Paver Portal to build your project. Most clients who sign the retainer
             do go on to build with us — which means in practice it costs them nothing.
           </div>
         </div>
@@ -415,14 +415,14 @@ function injectStyles() {
       text-align: left;
     }
     .bp-hrc-card-confirmed {
-      background: #e8eee9;
-      border-color: #5d7e69;
+      background: #f1e7d3;
+      border-color: #9c7440;
     }
     .bp-hrc-eyebrow {
       font-size: 12px;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #5d7e69;
+      color: #9c7440;
       margin-bottom: 8px;
       font-weight: 600;
     }
@@ -455,11 +455,11 @@ function injectStyles() {
     }
     .bp-hrc-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .bp-hrc-btn-primary {
-      background: #5d7e69; color: #fff;
+      background: #9c7440; color: #fff;
       box-shadow: 0 4px 14px rgba(93, 126, 105, 0.22);
     }
     .bp-hrc-btn-primary:hover:not(:disabled) {
-      background: #4a6654;
+      background: #7d5c31;
       transform: translateY(-1px);
     }
     .bp-hrc-btn-secondary {
@@ -516,7 +516,7 @@ function injectStyles() {
       font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: #5d7e69;
+      color: #9c7440;
       margin-bottom: 6px;
       font-weight: 600;
     }
@@ -559,17 +559,17 @@ function injectStyles() {
       transition: background 0.12s, border-color 0.12s;
     }
     .bp-hrc-option:hover {
-      border-color: #5d7e69;
+      border-color: #9c7440;
       background: #f4f8f5;
     }
     .bp-hrc-option input[type="radio"] {
       margin-top: 3px;
       flex-shrink: 0;
-      accent-color: #5d7e69;
+      accent-color: #9c7440;
     }
     .bp-hrc-option:has(input:checked) {
-      border-color: #5d7e69;
-      background: #e8eee9;
+      border-color: #9c7440;
+      background: #f1e7d3;
     }
     .bp-hrc-option-content { flex: 1; }
     .bp-hrc-option-title {
@@ -608,8 +608,8 @@ function injectStyles() {
     }
     .bp-hrc-textarea:focus {
       outline: none;
-      border-color: #5d7e69;
-      box-shadow: 0 0 0 3px #e8eee9;
+      border-color: #9c7440;
+      box-shadow: 0 0 0 3px #f1e7d3;
     }
 
     .bp-hrc-pitch-lead {
@@ -634,7 +634,7 @@ function injectStyles() {
       content: '✓';
       position: absolute;
       left: 0; top: 8px;
-      color: #5d7e69;
+      color: #9c7440;
       font-weight: 700;
       font-size: 16px;
     }
@@ -646,7 +646,7 @@ function injectStyles() {
     .bp-hrc-pitch-amount {
       font-size: 32px;
       font-weight: 700;
-      color: #5d7e69;
+      color: #9c7440;
       letter-spacing: -0.02em;
       margin-bottom: 6px;
     }

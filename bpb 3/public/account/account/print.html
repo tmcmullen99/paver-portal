@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Print your plan · Bayside Pavers</title>
+<title>Print your plan · Paver Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -22,8 +22,8 @@
      this page architecture in subsequent sprints (14C.11 and beyond).
      ═══════════════════════════════════════════════════════════════════ */
   :root {
-    --bp-green:      #5d7e69;
-    --bp-green-dk:   #4a6554;
+    --bp-green:      #9c7440;
+    --bp-green-dk:   #7d5c31;
     --bp-charcoal:   #353535;
     --bp-tan:        #dad7c5;
     --bp-cream:      #faf8f3;
@@ -183,7 +183,7 @@
   }
 
   /* Eyebrow + section title — match the published-proposal vibe so
-     it's clearly Bayside-branded. */
+     it's clearly Paver Portal-branded. */
   .pp-section-eyebrow {
     font-size: 10px; letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -509,7 +509,7 @@
   // colors a homeowner sees on /p/<slug> match what they see on their
   // printout. If publish.js changes, update both lists.
   const REGION_COLORS = [
-    '#5d7e69', '#3b82f6', '#f59e0b', '#a855f7', '#ec4899',
+    '#9c7440', '#3b82f6', '#f59e0b', '#a855f7', '#ec4899',
     '#14b8a6', '#f97316', '#06b6d4', '#84cc16', '#ef4444',
   ];
 
@@ -621,7 +621,7 @@
     pagesEl.style.display  = 'flex';
 
     // Update document title so the print dialog filename is sensible.
-    document.title = `Print plan · ${addressLine || 'Bayside Pavers'}`;
+    document.title = `Print plan · ${addressLine || 'Paver Portal'}`;
   }
 
   function renderPageOne({ proposal, regions, materialsByRegion, addressLine, dateLine }) {
@@ -698,7 +698,7 @@
         </div>
 
         <div class="pp-page-footer">
-          <span>Page 2 of 2 · Bayside Pavers</span>
+          <span>Page 2 of 2 · Paver Portal</span>
           <span>portal-baysidepavers.com/account</span>
         </div>
       </div>
@@ -711,7 +711,7 @@
         <div class="pp-page-header-left">
           <div class="pp-page-header-logo">B</div>
           <div>
-            <div class="pp-page-header-brand">Bayside Pavers</div>
+            <div class="pp-page-header-brand">Paver Portal</div>
             <div class="pp-page-header-tag">Project plan · Mark up</div>
           </div>
         </div>

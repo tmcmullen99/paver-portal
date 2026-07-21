@@ -8,7 +8,7 @@
 //   - Existing horizontal-scroll rail becomes a single-card stage
 //   - New tab strip above lets reader pick a category directly
 //   - Matched cards (paver / turf / wall) get an SVG cross-section +
-//     Local Guy vs. Bayside comparison alongside the existing prose
+//     Local Guy vs. Paver Portal comparison alongside the existing prose
 //   - Unmatched cards (porcelain, accessories, fire, lighting) keep
 //     their original prose-only layout
 //   - Prev/next nav + page dots below
@@ -98,7 +98,7 @@
       const id = row.getAttribute('data-region-id');
       if (!id) return;
       const dot = row.querySelector('.pub-region-legend-dot');
-      const color = (dot && dot.style && dot.style.background) || '#5d7e69';
+      const color = (dot && dot.style && dot.style.background) || '#9c7440';
       const nameEl = row.querySelector('.pub-region-legend-name');
       const metaEl = row.querySelector('.pub-region-legend-meta');
       regions.push({
@@ -142,7 +142,7 @@
   // INSTALL VISUALS (B2-r7 — used by Quality Standards transform)
   // ───────────────────────────────────────────────────────────────────────
 
-  const SVG_PAVER = `<svg viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;"><defs><pattern id="bpc-pat-h1" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#5d7e69" stroke-width="0.6" opacity="0.5"/></pattern></defs><g fill="none" stroke="#353535" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M 18 195 L 165 195 L 168 198 L 18 198 Z" fill="#e8dfc8" opacity="0.6"/><path d="M 18 195 L 165 195"/><path d="M 22 192 L 26 195 M 35 192 L 39 195 M 50 193 L 54 196 M 70 192 L 74 195 M 92 193 L 96 196 M 115 192 L 119 195 M 140 193 L 144 196" stroke-width="0.7"/><text x="178" y="200" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">1. Native soil</text><path d="M 18 178 L 165 178 L 165 192 L 18 192 Z" fill="#d4cfb8" opacity="0.5"/><path d="M 18 178 L 165 178"/><path d="M 18 185 L 165 185" stroke-dasharray="2,2" stroke-width="0.6"/><text x="178" y="187" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">2. Geo-tech fabric</text><path d="M 18 158 L 165 158 L 165 178 L 18 178 Z" fill="url(#bpc-pat-h1)" opacity="0.4"/><path d="M 18 158 L 165 158"/><circle cx="32" cy="167" r="2"/><circle cx="48" cy="171" r="2.3"/><circle cx="64" cy="166" r="1.7"/><circle cx="82" cy="170" r="2.1"/><circle cx="100" cy="166" r="1.8"/><circle cx="120" cy="171" r="2.4"/><circle cx="142" cy="167" r="2"/><circle cx="156" cy="171" r="1.7"/><text x="178" y="172" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">3. Base material</text><path d="M 18 148 L 165 148 L 165 158 L 18 158 Z"/><path d="M 18 153 L 165 153" stroke-width="0.7"/><path d="M 30 148 L 30 158 M 50 148 L 50 158 M 70 148 L 70 158 M 90 148 L 90 158 M 110 148 L 110 158 M 130 148 L 130 158 M 150 148 L 150 158" stroke-width="0.6"/><text x="178" y="155" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">4. Geo grid</text><path d="M 18 128 L 165 128 L 165 148 L 18 148 Z" fill="url(#bpc-pat-h1)" opacity="0.4"/><path d="M 18 128 L 165 128"/><circle cx="32" cy="137" r="2"/><circle cx="48" cy="141" r="2.3"/><circle cx="64" cy="136" r="1.7"/><circle cx="82" cy="140" r="2.1"/><circle cx="100" cy="136" r="1.8"/><circle cx="120" cy="141" r="2.4"/><circle cx="142" cy="137" r="2"/><circle cx="156" cy="141" r="1.7"/><text x="178" y="142" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">5. Base material</text><path d="M 18 118 L 165 118 L 165 128 L 18 128 Z" fill="#f4e8c8" opacity="0.6"/><path d="M 18 118 L 165 118"/><text x="178" y="125" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">6. Bedding sand</text><path d="M 18 95 L 165 95 L 165 118 L 18 118 Z" fill="#a8a59a" opacity="0.5"/><path d="M 18 95 L 165 95"/><path d="M 42 95 L 42 118 M 70 95 L 70 118 M 100 95 L 100 118 M 130 95 L 130 118" stroke-width="0.8"/><path d="M 18 106 L 42 106 M 56 106 L 100 106 M 116 106 L 165 106" stroke-width="0.6"/><text x="178" y="110" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">7. Pavers</text><text x="178" y="92" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">8. Polymeric sand</text><line x1="172" y1="89" x2="100" y2="98" stroke-width="0.7"/></g></svg>`;
+  const SVG_PAVER = `<svg viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;"><defs><pattern id="bpc-pat-h1" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#9c7440" stroke-width="0.6" opacity="0.5"/></pattern></defs><g fill="none" stroke="#353535" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M 18 195 L 165 195 L 168 198 L 18 198 Z" fill="#e8dfc8" opacity="0.6"/><path d="M 18 195 L 165 195"/><path d="M 22 192 L 26 195 M 35 192 L 39 195 M 50 193 L 54 196 M 70 192 L 74 195 M 92 193 L 96 196 M 115 192 L 119 195 M 140 193 L 144 196" stroke-width="0.7"/><text x="178" y="200" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">1. Native soil</text><path d="M 18 178 L 165 178 L 165 192 L 18 192 Z" fill="#d4cfb8" opacity="0.5"/><path d="M 18 178 L 165 178"/><path d="M 18 185 L 165 185" stroke-dasharray="2,2" stroke-width="0.6"/><text x="178" y="187" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">2. Geo-tech fabric</text><path d="M 18 158 L 165 158 L 165 178 L 18 178 Z" fill="url(#bpc-pat-h1)" opacity="0.4"/><path d="M 18 158 L 165 158"/><circle cx="32" cy="167" r="2"/><circle cx="48" cy="171" r="2.3"/><circle cx="64" cy="166" r="1.7"/><circle cx="82" cy="170" r="2.1"/><circle cx="100" cy="166" r="1.8"/><circle cx="120" cy="171" r="2.4"/><circle cx="142" cy="167" r="2"/><circle cx="156" cy="171" r="1.7"/><text x="178" y="172" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">3. Base material</text><path d="M 18 148 L 165 148 L 165 158 L 18 158 Z"/><path d="M 18 153 L 165 153" stroke-width="0.7"/><path d="M 30 148 L 30 158 M 50 148 L 50 158 M 70 148 L 70 158 M 90 148 L 90 158 M 110 148 L 110 158 M 130 148 L 130 158 M 150 148 L 150 158" stroke-width="0.6"/><text x="178" y="155" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">4. Geo grid</text><path d="M 18 128 L 165 128 L 165 148 L 18 148 Z" fill="url(#bpc-pat-h1)" opacity="0.4"/><path d="M 18 128 L 165 128"/><circle cx="32" cy="137" r="2"/><circle cx="48" cy="141" r="2.3"/><circle cx="64" cy="136" r="1.7"/><circle cx="82" cy="140" r="2.1"/><circle cx="100" cy="136" r="1.8"/><circle cx="120" cy="141" r="2.4"/><circle cx="142" cy="137" r="2"/><circle cx="156" cy="141" r="1.7"/><text x="178" y="142" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">5. Base material</text><path d="M 18 118 L 165 118 L 165 128 L 18 128 Z" fill="#f4e8c8" opacity="0.6"/><path d="M 18 118 L 165 118"/><text x="178" y="125" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">6. Bedding sand</text><path d="M 18 95 L 165 95 L 165 118 L 18 118 Z" fill="#a8a59a" opacity="0.5"/><path d="M 18 95 L 165 95"/><path d="M 42 95 L 42 118 M 70 95 L 70 118 M 100 95 L 100 118 M 130 95 L 130 118" stroke-width="0.8"/><path d="M 18 106 L 42 106 M 56 106 L 100 106 M 116 106 L 165 106" stroke-width="0.6"/><text x="178" y="110" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">7. Pavers</text><text x="178" y="92" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">8. Polymeric sand</text><line x1="172" y1="89" x2="100" y2="98" stroke-width="0.7"/></g></svg>`;
 
   const SVG_TURF = `<svg viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;"><g fill="none" stroke="#353535" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M 18 188 L 165 188 L 168 192 L 18 192 Z" fill="#a89b7e" opacity="0.55"/><path d="M 18 188 L 165 188"/><path d="M 26 184 L 30 188 M 50 185 L 54 188 M 78 184 L 82 188 M 105 185 L 109 188 M 132 184 L 136 188 M 156 185 L 160 188" stroke-width="0.7"/><text x="178" y="192" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">Existing subgrade</text><path d="M 18 158 L 165 158 L 165 188 L 18 188 Z" fill="#bfb198" opacity="0.45"/><path d="M 18 158 L 165 158"/><circle cx="30" cy="170" r="2.3"/><circle cx="48" cy="175" r="1.9"/><circle cx="64" cy="168" r="2.2"/><circle cx="84" cy="174" r="2"/><circle cx="105" cy="170" r="2.5"/><circle cx="124" cy="175" r="1.8"/><circle cx="142" cy="168" r="2.1"/><circle cx="158" cy="174" r="1.9"/><circle cx="38" cy="180" r="1.6"/><circle cx="74" cy="182" r="2"/><circle cx="116" cy="180" r="1.8"/><circle cx="150" cy="183" r="1.7"/><text x="178" y="175" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">3" compacted base rock</text><path d="M 18 148 L 165 148 L 165 158 L 18 158 Z" fill="#3d3530" opacity="0.4"/><path d="M 18 148 L 165 148"/><path d="M 18 153 L 165 153" stroke-dasharray="3,2" stroke-width="0.6"/><text x="178" y="156" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">Weed barrier</text><path d="M 18 110 L 30 110 L 30 158 L 18 158 Z" fill="#8e8b85" opacity="0.5"/><path d="M 18 110 L 30 110 L 30 158"/><path d="M 22 118 L 26 122 M 22 130 L 26 134 M 22 142 L 26 146" stroke-width="0.6"/><text x="178" y="142" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">Edge restraint</text><line x1="172" y1="139" x2="36" y2="125" stroke-width="0.6"/><path d="M 30 138 L 165 138 L 165 148 L 30 148 Z" fill="#c8b896" opacity="0.5"/><path d="M 30 138 L 165 138"/><path d="M 38 142 L 42 144 M 56 142 L 60 144 M 76 142 L 80 144 M 96 142 L 100 144 M 116 142 L 120 144 M 136 142 L 140 144 M 156 142 L 160 144" stroke-width="0.6"/><text x="178" y="123" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">Infill</text><text x="178" y="135" font-family="Caveat, cursive" font-size="9" fill="#888" stroke="none">(anti-microbial)</text><line x1="172" y1="120" x2="100" y2="138" stroke-width="0.6"/><path d="M 30 110 L 165 110 L 165 138 L 30 138 Z"/><path d="M 30 110 L 165 110"/><path d="M 36 138 L 35 124 M 42 138 L 43 122 M 48 138 L 47 126 M 54 138 L 55 121 M 60 138 L 60 125 M 66 138 L 65 123 M 72 138 L 73 126 M 78 138 L 78 122 M 84 138 L 83 125 M 90 138 L 91 123 M 96 138 L 96 126 M 102 138 L 101 122 M 108 138 L 109 124 M 114 138 L 114 121 M 120 138 L 119 125 M 126 138 L 127 123 M 132 138 L 132 126 M 138 138 L 137 122 M 144 138 L 145 124 M 150 138 L 150 121 M 156 138 L 155 126 M 162 138 L 162 124" stroke-width="0.7"/><text x="178" y="105" font-family="Caveat, cursive" font-size="11" fill="#353535" stroke="none">Turf</text><line x1="172" y1="103" x2="100" y2="115" stroke-width="0.6"/></g></svg>`;
 
@@ -223,7 +223,7 @@
         <div class="bpc-cmp-header">
           <span class="bpc-cmp-label-h"></span>
           <span class="bpc-cmp-cell-h">Local guy</span>
-          <span class="bpc-cmp-cell-h bpc-cmp-cell-h--us">Bayside</span>
+          <span class="bpc-cmp-cell-h bpc-cmp-cell-h--us">Paver Portal</span>
         </div>
         ${compareRowsHtml}
       </div>
@@ -369,7 +369,7 @@
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.14em;
-      color: #5d7e69;
+      color: #9c7440;
       text-transform: uppercase;
       margin: 0 0 6px;
     }
@@ -395,7 +395,7 @@
     .bpc-card-back {
       background: transparent;
       border: none;
-      color: #5d7e69;
+      color: #9c7440;
       font-family: inherit;
       font-size: 12px;
       font-weight: 600;
@@ -407,7 +407,7 @@
       align-items: center;
       gap: 4px;
     }
-    .bpc-card-back:hover { color: #4a6554; }
+    .bpc-card-back:hover { color: #7d5c31; }
 
     .bpc-overview-list {
       display: flex;
@@ -469,7 +469,7 @@
       align-items: center;
     }
     .bpc-detail-mat--pending {
-      border-color: #5d7e69;
+      border-color: #9c7440;
       background: #f0f4f1;
       border-width: 2px;
     }
@@ -502,7 +502,7 @@
       margin-top: 2px;
     }
     .bpc-detail-mat-pending-arrow {
-      color: #5d7e69;
+      color: #9c7440;
       font-size: 12px;
       font-weight: 700;
       margin-top: 4px;
@@ -510,7 +510,7 @@
     .bpc-detail-mat-pending-name {
       font-weight: 700;
       font-size: 13px;
-      color: #5d7e69;
+      color: #9c7440;
       line-height: 1.2;
     }
     .bpc-detail-mat-actions {
@@ -520,7 +520,7 @@
       flex-shrink: 0;
     }
     .bpc-swap-btn {
-      background: #5d7e69;
+      background: #9c7440;
       color: #fff;
       border: none;
       border-radius: 4px;
@@ -532,11 +532,11 @@
       transition: background 0.15s;
       white-space: nowrap;
     }
-    .bpc-swap-btn:hover { background: #4a6554; }
+    .bpc-swap-btn:hover { background: #7d5c31; }
     .bpc-swap-btn--undo {
       background: transparent;
-      color: #5d7e69;
-      border: 1px solid #5d7e69;
+      color: #9c7440;
+      border: 1px solid #9c7440;
       font-size: 11px;
       padding: 4px 10px;
     }
@@ -558,15 +558,15 @@
       font-family: inherit;
       font-size: 13px;
       font-weight: 600;
-      color: #5d7e69;
+      color: #9c7440;
       background: #fff;
-      border: 1.5px solid #5d7e69;
+      border: 1.5px solid #9c7440;
       border-radius: 6px;
       cursor: pointer;
       letter-spacing: 0.02em;
       transition: background 0.15s, color 0.15s;
     }
-    .bpc-card-section-link:hover { background: #5d7e69; color: #fff; }
+    .bpc-card-section-link:hover { background: #9c7440; color: #fff; }
 
     .bpc-tray {
       flex-shrink: 0;
@@ -579,13 +579,13 @@
     .bpc-tray-count {
       font-size: 12px;
       font-weight: 600;
-      color: #5d7e69;
+      color: #9c7440;
       letter-spacing: 0.04em;
       margin-bottom: 6px;
     }
     .bpc-tray-cta {
       width: 100%;
-      background: #5d7e69;
+      background: #9c7440;
       color: #fff;
       border: none;
       border-radius: 6px;
@@ -596,7 +596,7 @@
       cursor: pointer;
       transition: background 0.15s;
     }
-    .bpc-tray-cta:hover { background: #4a6554; }
+    .bpc-tray-cta:hover { background: #7d5c31; }
     .bpc-tray-cta:disabled { background: #a8b5ac; cursor: not-allowed; }
 
     .bpc-modal-backdrop {
@@ -677,8 +677,8 @@
       font-family: inherit;
       transition: border-color 0.15s, transform 0.05s;
     }
-    .bpc-cand:hover { border-color: #5d7e69; transform: translateY(-1px); }
-    .bpc-cand--selected { border-color: #5d7e69; background: #f0f4f1; }
+    .bpc-cand:hover { border-color: #9c7440; transform: translateY(-1px); }
+    .bpc-cand--selected { border-color: #9c7440; background: #f0f4f1; }
     .bpc-cand--current { opacity: 0.4; pointer-events: none; }
     .bpc-cand-thumb {
       width: 100%; aspect-ratio: 1;
@@ -702,7 +702,7 @@
     .bpc-cand-color { font-size: 11px; color: #888; margin-top: 2px; }
     .bpc-cand-current-pill {
       display: inline-block;
-      background: #5d7e69; color: #fff;
+      background: #9c7440; color: #fff;
       font-size: 9px; font-weight: 700;
       padding: 2px 6px; border-radius: 8px;
       letter-spacing: 0.05em;
@@ -722,7 +722,7 @@
     }
     .bpc-modal-textarea:focus {
       outline: none;
-      border-color: #5d7e69;
+      border-color: #9c7440;
       box-shadow: 0 0 0 3px rgba(93, 126, 105, 0.16);
     }
 
@@ -736,8 +736,8 @@
       cursor: pointer;
       transition: background 0.15s;
     }
-    .bpc-btn--primary { background: #5d7e69; color: #fff; }
-    .bpc-btn--primary:hover { background: #4a6554; }
+    .bpc-btn--primary { background: #9c7440; color: #fff; }
+    .bpc-btn--primary:hover { background: #7d5c31; }
     .bpc-btn--primary:disabled { background: #a8b5ac; cursor: not-allowed; }
     .bpc-btn--ghost { background: transparent; color: #353535; border: 1px solid #d4d0c2; }
     .bpc-btn--ghost:hover { background: #f4f4ef; }
@@ -757,10 +757,10 @@
     .bpc-summary-item:last-child { border-bottom: none; }
     .bpc-summary-region {
       font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
-      color: #5d7e69; font-weight: 700; margin-bottom: 2px;
+      color: #9c7440; font-weight: 700; margin-bottom: 2px;
     }
     .bpc-summary-from { color: #999; text-decoration: line-through; }
-    .bpc-summary-arrow { color: #5d7e69; margin: 0 6px; }
+    .bpc-summary-arrow { color: #9c7440; margin: 0 6px; }
 
     .bpc-success {
       text-align: center;
@@ -769,7 +769,7 @@
     .bpc-success-icon {
       width: 48px; height: 48px;
       border-radius: 50%;
-      background: #5d7e69;
+      background: #9c7440;
       color: #fff;
       font-size: 24px;
       display: flex; align-items: center; justify-content: center;
@@ -815,8 +815,8 @@
       flex-shrink: 0;
       margin-bottom: 0;
       padding: 2px 8px;
-      background: #e8eee9;
-      color: #4a6554;
+      background: #f1e7d3;
+      color: #7d5c31;
       font-size: 9.5px;
       letter-spacing: 0.16em;
       border-radius: 3px;
@@ -871,7 +871,7 @@
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.16em;
-      color: #5d7e69;
+      color: #9c7440;
       text-transform: uppercase;
       margin-bottom: 4px;
     }
@@ -907,7 +907,7 @@
       font-weight: 500;
     }
     .bpc-bid-total-breakdown-row--credit span:last-child {
-      color: #5d7e69;
+      color: #9c7440;
     }
 
     .bpc-bid-reader-rows {
@@ -932,7 +932,7 @@
     }
     .bpc-bid-reader-row.bpc-active {
       background: #fff;
-      border-left-color: #5d7e69;
+      border-left-color: #9c7440;
     }
     .bpc-bid-reader-row-eyebrow {
       font-size: 10px;
@@ -943,7 +943,7 @@
       margin-bottom: 2px;
     }
     .bpc-bid-reader-row.bpc-active .bpc-bid-reader-row-eyebrow {
-      color: #5d7e69;
+      color: #9c7440;
     }
     .bpc-bid-reader-row-name {
       font-size: 13.5px;
@@ -1029,11 +1029,11 @@
     }
     .bpc-prep-tab:hover { background: #f4f1e8; }
     .bpc-prep-tab--active {
-      background: #5d7e69;
+      background: #9c7440;
       color: #fff;
-      border-color: #5d7e69;
+      border-color: #9c7440;
     }
-    .bpc-prep-tab--active:hover { background: #4a6554; }
+    .bpc-prep-tab--active:hover { background: #7d5c31; }
 
     .bpc-prep-grid {
       display: grid;
@@ -1071,8 +1071,8 @@
       gap: 6px;
     }
     .bpc-install-badge {
-      background: #e8eee9;
-      color: #4a6554;
+      background: #f1e7d3;
+      color: #7d5c31;
       font-size: 10px;
       font-weight: 700;
       padding: 4px 8px;
@@ -1100,7 +1100,7 @@
       text-align: center;
     }
     .bpc-cmp-label-h { text-align: left; }
-    .bpc-cmp-cell-h--us { color: #5d7e69; }
+    .bpc-cmp-cell-h--us { color: #9c7440; }
     .bpc-cmp-row {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 56px 56px;
@@ -1121,7 +1121,7 @@
     }
     .bpc-cmp-x { color: #b85450; }
     .bpc-cmp-meh { color: #999; font-size: 11px; font-weight: 500; }
-    .bpc-cmp-check { color: #5d7e69; font-weight: 700; }
+    .bpc-cmp-check { color: #9c7440; font-weight: 700; }
 
     .bpc-prep-nav {
       display: flex;
@@ -1145,7 +1145,7 @@
       cursor: pointer;
       transition: background 0.12s, border-color 0.12s;
     }
-    .bpc-prep-nav-btn:hover { background: #f4f1e8; border-color: #5d7e69; color: #5d7e69; }
+    .bpc-prep-nav-btn:hover { background: #f4f1e8; border-color: #9c7440; color: #9c7440; }
     .bpc-prep-nav-dots {
       display: flex;
       gap: 8px;
@@ -1162,7 +1162,7 @@
     }
     .bpc-prep-nav-dot:hover { background: #a8b5ac; }
     .bpc-prep-nav-dot--active {
-      background: #5d7e69;
+      background: #9c7440;
       transform: scale(1.3);
     }
   `;
@@ -1180,7 +1180,7 @@
     regions.forEach(r => (regionMap.get(r.id) || []).forEach(m => matNames.add(m.name)));
 
     const customizableNote = customize.enabled
-      ? '<p class="bpc-card-prompt" style="background:#f0f4f1;border-left:3px solid #5d7e69;padding:10px 12px;border-radius:4px;"><strong style="color:#5d7e69;">You can customize this proposal.</strong> Tap any section below or any colored area on the plan to swap materials. We\'ll let your designer know.</p>'
+      ? '<p class="bpc-card-prompt" style="background:#f0f4f1;border-left:3px solid #9c7440;padding:10px 12px;border-radius:4px;"><strong style="color:#9c7440;">You can customize this proposal.</strong> Tap any section below or any colored area on the plan to swap materials. We\'ll let your designer know.</p>'
       : '<p class="bpc-card-prompt">Tap any highlighted area on the plan to see what\'s planned for that section, or pick from the list below.</p>';
 
     card.innerHTML = `
@@ -1419,7 +1419,7 @@
       title: 'Send these changes to your designer?',
       bodyHtml: `
         <ul class="bpc-summary-list">${summaryHtml}</ul>
-        <label style="display:block;font-size:12px;font-weight:600;color:#5d7e69;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:6px;">Add a note (optional)</label>
+        <label style="display:block;font-size:12px;font-weight:600;color:#9c7440;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:6px;">Add a note (optional)</label>
         <textarea class="bpc-modal-textarea" placeholder="Anything you want your designer to know about these choices?"></textarea>
         <p style="font-size:12px;color:#999;line-height:1.5;margin-top:12px;">Your designer will review these choices, update pricing if needed, and get back to you.</p>
       `,

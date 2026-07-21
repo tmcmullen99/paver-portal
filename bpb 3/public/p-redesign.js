@@ -45,7 +45,7 @@
   // colors the homeowner sees on the proposal page match what they see
   // in the unified editor. Keep both lists in sync if either changes.
   const RESHAPE_PALETTE = [
-    '#5d7e69', '#3b82f6', '#f59e0b', '#a855f7', '#ec4899',
+    '#9c7440', '#3b82f6', '#f59e0b', '#a855f7', '#ec4899',
     '#14b8a6', '#f97316', '#06b6d4', '#84cc16', '#ef4444',
   ];
 
@@ -195,10 +195,10 @@
       white-space: nowrap;
     }
     .bpc-redesign-fab-btn--reshape {
-      background: #5d7e69;
+      background: #9c7440;
       color: #fff;
     }
-    .bpc-redesign-fab-btn--reshape:hover { background: #4a6554; }
+    .bpc-redesign-fab-btn--reshape:hover { background: #7d5c31; }
     .bpc-redesign-fab-btn {
       background: #dad7c5;
       color: #353535;
@@ -206,7 +206,7 @@
     .bpc-redesign-fab-btn:hover { background: #cdc7ae; }
     .bpc-redesign-fab-btn--secondary {
       background: #fff;
-      color: #5d7e69;
+      color: #9c7440;
       border: 1px solid #d8d2bf;
     }
     .bpc-redesign-fab-btn--secondary:hover { background: #faf8f3; }
@@ -391,12 +391,12 @@
     }
     .bpc-redesign-note:focus {
       outline: none;
-      border-color: #5d7e69;
+      border-color: #9c7440;
       box-shadow: 0 0 0 3px rgba(93,126,105,0.16);
     }
     .bpc-redesign-submit-btn {
       flex-shrink: 0;
-      background: #5d7e69;
+      background: #9c7440;
       color: #fff;
       font-family: inherit;
       font-size: 14px;
@@ -408,7 +408,7 @@
       align-self: stretch;
       min-width: 140px;
     }
-    .bpc-redesign-submit-btn:hover:not(:disabled) { background: #4a6554; }
+    .bpc-redesign-submit-btn:hover:not(:disabled) { background: #7d5c31; }
     .bpc-redesign-submit-btn:disabled {
       background: #a8b5ac;
       cursor: not-allowed;
@@ -418,7 +418,7 @@
       color: #888;
     }
     .bpc-redesign-submit-status--error { color: #b85450; }
-    .bpc-redesign-submit-status--success { color: #5d7e69; font-weight: 600; }
+    .bpc-redesign-submit-status--success { color: #9c7440; font-weight: 600; }
 
     /* Print rules (unchanged from 14C.13) */
     .bpc-redesign-print-notes { display: none; }
@@ -548,7 +548,7 @@
       width: 100%;
       background: #faf8f3;
       border: 1px solid #dad7c5;
-      border-left: 3px solid #5d7e69;
+      border-left: 3px solid #9c7440;
       border-radius: 6px;
       padding: 7px 12px;
       font-size: 12px;
@@ -634,7 +634,7 @@
       font-size: 9px;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #5d7e69;
+      color: #9c7440;
       font-weight: 700;
       margin-bottom: 3px;
     }
@@ -693,7 +693,7 @@
       transform: translateY(-1px);
     }
     .bpc-reshape-mat-swatch--active {
-      border-color: #5d7e69;
+      border-color: #9c7440;
       background: #f4f8f5;
       box-shadow: 0 2px 8px rgba(93,126,105,0.18);
     }
@@ -726,8 +726,8 @@
     }
     .bpc-reshape-mat-undo {
       background: transparent;
-      border: 1px solid #5d7e69;
-      color: #5d7e69;
+      border: 1px solid #9c7440;
+      color: #9c7440;
       padding: 4px 10px;
       border-radius: 999px;
       font-family: inherit;
@@ -871,7 +871,7 @@
       align-items: baseline;
       padding: 12px 14px;
       background: #faf8f3;
-      border-top: 2px solid #5d7e69;
+      border-top: 2px solid #9c7440;
       font-size: 13px;
     }
     .bpc-reshape-readout-total-label {
@@ -957,12 +957,12 @@
     }
     .bpc-reshape-note:focus {
       outline: none;
-      border-color: #5d7e69;
+      border-color: #9c7440;
       box-shadow: 0 0 0 3px rgba(93,126,105,0.16);
     }
     .bpc-reshape-submit-btn {
       flex-shrink: 0;
-      background: #5d7e69;
+      background: #9c7440;
       color: #fff;
       font-family: inherit;
       font-size: 14px;
@@ -974,7 +974,7 @@
       align-self: stretch;
       min-width: 140px;
     }
-    .bpc-reshape-submit-btn:hover:not(:disabled) { background: #4a6554; }
+    .bpc-reshape-submit-btn:hover:not(:disabled) { background: #7d5c31; }
     .bpc-reshape-submit-btn:disabled {
       background: #a8b5ac;
       cursor: not-allowed;
@@ -984,7 +984,7 @@
       color: #888;
     }
     .bpc-reshape-status--error { color: #b85450; }
-    .bpc-reshape-status--success { color: #5d7e69; font-weight: 600; }
+    .bpc-reshape-status--success { color: #9c7440; font-weight: 600; }
   `;
 
   function injectStyles() {

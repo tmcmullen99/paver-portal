@@ -1,6 +1,6 @@
-# Bayside Proposal Builder
+# Paver Portal Proposal Builder
 
-Internal tool for generating Bayside Pavers proposal pages. Replaces the hand-built HTML workflow with a repeatable pipeline: project info → bid PDF parse → material selection → site plan extraction → HTML export.
+Internal tool for generating Paver Portal proposal pages. Replaces the hand-built HTML workflow with a repeatable pipeline: project info → bid PDF parse → material selection → site plan extraction → HTML export.
 
 Single-user (Tim). Self-hosted on Cloudflare Pages, backed by the existing `bayside-pavers` Supabase project.
 

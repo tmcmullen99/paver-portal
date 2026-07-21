@@ -1,13 +1,13 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Bayside Proposal Builder — shared stylesheet
-   Brand kit: green #5d7e69 primary, tan #dad7c5, charcoal #353535 on cream
+   Paver Portal Proposal Builder — shared stylesheet
+   Brand kit: green #9c7440 primary, tan #dad7c5, charcoal #353535 on cream
    #faf8f3 paper. Onest for all type.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --bp-green: #5d7e69;
-  --bp-green-dark: #4a6654;
-  --bp-green-soft: #e8eee9;
+  --bp-green: #9c7440;
+  --bp-green-dark: #7d5c31;
+  --bp-green-soft: #f1e7d3;
   --bp-charcoal: #353535;
   --bp-charcoal-soft: #58595b;
   --bp-tan: #dad7c5;
@@ -1515,7 +1515,7 @@ input:focus, textarea:focus, select:focus {
 }
 .bp-publish-loom-input:focus {
   outline: none;
-  border-color: #5d7e69;
+  border-color: #9c7440;
   background: #fff;
 }
 .bp-publish-loom-hint {
@@ -1549,8 +1549,8 @@ input:focus, textarea:focus, select:focus {
   display: inline-block;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 13px;
-  color: #5d7e69;
-  background: #e8eee9;
+  color: #9c7440;
+  background: #f1e7d3;
   padding: 6px 10px;
   border-radius: 4px;
   word-break: break-all;
@@ -1582,14 +1582,14 @@ input:focus, textarea:focus, select:focus {
   font-weight: 600;
   padding: 11px 22px;
   border-radius: 6px;
-  background: #5d7e69;
+  background: #9c7440;
   color: #dad7c5;
-  border: 1px solid #5d7e69;
+  border: 1px solid #9c7440;
   cursor: pointer;
   transition: background 0.15s, transform 0.08s;
 }
 .bp-publish-btn:hover:not(:disabled) {
-  background: #4a6654;
+  background: #7d5c31;
 }
 .bp-publish-btn:active:not(:disabled) {
   transform: translateY(1px);
@@ -1607,7 +1607,7 @@ input:focus, textarea:focus, select:focus {
   min-height: 1em;
 }
 .bp-publish-status-ok {
-  color: #5d7e69;
+  color: #9c7440;
   font-weight: 600;
 }
 .bp-publish-status-error {
@@ -1725,9 +1725,9 @@ input:focus, textarea:focus, select:focus {
   transition: background 0.12s, border-color 0.12s;
 }
 .bp-publish-history-btn:hover {
-  background: #e8eee9;
-  border-color: #5d7e69;
-  color: #5d7e69;
+  background: #f1e7d3;
+  border-color: #9c7440;
+  color: #9c7440;
 }
 
 @media (max-width: 700px) {

@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Your account · Bayside Pavers</title>
+<title>Your account · Paver Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bp-green:    #5d7e69;
-    --bp-green-dk: #4a6554;
-    --bp-green-soft: #e8eee9;
+    --bp-green:    #9c7440;
+    --bp-green-dk: #7d5c31;
+    --bp-green-soft: #f1e7d3;
     --bp-charcoal: #353535;
     --bp-tan:      #dad7c5;
     --bp-cream:    #faf8f3;
@@ -1172,7 +1172,7 @@
 <nav class="ho-nav">
   <a class="ho-nav-brand-link" href="https://baysidepavers.com" target="_blank" rel="noopener" aria-label="Visit baysidepavers.com">
     <span class="ho-nav-brand">
-      <img src="https://baysidepavers.com/wp-content/uploads/2023/03/baysidepavers-logo-light-scaled.png" alt="Bayside Pavers">
+      <img src="https://baysidepavers.com/wp-content/uploads/2023/03/baysidepavers-logo-light-scaled.png" alt="Paver Portal">
       <span class="ho-nav-brand-divider"></span>
       <span class="ho-nav-brand-tag">Your Account</span>
     </span>
@@ -1324,7 +1324,7 @@
       <div class="ho-qs-body">
         <p>The last day is when most homeowners notice everything coming together. Polymeric jointing sand goes in, gets activated with water, and locks every joint. Where the design calls for sealing, we use the right sealer for the surface — penetrating for natural stone, joint-stabilizing for concrete pavers, none for some porcelain — and apply only after the install has fully cured.</p>
         <p>Belgard's transferable lifetime limited warranty covers the materials, and we stand behind the workmanship. Adherence to ICPI (Interlocking Concrete Paver Institute) standards isn't optional for us — it's how we keep that warranty intact and how we sleep at night.</p>
-        <a href="https://cdn.prod.website-files.com/67c10dbe66a9f7b9cf3c6e47/68d2db027d1d1b4ad1543f05_Bayside%20Pavers%20Presentation%20(1)_compressed%20(1).pdf" target="_blank" rel="noopener" class="ho-qs-warranty-cta">📄 View full warranty PDF →</a>
+        <a href="/assets/paver-portal-logo.svg)_compressed%20(1).pdf" target="_blank" rel="noopener" class="ho-qs-warranty-cta">📄 View full warranty PDF →</a>
       </div>
     </details>
 
@@ -1346,7 +1346,7 @@
       <div class="ho-credit-cap" id="ho-credit-cap">of $2,500 max</div>
       <div class="ho-credit-bar"><div class="ho-credit-bar-fill" id="ho-credit-fill" style="width: 0%;"></div></div>
       <p class="ho-credit-desc">
-        Refer a neighbor to Bayside Pavers. When they complete a design appointment, you both earn $500 off your next project.
+        Refer a neighbor to Paver Portal. When they complete a design appointment, you both earn $500 off your next project.
       </p>
       <button type="button" class="ho-credit-cta" id="ho-credit-cta">Refer a neighbor →</button>
     </div>
@@ -1429,7 +1429,7 @@
 <footer class="ho-footer">
   <div class="ho-footer-inner">
     <div class="ho-footer-brand-block">
-      <img src="https://baysidepavers.com/wp-content/uploads/2023/03/baysidepavers-logo-light-scaled.png" alt="Bayside Pavers" style="filter: brightness(0) invert(1);">
+      <img src="https://baysidepavers.com/wp-content/uploads/2023/03/baysidepavers-logo-light-scaled.png" alt="Paver Portal" style="filter: brightness(0) invert(1);">
       <p class="ho-footer-brand-tagline">
         The Bay Area's hardscape specialists. Custom paver patios, driveways, pool decks,
         retaining walls, fire features, and outdoor living — built to last.
@@ -1464,7 +1464,7 @@
     </div>
   </div>
   <div class="ho-footer-bottom">
-    <span>© <span id="ho-footer-year">2026</span> Bayside Pavers · Licensed CA contractor</span>
+    <span>© <span id="ho-footer-year">2026</span> Paver Portal · Licensed CA contractor</span>
     <span><a href="https://baysidepavers.com" target="_blank" rel="noopener">baysidepavers.com</a></span>
   </div>
 </footer>
@@ -1545,7 +1545,7 @@ let matShowAllForCurrent = false;
 // when primary_image_url fails (Belgard CDN sometimes hotlink-blocks).
 window.bpHandleModalImgError = function(img) {
   const fb = img.getAttribute('data-fallback');
-  const mfr = img.getAttribute('data-mfr') || 'Bayside';
+  const mfr = img.getAttribute('data-mfr') || 'Paver Portal';
   if (fb && img.src !== fb) {
     img.src = fb;
     return;
@@ -1835,7 +1835,7 @@ async function loadProposals(clientId) {
     return `
       <div class="ho-prop-card">
         <div class="ho-prop-cover">
-          <div class="ho-prop-cover-fallback">Bayside Pavers</div>
+          <div class="ho-prop-cover-fallback">Paver Portal</div>
           <span class="ho-prop-status ${statusClass}">${escapeHtml(statusLabel)}</span>
         </div>
         <div class="ho-prop-body">
@@ -2087,9 +2087,9 @@ function filterGuidesForMaterial(m, max) {
   const ranked = INSTALL_GUIDES_CACHE.map(g => {
     let rank = 9;
     if (g.manufacturer === mfrName) rank = 0;
-    else if (g.manufacturer === 'Bayside' && g.category === cat) rank = 1;
+    else if (g.manufacturer === 'Paver Portal' && g.category === cat) rank = 1;
     else if (g.category === cat) rank = 2;
-    else if (g.manufacturer === 'Bayside') rank = 3;
+    else if (g.manufacturer === 'Paver Portal') rank = 3;
     return { g, rank };
   }).filter(x => x.rank < 9);
   ranked.sort((a, b) => a.rank - b.rank || (a.g.sort_order || 0) - (b.g.sort_order || 0));
@@ -2101,9 +2101,9 @@ function findManufacturerForMaterial(m) {
   if (!MANUFACTURERS_CACHE || !m || !m.manufacturer) return null;
   return MANUFACTURERS_CACHE.find(x => x.name === m.manufacturer) || null;
 }
-function findBayside() {
+function findPaver Portal() {
   if (!MANUFACTURERS_CACHE) return null;
-  return MANUFACTURERS_CACHE.find(x => x.name === 'Bayside') || null;
+  return MANUFACTURERS_CACHE.find(x => x.name === 'Paver Portal') || null;
 }
 
 function renderMatTabs() {
@@ -2185,7 +2185,7 @@ function renderMatCard(m) {
   const img = m.swatch_url || m.primary_image_url || '';
   const imgHtml = img
     ? `<div class="ho-mat-card-img" style="background-image:url('${escapeAttr(img)}');"></div>`
-    : `<div class="ho-mat-card-img-fallback">${escapeHtml(m.manufacturer || 'Bayside')}</div>`;
+    : `<div class="ho-mat-card-img-fallback">${escapeHtml(m.manufacturer || 'Paver Portal')}</div>`;
   const colorLine = m.color || m.collection || m.pattern || '';
   return `
     <button type="button" class="ho-mat-card" data-mat-id="${escapeAttr(m.id)}">
@@ -2199,16 +2199,16 @@ function renderMatCard(m) {
 }
 
 // Sprint 28 · openMatModal extended: hero image with <img> + onerror fallback (fixes Cambridge Cobble bug),
-// + manufacturer warranty card + Bayside installation warranty card with PDF link + matching install guides.
+// + manufacturer warranty card + Paver Portal installation warranty card with PDF link + matching install guides.
 function openMatModal(m) {
   const primary = m.primary_image_url || '';
   const swatch  = m.swatch_url || '';
   if (primary || swatch) {
     const first = primary || swatch;
     const fallback = (primary && swatch && primary !== swatch) ? swatch : '';
-    matModalImg.innerHTML = `<img src="${escapeAttr(first)}" alt="${escapeAttr(m.product_name || '')}" data-fallback="${escapeAttr(fallback)}" data-mfr="${escapeAttr(m.manufacturer || 'Bayside')}" onerror="window.bpHandleModalImgError(this)">`;
+    matModalImg.innerHTML = `<img src="${escapeAttr(first)}" alt="${escapeAttr(m.product_name || '')}" data-fallback="${escapeAttr(fallback)}" data-mfr="${escapeAttr(m.manufacturer || 'Paver Portal')}" onerror="window.bpHandleModalImgError(this)">`;
   } else {
-    matModalImg.innerHTML = `<div class="ho-mat-modal-img-fallback">${escapeHtml(m.manufacturer || 'Bayside')}</div>`;
+    matModalImg.innerHTML = `<div class="ho-mat-modal-img-fallback">${escapeHtml(m.manufacturer || 'Paver Portal')}</div>`;
   }
 
   const specRows = [
@@ -2230,7 +2230,7 @@ function openMatModal(m) {
 
   // Sprint 28 · warranty cards
   const mfrInfo = findManufacturerForMaterial(m);
-  const bayInfo = findBayside();
+  const bayInfo = findPaver Portal();
   let warrantyHtml = '';
   const hasMfrWarranty = mfrInfo && (mfrInfo.warranty_summary || mfrInfo.warranty_url);
   const hasBayWarranty = bayInfo && (bayInfo.warranty_summary || bayInfo.warranty_url);
@@ -2247,7 +2247,7 @@ function openMatModal(m) {
     if (hasBayWarranty) {
       warrantyHtml += `
         <div class="ho-mat-modal-warranty-card bayside">
-          <div class="ho-mat-modal-warranty-label">Bayside installation warranty</div>
+          <div class="ho-mat-modal-warranty-label">Paver Portal installation warranty</div>
           ${bayInfo.warranty_summary ? `<div class="ho-mat-modal-warranty-text">${escapeHtml(bayInfo.warranty_summary)}</div>` : ''}
           ${bayInfo.warranty_url ? `<a class="ho-mat-modal-warranty-link" href="${escapeAttr(bayInfo.warranty_url)}" target="_blank" rel="noopener">View full warranty PDF →</a>` : ''}
         </div>`;

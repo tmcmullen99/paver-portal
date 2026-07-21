@@ -14,7 +14,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
 const ACUITY_URL = 'https://baysidepaversfreeconsultation.as.me/';
 
 const PROJECT_TYPES = [
-  { slug: 'pavers',        label: 'Pavers',          lede: 'Paver patios, walkways, and garden paths — the most common Bayside project. Built to ICPI standards with polymeric jointing sand, your choice of pattern, and a base graded for your soil and climate.' },
+  { slug: 'pavers',        label: 'Pavers',          lede: 'Paver patios, walkways, and garden paths — the most common Paver Portal project. Built to ICPI standards with polymeric jointing sand, your choice of pattern, and a base graded for your soil and climate.' },
   { slug: 'driveway',      label: 'Driveways',       lede: 'Driveways carry your car day in, day out. The base depth (8" vs 4" for patios), bond pattern (herringbone for shear strength), and edge restraints all matter more here than anywhere else.' },
   { slug: 'pool_deck',     label: 'Pool decks',      lede: 'Pool decks are a different animal — slip resistance, surface temperature, and how the coping meets the deck all need solving. Porcelain has become the go-to for new builds; pavers are still the workhorse for retrofits.' },
   { slug: 'walls',         label: 'Retaining walls', lede: 'Retaining walls are engineered structures, not stacked stones. A leveling pad of compacted aggregate, drainage backfill, and geosynthetic reinforcement (where soil and height demand it) is what keeps them straight for decades.' },
@@ -411,7 +411,7 @@ function renderWarrantySection(slug) {
       ${url ? `<a href="${escapeAttr(url)}" target="_blank" rel="noopener">View warranty</a>` : ''}
     </div>`;
   const baysideHtml = bayside
-    ? card('Bayside Pavers — workmanship', bayside.warranty_summary, bayside.warranty_url, true) : '';
+    ? card('Paver Portal — workmanship', bayside.warranty_summary, bayside.warranty_url, true) : '';
   const mfrHtml = mfrs.map(m =>
     card(`${m.display_name || m.name} — materials`, m.warranty_summary, m.warranty_url, false)).join('');
   return `<div class="ho-pt-sub">

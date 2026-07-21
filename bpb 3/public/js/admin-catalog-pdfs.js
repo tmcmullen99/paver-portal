@@ -575,7 +575,7 @@ function drawBoundingBoxes(canvas, ctx, viewport, swatches) {
     const w = b.width * canvas.width;
     const h = b.height * canvas.height;
 
-    ctx.strokeStyle = 'rgba(93, 126, 105, 0.95)';   // Bayside green
+    ctx.strokeStyle = 'rgba(93, 126, 105, 0.95)';   // Paver Portal green
     ctx.fillStyle = 'rgba(93, 126, 105, 0.15)';
     ctx.fillRect(x, y, w, h);
     ctx.strokeRect(x, y, w, h);

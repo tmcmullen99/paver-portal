@@ -107,7 +107,7 @@ function injectStylesOnce() {
       text-decoration: none;
     }
     .site-plan-fullscreen-link:hover {
-      color: #1a1f2e;
+      color: #33281c;
       text-decoration: underline;
     }
     .site-plan-iframe-wrap {

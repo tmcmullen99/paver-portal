@@ -62,7 +62,7 @@ const PROJECT_DIAGRAMS = {
 };
 
 // Content attribution — Track 3 personalization. Articles are credited to the
-// Bayside designer who owns the homeowner's account, so the person they're
+// Paver Portal designer who owns the homeowner's account, so the person they're
 // already working with shows up as the expert behind the content. Resolved
 // per-mount; falls back gracefully if the designer can't be determined.
 let CONTENT_AUTHOR = 'Your designer';
@@ -186,7 +186,7 @@ async function fetchPortalData() {
   const [baysideRes, manufacturersRes, guidesRes, articlesRes, materialsRes, stepsRes] = await Promise.all([
     supabase.from('manufacturer_info')
       .select('quality_standards, warranty_summary, about')
-      .eq('name', 'Bayside').single(),
+      .eq('name', 'Paver Portal').single(),
     supabase.from('manufacturer_info')
       .select('name, display_name, warranty_summary, warranty_url, about, sort_order')
       .eq('is_active', true).order('sort_order'),
@@ -683,7 +683,7 @@ function openMaterialModal(state, material) {
         ` : ''}
         <div class="bpb-library-warranty-card">
           <h3>Installation warranty</h3>
-          <p>${escapeHtml(baysideWarranty || '25-year installation warranty on all Bayside-installed work.')}</p>
+          <p>${escapeHtml(baysideWarranty || '25-year installation warranty on all Paver Portal-installed work.')}</p>
         </div>
       </div>
     </div>

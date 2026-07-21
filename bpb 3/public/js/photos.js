@@ -141,8 +141,8 @@ function render() {
         vertical-align: middle;
       }
       .bp-photo-tag-pdf {
-        background: #e8eee9;
-        color: #4a6654;
+        background: #f1e7d3;
+        color: #7d5c31;
       }
       .bp-photo-tag-upload {
         background: #f0f0f0;
@@ -196,15 +196,15 @@ function render() {
         transition: border-color 0.15s;
       }
       .bp-photo-classification select:hover {
-        border-color: #5d7e69;
+        border-color: #9c7440;
       }
       .bp-photo-classification select[data-value="current_photo"] {
-        border-left: 5px solid #5d7e69;
-        color: #4a6654;
+        border-left: 5px solid #9c7440;
+        color: #7d5c31;
       }
       .bp-photo-classification select[data-value="design_rendering"] {
         border-left: 5px solid #91a1ba;
-        color: #1a1f2e;
+        color: #33281c;
       }
       .bp-photo-classification select[data-value="hidden"] {
         border-left: 5px solid #b04040;

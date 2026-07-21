@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Materials Library · Bayside Pavers</title>
+<title>Materials Library · Paver Portal</title>
 <link rel="icon" href="/favicon.ico">
 <style>
   :root {
-    --bp-green:    #5d7e69;
+    --bp-green:    #9c7440;
     --bp-charcoal: #58595b;
     --bp-tan:      #dad7c5;
     --bp-cream:    #faf8f3;
@@ -117,7 +117,7 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="eyebrow">BAYSIDE PAVERS · MATERIALS LIBRARY</div>
+    <div class="eyebrow">PAVER PORTAL · MATERIALS LIBRARY</div>
     <h1>Every product. Every install. Every warranty.</h1>
     <p class="lede">
       Browse every paver, wall, finish, and accessory we install. Click any material for the manufacturer specs, warranty terms, and our ICPI-standard installation process.
@@ -286,7 +286,7 @@
     }
     if (bay && bay.warranty_summary) {
       warrantyHtml += `<div class="m-warranty-card">
-        <div class="wlabel">${escapeHtml(bay.display_name || 'Bayside')} installation warranty</div>
+        <div class="wlabel">${escapeHtml(bay.display_name || 'Paver Portal')} installation warranty</div>
         <div class="wsum">${escapeHtml(bay.warranty_summary)}</div>
         ${bay.about ? `<div class="wsum" style="color:var(--bp-muted);font-size:12px;">${escapeHtml(bay.about)}</div>` : ''}
       </div>`;
@@ -312,7 +312,7 @@
       </div>`;
     } else {
       guidesHtml = `<div class="m-section"><h3>Installation</h3>
-        <p>Standard Bayside installation applies. <a href="/account/install-guides.html" style="color:var(--bp-green);text-decoration:underline;">Browse our full how-to library →</a></p>
+        <p>Standard Paver Portal installation applies. <a href="/account/install-guides.html" style="color:var(--bp-green);text-decoration:underline;">Browse our full how-to library →</a></p>
       </div>`;
     }
 

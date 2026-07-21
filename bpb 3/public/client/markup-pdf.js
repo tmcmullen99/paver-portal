@@ -1,12 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // /client/markup-pdf.js — Phase 1A
 //
-// Generates a brand-matched markup PDF for a Bayside proposal entirely
+// Generates a brand-matched markup PDF for a Paver Portal proposal entirely
 // client-side using jsPDF (loaded from CDN on first use). Mirrors the
 // "Project Site Map Proposal" template:
 //
 //   - Landscape letter (792 × 612 pt)
-//   - Dark charcoal header band with Bayside green "Bayside Pavers" logo
+//   - Dark charcoal header band with Paver Portal green "Paver Portal" logo
 //     left, "PROJECT SITE MAP PROPOSAL" white centered, brand subtitle.
 //   - Top strip: Client / Date / Revision # + baysidepavers.com URL
 //   - Two-column body: image on the left, lined NOTES & MARKUPS column
@@ -146,7 +146,7 @@ async function renderPage(doc, imgInfo, dataUrl, proposal, options) {
   doc.setTextColor(...BRAND.green);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(20);
-  doc.text('Bayside Pavers', 28, 42);
+  doc.text('Paver Portal', 28, 42);
   doc.setFontSize(7);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(170, 170, 170);
@@ -159,7 +159,7 @@ async function renderPage(doc, imgInfo, dataUrl, proposal, options) {
   doc.text('PROJECT SITE MAP PROPOSAL', pw / 2, 38, { align: 'center' });
   doc.setFontSize(9);
   doc.setTextColor(...BRAND.inkLight);
-  doc.text('BAYSIDE PAVERS', pw / 2, 56, { align: 'center' });
+  doc.text('PAVER PORTAL', pw / 2, 56, { align: 'center' });
 
   // Top strip: Client / Date / Revision + URL
   doc.setTextColor(80, 80, 80);

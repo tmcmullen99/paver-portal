@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>You've been invited · Bayside Pavers free consultation</title>
+  <title>You've been invited · Paver Portal free consultation</title>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --green: #5d7e69;
-      --green-dark: #4a6654;
-      --green-soft: #e8eee9;
+      --green: #9c7440;
+      --green-dark: #7d5c31;
+      --green-soft: #f1e7d3;
       --charcoal: #353535;
       --tan: #dad7c5;
       --cream: #faf8f3;
@@ -259,7 +259,7 @@
   <div class="brand">
     🧱
     <div>
-      Bayside Pavers <small>Custom Hardscape · Bay Area</small>
+      Paver Portal <small>Custom Hardscape · Bay Area</small>
     </div>
   </div>
 </header>
@@ -272,20 +272,20 @@
 
   <div id="invalidState" class="invalid-state" hidden>
     <h2>Hmm — that link doesn't look right.</h2>
-    <p>The referral code may have expired or been mistyped. You can still get in touch with Bayside Pavers directly at <a href="mailto:tim@mcmullen.properties">tim@mcmullen.properties</a> or visit <a href="https://baysidepavers.com">baysidepavers.com</a>.</p>
+    <p>The referral code may have expired or been mistyped. You can still get in touch with Paver Portal directly at <a href="mailto:tim@mcmullen.properties">tim@mcmullen.properties</a> or visit <a href="https://baysidepavers.com">baysidepavers.com</a>.</p>
   </div>
 
   <div id="layoutState" class="layout" hidden>
     <div>
-      <div class="pitch-eyebrow" id="referrerLine">Someone thinks you'd love Bayside Pavers.</div>
+      <div class="pitch-eyebrow" id="referrerLine">Someone thinks you'd love Paver Portal.</div>
       <h1 class="pitch-headline">Your <em>free</em> design consultation.</h1>
-      <p class="pitch-sub">An in-person walkthrough of your project with a Bayside designer. Site measurements, material recommendations, and a fully-priced interactive proposal — built around your space, not a template.</p>
+      <p class="pitch-sub">An in-person walkthrough of your project with a Paver Portal designer. Site measurements, material recommendations, and a fully-priced interactive proposal — built around your space, not a template.</p>
 
       <div class="perk-row">
         <div class="perk-icon">📐</div>
         <div>
           <div class="perk-title">A real designer, on-site</div>
-          <div class="perk-text">No cookie-cutter quotes. Bayside's designers measure your yard with you, talk through what's possible, and bring back a fully-priced plan.</div>
+          <div class="perk-text">No cookie-cutter quotes. Paver Portal's designers measure your yard with you, talk through what's possible, and bring back a fully-priced plan.</div>
         </div>
       </div>
       <div class="perk-row">
@@ -299,7 +299,7 @@
         <div class="perk-icon">🤝</div>
         <div>
           <div class="perk-title">No high-pressure sales</div>
-          <div class="perk-text">Bayside has been the Bay Area's go-to paver installer for years. Their reputation runs the business, not commissioned closers.</div>
+          <div class="perk-text">Paver Portal has been the Bay Area's go-to paver installer for years. Their reputation runs the business, not commissioned closers.</div>
         </div>
       </div>
     </div>
@@ -329,7 +329,7 @@
           <textarea id="notes" name="notes" placeholder="Backyard patio, ~400 sqft. Hoping to start in early summer."></textarea>
         </div>
         <button type="submit" class="submit-btn" id="submitBtn">Notify Tim & book my consultation →</button>
-        <p class="form-fineprint">By submitting, Bayside will reach out within 24 hours to schedule your design appointment. We'll never share your details with anyone outside Bayside.</p>
+        <p class="form-fineprint">By submitting, Paver Portal will reach out within 24 hours to schedule your design appointment. We'll never share your details with anyone outside Paver Portal.</p>
       </form>
     </div>
   </div>
@@ -361,7 +361,7 @@
       return;
     }
     document.getElementById('referrerLine').textContent =
-      data.referrer_first_name + ' thinks you\u2019d love Bayside Pavers.';
+      data.referrer_first_name + ' thinks you\u2019d love Paver Portal.';
     loading.hidden = true;
     layout.hidden = false;
   } catch (e) {

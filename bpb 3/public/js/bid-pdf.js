@@ -137,14 +137,14 @@ function render() {
       }
       .bp-parse-progress-bar {
         height: 4px;
-        background: #e8eee9;
+        background: #f1e7d3;
         border-radius: 2px;
         overflow: hidden;
         margin-top: 6px;
       }
       .bp-parse-progress-fill {
         height: 100%;
-        background: #5d7e69;
+        background: #9c7440;
         transition: width 0.2s ease;
       }
       .bp-extract-warning {

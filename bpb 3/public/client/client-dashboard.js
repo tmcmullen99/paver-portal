@@ -132,7 +132,7 @@ function renderDashboard() {
   welcomeTitle.textContent = `Welcome, ${firstName}`;
   welcomeSubtitle.textContent = ctx.proposals.length === 0
     ? "You don't have any proposals yet. Tim will send you one when it's ready."
-    : `Here's the latest on your project${ctx.proposals.length > 1 ? 's' : ''} with Bayside Pavers.`;
+    : `Here's the latest on your project${ctx.proposals.length > 1 ? 's' : ''} with Paver Portal.`;
 
   proposalsCount.textContent = `${ctx.proposals.length} proposal${ctx.proposals.length === 1 ? '' : 's'}`;
 
@@ -290,18 +290,18 @@ function renderReferCard() {
 
   // Share buttons
   const firstName = (ctx.client.name || '').split(/\s+/)[0] || 'a friend';
-  const emailSubject = encodeURIComponent(`${firstName} thinks you'd love Bayside Pavers`);
+  const emailSubject = encodeURIComponent(`${firstName} thinks you'd love Paver Portal`);
   const emailBody = encodeURIComponent(
     `Hi —\n\n` +
-    `I've been working with Bayside Pavers on a hardscape project and they've been great. ` +
+    `I've been working with Paver Portal on a hardscape project and they've been great. ` +
     `If you've been thinking about a patio, walkway, or retaining wall, they offer free design consultations.\n\n` +
-    `Here's my personal link — book through this and Bayside will credit me, no cost to you:\n${shareUrl}\n\n` +
+    `Here's my personal link — book through this and Paver Portal will credit me, no cost to you:\n${shareUrl}\n\n` +
     `— ${ctx.client.name || ''}`
   );
   shareEmail.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
 
   const smsBody = encodeURIComponent(
-    `Hey — Bayside Pavers does great hardscape work. Free design consultation through my link: ${shareUrl}`
+    `Hey — Paver Portal does great hardscape work. Free design consultation through my link: ${shareUrl}`
   );
   shareSms.href = `sms:?&body=${smsBody}`;
 
@@ -311,8 +311,8 @@ function renderReferCard() {
     shareNative.addEventListener('click', async () => {
       try {
         await navigator.share({
-          title: 'Bayside Pavers free design consultation',
-          text: `${firstName} thinks you'd love Bayside Pavers. Book a free consultation:`,
+          title: 'Paver Portal free design consultation',
+          text: `${firstName} thinks you'd love Paver Portal. Book a free consultation:`,
           url: shareUrl,
         });
       } catch (e) {
