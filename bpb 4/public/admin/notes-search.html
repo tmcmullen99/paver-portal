@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notes search · Paver Portal Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/admin-shell.css">
+  <style>
+    :root {
+      --bp-green: #9c7440;
+      --bp-charcoal: #353535;
+      --bp-navy: #33281c;
+      --bp-cream: #faf8f3;
+      --bp-border: #e8e8e3;
+    }
+    body { margin:0; background:var(--bp-cream); font-family:'Onest',system-ui,sans-serif; color:var(--bp-charcoal); }
+    .ns-shell { max-width:980px; margin:0 auto; padding:24px 24px 80px; }
+    .ns-header { margin-bottom:18px; }
+    .ns-eyebrow { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--bp-green); font-weight:700; margin-bottom:4px; }
+    .ns-title { font-size:24px; font-weight:600; color:var(--bp-navy); letter-spacing:-0.005em; margin:0 0 4px; }
+    .ns-sub { font-size:14px; color:#777; margin:0; }
+    .ns-searchbar { position:relative; margin:18px 0 24px; }
+    .ns-input {
+      width:100%; box-sizing:border-box; padding:14px 18px 14px 46px;
+      border:1px solid var(--bp-border); border-radius:10px; background:#fff;
+      font-family:inherit; font-size:15px; color:var(--bp-charcoal);
+      transition:border-color .15s ease, box-shadow .15s ease;
+    }
+    .ns-input:focus { outline:none; border-color:var(--bp-green); box-shadow:0 0 0 3px rgba(93,126,105,0.15); }
+    .ns-search-icon { position:absolute; left:16px; top:50%; transform:translateY(-50%); width:18px; height:18px; opacity:0.45; pointer-events:none; }
+    .ns-hint { font-size:12px; color:#999; margin-top:6px; padding-left:6px; }
+
+    .ns-stats { font-size:13px; color:#777; margin-bottom:14px; }
+    .ns-stats strong { color:var(--bp-charcoal); }
+    .ns-empty { text-align:center; padding:60px 20px; color:#999; font-style:italic; }
+    .ns-empty .ns-empty-hint { display:block; font-size:13px; margin-top:8px; font-style:normal; }
+
+    .ns-result {
+      background:#fff; border:1px solid var(--bp-border); border-radius:10px;
+      padding:14px 18px; margin-bottom:10px;
+      transition:border-color .15s ease, box-shadow .15s ease;
+    }
+    .ns-result:hover { border-color:#d0d0c8; box-shadow:0 2px 8px rgba(0,0,0,0.03); }
+    .ns-row1 { display:flex; align-items:baseline; justify-content:space-between; gap:14px; margin-bottom:6px; }
+    .ns-client { font-size:15px; font-weight:600; color:var(--bp-navy); }
+    .ns-meta { font-size:11px; color:#999; font-family:'Menlo','Monaco',monospace; }
+    .ns-row2 { font-size:12px; color:#777; margin-bottom:8px; }
+    .ns-row2 .ns-source { display:inline-block; padding:1px 7px; border-radius:999px; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; font-weight:600; }
+    .ns-row2 .ns-source.current { background:#eef3ef; color:var(--bp-green); }
+    .ns-row2 .ns-source.history { background:#f3eee9; color:#8a6a3f; }
+    .ns-snippet {
+      padding:9px 12px; background:var(--bp-cream); border-left:3px solid var(--bp-green);
+      border-radius:4px; font-size:13px; color:var(--bp-charcoal); line-height:1.55;
+      white-space:pre-wrap; word-break:break-word;
+    }
+    .ns-snippet mark { background:#fff7c2; color:inherit; padding:0 2px; border-radius:2px; }
+    .ns-actions { margin-top:10px; display:flex; gap:8px; }
+    .ns-btn {
+      display:inline-block; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600;
+      text-decoration:none; cursor:pointer; border:none; font-family:inherit;
+    }
+    .ns-btn-primary { background:var(--bp-green); color:#fff; }
+    .ns-btn-primary:hover { background:#7d5c31; }
+
+    .ns-loading { color:#999; font-size:13px; text-align:center; padding:30px 0; }
+    .ns-error { color:#c0392b; background:#fdecea; border:1px solid #f8c8c2; border-radius:6px; padding:10px 14px; font-size:13px; }
+  </style>
+</head>
+<body>
+
+<div class="ns-shell">
+
+  <div class="ns-header">
+    <div class="ns-eyebrow">PAVER PORTAL PORTAL · ADMIN</div>
+    <h1 class="ns-title">Notes search</h1>
+    <p class="ns-sub">Find any client by a word or phrase you wrote in their notes — current or historical.</p>
+  </div>
+
+  <div class="ns-searchbar">
+    <svg class="ns-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-3.5-3.5"></path>
+    </svg>
+    <input
+      type="search"
+      id="search"
+      class="ns-input"
+      placeholder='Try "Memorial Day" or "budget" or a client''s last name…'
+      autocomplete="off"
+      autofocus
+    >
+    <div class="ns-hint">Minimum 2 characters · searches across current notes + history · case-insensitive.</div>
+  </div>
+
+  <div id="status" class="ns-stats" style="display:none;"></div>
+  <div id="results"></div>
+
+</div>
+
+<script type="module">
+  import { requireDesigner } from '/admin/admin-shell.js';
+
+  const auth = await requireDesigner();
+  if (!auth) {
+    // requireDesigner handles the redirect; just bail.
+    throw new Error('not authenticated');
+  }
+
+  const input = document.getElementById('search');
+  const statusEl = document.getElementById('status');
+  const resultsEl = document.getElementById('results');
+
+  const esc = (s) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  function highlight(snippet, query) {
+    if (!query) return esc(snippet);
+    const pattern = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp('(' + pattern + ')', 'gi');
+    return esc(snippet).replace(re, '<mark>$1</mark>');
+  }
+
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const sec = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    if (sec < 60) return sec + 's ago';
+    const min = Math.floor(sec / 60);
+    if (min < 60) return min + 'm ago';
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return hr + 'h ago';
+    const day = Math.floor(hr / 24);
+    if (day < 30) return day + 'd ago';
+    const mo = Math.floor(day / 30);
+    return mo + 'mo ago';
+  }
+
+  function render(query, total, results) {
+    if (!query || query.length < 2) {
+      statusEl.style.display = 'none';
+      resultsEl.innerHTML = '';
+      return;
+    }
+    statusEl.style.display = '';
+
+    if (total === 0) {
+      statusEl.innerHTML = `<strong>No matches</strong> for "${esc(query)}".`;
+      resultsEl.innerHTML = '<div class="ns-empty">Nothing yet. Try a different word or check your spelling.<span class="ns-empty-hint">Tip: short keywords (e.g. <code>budget</code>) cast a wider net than full phrases.</span></div>';
+      return;
+    }
+
+    statusEl.innerHTML = `<strong>${total}</strong> match${total === 1 ? '' : 'es'} for "${esc(query)}".`;
+
+    resultsEl.innerHTML = results.map((r) => `
+      <div class="ns-result">
+        <div class="ns-row1">
+          <div class="ns-client">${esc(r.client_name || 'Unknown')}</div>
+          <div class="ns-meta">${timeAgo(r.matched_at)}</div>
+        </div>
+        <div class="ns-row2">
+          ${r.project_address ? esc(r.project_address) + ' · ' : ''}
+          <span class="ns-source ${r.source}">${r.source === 'current' ? 'Current note' : 'History'}</span>
+        </div>
+        <div class="ns-snippet">${highlight(r.match_snippet || '', query)}</div>
+        <div class="ns-actions">
+          <a class="ns-btn ns-btn-primary" href="/admin/client.html?id=${encodeURIComponent(r.client_id)}">View profile →</a>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  let debounceTimer = null;
+  let lastQuery = '';
+
+  async function runSearch(q) {
+    if (q === lastQuery) return;
+    lastQuery = q;
+
+    if (q.length < 2) {
+      render(q, 0, []);
+      return;
+    }
+
+    statusEl.style.display = '';
+    statusEl.innerHTML = `<span class="ns-loading">Searching…</span>`;
+    resultsEl.innerHTML = '';
+
+    try {
+      const resp = await fetch(`/api/admin-notes-search?q=${encodeURIComponent(q)}&limit=50`, {
+        headers: { Authorization: `Bearer ${auth.session.access_token}` },
+      });
+      if (!resp.ok) {
+        const err = await resp.text();
+        statusEl.innerHTML = `<div class="ns-error">Search failed: ${esc(err)}</div>`;
+        return;
+      }
+      const data = await resp.json();
+      if (data.query !== q && q !== lastQuery) return; // stale response
+      render(q, data.total, data.results || []);
+    } catch (e) {
+      statusEl.innerHTML = `<div class="ns-error">Network error: ${esc(e.message)}</div>`;
+    }
+  }
+
+  input.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    const q = input.value.trim();
+    debounceTimer = setTimeout(() => runSearch(q), 220);
+  });
+
+  // Allow URL preload: ?q=foo
+  const urlQ = new URLSearchParams(location.search).get('q');
+  if (urlQ) {
+    input.value = urlQ;
+    runSearch(urlQ.trim());
+  }
+</script>
+
+</body>
+</html>

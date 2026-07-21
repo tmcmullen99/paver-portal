@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bulk Republish · Admin · Paver Portal Proposal Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/admin-shell.css">
+  <style>
+    /* Page-specific styles only — chrome lives in admin-shell.css */
+    :root {
+      --green: #9c7440;
+      --green-dark: #7d5c31;
+      --green-soft: #f1e7d3;
+      --charcoal: #353535;
+      --tan: #dad7c5;
+      --cream: #faf8f3;
+      --navy: #33281c;
+      --border: #e5e5e5;
+      --muted: #666;
+      --danger: #b04040;
+      --warn: #b88030;
+    }
+
+    .controls {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .controls .left {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+    }
+    .controls .right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn {
+      padding: 10px 18px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      letter-spacing: 0.01em;
+    }
+    .btn-primary { background: var(--green); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--green-dark); }
+    .btn-primary:disabled { background: #a8b5ac; cursor: not-allowed; }
+    .btn-ghost {
+      background: #fff;
+      color: var(--charcoal);
+      border-color: var(--border);
+    }
+    .btn-ghost:hover:not(:disabled) { border-color: var(--green); color: var(--green-dark); }
+    .btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .counter {
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .status-banner {
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-bottom: 18px;
+      display: none;
+    }
+    .status-banner.visible { display: block; }
+    .status-banner.info { background: var(--green-soft); color: var(--green-dark); }
+    .status-banner.error { background: #fbe6e6; color: var(--danger); }
+    .status-banner.warn { background: #fcf2dd; color: var(--warn); }
+
+    .bids-table {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .bids-row {
+      display: grid;
+      grid-template-columns: 36px minmax(0, 2fr) minmax(0, 1.2fr) minmax(0, 1fr) 130px;
+      gap: 14px;
+      align-items: center;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .bids-row:last-child { border-bottom: none; }
+    .bids-row.header {
+      background: #f7f6f0;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      padding: 10px 18px;
+    }
+    .bids-row .col-checkbox input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--green);
+      cursor: pointer;
+    }
+    .bids-row .col-address {
+      font-weight: 500;
+      color: var(--navy);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .bids-row .col-slug {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .bids-row .col-slug a { color: var(--muted); text-decoration: none; }
+    .bids-row .col-slug a:hover { color: var(--green-dark); text-decoration: underline; }
+    .bids-row .col-published {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .bids-row .col-status {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-align: right;
+    }
+    .col-status.queued { color: var(--muted); }
+    .col-status.running { color: var(--warn); }
+    .col-status.success { color: var(--green-dark); }
+    .col-status.failed { color: var(--danger); }
+    .col-status .err-msg {
+      display: block;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--danger);
+      margin-top: 2px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .empty, .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      background: #fff;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+    }
+    .loading .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 8px;
+      vertical-align: -4px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Hidden offscreen container for the publish module to mount into.
+       We can't display:none because some publish logic measures elements.
+       Position absolute offscreen keeps it out of view but rendered. */
+    #publishMount {
+      position: absolute;
+      left: -100000px;
+      top: 0;
+      width: 1200px;
+      height: auto;
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    @media (max-width: 760px) {
+      .bids-row {
+        grid-template-columns: 28px 1fr 110px;
+      }
+      .bids-row.header .col-slug,
+      .bids-row.header .col-published,
+      .bids-row .col-slug,
+      .bids-row .col-published {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Shared admin chrome (topbar + tab strip) — rendered by admin-shell.js -->
+<header class="ash-topbar">
+  <div class="ash-topbar-inner">
+    <a href="/admin/" class="ash-brand">
+      <span class="ash-brand-bayside">Paver Portal Proposal Builder</span>
+      <span class="ash-brand-divider">/</span>
+      <span class="ash-brand-section">Admin</span>
+    </a>
+    <div class="ash-topbar-right">
+      <span class="ash-role-badge is-loading" id="ashRoleBadge">…</span>
+      <span class="ash-user-email" id="ashUserEmail"></span>
+      <a class="ash-link-back" href="/dashboard">← Editor</a>
+      <button class="ash-signout" id="ashSignOutBtn" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+<nav class="ash-tabs" id="ashTabs" aria-label="Admin sections"></nav>
+
+<main class="ash-shell">
+  <div class="ash-intro">
+    <div class="ash-eyebrow">Tools · Bulk republish</div>
+    <h1 class="ash-title">Republish bids to pull in new swatches</h1>
+    <p class="ash-lede">
+      Already-published bids are immutable HTML snapshots — new material swatches in the catalog don't reach them
+      automatically. Select bids below and republish to bake the new swatches into a fresh snapshot. Old snapshots
+      stay in place; each republish creates a new version slug.
+    </p>
+    <div style="margin-top:14px;padding:14px 18px;background:var(--green-soft);border-left:3px solid var(--green);border-radius:4px;font-size:13px;color:var(--charcoal);line-height:1.6;">
+      <strong style="color:var(--navy);">How it works:</strong> Each republish runs the same flow as clicking "Publish new version" in the editor — pulls fresh data from the catalog, generates HTML, writes a new <code style="background:var(--cream);padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:12px;">published_proposals</code> row. Bids are processed one at a time. Plan ~5–10 seconds per bid; don't close this tab while it's running.
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="left">
+      <button type="button" id="selectAllBtn" class="btn btn-ghost">Select all</button>
+      <button type="button" id="selectNoneBtn" class="btn btn-ghost">Clear</button>
+      <span class="counter" id="counter">loading…</span>
+    </div>
+    <div class="right">
+      <button type="button" id="republishBtn" class="btn btn-primary" disabled>Republish selected</button>
+    </div>
+  </div>
+
+  <div id="statusBanner" class="status-banner"></div>
+
+  <div id="results">
+    <div class="loading"><span class="spinner"></span>Loading published bids…</div>
+  </div>
+</main>
+
+<!-- Hidden mount point for publish module. Offscreen via CSS so the module
+     can render its UI without blocking interaction with this page. -->
+<div id="publishMount"></div>
+
+<!-- Render the shared shell chrome (topbar role badge + tab strip) -->
+<script type="module" src="/admin/admin-shell.js"></script>
+
+<!-- Page-specific logic (already has master URL gate from Phase 5B P2 Batch 1) -->
+<script type="module" src="/admin/republish-bulk.js"></script>
+
+</body>
+</html>

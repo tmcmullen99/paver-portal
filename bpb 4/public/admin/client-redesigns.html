@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Design change requests · Admin · Paver Portal Proposal Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/admin-shell.css">
+  <style>
+    :root {
+      --green: #9c7440;
+      --green-dark: #7d5c31;
+      --green-soft: #f1e7d3;
+      --charcoal: #353535;
+      --cream: #faf8f3;
+      --navy: #33281c;
+      --border: #e5e5e5;
+      --muted: #666;
+      --muted-soft: #999;
+      --danger: #b04040;
+      --danger-soft: #fef2f2;
+      --danger-fg: #991616;
+      --info-soft: #eef3f8;
+      --info-fg: #2b4a73;
+      --warn-soft: #fff4d4;
+      --warn-fg: #7a5a10;
+    }
+
+    .rd-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .rd-stat {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .rd-stat.is-urgent { background: var(--warn-soft); border-color: #f3d97a; }
+    .rd-stat-num { font-size: 26px; font-weight: 700; color: var(--navy); line-height: 1; }
+    .rd-stat.is-urgent .rd-stat-num { color: var(--warn-fg); }
+    .rd-stat-num.is-empty { color: var(--muted-soft); font-weight: 400; }
+    .rd-stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .rd-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .rd-controls select {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      background: #fff;
+      color: var(--charcoal);
+      min-width: 200px;
+    }
+    .rd-controls select:focus { outline: none; border-color: var(--green); }
+    .rd-spacer { flex: 1; }
+    .rd-refresh-btn {
+      padding: 9px 16px;
+      background: #fff;
+      color: var(--charcoal);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 13px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .rd-refresh-btn:hover { border-color: var(--green); color: var(--green-dark); }
+
+    .rd-list { display: flex; flex-direction: column; gap: 14px; }
+    .rd-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .rd-card.is-urgent {
+      border-color: #f3d97a;
+      box-shadow: 0 1px 3px rgba(245, 166, 35, 0.08);
+    }
+    .rd-card-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.12s;
+    }
+    .rd-card-header:hover { background: #fcfaf5; }
+    .rd-card.is-expanded .rd-card-header {
+      border-bottom: 1px solid var(--border);
+      background: #fcfaf5;
+    }
+    .rd-card-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .rd-status-submitted { background: var(--warn-soft); color: var(--warn-fg); }
+    .rd-status-reviewed { background: var(--info-soft); color: var(--info-fg); }
+    .rd-status-addressed { background: var(--green-soft); color: var(--green-dark); }
+    .rd-status-rejected { background: var(--danger-soft); color: var(--danger-fg); }
+    .rd-status-superseded { background: #f0f0f0; color: var(--muted); }
+
+    .rd-card-headline { flex: 1; min-width: 0; }
+    .rd-card-client { font-weight: 600; color: var(--navy); font-size: 15px; }
+    .rd-card-proposal { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .rd-card-meta { text-align: right; flex-shrink: 0; font-size: 12px; color: var(--muted); }
+    .rd-card-time {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted-soft);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+    .rd-card-chevron {
+      color: var(--muted-soft);
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: transform 0.18s;
+    }
+    .rd-card.is-expanded .rd-card-chevron { transform: rotate(90deg); }
+
+    .rd-card-body { display: none; padding: 18px; background: #fff; }
+    .rd-card.is-expanded .rd-card-body { display: block; }
+    .rd-section { margin-bottom: 18px; }
+    .rd-section:last-child { margin-bottom: 0; }
+    .rd-section-h {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 0 0 8px;
+    }
+    .rd-meta-row {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .rd-meta-row a {
+      color: var(--green-dark);
+      text-decoration: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+    .rd-meta-row a:hover { text-decoration: underline; }
+
+    /* Markup overlay rendering */
+    .rd-markup-stage {
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--cream);
+      max-width: 760px;
+    }
+    .rd-markup-bg { display: block; width: 100%; height: auto; }
+    .rd-markup-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .rd-photo-frame {
+      max-width: 540px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .rd-photo-frame img { display: block; width: 100%; height: auto; }
+    .rd-no-visual {
+      padding: 16px;
+      background: var(--cream);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    .rd-note-block {
+      background: var(--cream);
+      border-left: 3px solid var(--green);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--charcoal);
+      line-height: 1.5;
+      border-radius: 0 6px 6px 0;
+    }
+    .rd-note-block.is-response {
+      border-left-color: var(--info-fg);
+      background: var(--info-soft);
+    }
+
+    .rd-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      margin-top: 16px;
+    }
+    .rd-action-btn {
+      padding: 8px 14px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .rd-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .rd-action-address { background: var(--green); color: #fff; }
+    .rd-action-address:hover:not(:disabled) { background: var(--green-dark); }
+    .rd-action-review {
+      background: #fff;
+      color: var(--info-fg);
+      border-color: var(--info-fg);
+    }
+    .rd-action-review:hover:not(:disabled) { background: var(--info-soft); }
+    .rd-action-reject {
+      background: #fff;
+      color: var(--danger-fg);
+      border-color: #fecaca;
+    }
+    .rd-action-reject:hover:not(:disabled) { background: var(--danger-soft); }
+
+    .rd-reviewed-footer {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .rd-empty {
+      padding: 60px 24px;
+      text-align: center;
+      color: var(--muted);
+      background: #fff;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+    }
+    .rd-empty-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .rd-loading { padding: 60px 20px; text-align: center; color: var(--muted); }
+    .rd-spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: rd-spin 0.8s linear infinite;
+      vertical-align: -4px;
+      margin-right: 8px;
+    }
+    @keyframes rd-spin { to { transform: rotate(360deg); } }
+
+    .rd-status {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .rd-status.is-success { background: var(--green-soft); color: var(--green-dark); display: block; }
+    .rd-status.is-error { background: var(--danger-soft); color: var(--danger-fg); display: block; }
+  </style>
+</head>
+<body>
+
+<header class="ash-topbar">
+  <div class="ash-topbar-inner">
+    <a href="/admin/" class="ash-brand">
+      <span class="ash-brand-bayside">Paver Portal Proposal Builder</span>
+      <span class="ash-brand-divider">/</span>
+      <span class="ash-brand-section">Admin</span>
+    </a>
+    <div class="ash-topbar-right">
+      <span class="ash-role-badge is-loading" id="ashRoleBadge">…</span>
+      <span class="ash-user-email" id="ashUserEmail"></span>
+      <a class="ash-link-back" href="/dashboard">← Editor</a>
+      <button class="ash-signout" id="ashSignOutBtn" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+<nav class="ash-tabs" id="ashTabs" aria-label="Admin sections"></nav>
+
+<main class="ash-shell">
+  <div class="ash-intro">
+    <div class="ash-eyebrow">Operations · Redesigns</div>
+    <h1 class="ash-title">Design change requests</h1>
+    <p class="ash-lede">
+      Homeowners submit design change requests when they want to move, resize,
+      or reshape areas — beyond what material swaps cover. Each submission
+      includes either a digital markup drawn over their site map or a photo
+      of paper markup, plus an optional note. Review, mark addressed once
+      you've updated the proposal, or reject with a reason the homeowner sees.
+    </p>
+  </div>
+
+  <div class="rd-status" id="rdStatus"></div>
+
+  <div class="rd-stats">
+    <div class="rd-stat is-urgent">
+      <div class="rd-stat-num" id="rdStatPending">—</div>
+      <div class="rd-stat-label">Pending decision</div>
+    </div>
+    <div class="rd-stat">
+      <div class="rd-stat-num" id="rdStatReviewedToday">—</div>
+      <div class="rd-stat-label">Reviewed today</div>
+    </div>
+    <div class="rd-stat">
+      <div class="rd-stat-num" id="rdStatAddressedWeek">—</div>
+      <div class="rd-stat-label">Addressed this week</div>
+    </div>
+    <div class="rd-stat">
+      <div class="rd-stat-num" id="rdStatTotal">—</div>
+      <div class="rd-stat-label">Total submissions</div>
+    </div>
+  </div>
+
+  <div class="rd-controls">
+    <select id="rdFilter">
+      <option value="pending">Pending only</option>
+      <option value="all">All submissions</option>
+      <option value="resolved">Resolved (addressed + rejected)</option>
+    </select>
+    <span class="rd-spacer"></span>
+    <button class="rd-refresh-btn" id="rdRefreshBtn" type="button">Refresh</button>
+  </div>
+
+  <div id="rdContent">
+    <div class="rd-loading"><span class="rd-spinner"></span>Loading design change requests…</div>
+  </div>
+</main>
+
+<script type="module" src="/admin/admin-shell.js"></script>
+<script type="module" src="/admin/admin-client-redesigns.js"></script>
+
+</body>
+</html>

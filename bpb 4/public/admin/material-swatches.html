@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Material Swatches · Admin · Paver Portal Proposal Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/admin-shell.css">
+  <style>
+    /* Page-specific styles only — chrome lives in admin-shell.css */
+    :root {
+      --green: #9c7440;
+      --green-dark: #7d5c31;
+      --green-soft: #f1e7d3;
+      --charcoal: #353535;
+      --tan: #dad7c5;
+      --cream: #faf8f3;
+      --navy: #33281c;
+      --border: #e5e5e5;
+      --muted: #666;
+      --danger: #b04040;
+    }
+
+    .intro-help {
+      margin-top: 14px;
+      padding: 14px 18px;
+      background: var(--green-soft);
+      border-left: 3px solid var(--green);
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--charcoal);
+      line-height: 1.6;
+    }
+    .intro-help strong { color: var(--navy); }
+    .intro-help ol { margin: 8px 0 0 18px; padding: 0; }
+    .intro-help li { margin-bottom: 3px; }
+
+    .controls {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .controls input[type="search"],
+    .controls select {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      background: #fff;
+      color: var(--charcoal);
+    }
+    .controls input[type="search"] {
+      flex: 1;
+      min-width: 220px;
+    }
+    .controls input[type="search"]:focus,
+    .controls select:focus {
+      outline: none;
+      border-color: var(--green);
+    }
+    .controls .counter {
+      font-size: 13px;
+      color: var(--muted);
+      margin-left: auto;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .status {
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .status.visible { display: block; }
+    .status.success { background: var(--green-soft); color: var(--green-dark); }
+    .status.error { background: #fbe6e6; color: var(--danger); }
+
+    .product-group {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+    .product-group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .product-group-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--navy);
+      letter-spacing: -0.01em;
+    }
+    .product-group-title small {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-left: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .product-group-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .product-group-count.complete { color: var(--green-dark); }
+
+    .variant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .variant-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+    .variant-card:hover {
+      border-color: var(--green);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+    .variant-card.uploading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .variant-card.has-swatch {
+      border-color: var(--green);
+    }
+    .swatch-preview {
+      width: 100%;
+      aspect-ratio: 1/1;
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .swatch-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .no-swatch {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .variant-info {
+      padding: 12px 14px 8px;
+      flex: 1;
+    }
+    .color-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 2px;
+    }
+    .sizes {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .variant-actions {
+      padding: 0 14px 14px;
+      display: flex;
+      gap: 6px;
+    }
+    .upload-btn {
+      flex: 1;
+      display: inline-block;
+      text-align: center;
+      padding: 9px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.15s;
+      border: 1px solid transparent;
+      letter-spacing: 0.02em;
+    }
+    .upload-btn-primary {
+      background: var(--green);
+      color: #fff;
+    }
+    .upload-btn-primary:hover { background: var(--green-dark); }
+    .upload-btn-secondary {
+      background: #fff;
+      color: var(--charcoal);
+      border-color: var(--border);
+    }
+    .upload-btn-secondary:hover {
+      border-color: var(--green);
+      color: var(--green-dark);
+    }
+    .upload-btn-danger {
+      background: #fff;
+      color: var(--danger);
+      border-color: var(--border);
+      flex: 0 0 auto;
+      padding: 9px 12px;
+    }
+    .upload-btn-danger:hover {
+      border-color: var(--danger);
+      background: #fbe6e6;
+    }
+
+    .empty, .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      background: #fff;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+    }
+    .loading .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 8px;
+      vertical-align: -4px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 640px) {
+      .product-group { padding: 16px 16px; }
+      .variant-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Shared admin chrome (topbar + tab strip) — rendered by admin-shell.js -->
+<header class="ash-topbar">
+  <div class="ash-topbar-inner">
+    <a href="/admin/" class="ash-brand">
+      <span class="ash-brand-bayside">Paver Portal Proposal Builder</span>
+      <span class="ash-brand-divider">/</span>
+      <span class="ash-brand-section">Admin</span>
+    </a>
+    <div class="ash-topbar-right">
+      <span class="ash-role-badge is-loading" id="ashRoleBadge">…</span>
+      <span class="ash-user-email" id="ashUserEmail"></span>
+      <a class="ash-link-back" href="/dashboard">← Editor</a>
+      <button class="ash-signout" id="ashSignOutBtn" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+<nav class="ash-tabs" id="ashTabs" aria-label="Admin sections"></nav>
+
+<main class="ash-shell">
+  <div class="ash-intro">
+    <div class="ash-eyebrow">Catalog · Swatches</div>
+    <h1 class="ash-title">Per-color swatch uploads</h1>
+    <p class="ash-lede">Upload individual color swatch images for each Belgard product variant. Once a swatch is saved, it replaces the generic product hero on published proposals and in the material picker.</p>
+
+    <div class="intro-help">
+      <strong>How to source swatches from Belgard.com:</strong>
+      <ol>
+        <li>Open any product detail page, e.g. <code>belgard.com/products/pavers/catalina-grana/</code></li>
+        <li>Scroll to the <em>Colors</em> section — each color has a small circular swatch</li>
+        <li>Right-click a swatch → <em>Save Image As…</em> → save with a descriptive name like <code>scandina-gray.jpg</code></li>
+        <li>Come back here, find the matching variant, and click <em>Upload swatch</em></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input type="search" id="searchInput" placeholder="Search products… (e.g. Catalina, Belair, Dimension)" autofocus>
+    <select id="filterState">
+      <option value="all">All variants</option>
+      <option value="missing">Missing swatch only</option>
+      <option value="has">Has swatch only</option>
+    </select>
+    <span class="counter" id="counter">loading…</span>
+  </div>
+
+  <div id="statusBanner" class="status"></div>
+
+  <div id="results">
+    <div class="loading"><span class="spinner"></span>Loading catalog…</div>
+  </div>
+</main>
+
+<!-- Render the shared shell chrome (topbar role badge + tab strip) -->
+<script type="module" src="/admin/admin-shell.js"></script>
+<!-- Page-specific logic (loads catalog, handles uploads) -->
+<script type="module" src="/js/admin-material-swatches.js"></script>
+
+</body>
+</html>

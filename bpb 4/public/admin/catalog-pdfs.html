@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catalog PDFs · Admin · Paver Portal Proposal Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/admin/admin-shell.css">
+<style>
+  /* Page-specific styles only — chrome lives in admin-shell.css.
+     All page classes prefixed .cp- (Catalog PDFs). Mirrors the .bs- visual
+     language from belgard-sync.html so the two admin tools feel coherent. */
+
+  .cp-panel {
+    background: #fff; border: 1px solid #e5e5e5; border-radius: 12px;
+    padding: 24px 26px; margin-bottom: 24px;
+  }
+  .cp-panel h2 { font-size: 18px; font-weight: 600; color: #33281c; margin: 0 0 6px; }
+  .cp-panel-sub { font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 18px; }
+
+  .cp-form-row {
+    display: grid; grid-template-columns: 1fr 2fr; gap: 14px;
+    margin-bottom: 14px; align-items: center;
+  }
+  .cp-form-row label { font-size: 13px; color: #353535; font-weight: 600; }
+  .cp-form-row input[type="text"], .cp-form-row select {
+    width: 100%; padding: 9px 12px; font-size: 14px;
+    border: 1px solid #d8dad7; border-radius: 6px;
+    background: #faf8f3; color: #33281c; font-family: inherit;
+  }
+  .cp-form-row input[type="text"]:focus, .cp-form-row select:focus {
+    outline: none; border-color: #9c7440; background: #fff;
+  }
+
+  .cp-drop-zone {
+    border: 2px dashed #c9d3cb; border-radius: 10px; padding: 32px 20px;
+    text-align: center; background: #faf8f3;
+    transition: border-color 0.15s, background 0.15s; cursor: pointer;
+  }
+  .cp-drop-zone:hover { border-color: #9c7440; background: #f5f7f5; }
+  .cp-drop-zone.is-dragover { border-color: #9c7440; background: #ecf1ed; }
+  .cp-drop-zone.has-file { border-color: #9c7440; background: #ecf1ed; }
+  .cp-drop-zone input[type="file"] { display: none; }
+  .cp-drop-text { font-size: 14px; color: #666; }
+  .cp-drop-filename { font-size: 14px; color: #33281c; font-weight: 600; margin-top: 6px; }
+  .cp-drop-hint { font-size: 12px; color: #888; margin-top: 6px; }
+
+  .cp-btn {
+    display: inline-block; padding: 10px 18px; border-radius: 6px; border: none;
+    font-weight: 600; font-size: 14px; cursor: pointer;
+    transition: background 0.15s; font-family: inherit;
+  }
+  .cp-btn-primary { background: #9c7440; color: #fff; }
+  .cp-btn-primary:hover:not(:disabled) { background: #7d5c31; }
+  .cp-btn-primary:disabled { background: #999; cursor: not-allowed; }
+  .cp-btn-secondary { background: #fff; color: #353535; border: 1px solid #c9d3cb; }
+  .cp-btn-secondary:hover:not(:disabled) { background: #f5f5f5; }
+  .cp-btn-danger {
+    background: transparent; color: #b04040; border: 1px solid transparent;
+    padding: 6px 10px; font-size: 12px;
+  }
+  .cp-btn-danger:hover { background: #fbeaea; border-color: #e8c0c0; }
+
+  .cp-form-actions {
+    display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px;
+    padding-top: 16px; border-top: 1px solid #f0f0f0;
+  }
+
+  .cp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cp-table th {
+    text-align: left; padding: 10px 12px; background: #faf8f3;
+    border-bottom: 1px solid #e5e5e5; font-weight: 600; color: #353535;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .cp-table td { padding: 14px 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+  .cp-table tr:hover td { background: #fcfaf5; }
+  .cp-pdf-name { font-weight: 600; color: #33281c; }
+  .cp-pdf-meta { font-size: 12px; color: #888; margin-top: 2px; }
+  .cp-pdf-meta a { color: #9c7440; }
+  .cp-row-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  .cp-source-pill {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 10px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .cp-source-pill.external { background: #e8eef5; color: #2d4a7a; }
+  .cp-source-pill.uploaded { background: #ecf1ed; color: #2d5a3a; }
+
+  .cp-empty { text-align: center; padding: 32px 20px; color: #888; font-size: 13px; }
+
+  .cp-msg {
+    margin-top: 14px; padding: 10px 14px; border-radius: 6px;
+    font-size: 13px; line-height: 1.5;
+  }
+  .cp-msg-error { background: #fbeaea; border: 1px solid #e8c0c0; color: #7a2020; }
+  .cp-msg-success { background: #ecf1ed; border: 1px solid #c9d3cb; color: #2d5a3a; }
+  .cp-msg-info { background: #e8eef5; border: 1px solid #c4d2e1; color: #2d4a7a; }
+
+  /* ─── Extraction Modal ─────────────────────────────────────────────── */
+  .cp-modal-backdrop {
+    position: fixed; inset: 0; background: rgba(26, 31, 46, 0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9000; padding: 20px;
+  }
+  .cp-modal {
+    background: #fff; border-radius: 14px; max-width: 1200px;
+    width: 100%; max-height: calc(100vh - 40px); overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  }
+  .cp-modal-header {
+    padding: 20px 26px; border-bottom: 1px solid #eee;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .cp-modal-header h2 { font-size: 18px; font-weight: 600; margin: 0; color: #33281c; }
+  .cp-modal-header .cp-modal-eyebrow {
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #9c7440; font-weight: 700; margin-bottom: 4px;
+  }
+  .cp-modal-close {
+    background: transparent; border: none; font-size: 24px; cursor: pointer;
+    color: #888; line-height: 1; padding: 4px 10px; border-radius: 6px;
+  }
+  .cp-modal-close:hover { background: #f5f5f5; color: #33281c; }
+
+  .cp-modal-body {
+    flex: 1; overflow-y: auto; padding: 22px 26px;
+    display: grid; grid-template-columns: 280px 1fr; gap: 24px;
+    min-height: 400px;
+  }
+
+  /* Left: product picker */
+  .cp-product-picker {
+    border-right: 1px solid #eee; padding-right: 22px;
+    display: flex; flex-direction: column; min-height: 0;
+  }
+  .cp-product-picker h3 {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: #9c7440; margin: 0 0 10px;
+  }
+  .cp-product-search {
+    width: 100%; padding: 7px 10px; font-size: 13px;
+    border: 1px solid #d8dad7; border-radius: 6px;
+    background: #faf8f3; margin-bottom: 10px; font-family: inherit;
+  }
+  .cp-product-list { flex: 1; overflow-y: auto; min-height: 0; }
+  .cp-product-item {
+    padding: 8px 10px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; color: #353535; line-height: 1.4;
+    border: 1px solid transparent;
+  }
+  .cp-product-item:hover { background: #faf8f3; }
+  .cp-product-item.is-active {
+    background: #ecf1ed; border-color: #c9d3cb; color: #33281c;
+  }
+  .cp-product-item .cp-product-page {
+    font-size: 11px; color: #888; font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  }
+
+  /* Right: results panel */
+  .cp-results-panel { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+  .cp-status-line {
+    font-size: 13px; color: #666; line-height: 1.5;
+  }
+  .cp-status-line.is-error { color: #7a2020; }
+  .cp-status-line.is-success { color: #2d5a3a; }
+
+  .cp-canvas-wrap {
+    border: 1px solid #e5e5e5; border-radius: 8px;
+    background: #faf8f3; padding: 12px; overflow: hidden;
+    position: relative; max-width: 100%;
+  }
+  .cp-canvas-wrap canvas { max-width: 100%; height: auto; display: block; }
+
+  .cp-json-output {
+    background: #33281c; color: #c4d2e1;
+    border-radius: 8px; padding: 14px 16px;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, ui-monospace, monospace;
+    font-size: 11px; line-height: 1.6;
+    overflow-x: auto; white-space: pre;
+    max-height: 380px; overflow-y: auto;
+  }
+
+  .cp-progress-bar {
+    height: 4px; background: #e5eae7; border-radius: 2px;
+    overflow: hidden; margin-top: 8px;
+  }
+  .cp-progress-fill {
+    height: 100%; background: #9c7440;
+    transition: width 0.3s ease; width: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- Shared admin chrome (topbar + tab strip) — rendered by admin-shell.js -->
+<header class="ash-topbar">
+  <div class="ash-topbar-inner">
+    <a href="/admin/" class="ash-brand">
+      <span class="ash-brand-bayside">Paver Portal Proposal Builder</span>
+      <span class="ash-brand-divider">/</span>
+      <span class="ash-brand-section">Admin</span>
+    </a>
+    <div class="ash-topbar-right">
+      <span class="ash-role-badge is-loading" id="ashRoleBadge">…</span>
+      <span class="ash-user-email" id="ashUserEmail"></span>
+      <a class="ash-link-back" href="/dashboard">← Editor</a>
+      <button class="ash-signout" id="ashSignOutBtn" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+<nav class="ash-tabs" id="ashTabs" aria-label="Admin sections"></nav>
+
+<main class="ash-shell">
+  <div class="ash-intro">
+    <div class="ash-eyebrow">Catalog · Catalog PDFs</div>
+    <h1 class="ash-title">Catalog PDFs</h1>
+    <p class="ash-lede">
+      Manage the manufacturer catalog PDFs that the swatch extractor reads from.
+      Belgard's PCG is registered automatically; upload Techo-Bloc, Keystone,
+      and other manufacturer catalogs here.
+    </p>
+  </div>
+
+  <!-- Upload panel -->
+  <section class="cp-panel" id="cpUploadPanel">
+    <h2>Upload a manufacturer catalog</h2>
+    <p class="cp-panel-sub">
+      PDF files only. Most product catalogs are 5-30 MB.
+      Each upload registers a row that the swatch extractor can target.
+    </p>
+
+    <div class="cp-form-row">
+      <label for="cpManufacturer">Manufacturer</label>
+      <select id="cpManufacturer">
+        <option value="">— select —</option>
+        <option value="Belgard">Belgard</option>
+        <option value="Techo-Bloc">Techo-Bloc</option>
+        <option value="Keystone Hardscapes">Keystone Hardscapes</option>
+        <option value="Trex">Trex</option>
+        <option value="Tru-Scapes">Tru-Scapes</option>
+        <option value="Unilock">Unilock</option>
+        <option value="MSI">MSI</option>
+        <option value="Basalite">Basalite</option>
+        <option value="Other">Other (specify in name)</option>
+      </select>
+    </div>
+
+    <div class="cp-form-row">
+      <label for="cpPdfName">Catalog name</label>
+      <input type="text" id="cpPdfName" placeholder="e.g. Product Guide 2024 / Winters Catalog 2023">
+    </div>
+
+    <div class="cp-form-row">
+      <label>PDF file</label>
+      <div>
+        <label for="cpFileInput" class="cp-drop-zone" id="cpDropZone">
+          <input type="file" id="cpFileInput" accept="application/pdf,.pdf">
+          <div class="cp-drop-text" id="cpDropText">
+            Drop a PDF here or click to choose a file
+          </div>
+          <div class="cp-drop-filename" id="cpDropFilename" style="display:none;"></div>
+          <div class="cp-drop-hint">
+            PDFs up to ~50 MB · stored privately in Supabase
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="cp-form-actions">
+      <button id="cpUploadBtn" class="cp-btn cp-btn-primary" disabled>Upload catalog</button>
+    </div>
+
+    <div id="cpUploadMsg"></div>
+  </section>
+
+  <!-- Registered PDFs panel -->
+  <section class="cp-panel" id="cpListPanel">
+    <h2>Registered catalogs</h2>
+    <p class="cp-panel-sub">
+      Each row is a PDF the swatch extractor can read.
+      <strong>External</strong> = referenced from a public manufacturer URL (no upload needed).
+      <strong>Uploaded</strong> = stored in Supabase.
+    </p>
+    <div id="cpTableWrap">
+      <div class="cp-empty">Loading…</div>
+    </div>
+  </section>
+</main>
+
+<!-- ─── Extraction Modal ────────────────────────────────────────────────── -->
+<div id="cpExtractModal" class="cp-modal-backdrop" style="display:none;">
+  <div class="cp-modal" role="dialog" aria-modal="true" aria-labelledby="cpExtractModalTitle">
+    <div class="cp-modal-header">
+      <div>
+        <div class="cp-modal-eyebrow">Test extraction</div>
+        <h2 id="cpExtractModalTitle">Extract swatches from PDF</h2>
+      </div>
+      <button id="cpExtractClose" class="cp-modal-close" aria-label="Close">×</button>
+    </div>
+
+    <div class="cp-modal-body">
+      <!-- Left: product picker -->
+      <div class="cp-product-picker">
+        <h3>Pick a Belgard product</h3>
+        <input type="text" id="cpProductSearch" class="cp-product-search" placeholder="Filter products…">
+        <div id="cpProductList" class="cp-product-list">
+          <div class="cp-empty">Loading products…</div>
+        </div>
+      </div>
+
+      <!-- Right: results panel -->
+      <div class="cp-results-panel">
+        <div id="cpExtractStatus" class="cp-status-line">
+          Pick a product on the left to start. Extraction renders that page from the PCG, sends it to Claude vision, and shows you the swatches it found.
+        </div>
+        <div id="cpExtractProgress" style="display:none;">
+          <div class="cp-progress-bar"><div class="cp-progress-fill" id="cpExtractProgressFill"></div></div>
+        </div>
+
+        <div id="cpCanvasWrap" class="cp-canvas-wrap" style="display:none;">
+          <canvas id="cpRenderCanvas"></canvas>
+        </div>
+
+        <div id="cpJsonOutput" class="cp-json-output" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Render the shared shell chrome (topbar role badge + tab strip) -->
+<script type="module" src="/admin/admin-shell.js"></script>
+
+<!-- Page-specific logic — designer-accessible, no master gate needed -->
+<script type="module" src="/js/admin-catalog-pdfs.js"></script>
+
+</body>
+</html>

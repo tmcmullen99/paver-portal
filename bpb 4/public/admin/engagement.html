@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Engagement · Admin · Paver Portal Proposal Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/admin-shell.css">
+  <style>
+    /* Page-specific styles only — chrome lives in admin-shell.css.
+       Class prefix .eng- (Engagement). */
+    :root {
+      --green: #9c7440;
+      --green-dark: #7d5c31;
+      --green-soft: #f1e7d3;
+      --green-live: #10a04a;
+      --charcoal: #353535;
+      --cream: #faf8f3;
+      --navy: #33281c;
+      --border: #e5e5e5;
+      --muted: #666;
+      --muted-soft: #999;
+      --danger: #b04040;
+      --info-soft: #eef3f8;
+      --info-fg: #2b4a73;
+    }
+
+    /* Header */
+    .eng-header-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .eng-header-meta a {
+      color: var(--green-dark);
+      text-decoration: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+    .eng-header-meta a:hover { text-decoration: underline; }
+
+    /* Live presence pill */
+    .eng-presence {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 22px;
+    }
+    .eng-presence.is-live {
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-weight: 600;
+    }
+    .eng-presence.is-recent { background: var(--info-soft); color: var(--info-fg); }
+    .eng-presence.is-stale { background: #f0f0f0; color: var(--muted); }
+    .eng-presence.is-empty { background: #f0f0f0; color: var(--muted); }
+    .eng-presence-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--muted-soft);
+      flex-shrink: 0;
+    }
+    .eng-presence.is-live .eng-presence-dot {
+      background: var(--green-live);
+      animation: eng-pulse 1.5s ease-in-out infinite;
+    }
+    .eng-presence.is-recent .eng-presence-dot { background: var(--info-fg); }
+    @keyframes eng-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.6; }
+    }
+
+    /* Stats strip */
+    .eng-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .eng-stat {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .eng-stat-num {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1;
+    }
+    .eng-stat-num.is-empty { color: var(--muted-soft); font-weight: 400; }
+    .eng-stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+    .eng-stat-sub {
+      font-size: 11px;
+      color: var(--muted-soft);
+      margin-top: 2px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Mobile/desktop split */
+    .eng-split {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 22px;
+    }
+    .eng-split-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+    .eng-split-title {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+    .eng-split-meta {
+      font-size: 12px;
+      color: var(--muted-soft);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .eng-split-bar {
+      height: 12px;
+      border-radius: 6px;
+      background: #f0f0f0;
+      overflow: hidden;
+      display: flex;
+    }
+    .eng-split-mobile { background: var(--info-fg); transition: width 0.3s ease; }
+    .eng-split-desktop { background: var(--green); transition: width 0.3s ease; }
+    .eng-split-legend {
+      display: flex;
+      gap: 18px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--charcoal);
+    }
+    .eng-split-legend-swatch {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      margin-right: 6px;
+    }
+
+    /* Section heading shared across sessions + timeline */
+    .eng-section-h {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--charcoal);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin: 0 0 10px;
+    }
+    .eng-section-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin: -6px 0 14px;
+    }
+
+    /* Sessions table */
+    .eng-table-wrap {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      overflow-x: auto;
+      margin-bottom: 28px;
+    }
+    .eng-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .eng-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: #faf8f3;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      color: var(--charcoal);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .eng-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #eee;
+      vertical-align: middle;
+    }
+    .eng-table tr:last-child td { border-bottom: none; }
+    .eng-table tr:hover td { background: #fcfaf5; }
+
+    .eng-device { font-size: 18px; line-height: 1; filter: grayscale(0.2); }
+    .eng-mono {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .eng-mono-id {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted-soft);
+      font-size: 11px;
+    }
+
+    /* Event timeline */
+    .eng-event-list {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .eng-event-row {
+      display: grid;
+      grid-template-columns: 90px 160px 1fr 90px;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 1px solid #f4f4f4;
+      font-size: 13px;
+    }
+    .eng-event-row:last-child { border-bottom: none; }
+    .eng-event-row:hover { background: #fcfaf5; }
+    .eng-event-time {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .eng-event-type {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .eng-event-type-page_view { background: var(--info-soft); color: var(--info-fg); }
+    .eng-event-type-section_view { background: var(--green-soft); color: var(--green-dark); }
+    .eng-event-type-swap_modal_open,
+    .eng-event-type-swap_save { background: #fff4d4; color: #7a5a10; }
+    .eng-event-type-accept_proposal_click { background: var(--green-soft); color: var(--green-dark); font-weight: 700; }
+    .eng-event-type-other { background: #f0f0f0; color: var(--muted); }
+    .eng-event-payload {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Empty + loading + error */
+    .eng-empty {
+      padding: 48px 20px;
+      text-align: center;
+      color: var(--muted);
+      background: #fff;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+    }
+    .eng-empty-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .eng-loading {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .eng-spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: eng-spin 0.8s linear infinite;
+      vertical-align: -4px;
+      margin-right: 8px;
+    }
+    @keyframes eng-spin { to { transform: rotate(360deg); } }
+
+    .eng-error {
+      padding: 32px 20px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      color: #991616;
+    }
+    .eng-error-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+
+    /* Refresh button */
+    .eng-refresh-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .eng-refresh-btn {
+      padding: 6px 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--charcoal);
+    }
+    .eng-refresh-btn:hover { border-color: var(--green); color: var(--green-dark); }
+  </style>
+</head>
+<body>
+
+<header class="ash-topbar">
+  <div class="ash-topbar-inner">
+    <a href="/admin/" class="ash-brand">
+      <span class="ash-brand-bayside">Paver Portal Proposal Builder</span>
+      <span class="ash-brand-divider">/</span>
+      <span class="ash-brand-section">Admin</span>
+    </a>
+    <div class="ash-topbar-right">
+      <span class="ash-role-badge is-loading" id="ashRoleBadge">…</span>
+      <span class="ash-user-email" id="ashUserEmail"></span>
+      <a class="ash-link-back" href="/dashboard">← Editor</a>
+      <button class="ash-signout" id="ashSignOutBtn" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+<nav class="ash-tabs" id="ashTabs" aria-label="Admin sections"></nav>
+
+<main class="ash-shell">
+  <div id="engagementContent">
+    <div class="eng-loading"><span class="eng-spinner"></span>Loading engagement…</div>
+  </div>
+</main>
+
+<script type="module" src="/admin/admin-shell.js"></script>
+<script type="module" src="/admin/admin-engagement.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notifications · Admin · Paver Portal Proposal Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/admin-shell.css">
+  <style>
+    /* Page-specific only — chrome is in admin-shell.css. Class prefix .ntf-. */
+    :root {
+      --green: #9c7440;
+      --green-dark: #7d5c31;
+      --green-soft: #f1e7d3;
+      --charcoal: #353535;
+      --cream: #faf8f3;
+      --navy: #33281c;
+      --border: #e5e5e5;
+      --muted: #666;
+      --muted-soft: #999;
+      --danger-soft: #fef2f2;
+      --danger-fg: #991616;
+      --info-soft: #eef3f8;
+      --info-fg: #2b4a73;
+    }
+
+    .ntf-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+    .ntf-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0 0 4px;
+    }
+    .ntf-card-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0 0 18px;
+    }
+
+    /* Toggle row */
+    .ntf-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 0;
+      border-top: 1px solid var(--border);
+    }
+    .ntf-toggle-row:first-of-type { border-top: none; padding-top: 4px; }
+    .ntf-toggle-row:last-child { padding-bottom: 0; }
+    .ntf-toggle-info { flex: 1; min-width: 0; }
+    .ntf-toggle-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--charcoal);
+      margin-bottom: 2px;
+    }
+    .ntf-toggle-sub {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* iOS-style switch */
+    .ntf-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .ntf-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .ntf-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: #ccc;
+      border-radius: 999px;
+      transition: background 0.2s;
+    }
+    .ntf-slider::before {
+      content: '';
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.18);
+    }
+    .ntf-switch input:checked + .ntf-slider { background: var(--green); }
+    .ntf-switch input:checked + .ntf-slider::before { transform: translateX(20px); }
+    .ntf-switch input:disabled + .ntf-slider { opacity: 0.5; cursor: not-allowed; }
+
+    /* Quiet hours sub-controls */
+    .ntf-quiet {
+      display: none;
+      padding: 14px 0 0;
+      margin-top: 10px;
+      border-top: 1px dashed var(--border);
+    }
+    .ntf-quiet.is-visible { display: block; }
+    .ntf-quiet-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--charcoal);
+    }
+    .ntf-quiet-select {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      background: #fff;
+      color: var(--charcoal);
+      min-width: 90px;
+    }
+    .ntf-quiet-select:focus { outline: none; border-color: var(--green); }
+    .ntf-quiet-tz {
+      font-size: 11px;
+      color: var(--muted-soft);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .ntf-quiet-now {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Save bar */
+    .ntf-save-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+    .ntf-save-spacer { flex: 1; }
+    .ntf-save-btn {
+      padding: 10px 22px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .ntf-save-btn:hover:not(:disabled) { background: var(--green-dark); }
+    .ntf-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .ntf-save-btn-ghost {
+      padding: 10px 18px;
+      background: #fff;
+      color: var(--charcoal);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .ntf-save-btn-ghost:hover:not(:disabled) { border-color: var(--green); color: var(--green-dark); }
+    .ntf-save-btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Status flash */
+    .ntf-status {
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: none;
+    }
+    .ntf-status.is-success { background: var(--green-soft); color: var(--green-dark); display: block; }
+    .ntf-status.is-error { background: var(--danger-soft); color: var(--danger-fg); display: block; }
+    .ntf-status.is-info { background: var(--info-soft); color: var(--info-fg); display: block; }
+
+    /* Recent activity log */
+    .ntf-log-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    .ntf-log-table th {
+      text-align: left;
+      padding: 8px 12px;
+      background: var(--cream);
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      color: var(--charcoal);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .ntf-log-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #f0ede4;
+      vertical-align: middle;
+    }
+    .ntf-log-table tr:last-child td { border-bottom: none; }
+    .ntf-log-status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .ntf-log-status-sent { background: var(--green-soft); color: var(--green-dark); }
+    .ntf-log-status-failed { background: var(--danger-soft); color: var(--danger-fg); }
+    .ntf-log-status-skipped_rate_limit,
+    .ntf-log-status-skipped_quiet_hours,
+    .ntf-log-status-skipped_pref_off { background: #f0f0f0; color: var(--muted); }
+    .ntf-log-mono { font-family: 'JetBrains Mono', monospace; color: var(--muted); font-size: 12px; }
+
+    /* Loading + error */
+    .ntf-loading {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .ntf-spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: ntf-spin 0.8s linear infinite;
+      vertical-align: -3px;
+      margin-right: 8px;
+    }
+    @keyframes ntf-spin { to { transform: rotate(360deg); } }
+
+    .ntf-empty {
+      padding: 28px 20px;
+      text-align: center;
+      color: var(--muted-soft);
+      font-size: 13px;
+      background: var(--cream);
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<header class="ash-topbar">
+  <div class="ash-topbar-inner">
+    <a href="/admin/" class="ash-brand">
+      <span class="ash-brand-bayside">Paver Portal Proposal Builder</span>
+      <span class="ash-brand-divider">/</span>
+      <span class="ash-brand-section">Admin</span>
+    </a>
+    <div class="ash-topbar-right">
+      <span class="ash-role-badge is-loading" id="ashRoleBadge">…</span>
+      <span class="ash-user-email" id="ashUserEmail"></span>
+      <a class="ash-link-back" href="/dashboard">← Editor</a>
+      <button class="ash-signout" id="ashSignOutBtn" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+<nav class="ash-tabs" id="ashTabs" aria-label="Admin sections"></nav>
+
+<main class="ash-shell">
+  <div class="ash-intro">
+    <div class="ash-eyebrow">Analytics · Notifications</div>
+    <h1 class="ash-title">Notification preferences</h1>
+    <p class="ash-lede">
+      Get pinged when homeowners view your proposals. First-view emails fire
+      live (rate-limited to one per proposal per hour). The daily digest
+      summarizes everything else at 8am Pacific. Quiet hours pause sends
+      overnight if you need them.
+    </p>
+  </div>
+
+  <div class="ntf-status" id="ntfStatus"></div>
+
+  <div id="ntfContent">
+    <div class="ntf-loading"><span class="ntf-spinner"></span>Loading preferences…</div>
+  </div>
+</main>
+
+<script type="module" src="/admin/admin-shell.js"></script>
+<script type="module" src="/admin/admin-notifications.js"></script>
+
+</body>
+</html>

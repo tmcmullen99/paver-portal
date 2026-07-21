@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install Guide Parse · Admin · Paver Portal Proposal Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/admin/admin-shell.css">
+<style>
+  /* Page-specific styles only — chrome lives in admin-shell.css.
+     All page classes prefixed .ig- (Install Guide). */
+
+  /* Stats strip */
+  .ig-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .ig-stat {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    padding: 18px 20px;
+    border-radius: 10px;
+  }
+  .ig-stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: #33281c;
+    line-height: 1;
+  }
+  .ig-stat-num.is-populated { color: #7d5c31; }
+  .ig-stat-num.is-missing { color: #b04040; }
+  .ig-stat-label {
+    font-size: 11px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+
+  /* Panel */
+  .ig-panel {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 24px 26px;
+    margin-bottom: 24px;
+  }
+  .ig-panel h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #33281c;
+    margin: 0 0 6px;
+  }
+  .ig-panel-sub {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.55;
+    margin-bottom: 18px;
+  }
+  .ig-pdf-link {
+    display: inline-block;
+    margin: 8px 0 16px;
+    padding: 8px 14px;
+    background: #faf8f3;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #9c7440;
+    text-decoration: none;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  }
+  .ig-pdf-link:hover { background: #f5f5f5; color: #33281c; }
+
+  /* Buttons */
+  .ig-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+  .ig-btn-primary { background: #9c7440; color: #fff; }
+  .ig-btn-primary:hover { background: #7d5c31; }
+  .ig-btn-primary:disabled { background: #999; cursor: not-allowed; }
+
+  .ig-btn-secondary {
+    background: #fff;
+    color: #353535;
+    border: 1px solid #c9d3cb;
+  }
+  .ig-btn-secondary:hover { background: #f5f5f5; }
+
+  .ig-btn-danger {
+    background: #fff;
+    color: #b04040;
+    border: 1px solid #e8c0c0;
+  }
+  .ig-btn-danger:hover { background: #fbeaea; }
+
+  /* Progress */
+  .ig-progress {
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: #f5f7f5;
+    border: 1px solid #d8e0da;
+    border-radius: 8px;
+  }
+  .ig-progress-label {
+    font-size: 13px;
+    color: #7d5c31;
+    font-weight: 600;
+  }
+  .ig-progress-spinner {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border: 2px solid #c9d3cb;
+    border-top-color: #9c7440;
+    border-radius: 50%;
+    animation: ig-spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: -2px;
+  }
+  @keyframes ig-spin { to { transform: rotate(360deg); } }
+
+  /* Section cards (review phase) */
+  .ig-section-card {
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    background: #fff;
+  }
+  .ig-section-card + .ig-section-card { margin-top: 14px; }
+
+  .ig-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .ig-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #33281c;
+    margin: 0 0 4px;
+  }
+  .ig-section-pages {
+    font-size: 11px;
+    color: #888;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  }
+  .ig-section-key-badge {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 10px;
+    background: #eef2ef;
+    color: #7d5c31;
+    white-space: nowrap;
+  }
+
+  .ig-section-summary {
+    font-size: 13px;
+    color: #353535;
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+  .ig-section-points {
+    font-size: 13px;
+    color: #555;
+    margin: 0 0 16px;
+    padding-left: 20px;
+    line-height: 1.55;
+  }
+  .ig-section-points li { margin-bottom: 4px; }
+
+  .ig-section-categories {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 14px;
+  }
+  .ig-section-categories-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  .ig-category-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ig-category-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 14px;
+    border: 1px solid #e5e5e5;
+    background: #faf8f3;
+    cursor: pointer;
+    font-size: 12px;
+    color: #666;
+    transition: all 0.15s;
+  }
+  .ig-category-chip:hover { border-color: #c9d3cb; }
+  .ig-category-chip input { margin: 0; }
+  .ig-category-chip.is-checked {
+    background: #e8efe9;
+    border-color: #9cb5a3;
+    color: #2d5a3a;
+    font-weight: 600;
+  }
+
+  /* Apply bar */
+  .ig-apply-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #e5e5e5;
+  }
+  .ig-apply-summary { font-size: 13px; color: #666; }
+
+  /* Existing sections display */
+  .ig-existing {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .ig-existing-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #faf8f3;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+  }
+  .ig-existing-title {
+    font-weight: 600;
+    color: #33281c;
+    font-size: 14px;
+  }
+  .ig-existing-meta {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+  }
+  .ig-existing-cats {
+    font-size: 11px;
+    color: #7d5c31;
+  }
+
+  .ig-error {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: #fbeaea;
+    border: 1px solid #e8c0c0;
+    border-radius: 6px;
+    color: #7a2020;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-line;
+  }
+</style>
+</head>
+<body>
+
+<!-- Shared admin chrome (topbar + tab strip) — rendered by admin-shell.js -->
+<header class="ash-topbar">
+  <div class="ash-topbar-inner">
+    <a href="/admin/" class="ash-brand">
+      <span class="ash-brand-bayside">Paver Portal Proposal Builder</span>
+      <span class="ash-brand-divider">/</span>
+      <span class="ash-brand-section">Admin</span>
+    </a>
+    <div class="ash-topbar-right">
+      <span class="ash-role-badge is-loading" id="ashRoleBadge">…</span>
+      <span class="ash-user-email" id="ashUserEmail"></span>
+      <a class="ash-link-back" href="/dashboard">← Editor</a>
+      <button class="ash-signout" id="ashSignOutBtn" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+<nav class="ash-tabs" id="ashTabs" aria-label="Admin sections"></nav>
+
+<main class="ash-shell">
+  <div class="ash-intro">
+    <div class="ash-eyebrow">Tools · Install guide</div>
+    <h1 class="ash-title">Install guide parse</h1>
+    <p class="ash-lede">
+      Parse the Paver Portal install-guide PDF into structured sections. Master-only.
+      Claude reads the master Belgard PDF natively and extracts ~5 ICPI-standard prep sections,
+      each linkable to the catalog categories the section applies to. Sections drive the dynamic
+      "Why preparation matters" content on published proposals.
+    </p>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="ig-stats">
+    <div class="ig-stat">
+      <div class="ig-stat-num" id="igStatSections">—</div>
+      <div class="ig-stat-label">Parsed sections</div>
+    </div>
+    <div class="ig-stat">
+      <div class="ig-stat-num is-populated" id="igStatLinks">—</div>
+      <div class="ig-stat-label">Category links</div>
+    </div>
+    <div class="ig-stat">
+      <div class="ig-stat-num" id="igStatCategories">—</div>
+      <div class="ig-stat-label">Belgard categories</div>
+    </div>
+  </div>
+
+  <!-- Existing sections (if any) -->
+  <section class="ig-panel" id="igExistingPanel" style="display:none;">
+    <h2>Current parsed sections</h2>
+    <p class="ig-panel-sub">
+      These sections are already stored and will drive the dynamic "Why preparation matters"
+      content on published proposals (once Sprint 2 Part B.2 ships).
+      Re-parsing replaces all existing rows.
+    </p>
+    <div class="ig-existing" id="igExistingList"></div>
+  </section>
+
+  <!-- Parse panel -->
+  <section class="ig-panel" id="igParsePanel">
+    <h2>1. Parse the master install guide PDF</h2>
+    <p class="ig-panel-sub">
+      Claude Sonnet 4.6 reads the Belgard Product Installation Guide PDF natively (page by page as
+      visual input) and extracts 5 major sections with 3-5 substantive ICPI-standard preparation
+      requirements each.
+    </p>
+
+    <a
+      class="ig-pdf-link"
+      href="https://www.belgard.com/wp-content/uploads/2025/05/Product-Installation-Guide_WEB_BEL24-D-298050.pdf"
+      target="_blank" rel="noopener"
+    >
+      📄 Product-Installation-Guide_WEB_BEL24-D-298050.pdf ↗
+    </a>
+    <br>
+
+    <p class="ig-panel-sub" style="margin-top:0;">
+      Expected: ~40-90 seconds. Estimated cost: ~$0.75-$1.50 per parse (PDFs cost more than text
+      because each page is rasterized as an image). One-time operation — you won't re-run this
+      unless Belgard updates the guide.
+    </p>
+
+    <button id="igParseBtn" class="ig-btn ig-btn-primary">
+      Parse install guide →
+    </button>
+
+    <div id="igParseProgress"></div>
+    <div id="igParseError"></div>
+  </section>
+
+  <!-- Review panel (hidden until parse completes) -->
+  <section class="ig-panel" id="igReviewPanel" style="display:none;">
+    <h2>2. Review extracted sections</h2>
+    <p class="ig-panel-sub">
+      Claude has suggested a category match for each section (auto-checked below). Adjust as needed
+      — each section can link to multiple Belgard categories (e.g., "Paver Installation" typically
+      applies to Pavers, Permeable Pavers, and Porcelain Pavers).
+      Sections with zero checked categories won't write.
+    </p>
+
+    <div id="igSectionsWrap"></div>
+
+    <div class="ig-apply-bar">
+      <div class="ig-apply-summary" id="igApplySummary"></div>
+      <button id="igApplyBtn" class="ig-btn ig-btn-primary">
+        Write all sections →
+      </button>
+    </div>
+
+    <div id="igApplyError"></div>
+  </section>
+
+  <!-- Done panel -->
+  <section class="ig-panel" id="igDonePanel" style="display:none;">
+    <h2 id="igDoneTitle">✓ Install guide sections stored</h2>
+    <p class="ig-panel-sub" id="igDoneSummary"></p>
+    <p class="ig-panel-sub">
+      <strong>Next:</strong> Sprint 2 Part B.2 will rewrite <code>publish.js</code> to consume these
+      sections — the "Why preparation matters" section on published proposals will become dynamic,
+      showing only the prep content relevant to materials in each proposal, with page-anchored
+      links to the full Belgard guide.
+    </p>
+    <button id="igDoneReload" class="ig-btn ig-btn-secondary">Reload page</button>
+  </section>
+</main>
+
+<!-- Render the shared shell chrome (topbar role badge + tab strip) -->
+<script type="module" src="/admin/admin-shell.js"></script>
+
+<!-- Page-specific logic (already has master URL gate from Phase 5B P2 Batch 1) -->
+<script type="module" src="/js/admin-install-guide.js"></script>
+
+</body>
+</html>

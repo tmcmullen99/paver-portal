@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Designer Inbox · Paver Portal Proposal Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===========================================================
+       Designer Inbox · class prefix .inb-
+       =========================================================== */
+    :root {
+      --green: #9c7440;
+      --green-dark: #7d5c31;
+      --green-soft: #f1e7d3;
+      --green-paler: #f4f7f4;
+      --charcoal: #353535;
+      --cream: #faf8f3;
+      --navy: #33281c;
+      --border: #e5e5e5;
+      --border-soft: #f0f0f0;
+      --muted: #666;
+      --muted-soft: #999;
+      --danger: #b04040;
+      --danger-soft: #fef2f2;
+      --warn: #b78b3a;
+      --warn-soft: #fff7e6;
+      --success: #167d3a;
+      --success-soft: #ecf7ef;
+      --info: #2b4a73;
+      --info-soft: #eef3f8;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Onest', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--charcoal);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Topbar */
+    .inb-topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .inb-brand {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--navy);
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .inb-brand-divider { color: var(--muted-soft); font-weight: 400; }
+    .inb-brand-section { color: var(--green); font-weight: 500; }
+    .inb-topbar-back {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .inb-topbar-back:hover { color: var(--charcoal); }
+
+    /* Shell */
+    .inb-shell {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 32px 28px 80px;
+    }
+
+    /* Header */
+    .inb-header {
+      margin-bottom: 32px;
+    }
+    .inb-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--green-dark);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .inb-h1 {
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0 0 6px;
+      line-height: 1.15;
+    }
+    .inb-subtitle {
+      font-size: 15px;
+      color: var(--muted);
+      margin: 0 0 16px;
+    }
+    .inb-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 12px;
+      color: var(--muted-soft);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .inb-refresh-btn {
+      padding: 6px 14px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'Onest', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--charcoal);
+      transition: all 0.15s ease;
+    }
+    .inb-refresh-btn:hover:not(:disabled) {
+      border-color: var(--green);
+      color: var(--green-dark);
+    }
+    .inb-refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Section */
+    .inb-section {
+      margin-bottom: 28px;
+    }
+    .inb-section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .inb-section-title {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--charcoal);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 0;
+    }
+    .inb-section-icon { font-size: 14px; }
+    .inb-count-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      padding: 2px 8px;
+      background: var(--charcoal);
+      color: #fff;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .inb-count-pill.is-zero { background: var(--border); color: var(--muted-soft); }
+    .inb-count-pill.is-hot { background: var(--success); }
+    .inb-count-pill.is-warm { background: var(--warn); }
+    .inb-count-pill.is-cold { background: var(--info); }
+    .inb-count-pill.is-urgent { background: var(--danger); }
+    .inb-section-help {
+      font-size: 12px;
+      color: var(--muted-soft);
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    /* Row */
+    .inb-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 16px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: border-color 0.15s ease;
+    }
+    .inb-row:hover { border-color: var(--green); }
+    .inb-row-main { min-width: 0; }
+    .inb-row-title {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 15px;
+      color: var(--navy);
+      margin-bottom: 3px;
+      flex-wrap: wrap;
+    }
+    .inb-row-title strong { font-weight: 600; }
+    .inb-row-title em {
+      font-style: normal;
+      color: var(--muted);
+      font-weight: 400;
+      font-size: 14px;
+    }
+    .inb-row-amount {
+      font-weight: 700;
+      color: var(--green-dark);
+      font-size: 15px;
+    }
+    .inb-row-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+    .inb-row-meta strong { color: var(--charcoal); font-weight: 500; }
+    .inb-row-note {
+      margin-top: 6px;
+      padding: 8px 12px;
+      background: var(--cream);
+      border-left: 3px solid var(--warn);
+      font-size: 13px;
+      color: var(--charcoal);
+      border-radius: 4px;
+      max-height: 80px;
+      overflow: hidden;
+      line-height: 1.5;
+    }
+    .inb-row-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .inb-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 7px 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'Onest', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--charcoal);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .inb-action-btn:hover:not(:disabled) {
+      border-color: var(--green);
+      color: var(--green-dark);
+      background: var(--green-paler);
+    }
+    .inb-action-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .inb-action-btn.is-primary {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+    .inb-action-btn.is-primary:hover:not(:disabled) {
+      background: var(--green-dark);
+      border-color: var(--green-dark);
+    }
+    .inb-action-btn.is-success { color: var(--success); border-color: var(--success); background: var(--success-soft); }
+
+    /* Tag pill */
+    .inb-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      vertical-align: middle;
+    }
+    .inb-tag-status-pending  { background: var(--warn-soft); color: var(--warn); }
+    .inb-tag-status-notified { background: var(--success-soft); color: var(--success); }
+    .inb-tag-needs-account   { background: var(--danger-soft); color: var(--danger); }
+    .inb-tag-no-msg          { background: var(--info-soft); color: var(--info); }
+
+    /* Empty / loading */
+    .inb-empty {
+      padding: 16px 18px;
+      background: var(--green-paler);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-style: italic;
+      text-align: center;
+    }
+    .inb-loading {
+      padding: 80px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .inb-spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: inb-spin 0.8s linear infinite;
+      vertical-align: -3px;
+      margin-right: 8px;
+    }
+    @keyframes inb-spin { to { transform: rotate(360deg); } }
+
+    /* Error */
+    .inb-error {
+      padding: 28px;
+      background: var(--danger-soft);
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      color: #7a1010;
+    }
+    .inb-error-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+
+    /* Toast */
+    .inb-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 14px 18px;
+      background: var(--charcoal);
+      color: #fff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.25s ease;
+      z-index: 1000;
+      pointer-events: none;
+      max-width: 360px;
+    }
+    .inb-toast.is-visible { opacity: 1; transform: translateY(0); }
+    .inb-toast.is-success { background: var(--success); }
+    .inb-toast.is-error { background: var(--danger); }
+
+    /* Mobile */
+    @media (max-width: 720px) {
+      .inb-shell { padding: 20px 16px 60px; }
+      .inb-h1 { font-size: 24px; }
+      .inb-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .inb-row-actions { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="inb-topbar">
+  <a href="/admin/" class="inb-brand">
+    <span>Paver Portal Proposal Builder</span>
+    <span class="inb-brand-divider">/</span>
+    <span class="inb-brand-section">Designer Inbox</span>
+  </a>
+  <a href="/admin/" class="inb-topbar-back">← Back to admin</a>
+</header>
+
+<main class="inb-shell">
+  <div class="inb-header">
+    <div class="inb-eyebrow">CLIENT SIGNALS · PAVER PORTAL PORTAL</div>
+    <h1 class="inb-h1">Designer Inbox</h1>
+    <p class="inb-subtitle">What needs your attention right now.</p>
+    <div class="inb-meta-row">
+      <span id="lastRefreshed">Loading…</span>
+      <button id="refreshBtn" class="inb-refresh-btn">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div id="inboxContent">
+    <div class="inb-loading"><span class="inb-spinner"></span>Loading inbox…</div>
+  </div>
+</main>
+
+<div id="toast" class="inb-toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ─────────────────────────────────────────────────────────────────────
+  // Configuration
+  // ─────────────────────────────────────────────────────────────────────
+  const INBOX_URL          = '/api/admin-inbox';
+  const RESEND_INVITE_URL  = '/api/resend-magic-link';
+  const PROPOSAL_PUBLIC    = (slug) => `/p/${encodeURIComponent(slug)}`;
+  const PROPOSAL_EDIT      = (id)   => `/editor?id=${encodeURIComponent(id)}`;
+  const JOBNIMBUS_SEARCH   = (q)    => `https://app.jobnimbus.com/people?search=${encodeURIComponent(q)}`;
+
+  const $ = (sel) => document.querySelector(sel);
+
+  // ─────────────────────────────────────────────────────────────────────
+  // Helpers
+  // ─────────────────────────────────────────────────────────────────────
+  function esc(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function fmtMoney(n) {
+    if (n == null) return '—';
+    return '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  }
+
+  function fmtPhone(s) {
+    if (!s) return '';
+    const d = String(s).replace(/\D/g, '');
+    if (d.length === 10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+    if (d.length === 11) return `+${d[0]} (${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`;
+    return s;
+  }
+
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const then = new Date(iso).getTime();
+    const seconds = Math.floor((Date.now() - then) / 1000);
+    if (seconds < 60)      return seconds + 's ago';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60)      return minutes + 'm ago';
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24)        return hours + 'h ago';
+    const days = Math.floor(hours / 24);
+    if (days < 30)         return days + 'd ago';
+    const months = Math.floor(days / 30);
+    if (months < 12)       return months + 'mo ago';
+    return Math.floor(months / 12) + 'y ago';
+  }
+
+  function truncate(s, max) {
+    if (!s) return '';
+    s = String(s).trim();
+    return s.length > max ? s.slice(0, max - 1) + '…' : s;
+  }
+
+  function toast(msg, kind) {
+    const el = $('#toast');
+    el.textContent = msg;
+    el.className = 'inb-toast is-visible' + (kind ? ' is-' + kind : '');
+    setTimeout(() => { el.className = 'inb-toast'; }, 3500);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // Section renderers — each returns an HTML string
+  // ─────────────────────────────────────────────────────────────────────
+
+  function sectionWrap({ id, icon, title, count, urgency, help, body }) {
+    const pillClass =
+      count === 0 ? 'is-zero'
+        : urgency === 'urgent' ? 'is-urgent'
+        : urgency === 'warm'   ? 'is-warm'
+        : urgency === 'hot'    ? 'is-hot'
+        : urgency === 'cold'   ? 'is-cold'
+        : '';
+    return `
+      <section class="inb-section" id="section-${id}">
+        <div class="inb-section-header">
+          <h2 class="inb-section-title">
+            <span class="inb-section-icon">${icon}</span>
+            <span>${esc(title)}</span>
+            <span class="inb-count-pill ${pillClass}">${count}</span>
+          </h2>
+          <span class="inb-section-help">${esc(help || '')}</span>
+        </div>
+        ${count === 0
+          ? `<div class="inb-empty">✓ All clear</div>`
+          : body}
+      </section>
+    `;
+  }
+
+  function renderIntents(items) {
+    const body = items.map(it => {
+      const proposalUrl = it.published_slug ? PROPOSAL_PUBLIC(it.published_slug) : (it.proposal_id ? PROPOSAL_EDIT(it.proposal_id) : '#');
+      const jnUrl = JOBNIMBUS_SEARCH(it.viewer_email || '');
+      const statusTag = it.notified_at
+        ? `<span class="inb-tag inb-tag-status-notified">Notified</span>`
+        : `<span class="inb-tag inb-tag-status-pending">Pending</span>`;
+      return `
+        <div class="inb-row">
+          <div class="inb-row-main">
+            <div class="inb-row-title">
+              <strong>${esc(it.viewer_name || 'Unknown')}</strong>
+              <em>wants to lock in</em>
+              <strong>${esc(it.project_address || '—')}</strong>
+              ${it.bid_total_amount != null ? `<span class="inb-row-amount">${fmtMoney(it.bid_total_amount)}</span>` : ''}
+              ${statusTag}
+            </div>
+            <div class="inb-row-meta">
+              <span><strong>Email:</strong> ${esc(it.viewer_email || '—')}</span>
+              ${it.viewer_phone ? `<span><strong>Phone:</strong> ${esc(fmtPhone(it.viewer_phone))}</span>` : ''}
+              <span>${timeAgo(it.clicked_at)}</span>
+            </div>
+            ${it.viewer_message ? `<div class="inb-row-note">${esc(truncate(it.viewer_message, 240))}</div>` : ''}
+          </div>
+          <div class="inb-row-actions">
+            <a class="inb-action-btn is-primary" href="${esc(jnUrl)}" target="_blank" rel="noopener">📋 JobNimbus</a>
+            <a class="inb-action-btn" href="${esc(proposalUrl)}" target="_blank" rel="noopener">View proposal</a>
+          </div>
+        </div>
+      `;
+    }).join('');
+    return sectionWrap({
+      id: 'intents',
+      icon: '🔒',
+      title: 'Lock-in requests · ready to sign',
+      count: items.length,
+      urgency: 'hot',
+      help: 'Highest priority — these are clients asking for a contract.',
+      body,
+    });
+  }
+
+  function renderUnreadInbound(items) {
+    const body = items.map(it => {
+      const proposalUrl = it.latest_proposal_id ? PROPOSAL_EDIT(it.latest_proposal_id) : '#';
+      return `
+        <div class="inb-row">
+          <div class="inb-row-main">
+            <div class="inb-row-title">
+              <strong>${esc(it.client_name || 'Unknown')}</strong>
+              <em>messaged</em>
+              <span>${timeAgo(it.created_at)}</span>
+            </div>
+            <div class="inb-row-meta">
+              <span><strong>Email:</strong> ${esc(it.client_email || '—')}</span>
+            </div>
+            <div class="inb-row-note">${esc(truncate(it.body || '', 280))}</div>
+          </div>
+          <div class="inb-row-actions">
+            ${it.client_id ? `<a class="inb-action-btn" href="/admin/client.html?id=${esc(it.client_id)}">👤 Profile</a>` : ''}
+            ${it.client_id ? `<button class="inb-action-btn" data-action="quick-note" data-client-id="${esc(it.client_id)}" data-client-name="${esc(it.client_name || 'client')}">📝 Note</button>` : ''}
+            <a class="inb-action-btn is-primary" href="${esc(proposalUrl)}" target="_blank" rel="noopener">View &amp; reply</a>
+            <a class="inb-action-btn" href="mailto:${esc(it.client_email || '')}">Email direct</a>
+          </div>
+        </div>
+      `;
+    }).join('');
+    return sectionWrap({
+      id: 'unread',
+      icon: '💬',
+      title: 'Unread messages from clients',
+      count: items.length,
+      urgency: items.length > 0 ? 'urgent' : 'cold',
+      help: 'Each one is a client awaiting a reply.',
+      body,
+    });
+  }
+
+  function renderRedesigns(items) {
+    const body = items.map(it => {
+      const editorUrl = PROPOSAL_EDIT(it.proposal_id);
+      return `
+        <div class="inb-row">
+          <div class="inb-row-main">
+            <div class="inb-row-title">
+              <strong>${esc(it.client_name || 'Unknown')}</strong>
+              <em>requested a redesign on</em>
+              <strong>${esc(it.project_address || '—')}</strong>
+            </div>
+            <div class="inb-row-meta">
+              <span>${timeAgo(it.created_at)}</span>
+              ${it.photo_url ? `<span><strong>📷</strong> Photo attached</span>` : ''}
+            </div>
+            ${it.homeowner_note ? `<div class="inb-row-note">${esc(truncate(it.homeowner_note, 320))}</div>` : ''}
+          </div>
+          <div class="inb-row-actions">
+            ${it.client_id ? `<a class="inb-action-btn" href="/admin/client.html?id=${esc(it.client_id)}">👤 Profile</a>` : ''}
+            ${it.client_id ? `<button class="inb-action-btn" data-action="quick-note" data-client-id="${esc(it.client_id)}" data-client-name="${esc(it.client_name || 'client')}">📝 Note</button>` : ''}
+            <a class="inb-action-btn is-primary" href="${esc(editorUrl)}" target="_blank" rel="noopener">Open in editor</a>
+          </div>
+        </div>
+      `;
+    }).join('');
+    return sectionWrap({
+      id: 'redesigns',
+      icon: '📐',
+      title: 'Pending design changes',
+      count: items.length,
+      urgency: 'warm',
+      help: 'Re-bid required before client sees a new version.',
+      body,
+    });
+  }
+
+  function renderSubstitutions(items) {
+    const body = items.map(it => {
+      const editorUrl = PROPOSAL_EDIT(it.proposal_id);
+      return `
+        <div class="inb-row">
+          <div class="inb-row-main">
+            <div class="inb-row-title">
+              <strong>${esc(it.client_name || 'Unknown')}</strong>
+              <em>requested material swaps on</em>
+              <strong>${esc(it.project_address || '—')}</strong>
+              <span class="inb-tag inb-tag-no-msg">${it.item_count || 0} item${it.item_count == 1 ? '' : 's'}</span>
+            </div>
+            <div class="inb-row-meta">
+              <span>${timeAgo(it.created_at)}</span>
+              <span><strong>Email:</strong> ${esc(it.client_email || '—')}</span>
+            </div>
+            ${it.homeowner_note ? `<div class="inb-row-note">${esc(truncate(it.homeowner_note, 320))}</div>` : ''}
+          </div>
+          <div class="inb-row-actions">
+            ${it.client_id ? `<a class="inb-action-btn" href="/admin/client.html?id=${esc(it.client_id)}">👤 Profile</a>` : ''}
+            ${it.client_id ? `<button class="inb-action-btn" data-action="quick-note" data-client-id="${esc(it.client_id)}" data-client-name="${esc(it.client_name || 'client')}">📝 Note</button>` : ''}
+            <a class="inb-action-btn is-primary" href="${esc(editorUrl)}" target="_blank" rel="noopener">Open in editor</a>
+          </div>
+        </div>
+      `;
+    }).join('');
+    return sectionWrap({
+      id: 'subs',
+      icon: '🎨',
+      title: 'Pending material substitutions',
+      count: items.length,
+      urgency: 'warm',
+      help: 'Quick re-price and reply.',
+      body,
+    });
+  }
+
+  function renderPendingClients(items) {
+    const body = items.map(it => {
+      return `
+        <div class="inb-row">
+          <div class="inb-row-main">
+            <div class="inb-row-title">
+              <strong>${esc(it.name || 'Unknown')}</strong>
+              <em>hasn't activated their account</em>
+              <span class="inb-tag inb-tag-needs-account">No login</span>
+            </div>
+            <div class="inb-row-meta">
+              <span><strong>Email:</strong> ${esc(it.email || '—')}</span>
+              ${it.phone ? `<span><strong>Phone:</strong> ${esc(fmtPhone(it.phone))}</span>` : ''}
+              <span><strong>Proposals:</strong> ${it.proposal_count || 0}</span>
+              ${it.unread_designer_msgs > 0 ? `<span><strong>${it.unread_designer_msgs}</strong> unread message${it.unread_designer_msgs == 1 ? '' : 's'} stuck behind login</span>` : ''}
+              <span>Last view ${timeAgo(it.last_view)}</span>
+            </div>
+          </div>
+          <div class="inb-row-actions">
+            <a class="inb-action-btn" href="/admin/client.html?id=${esc(it.client_id)}">👤 Profile</a>
+            <button class="inb-action-btn" data-action="quick-note" data-client-id="${esc(it.client_id)}" data-client-name="${esc(it.name || 'client')}">📝 Note</button>
+            <button class="inb-action-btn is-primary"
+                    data-action="resend-invite"
+                    data-client-id="${esc(it.client_id)}"
+                    data-client-name="${esc(it.name)}">📨 Resend magic link</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+    return sectionWrap({
+      id: 'pending-accounts',
+      icon: '🔓',
+      title: 'Clients pending account activation',
+      count: items.length,
+      urgency: items.length > 0 ? 'urgent' : 'cold',
+      help: 'Yorktown-style silent failures — send a fresh magic link.',
+      body,
+    });
+  }
+
+  function renderColdDeals(items) {
+    const body = items.map(it => {
+      const proposalUrl = it.slug ? PROPOSAL_PUBLIC(it.slug) : PROPOSAL_EDIT(it.proposal_id);
+      const resendBtn = it.client_needs_activation && it.client_id
+        ? `<button class="inb-action-btn"
+                  data-action="resend-invite"
+                  data-client-id="${esc(it.client_id)}"
+                  data-client-name="${esc(it.client_name)}">📨 Resend invite</button>`
+        : '';
+      return `
+        <div class="inb-row">
+          <div class="inb-row-main">
+            <div class="inb-row-title">
+              <strong>${esc(it.project_address || '—')}</strong>
+              ${it.client_name ? `<em>· ${esc(it.client_name)}</em>` : ''}
+              ${it.bid_total_amount != null ? `<span class="inb-row-amount">${fmtMoney(it.bid_total_amount)}</span>` : ''}
+            </div>
+            <div class="inb-row-meta">
+              <span><strong>${it.total_views}</strong> views</span>
+              <span>Last view ${timeAgo(it.last_view)}</span>
+              <span>Published ${timeAgo(it.published_at)}</span>
+            </div>
+          </div>
+          <div class="inb-row-actions">
+            ${it.client_id ? `<a class="inb-action-btn" href="/admin/client.html?id=${esc(it.client_id)}">👤 Profile</a>` : ''}
+            ${it.client_id ? `<button class="inb-action-btn" data-action="quick-note" data-client-id="${esc(it.client_id)}" data-client-name="${esc(it.client_name || 'client')}">📝 Note</button>` : ''}
+            ${resendBtn}
+            <a class="inb-action-btn is-primary" href="${esc(proposalUrl)}" target="_blank" rel="noopener">View proposal</a>
+          </div>
+        </div>
+      `;
+    }).join('');
+    return sectionWrap({
+      id: 'cold',
+      icon: '❄️',
+      title: 'Cold deals · viewed but stalled',
+      count: items.length,
+      urgency: 'cold',
+      help: 'Engaged once, no activity in 48h+, no Lock-In.',
+      body,
+    });
+  }
+
+  function renderHotToday(items) {
+    const body = items.map(it => {
+      const proposalUrl = it.slug ? PROPOSAL_PUBLIC(it.slug) : PROPOSAL_EDIT(it.proposal_id);
+      return `
+        <div class="inb-row">
+          <div class="inb-row-main">
+            <div class="inb-row-title">
+              <strong>${esc(it.project_address || '—')}</strong>
+              ${it.bid_total_amount != null ? `<span class="inb-row-amount">${fmtMoney(it.bid_total_amount)}</span>` : ''}
+            </div>
+            <div class="inb-row-meta">
+              <span><strong>${it.views_24h}</strong> views in 24h</span>
+              <span><strong>${it.sessions_24h}</strong> session${it.sessions_24h == 1 ? '' : 's'}</span>
+              <span>Last view ${timeAgo(it.last_view)}</span>
+            </div>
+          </div>
+          <div class="inb-row-actions">
+            <a class="inb-action-btn is-primary" href="${esc(proposalUrl)}" target="_blank" rel="noopener">View proposal</a>
+          </div>
+        </div>
+      `;
+    }).join('');
+    return sectionWrap({
+      id: 'hot',
+      icon: '🔥',
+      title: 'Active in the last 24 hours',
+      count: items.length,
+      urgency: 'hot',
+      help: 'Positive engagement signals worth watching.',
+      body,
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // Main render flow
+  // ─────────────────────────────────────────────────────────────────────
+
+  function renderInbox(data) {
+    const html = [
+      renderIntents(data.open_signature_intents || []),
+      renderUnreadInbound(data.unread_inbound || []),
+      renderRedesigns(data.pending_redesigns || []),
+      renderSubstitutions(data.pending_substitutions || []),
+      renderPendingClients(data.clients_pending_activation || []),
+      renderColdDeals(data.cold_deals || []),
+      renderHotToday(data.hot_today || []),
+    ].join('');
+    $('#inboxContent').innerHTML = html;
+    wireActions();
+  }
+
+  function renderError(message) {
+    $('#inboxContent').innerHTML = `
+      <div class="inb-error">
+        <div class="inb-error-title">Couldn't load the inbox</div>
+        <div>${esc(message)}</div>
+        <div style="margin-top:14px;font-size:13px;">Try refreshing in a moment, or check the Cloudflare Pages logs for /api/admin-inbox.</div>
+      </div>
+    `;
+  }
+
+  async function loadInbox() {
+    $('#refreshBtn').disabled = true;
+    $('#refreshBtn').textContent = 'Loading…';
+    try {
+      const resp = await fetch(INBOX_URL, { cache: 'no-store' });
+      const data = await resp.json();
+      if (!resp.ok) {
+        renderError(data.error || ('HTTP ' + resp.status));
+        return;
+      }
+      renderInbox(data);
+      $('#lastRefreshed').textContent = 'Last refreshed: just now';
+      scheduleLastRefreshedUpdate(data.generated_at || new Date().toISOString());
+    } catch (e) {
+      renderError(e.message || String(e));
+    } finally {
+      $('#refreshBtn').disabled = false;
+      $('#refreshBtn').textContent = '↻ Refresh';
+    }
+  }
+
+  let _lastRefreshedTimer = null;
+  function scheduleLastRefreshedUpdate(iso) {
+    if (_lastRefreshedTimer) clearInterval(_lastRefreshedTimer);
+    const update = () => {
+      $('#lastRefreshed').textContent = 'Last refreshed: ' + timeAgo(iso);
+    };
+    update();
+    _lastRefreshedTimer = setInterval(update, 30000);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // Action wiring · event delegation on the content container
+  // ─────────────────────────────────────────────────────────────────────
+
+  function wireActions() {
+    $('#inboxContent').addEventListener('click', handleAction, { once: false });
+  }
+
+  async function handleAction(e) {
+    const btn = e.target.closest('[data-action="resend-invite"]');
+    if (!btn) return;
+    e.preventDefault();
+
+    const clientId   = btn.getAttribute('data-client-id');
+    const clientName = btn.getAttribute('data-client-name') || 'client';
+    if (!clientId) return;
+
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    try {
+      const resp = await fetch(RESEND_INVITE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_id: clientId }),
+      });
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        toast(`Couldn't send to ${clientName}: ${data.error || resp.status}`, 'error');
+        btn.disabled = false;
+        btn.textContent = originalText;
+        return;
+      }
+      if (data.warning) {
+        toast(`⚠ ${data.warning}`, 'error');
+        btn.disabled = false;
+        btn.textContent = originalText;
+        return;
+      }
+      if (data.email_sent) {
+        toast(`✓ Magic link sent to ${clientName}`, 'success');
+        btn.classList.remove('is-primary');
+        btn.classList.add('is-success');
+        btn.textContent = '✓ Sent';
+        // Re-enable after a delay so Tim can re-send if needed
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = originalText;
+          btn.classList.add('is-primary');
+          btn.classList.remove('is-success');
+        }, 8000);
+      } else {
+        toast(`Magic link generated but email failed for ${clientName}`, 'error');
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    } catch (err) {
+      toast(`Network error: ${err.message || err}`, 'error');
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // Init
+  // ─────────────────────────────────────────────────────────────────────
+
+  $('#refreshBtn').addEventListener('click', loadInbox);
+  loadInbox();
+})();
+</script>
+
+<script type="module">
+  // Sprint 14 — Quick-add notes from inbox rows
+  import { openQuickNoteModal } from '/admin/notes-modal.js';
+  import { requireDesigner }    from '/js/auth-util.js';
+
+  const auth = await requireDesigner();
+  const createdBy = auth && auth.user ? auth.user.id : undefined;
+
+  document.body.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="quick-note"]');
+    if (!btn) return;
+    e.preventDefault();
+    const clientId   = btn.getAttribute('data-client-id');
+    const clientName = btn.getAttribute('data-client-name') || 'Client';
+    if (!clientId) return;
+    openQuickNoteModal({ clientId, clientName, createdBy });
+  });
+</script>
+</body>
+</html>

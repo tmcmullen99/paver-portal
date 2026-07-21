@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resend Magic Link · Admin · Paver Portal Proposal Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #9c7440;
+      --green-dark: #7d5c31;
+      --green-soft: #f1e7d3;
+      --green-paler: #f4f7f4;
+      --charcoal: #353535;
+      --cream: #faf8f3;
+      --navy: #33281c;
+      --border: #e5e5e5;
+      --muted: #666;
+      --muted-soft: #999;
+      --danger: #b04040;
+      --danger-soft: #fef2f2;
+      --success: #167d3a;
+      --success-soft: #ecf7ef;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Onest', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--charcoal);
+      min-height: 100vh;
+      line-height: 1.55;
+    }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .topbar-brand {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--navy);
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .topbar-brand-divider { color: var(--muted-soft); font-weight: 400; }
+    .topbar-brand-section { color: var(--green); font-weight: 500; }
+    .topbar-back {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .topbar-back:hover { color: var(--charcoal); }
+
+    .shell {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 28px;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--green-dark);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0 0 8px;
+      line-height: 1.2;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 22px;
+    }
+
+    .form-row {
+      margin-bottom: 18px;
+    }
+    .form-row:last-child { margin-bottom: 0; }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--charcoal);
+      margin-bottom: 6px;
+    }
+    .label-hint {
+      font-size: 12px;
+      color: var(--muted-soft);
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: normal;
+      margin-left: 6px;
+    }
+    input[type="text"],
+    input[type="email"],
+    textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--charcoal);
+      background: #fff;
+      transition: border-color 0.15s ease;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px var(--green-soft);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--green-dark); }
+    .btn-primary:disabled {
+      background: var(--muted-soft);
+      cursor: not-allowed;
+    }
+
+    .result {
+      padding: 16px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.55;
+      margin-top: 16px;
+      display: none;
+    }
+    .result.is-success {
+      background: var(--success-soft);
+      border-left: 3px solid var(--success);
+      color: #0c4a1f;
+      display: block;
+    }
+    .result.is-error {
+      background: var(--danger-soft);
+      border-left: 3px solid var(--danger);
+      color: #7a1010;
+      display: block;
+    }
+    .result.is-warning {
+      background: #fff7e6;
+      border-left: 3px solid #b78b3a;
+      color: #5e3f0a;
+      display: block;
+    }
+    .result-title { font-weight: 600; margin-bottom: 4px; }
+    .result-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .helper-block {
+      background: var(--green-paler);
+      border-radius: 10px;
+      padding: 16px 18px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .helper-block strong { color: var(--charcoal); }
+    .helper-block code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--green-dark);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: -2px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="/admin/" class="topbar-brand">
+    <span>Paver Portal Proposal Builder</span>
+    <span class="topbar-brand-divider">/</span>
+    <span class="topbar-brand-section">Resend Magic Link</span>
+  </a>
+  <a href="/admin/" class="topbar-back">← Back to admin</a>
+</header>
+
+<main class="shell">
+  <div class="page-header">
+    <div class="eyebrow">CLIENT ACCOUNT LIFELINE</div>
+    <h1>Resend Paver Portal Portal magic link</h1>
+    <p class="subtitle">For clients who never set up their account and have an unread in-app message — or anyone who needs a fresh sign-in link.</p>
+  </div>
+
+  <form id="resendForm" class="card" autocomplete="off">
+    <div class="form-row">
+      <label for="identifierInput">
+        Client identifier
+        <span class="label-hint">— email or UUID</span>
+      </label>
+      <input
+        type="text"
+        id="identifierInput"
+        name="identifier"
+        placeholder="m.delfarah@gmail.com  or  1d227deb-79bc-4a33-aa18-5590da5894d6"
+        required
+        autocomplete="off"
+        spellcheck="false">
+    </div>
+
+    <div class="form-row">
+      <label for="noteInput">
+        Personal note
+        <span class="label-hint">— optional, shown above the sign-in button</span>
+      </label>
+      <textarea
+        id="noteInput"
+        name="note"
+        placeholder="Hey Masood — wanted to make sure you saw the proposal I sent. Click below to sign in and we can chat through any changes you'd like."
+        maxlength="800"></textarea>
+    </div>
+
+    <div class="form-row" style="margin-top:24px;">
+      <button type="submit" class="btn-primary" id="submitBtn">
+        <span id="submitLabel">Send magic link</span>
+      </button>
+    </div>
+
+    <div class="result" id="resultArea" role="status" aria-live="polite"></div>
+  </form>
+
+  <div class="helper-block">
+    <strong>What this does:</strong> Looks up the client by email or UUID, generates a one-time sign-in link via Supabase, and emails it to them with a Paver Portal-branded message. If you include a personal note, it appears above the sign-in button. The client lands at <code>/client/dashboard.html</code> with no password needed.
+    <br><br>
+    <strong>Safe to repeat:</strong> If the client already has an active account, no link is sent — you'll see a warning instead.
+  </div>
+</main>
+
+<script>
+  const form        = document.getElementById('resendForm');
+  const idInput     = document.getElementById('identifierInput');
+  const noteInput   = document.getElementById('noteInput');
+  const submitBtn   = document.getElementById('submitBtn');
+  const submitLabel = document.getElementById('submitLabel');
+  const resultArea  = document.getElementById('resultArea');
+
+  const UUID_RE  = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function showResult(kind, html) {
+    resultArea.className = 'result is-' + kind;
+    resultArea.innerHTML = html;
+  }
+  function clearResult() {
+    resultArea.className = 'result';
+    resultArea.innerHTML = '';
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    clearResult();
+
+    const raw = idInput.value.trim();
+    if (!raw) {
+      showResult('error', '<div class="result-title">Missing identifier</div>Enter a client email or UUID.');
+      return;
+    }
+
+    const payload = { note: noteInput.value.trim() || undefined };
+    if (UUID_RE.test(raw)) {
+      payload.client_id = raw;
+    } else if (EMAIL_RE.test(raw)) {
+      payload.email = raw.toLowerCase();
+    } else {
+      showResult('error', '<div class="result-title">Invalid identifier</div>That doesn\'t look like a valid email or UUID. Double-check and try again.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitLabel.innerHTML = '<span class="spinner"></span> Sending…';
+
+    try {
+      const resp = await fetch('/api/resend-magic-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        showResult('error',
+          '<div class="result-title">Couldn\'t send the link</div>' +
+          escapeHtml(data.error || ('HTTP ' + resp.status)) +
+          (data.detail ? '<div class="result-meta">' + escapeHtml(data.detail) + '</div>' : '')
+        );
+        return;
+      }
+
+      if (data.warning) {
+        showResult('warning',
+          '<div class="result-title">⚠ ' + escapeHtml(data.warning) + '</div>' +
+          (data.client ? '<div class="result-meta">' + escapeHtml(data.client.name) + ' · ' + escapeHtml(data.client.email) + '</div>' : '')
+        );
+        return;
+      }
+
+      if (data.email_sent) {
+        showResult('success',
+          '<div class="result-title">✓ Magic link sent</div>' +
+          'Email delivered to <strong>' + escapeHtml(data.client.email) + '</strong>' +
+          (data.client.name ? ' (' + escapeHtml(data.client.name) + ')' : '') +
+          '. They\'ll be signed in automatically when they click the button.' +
+          '<div class="result-meta">client_id: ' + escapeHtml(data.client.id) + '</div>'
+        );
+        // Reset form for next send
+        idInput.value = '';
+        noteInput.value = '';
+      } else {
+        showResult('error',
+          '<div class="result-title">Magic link generated but email failed</div>' +
+          'Check the Cloudflare Pages logs — the most common cause is a misconfigured <code>RESEND_FROM_EMAIL</code> env var.' +
+          '<div class="result-meta">client_id: ' + escapeHtml(data.client.id) + '</div>'
+        );
+      }
+    } catch (err) {
+      showResult('error',
+        '<div class="result-title">Network error</div>' + escapeHtml(err.message || String(err))
+      );
+    } finally {
+      submitBtn.disabled = false;
+      submitLabel.textContent = 'Send magic link';
+    }
+  });
+
+  // Focus the input on load for fast typing.
+  idInput.focus();
+</script>
+
+</body>
+</html>

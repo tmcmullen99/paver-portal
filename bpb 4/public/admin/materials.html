@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Materials — BPB Admin</title>
+<style>
+  /* ═══════════════════════════════════════════════════════════════════════
+     Part A — Materials admin (v2 with paste-link scraper)
+     Third-party catalog list + single-entry form + CSV bulk import + paste
+     manufacturer product URL to auto-fill the add form via
+     /api/scrape-product. Auth is NOT required here — matches existing
+     admin pages /admin/belgard-sync, /admin/material-swatches-bulk.
+     ═══════════════════════════════════════════════════════════════════════ */
+  :root {
+    --bp-green:       #9c7440;
+    --bp-green-dark:  #7d5c31;
+    --bp-green-soft:  #f1e7d3;
+    --bp-charcoal:    #58595b;
+    --bp-navy:        #33281c;
+    --bp-tan:         #dad7c5;
+    --bp-cream:       #faf8f3;
+    --bp-bg:          #f7f7f4;
+    --bp-card:        #ffffff;
+    --bp-border:      #e4e4df;
+    --bp-text:        #1f2125;
+    --bp-muted:       #70726f;
+    --bp-danger:      #9c2a2a;
+    --bp-danger-bg:   #fde8e8;
+    --bp-ok:          #2f6b3a;
+    --bp-ok-bg:       #e4f1e6;
+    --bp-warn:        #8a6a1a;
+    --bp-warn-bg:     #fdf3dc;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bp-bg);
+    color: var(--bp-text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .bp-mat-wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 24px 80px;
+  }
+
+  /* ─── Header ──────────────────────────────────────────────────── */
+  .bp-mat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .bp-mat-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .bp-mat-header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--bp-text);
+  }
+  .bp-mat-badge {
+    background: var(--bp-green);
+    color: #fff;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .bp-mat-counter {
+    color: var(--bp-muted);
+    font-size: 13px;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .bp-mat-sub {
+    color: var(--bp-muted);
+    font-size: 13px;
+    margin: 0 0 20px;
+  }
+  .bp-mat-sub a { color: var(--bp-green); }
+
+  /* ─── Status banners ─────────────────────────────────────────── */
+  .bp-mat-status {
+    padding: 12px 14px;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .bp-mat-status.visible { display: block; }
+  .bp-mat-status.ok {
+    background: var(--bp-ok-bg);
+    color: var(--bp-ok);
+    border-left: 3px solid var(--bp-ok);
+  }
+  .bp-mat-status.error {
+    background: var(--bp-danger-bg);
+    color: var(--bp-danger);
+    border-left: 3px solid var(--bp-danger);
+  }
+  .bp-mat-status.warn {
+    background: var(--bp-warn-bg);
+    color: var(--bp-warn);
+    border-left: 3px solid var(--bp-warn);
+  }
+
+  /* ─── Toolbar ────────────────────────────────────────────────── */
+  .bp-mat-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .bp-mat-search {
+    flex: 1;
+    min-width: 220px;
+    max-width: 440px;
+    padding: 8px 12px;
+    font-size: 14px;
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 4px;
+    color: var(--bp-text);
+  }
+  .bp-mat-filter {
+    padding: 8px 10px;
+    font-size: 13px;
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 4px;
+    color: var(--bp-text);
+    min-width: 140px;
+  }
+  .bp-mat-search:focus,
+  .bp-mat-filter:focus {
+    outline: none;
+    border-color: var(--bp-green);
+    box-shadow: 0 0 0 2px rgba(93, 126, 105, 0.15);
+  }
+
+  /* ─── Buttons ────────────────────────────────────────────────── */
+  .bp-mat-btn {
+    background: var(--bp-green);
+    color: #fff;
+    border: none;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .bp-mat-btn:hover  { background: var(--bp-green-dark); }
+  .bp-mat-btn:disabled {
+    background: #a8b5ac;
+    cursor: not-allowed;
+  }
+  .bp-mat-btn-ghost {
+    background: transparent;
+    color: var(--bp-charcoal);
+    border: 1px solid var(--bp-border);
+    padding: 9px 14px;
+    font-size: 13px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .bp-mat-btn-ghost:hover { background: var(--bp-bg); }
+  .bp-mat-btn-small {
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--bp-charcoal);
+    border: 1px solid var(--bp-border);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .bp-mat-btn-small:hover { background: var(--bp-bg); }
+  .bp-mat-btn-danger {
+    color: var(--bp-danger);
+    border-color: #e5c8c8;
+  }
+  .bp-mat-btn-danger:hover {
+    background: var(--bp-danger-bg);
+    color: #6f1e1e;
+  }
+
+  /* ─── Panels (shared shell) ──────────────────────────────────── */
+  .bp-mat-panel {
+    background: var(--bp-card);
+    border: 1px solid var(--bp-border);
+    border-radius: 6px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    display: none;
+  }
+  .bp-mat-panel.visible { display: block; }
+  .bp-mat-panel h2 {
+    margin: 0 0 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--bp-charcoal);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ─── Scrape (paste-link) panel ──────────────────────────────── */
+  .bp-mat-scrape-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .bp-mat-scrape-row input {
+    flex: 1;
+    min-width: 300px;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: "SF Mono", Menlo, monospace;
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 4px;
+    color: var(--bp-text);
+  }
+  .bp-mat-scrape-row input:focus {
+    outline: none;
+    border-color: var(--bp-green);
+    box-shadow: 0 0 0 2px rgba(93, 126, 105, 0.15);
+  }
+  .bp-mat-scrape-hint {
+    font-size: 12px;
+    color: var(--bp-muted);
+    margin-top: 10px;
+  }
+  .bp-mat-scrape-hint strong { color: var(--bp-text); }
+  .bp-mat-scrape-result {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: var(--bp-bg);
+    border-radius: 4px;
+    font-size: 12px;
+    display: none;
+  }
+  .bp-mat-scrape-result.visible { display: block; }
+  .bp-mat-scrape-result ul {
+    margin: 6px 0 0;
+    padding-left: 20px;
+  }
+  .bp-mat-scrape-result li {
+    margin-bottom: 3px;
+    color: var(--bp-muted);
+  }
+  .bp-mat-scrape-result .bp-mat-src-tag {
+    display: inline-block;
+    padding: 1px 6px;
+    margin-left: 6px;
+    border-radius: 2px;
+    background: var(--bp-green-soft);
+    color: var(--bp-green-dark);
+    font-size: 10px;
+    font-family: "SF Mono", Menlo, monospace;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* ─── Form panel ─────────────────────────────────────────────── */
+  .bp-mat-form-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    align-items: start;
+    margin-bottom: 12px;
+  }
+  .bp-mat-form-row > label {
+    padding-top: 9px;
+    font-weight: 500;
+    color: var(--bp-charcoal);
+    font-size: 13px;
+  }
+  .bp-mat-form-row > label .bp-mat-req { color: var(--bp-danger); margin-left: 3px; }
+  .bp-mat-form-row input[type="text"],
+  .bp-mat-form-row input[type="url"],
+  .bp-mat-form-row textarea {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 13px;
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 4px;
+    color: var(--bp-text);
+    font-family: inherit;
+  }
+  .bp-mat-form-row textarea {
+    min-height: 68px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  .bp-mat-form-row input:focus,
+  .bp-mat-form-row textarea:focus {
+    outline: none;
+    border-color: var(--bp-green);
+    box-shadow: 0 0 0 2px rgba(93, 126, 105, 0.15);
+  }
+  .bp-mat-form-row input.bp-mat-filled-by-scrape {
+    background: var(--bp-green-soft);
+  }
+  .bp-mat-form-hint {
+    font-size: 11px;
+    color: var(--bp-muted);
+    margin-top: 4px;
+  }
+  .bp-mat-form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--bp-border);
+  }
+
+  /* ─── CSV uploader ───────────────────────────────────────────── */
+  .bp-mat-csv-drop {
+    border: 2px dashed var(--bp-border);
+    border-radius: 8px;
+    padding: 32px 20px;
+    text-align: center;
+    color: var(--bp-muted);
+    font-size: 14px;
+    background: var(--bp-cream);
+    transition: border-color 0.15s, background 0.15s;
+    cursor: pointer;
+  }
+  .bp-mat-csv-drop.drag-over {
+    border-color: var(--bp-green);
+    background: var(--bp-green-soft);
+    color: var(--bp-green-dark);
+  }
+  .bp-mat-csv-drop strong { color: var(--bp-text); font-weight: 600; }
+  .bp-mat-csv-drop input[type="file"] { display: none; }
+  .bp-mat-csv-spec {
+    background: var(--bp-bg);
+    border-left: 3px solid var(--bp-green);
+    padding: 10px 14px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    color: var(--bp-charcoal);
+    margin-top: 10px;
+    border-radius: 0 4px 4px 0;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .bp-mat-csv-preview {
+    margin-top: 16px;
+    padding: 14px;
+    background: #fff;
+    border: 1px solid var(--bp-border);
+    border-radius: 6px;
+    display: none;
+  }
+  .bp-mat-csv-preview.visible { display: block; }
+  .bp-mat-csv-preview h3 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bp-charcoal);
+  }
+  .bp-mat-csv-preview-summary {
+    font-size: 13px;
+    color: var(--bp-muted);
+    margin-bottom: 8px;
+  }
+  .bp-mat-csv-preview-summary strong { color: var(--bp-text); }
+  .bp-mat-csv-error-list {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    max-height: 160px;
+    overflow-y: auto;
+    font-size: 12px;
+  }
+  .bp-mat-csv-error-list li {
+    padding: 4px 8px;
+    color: var(--bp-danger);
+    background: var(--bp-danger-bg);
+    border-radius: 3px;
+    margin-bottom: 3px;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+
+  /* ─── Table / list ───────────────────────────────────────────── */
+  .bp-mat-empty {
+    background: var(--bp-card);
+    border: 1px dashed var(--bp-border);
+    border-radius: 8px;
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--bp-muted);
+  }
+  .bp-mat-empty strong { display: block; color: var(--bp-text); margin-bottom: 6px; font-size: 15px; }
+
+  .bp-mat-table-wrap {
+    background: var(--bp-card);
+    border: 1px solid var(--bp-border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .bp-mat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .bp-mat-table thead th {
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--bp-bg);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bp-charcoal);
+    border-bottom: 1px solid var(--bp-border);
+  }
+  .bp-mat-table tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--bp-border);
+    vertical-align: top;
+  }
+  .bp-mat-table tbody tr:last-child td { border-bottom: none; }
+  .bp-mat-table tbody tr:hover { background: var(--bp-cream); }
+  .bp-mat-row-mfr {
+    font-weight: 600;
+    color: var(--bp-navy);
+  }
+  .bp-mat-row-product {
+    font-weight: 500;
+    color: var(--bp-text);
+  }
+  .bp-mat-row-sub {
+    font-size: 12px;
+    color: var(--bp-muted);
+    margin-top: 2px;
+  }
+  .bp-mat-row-chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--bp-green-soft);
+    color: var(--bp-green-dark);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .bp-mat-row-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .bp-mat-col-actions { width: 160px; }
+
+  /* ─── Responsive ─────────────────────────────────────────────── */
+  @media (max-width: 720px) {
+    .bp-mat-form-row { grid-template-columns: 1fr; gap: 4px; }
+    .bp-mat-form-row > label { padding-top: 0; }
+    .bp-mat-table thead { display: none; }
+    .bp-mat-table tbody td {
+      display: block;
+      padding: 6px 14px;
+      border-bottom: none;
+    }
+    .bp-mat-table tbody tr {
+      display: block;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--bp-border);
+    }
+    .bp-mat-col-actions { width: auto; }
+    .bp-mat-row-actions { justify-content: flex-start; margin-top: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bp-mat-wrap">
+
+  <div class="bp-mat-header">
+    <div class="bp-mat-header-left">
+      <h1>Materials</h1>
+      <span class="bp-mat-badge">Part A</span>
+      <span class="bp-mat-counter" id="matCounter">—</span>
+    </div>
+  </div>
+  <p class="bp-mat-sub">
+    Third-party material catalog. Paste a manufacturer product URL below to auto-fill the form, or add manually / bulk-import via CSV.
+    Color swatches stay blank in v1 — manufacturers load them via JavaScript, so scraping only captures the hero image.
+  </p>
+
+  <div id="matStatus" class="bp-mat-status"></div>
+
+  <!-- ───── Toolbar ───── -->
+  <div class="bp-mat-toolbar">
+    <input type="text" id="matSearch" class="bp-mat-search"
+           placeholder="Search manufacturer, product, color, description…" />
+    <select id="matFilterMfr" class="bp-mat-filter">
+      <option value="">All manufacturers</option>
+    </select>
+    <select id="matFilterCat" class="bp-mat-filter">
+      <option value="">All categories</option>
+    </select>
+    <button id="matScrapeBtn" class="bp-mat-btn-ghost">Paste product link</button>
+    <button id="matAddBtn" class="bp-mat-btn">+ Add material</button>
+    <button id="matCsvBtn" class="bp-mat-btn-ghost">Bulk import (CSV)</button>
+  </div>
+
+  <!-- ───── Paste-link scrape panel ───── -->
+  <div id="matScrapePanel" class="bp-mat-panel">
+    <h2>Paste product URL</h2>
+    <div class="bp-mat-scrape-row">
+      <input type="url" id="matScrapeUrl"
+             placeholder="https://www.trex.com/products/decking/lineage/" spellcheck="false" />
+      <button id="matScrapeFetch" class="bp-mat-btn">Fetch details</button>
+      <button id="matScrapeCancel" class="bp-mat-btn-ghost">Close</button>
+    </div>
+    <div class="bp-mat-scrape-hint">
+      Best results: <strong>Trex, Belgard, Techo-Bloc, Keystone Hardscapes, Tru-Scapes</strong>.
+      Tracking parameters (<code>utm_*</code>, <code>gclid</code>, etc.) are stripped automatically.
+      Success pre-fills the Add Material form below — review and click Save.
+    </div>
+    <div id="matScrapeResult" class="bp-mat-scrape-result"></div>
+  </div>
+
+  <!-- ───── Add / Edit panel ───── -->
+  <div id="matFormPanel" class="bp-mat-panel">
+    <h2 id="matFormTitle">Add material</h2>
+
+    <div class="bp-mat-form-row">
+      <label for="matMfr">Manufacturer <span class="bp-mat-req">*</span></label>
+      <div>
+        <input type="text" id="matMfr" list="matMfrList" autocomplete="off"
+               placeholder="e.g. Trex, MSI, Tru-Scapes, Belgard" />
+        <datalist id="matMfrList"></datalist>
+        <div class="bp-mat-form-hint">
+          Required. Existing manufacturers appear as suggestions — type the exact same name to group cleanly.
+        </div>
+      </div>
+    </div>
+
+    <div class="bp-mat-form-row">
+      <label for="matCat">Category <span class="bp-mat-req">*</span></label>
+      <div>
+        <input type="text" id="matCat" list="matCatList" autocomplete="off"
+               placeholder="e.g. Decking, Turf, Lighting, Paver" />
+        <datalist id="matCatList"></datalist>
+        <div class="bp-mat-form-hint">Required. Grouped on the proposal page as "application area."</div>
+      </div>
+    </div>
+
+    <div class="bp-mat-form-row">
+      <label for="matProduct">Product name <span class="bp-mat-req">*</span></label>
+      <div>
+        <input type="text" id="matProduct" placeholder="e.g. Transcend Lineage, Summer Gold 96" />
+        <div class="bp-mat-form-hint">Required. The model / product line name (no SKU needed).</div>
+      </div>
+    </div>
+
+    <div class="bp-mat-form-row">
+      <label for="matColor">Color</label>
+      <div>
+        <input type="text" id="matColor" placeholder="e.g. Biscayne, Toscana" />
+        <div class="bp-mat-form-hint">Optional. The color / finish variant.</div>
+      </div>
+    </div>
+
+    <div class="bp-mat-form-row">
+      <label for="matDesc">Description</label>
+      <div>
+        <textarea id="matDesc" placeholder="Optional notes that help you recognize this material later."></textarea>
+      </div>
+    </div>
+
+    <div class="bp-mat-form-row">
+      <label for="matImgUrl">Image URL</label>
+      <div>
+        <input type="url" id="matImgUrl" placeholder="https://…" />
+        <div class="bp-mat-form-hint">Optional. Hero image pulled from the page's Open Graph tag when the scraper finds one.</div>
+      </div>
+    </div>
+
+    <div class="bp-mat-form-row">
+      <label for="matCatalogUrl">Catalog URL</label>
+      <div>
+        <input type="url" id="matCatalogUrl" placeholder="https://…" />
+        <div class="bp-mat-form-hint">Optional. Public manufacturer product page — tracking params auto-stripped.</div>
+      </div>
+    </div>
+
+    <div class="bp-mat-form-actions">
+      <button id="matFormSave" class="bp-mat-btn">Save material</button>
+      <button id="matFormCancel" class="bp-mat-btn-ghost">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ───── CSV bulk import panel ───── -->
+  <div id="matCsvPanel" class="bp-mat-panel">
+    <h2>Bulk import from CSV</h2>
+    <p class="bp-mat-form-hint" style="margin: 0 0 12px; font-size: 13px;">
+      Drop a CSV file below, or click to browse. The first row must be the header line.
+      Required columns: <strong>manufacturer</strong>, <strong>category</strong>, <strong>product_name</strong>.
+      Optional columns: <strong>color</strong>, <strong>description</strong>, <strong>image_url</strong>, <strong>catalog_url</strong>.
+    </p>
+
+    <label for="matCsvInput" class="bp-mat-csv-drop" id="matCsvDrop">
+      <div>
+        <strong>Drop CSV here</strong>
+        <div>or click to browse</div>
+      </div>
+      <input type="file" id="matCsvInput" accept=".csv,text/csv" />
+    </label>
+
+    <div class="bp-mat-csv-spec">manufacturer,category,product_name,color,description,image_url,catalog_url
+Trex,Decking,Transcend Lineage,Biscayne,Premium composite decking,,https://trex.com/...
+MSI,Turf,Summer Gold 96,,Paver Portal standard turf,,https://msisurfaces.com/...</div>
+
+    <div id="matCsvPreview" class="bp-mat-csv-preview">
+      <h3>Preview</h3>
+      <div class="bp-mat-csv-preview-summary" id="matCsvSummary"></div>
+      <ul class="bp-mat-csv-error-list" id="matCsvErrors"></ul>
+      <div class="bp-mat-form-actions">
+        <button id="matCsvImport" class="bp-mat-btn">Import valid rows</button>
+        <button id="matCsvReset" class="bp-mat-btn-ghost">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── List / empty state ───── -->
+  <div id="matEmpty" class="bp-mat-empty" style="display:none;">
+    <strong>No materials yet.</strong>
+    Click <em>Paste product link</em> to auto-fill from a manufacturer URL, <em>+ Add material</em> to add one by hand, or <em>Bulk import (CSV)</em> to paste a whole catalog.
+  </div>
+
+  <div id="matTableWrap" class="bp-mat-table-wrap" style="display:none;">
+    <table class="bp-mat-table">
+      <thead>
+        <tr>
+          <th>Manufacturer</th>
+          <th>Product</th>
+          <th>Category</th>
+          <th class="bp-mat-col-actions"></th>
+        </tr>
+      </thead>
+      <tbody id="matTableBody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script type="module" src="/admin/materials.js"></script>
+</body>
+</html>

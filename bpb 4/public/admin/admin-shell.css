@@ -1,0 +1,485 @@
+/* ═════════════════════════════════════════════════════════════════════════
+   admin-shell.css — Sprint 7 · Left-side navigation
+   Repurposes the existing .ash-tabs element as a fixed left sidebar.
+   All other classes (topbar, landing tiles, buttons, status) preserved.
+   Design tokens follow the Paver Portal palette already established in editor.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --ash-green:        #9c7440;
+  --ash-green-dark:   #7d5c31;
+  --ash-green-soft:   #f1e7d3;
+  --ash-green-paler:  #f4f7f4;
+  --ash-charcoal:     #353535;
+  --ash-tan:          #dad7c5;
+  --ash-cream:        #faf8f3;
+  --ash-navy:         #33281c;
+  --ash-border:       #e5e5e5;
+  --ash-border-soft:  #f0f0f0;
+  --ash-muted:        #666;
+  --ash-muted-soft:   #999;
+  --ash-danger:       #b04040;
+  --ash-warn-soft:    #fff4d4;
+  --ash-warn-text:    #7a5a10;
+  --ash-master-bg:    #33281c;
+  --ash-master-fg:    #faf8f3;
+
+  /* Sprint 7 — sidebar layout vars */
+  --ash-sidebar-width:   232px;
+  --ash-sidebar-mobile:  280px;
+  --ash-topbar-height:   53px; /* JS overrides on load with real measurement */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--ash-charcoal);
+  background: #fafafa;
+  line-height: 1.6;
+  font-size: 15px;
+  min-height: 100vh;
+}
+a { color: var(--ash-green-dark); }
+
+/* ─── Top bar ──────────────────────────────────────────────────────────── */
+.ash-topbar {
+  background: #fff;
+  border-bottom: 1px solid var(--ash-border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.ash-topbar-inner {
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+/* Sprint 7 — left group wraps [hamburger + brand], injected by admin-shell.js */
+.ash-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.ash-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+  font-family: 'Onest', sans-serif;
+  min-width: 0;
+}
+.ash-brand-bayside {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ash-navy);
+  letter-spacing: -0.005em;
+}
+.ash-brand-divider {
+  color: var(--ash-muted);
+  font-weight: 300;
+}
+.ash-brand-section {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ash-green-dark);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Sprint 7 — hamburger toggle, mobile only */
+.ash-sidebar-toggle {
+  display: none;
+  background: #fff;
+  border: 1px solid var(--ash-border);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--ash-charcoal);
+  font-family: inherit;
+  transition: background 0.12s, border-color 0.12s;
+}
+.ash-sidebar-toggle:hover {
+  background: #f0f0f0;
+  border-color: var(--ash-green);
+  color: var(--ash-green-dark);
+}
+
+.ash-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.ash-role-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.ash-role-badge.is-master   { background: var(--ash-master-bg); color: var(--ash-master-fg); }
+.ash-role-badge.is-designer { background: var(--ash-green-soft); color: var(--ash-green-dark); }
+.ash-role-badge.is-loading  { background: #f0f0f0; color: var(--ash-muted); }
+
+.ash-user-email {
+  font-size: 12px;
+  color: var(--ash-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+.ash-link-back {
+  font-size: 13px;
+  color: var(--ash-muted);
+  text-decoration: none;
+}
+.ash-link-back:hover { color: var(--ash-green-dark); }
+
+.ash-signout {
+  font-size: 12px;
+  color: var(--ash-muted);
+  cursor: pointer;
+  background: none;
+  border: 1px solid var(--ash-border);
+  font-family: inherit;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.ash-signout:hover {
+  background: #f0f0f0;
+  border-color: var(--ash-charcoal);
+  color: var(--ash-charcoal);
+}
+
+/* ─── Sidebar (formerly .ash-tabs top strip) ──────────────────────────── */
+.ash-tabs {
+  position: fixed;
+  top: var(--ash-topbar-height);
+  left: 0;
+  bottom: 0;
+  width: var(--ash-sidebar-width);
+  background: #fff;
+  border-right: 1px solid var(--ash-border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 49;
+  padding: 14px 0 80px;
+  transition: transform 0.2s ease;
+  /* Hide native scrollbar on desktop, keep functionality */
+  scrollbar-width: thin;
+  scrollbar-color: var(--ash-border) transparent;
+}
+.ash-tabs::-webkit-scrollbar { width: 6px; }
+.ash-tabs::-webkit-scrollbar-thumb { background: var(--ash-border); border-radius: 3px; }
+.ash-tabs::-webkit-scrollbar-track { background: transparent; }
+
+.ash-tabs-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  white-space: normal;
+}
+
+/* Sidebar section grouping */
+.ash-sidebar-section {
+  margin-bottom: 14px;
+}
+.ash-sidebar-section + .ash-sidebar-section {
+  border-top: 1px solid var(--ash-border-soft);
+  padding-top: 8px;
+}
+.ash-sidebar-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ash-muted-soft);
+  padding: 10px 18px 4px;
+}
+
+/* Sidebar item (formerly .ash-tab horizontal tab) */
+.ash-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ash-charcoal);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  margin-left: -1px; /* hairline alignment with right border */
+  transition: background 0.1s ease, color 0.1s ease, border-left-color 0.1s ease;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.ash-tab:hover {
+  background: var(--ash-green-paler);
+  color: var(--ash-green-dark);
+}
+.ash-tab.is-active {
+  background: var(--ash-green-soft);
+  color: var(--ash-navy);
+  font-weight: 600;
+  border-left-color: var(--ash-green);
+}
+.ash-tab-icon {
+  font-size: 14px;
+  line-height: 1;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+  color: inherit;
+}
+.ash-tab-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.005em;
+}
+.ash-tab-master-flag {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ash-muted);
+  background: var(--ash-border-soft);
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.ash-tab.is-active .ash-tab-master-flag {
+  background: var(--ash-master-bg);
+  color: var(--ash-master-fg);
+}
+
+/* Notification dot — Sprint 7 */
+.ash-tab-dot {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--ash-danger);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0;
+  letter-spacing: 0;
+}
+.ash-tab-dot.is-visible { display: inline-flex; }
+.ash-tab.is-active .ash-tab-dot {
+  /* Slightly muted when on the active page since the user is already here */
+  background: var(--ash-green-dark);
+}
+
+/* Mobile sidebar backdrop */
+.ash-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  z-index: 48;
+}
+body.ash-sidebar-open .ash-sidebar-backdrop {
+  display: block;
+}
+
+/* ─── Main shell — offset for sidebar ─────────────────────────────────── */
+.ash-shell {
+  margin-left: var(--ash-sidebar-width);
+  max-width: none;
+  padding: 36px 40px 80px;
+  min-height: calc(100vh - var(--ash-topbar-height));
+}
+
+/* ─── Intro block (used by landing + reusable across admin pages) ─────── */
+.ash-intro { margin-bottom: 28px; max-width: 920px; }
+.ash-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ash-green);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.ash-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ash-navy);
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.ash-lede {
+  color: var(--ash-muted);
+  max-width: 720px;
+  font-size: 15px;
+}
+
+/* ─── Tile groups (landing) ────────────────────────────────────────────── */
+.ash-tile-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.ash-tile-group {}
+.ash-tile-group-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--ash-border);
+  padding-bottom: 10px;
+}
+.ash-tile-group-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ash-navy);
+}
+.ash-tile-group-meta {
+  font-size: 11px;
+  color: var(--ash-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.ash-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+.ash-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid var(--ash-border);
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.12s, transform 0.12s, box-shadow 0.12s;
+  min-height: 124px;
+}
+.ash-tile:hover {
+  border-color: var(--ash-green);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transform: translateY(-1px);
+}
+.ash-tile-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ash-tile-icon {
+  font-size: 20px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ash-green-soft);
+  color: var(--ash-green-dark);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.ash-tile.is-master-only .ash-tile-icon {
+  background: var(--ash-master-bg);
+  color: var(--ash-master-fg);
+}
+.ash-tile-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ash-navy);
+  flex: 1;
+}
+.ash-tile-master-flag {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ash-master-fg);
+  background: var(--ash-master-bg);
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.ash-tile-desc {
+  font-size: 13px;
+  color: var(--ash-muted);
+  line-height: 1.5;
+}
+
+/* ─── Reusable admin-page primitives ───────────────────────────────────── */
+.ash-status {
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 18px;
+  display: none;
+}
+.ash-status.is-visible { display: block; }
+.ash-status.is-info  { background: var(--ash-green-soft); color: var(--ash-green-dark); }
+.ash-status.is-error { background: #fbe6e6; color: var(--ash-danger); }
+.ash-status.is-warn  { background: var(--ash-warn-soft); color: var(--ash-warn-text); }
+
+.ash-btn {
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  text-decoration: none;
+  display: inline-block;
+}
+.ash-btn--primary { background: var(--ash-green); color: #fff; }
+.ash-btn--primary:hover:not(:disabled) { background: var(--ash-green-dark); }
+.ash-btn--primary:disabled { background: #a8b5ac; cursor: not-allowed; }
+.ash-btn--ghost {
+  background: #fff;
+  color: var(--ash-charcoal);
+  border-color: var(--ash-border);
+}
+.ash-btn--ghost:hover:not(:disabled) { border-color: var(--ash-green); color: var(--ash-green-dark); }
+
+/* ─── Mobile (≤ 900px) ─────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .ash-sidebar-toggle { display: inline-flex; }
+  .ash-topbar-inner { padding: 12px 18px; }
+  .ash-tabs {
+    transform: translateX(-100%);
+    width: var(--ash-sidebar-mobile);
+    box-shadow: 4px 0 16px rgba(0,0,0,0.10);
+  }
+  .ash-tabs.is-open { transform: translateX(0); }
+  .ash-shell {
+    margin-left: 0;
+    padding: 28px 18px 60px;
+  }
+  .ash-user-email { display: none; }
+  .ash-link-back  { display: none; }
+  .ash-tile-grid  { grid-template-columns: 1fr; }
+}
+
+/* Prevent body scroll when mobile sidebar is open */
+@media (max-width: 900px) {
+  body.ash-sidebar-open { overflow: hidden; }
+}

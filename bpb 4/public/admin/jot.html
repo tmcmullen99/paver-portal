@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jot · Paver Portal Portal</title>
+<link rel="icon" href="/favicon.ico">
+<script type="module" src="/admin/admin-shell.js"></script>
+<style>
+  :root {
+    --bp-navy: #33281c;
+    --bp-green: #9c7440;
+    --bp-amber: #c89346;
+    --bp-cream: #faf8f3;
+    --bp-text: #353535;
+    --bp-muted: #777;
+    --bp-line: #e8e8e3;
+    --bp-card: #ffffff;
+    --bp-bg: #fafafa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bp-bg);
+    color: var(--bp-text);
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 32px 24px 80px; }
+  .eyebrow {
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--bp-green); font-weight: 700; margin-bottom: 8px;
+  }
+  h1 { margin: 0 0 6px; font-size: 28px; font-weight: 600; color: var(--bp-navy); letter-spacing: -0.01em; }
+  .lede { margin: 0 0 28px; font-size: 14px; color: var(--bp-muted); }
+
+  .field { margin-bottom: 18px; position: relative; }
+  .field label {
+    display: block;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--bp-muted); font-weight: 600; margin-bottom: 6px;
+  }
+
+  .picker-input, .note-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--bp-line);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    background: var(--bp-card);
+    color: var(--bp-text);
+    outline: none;
+    transition: border-color 120ms;
+  }
+  .picker-input:focus, .note-input:focus { border-color: var(--bp-green); }
+  .note-input {
+    min-height: 180px;
+    resize: vertical;
+    line-height: 1.55;
+  }
+
+  .picker-results {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    background: var(--bp-card);
+    border: 1px solid var(--bp-line);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 10;
+    display: none;
+  }
+  .picker-results.open { display: block; }
+  .picker-results .result {
+    padding: 10px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--bp-line);
+  }
+  .picker-results .result:last-child { border-bottom: none; }
+  .picker-results .result:hover, .picker-results .result.highlighted { background: var(--bp-cream); }
+  .picker-results .result .name { font-weight: 600; color: var(--bp-navy); font-size: 14px; }
+  .picker-results .result .email { color: var(--bp-muted); font-size: 12px; margin-top: 2px; }
+  .picker-results .empty { padding: 14px; color: var(--bp-muted); font-style: italic; font-size: 13px; }
+
+  .selected-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bp-cream);
+    border: 1px solid var(--bp-amber);
+    padding: 6px 10px 6px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--bp-navy);
+    font-weight: 500;
+  }
+  .selected-chip .clear {
+    cursor: pointer; color: var(--bp-muted); font-size: 14px;
+    background: none; border: none; padding: 0; line-height: 1;
+  }
+  .selected-chip .clear:hover { color: #c0392b; }
+
+  .actions { display: flex; align-items: center; gap: 14px; margin-top: 4px; }
+  .btn-save {
+    background: var(--bp-green); color: #fff;
+    border: none; padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    transition: opacity 120ms;
+  }
+  .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-save:hover:not(:disabled) { opacity: 0.92; }
+  .hint { font-size: 12px; color: var(--bp-muted); }
+  .hint kbd {
+    background: var(--bp-cream);
+    border: 1px solid var(--bp-line);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: Menlo, Monaco, monospace;
+    font-size: 11px;
+    color: var(--bp-text);
+  }
+
+  .toast {
+    margin-top: 18px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: none;
+  }
+  .toast.success { background: #e8f3ed; color: #1a5b34; border: 1px solid #9c7440; }
+  .toast.error   { background: #fce4e4; color: #861b1b; border: 1px solid #c0392b; }
+  .toast a { color: inherit; text-decoration: underline; font-weight: 600; }
+
+  .footer-note {
+    margin-top: 36px; padding-top: 18px;
+    border-top: 1px solid var(--bp-line);
+    font-size: 12px; color: var(--bp-muted);
+  }
+  .footer-note a { color: var(--bp-green); text-decoration: underline; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">PAVER PORTAL PORTAL · ADMIN</div>
+    <h1>Jot a note</h1>
+    <p class="lede">
+      Capture a quick thought about a client. It lands in their notes history and is searchable
+      from <a href="/admin/notes-search.html" style="color:var(--bp-green);text-decoration:underline;">notes search</a>.
+    </p>
+
+    <div class="field" id="client-field">
+      <label>Client</label>
+      <input id="picker-input" class="picker-input" type="text" placeholder="Start typing a name or email…" autocomplete="off" />
+      <div id="picker-results" class="picker-results"></div>
+      <div id="selected-chip-wrap" style="margin-top: 6px; display: none;"></div>
+    </div>
+
+    <div class="field">
+      <label>Note</label>
+      <textarea id="note-input" class="note-input" placeholder="Anything you want to remember — what they said, what to follow up on, who else they mentioned…"></textarea>
+    </div>
+
+    <div class="actions">
+      <button id="btn-save" class="btn-save" disabled>Save note</button>
+      <span class="hint"><kbd>⌘</kbd> <kbd>↵</kbd> to save</span>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <div class="footer-note">
+      <a href="/admin/notes-search.html">Search notes →</a>
+      ·
+      <a href="/admin/today.html">Today dashboard →</a>
+      ·
+      <a href="/admin/nurture-clients">Nurture pipeline →</a>
+    </div>
+  </div>
+
+<script type="module">
+  import { requireDesigner } from '/admin/admin-shell.js';
+
+  let session = null;
+  let selected = null;
+  let debounceTimer = null;
+  let highlightIdx = -1;
+  let currentResults = [];
+
+  async function init() {
+    const result = await requireDesigner();
+    if (!result.session) return;
+    session = result.session;
+
+    setupPicker();
+    setupSave();
+    document.getElementById('picker-input').focus();
+  }
+
+  function setupPicker() {
+    const input    = document.getElementById('picker-input');
+    const results  = document.getElementById('picker-results');
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      clearTimeout(debounceTimer);
+      if (q.length < 2) {
+        results.classList.remove('open');
+        results.innerHTML = '';
+        return;
+      }
+      debounceTimer = setTimeout(() => searchClients(q), 180);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (!results.classList.contains('open')) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        highlightIdx = Math.min(highlightIdx + 1, currentResults.length - 1);
+        paintHighlight();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        highlightIdx = Math.max(highlightIdx - 1, 0);
+        paintHighlight();
+      } else if (e.key === 'Enter') {
+        if (highlightIdx >= 0 && currentResults[highlightIdx]) {
+          e.preventDefault();
+          selectClient(currentResults[highlightIdx]);
+        }
+      } else if (e.key === 'Escape') {
+        results.classList.remove('open');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!document.getElementById('client-field').contains(e.target)) {
+        results.classList.remove('open');
+      }
+    });
+  }
+
+  async function searchClients(q) {
+    const results = document.getElementById('picker-results');
+    try {
+      const resp = await fetch('/api/admin-jot?q=' + encodeURIComponent(q), {
+        headers: { Authorization: 'Bearer ' + session.access_token },
+      });
+      if (!resp.ok) {
+        results.innerHTML = '<div class="empty">Search failed (' + resp.status + ')</div>';
+        results.classList.add('open');
+        return;
+      }
+      const data = await resp.json();
+      const rows = data.results || [];
+      currentResults = rows;
+      highlightIdx = rows.length > 0 ? 0 : -1;
+
+      if (rows.length === 0) {
+        results.innerHTML = '<div class="empty">No matches.</div>';
+      } else {
+        results.innerHTML = rows.map((c, i) => `
+          <div class="result ${i === 0 ? 'highlighted' : ''}" data-idx="${i}">
+            <div class="name">${escapeHtml(c.name || '(unnamed)')}</div>
+            <div class="email">${escapeHtml(c.email || '')}</div>
+          </div>
+        `).join('');
+        results.querySelectorAll('.result').forEach(el => {
+          el.addEventListener('click', () => {
+            const idx = parseInt(el.getAttribute('data-idx'), 10);
+            selectClient(currentResults[idx]);
+          });
+        });
+      }
+      results.classList.add('open');
+    } catch (e) {
+      results.innerHTML = '<div class="empty">Network error</div>';
+      results.classList.add('open');
+    }
+  }
+
+  function paintHighlight() {
+    document.querySelectorAll('.picker-results .result').forEach((el, i) => {
+      el.classList.toggle('highlighted', i === highlightIdx);
+    });
+  }
+
+  function selectClient(c) {
+    selected = c;
+    document.getElementById('picker-input').value = '';
+    document.getElementById('picker-results').classList.remove('open');
+    const wrap = document.getElementById('selected-chip-wrap');
+    wrap.innerHTML = `
+      <div class="selected-chip">
+        <span><strong>${escapeHtml(c.name || '(unnamed)')}</strong>${c.email ? ' · ' + escapeHtml(c.email) : ''}</span>
+        <button class="clear" id="clear-selected" title="Clear">×</button>
+      </div>
+    `;
+    wrap.style.display = 'block';
+    document.getElementById('clear-selected').addEventListener('click', clearSelected);
+    document.getElementById('note-input').focus();
+    updateSaveEnabled();
+  }
+
+  function clearSelected() {
+    selected = null;
+    document.getElementById('selected-chip-wrap').style.display = 'none';
+    document.getElementById('selected-chip-wrap').innerHTML = '';
+    document.getElementById('picker-input').focus();
+    updateSaveEnabled();
+  }
+
+  function setupSave() {
+    const noteInput = document.getElementById('note-input');
+    noteInput.addEventListener('input', updateSaveEnabled);
+    noteInput.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        saveNote();
+      }
+    });
+    document.getElementById('btn-save').addEventListener('click', saveNote);
+  }
+
+  function updateSaveEnabled() {
+    const note = document.getElementById('note-input').value.trim();
+    document.getElementById('btn-save').disabled = !(selected && note.length > 0);
+  }
+
+  async function saveNote() {
+    const note = document.getElementById('note-input').value.trim();
+    if (!selected || !note) return;
+
+    const btn   = document.getElementById('btn-save');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    try {
+      const resp = await fetch('/api/admin-jot', {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + session.access_token,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ client_id: selected.id, note }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) {
+        showToast('error', 'Save failed: ' + (data.detail?.message || data.error || 'unknown'));
+        btn.disabled = false; btn.textContent = 'Save note';
+        return;
+      }
+
+      const clientId = selected.id;
+      const clientName = selected.name;
+      showToast('success', `Saved to <strong>${escapeHtml(clientName)}</strong>. <a href="/admin/client.html?id=${escapeAttr(clientId)}">Open client →</a>`);
+
+      // Reset form for next jot
+      document.getElementById('note-input').value = '';
+      clearSelected();
+      btn.textContent = 'Save note';
+      btn.disabled = true;
+    } catch (e) {
+      showToast('error', 'Network error: ' + String(e));
+      btn.disabled = false; btn.textContent = 'Save note';
+    }
+  }
+
+  function showToast(kind, html) {
+    const t = document.getElementById('toast');
+    t.className = 'toast ' + kind;
+    t.innerHTML = html;
+    t.style.display = 'block';
+    if (kind === 'success') {
+      setTimeout(() => { t.style.display = 'none'; }, 6000);
+    }
+  }
+
+  function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+
+  init();
+</script>
+</body>
+</html>

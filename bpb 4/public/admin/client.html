@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Client · Admin · Paver Portal Proposal Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/admin-shell.css">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════
+       Client detail · class prefix .cli-
+       ═══════════════════════════════════════════════════════════════════ */
+
+    .cli-backlink {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--ash-muted);
+      text-decoration: none;
+      margin-bottom: 14px;
+    }
+    .cli-backlink:hover { color: var(--ash-green-dark); }
+
+    /* Header card */
+    .cli-header {
+      background: #fff;
+      border: 1px solid var(--ash-border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .cli-header-main { min-width: 0; flex: 1 1 320px; }
+    .cli-header-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ash-green);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .cli-header-name {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--ash-navy);
+      letter-spacing: -0.005em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .cli-header-contact {
+      font-size: 14px;
+      color: var(--ash-muted);
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .cli-header-contact a { color: inherit; text-decoration: none; }
+    .cli-header-contact a:hover { color: var(--ash-green-dark); text-decoration: underline; }
+    .cli-header-meta {
+      font-size: 12px;
+      color: var(--ash-muted);
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .cli-status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-family: 'Onest', sans-serif;
+    }
+    .cli-status-pill.is-no-account { background: #fef2f2; color: var(--ash-danger); }
+    .cli-status-pill.is-active     { background: var(--ash-green-soft); color: var(--ash-green-dark); }
+
+    .cli-header-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    .cli-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 9px 14px;
+      background: #fff;
+      border: 1px solid var(--ash-border);
+      border-radius: 7px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ash-charcoal);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .cli-btn:hover:not(:disabled) {
+      border-color: var(--ash-green);
+      color: var(--ash-green-dark);
+      background: var(--ash-green-soft);
+    }
+    .cli-btn.is-primary {
+      background: var(--ash-green);
+      color: #fff;
+      border-color: var(--ash-green);
+    }
+    .cli-btn.is-primary:hover:not(:disabled) {
+      background: var(--ash-green-dark);
+      border-color: var(--ash-green-dark);
+    }
+    .cli-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Stats strip */
+    .cli-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1px;
+      background: var(--ash-border);
+      border: 1px solid var(--ash-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .cli-stat {
+      background: #fff;
+      padding: 14px 18px;
+    }
+    .cli-stat-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ash-muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .cli-stat-value {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--ash-navy);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .cli-stat-value.is-zero { color: var(--ash-muted-soft, #999); font-weight: 400; }
+    .cli-stat-sub {
+      font-size: 11px;
+      color: var(--ash-muted);
+      margin-top: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Two-column body */
+    .cli-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+      gap: 24px;
+      align-items: flex-start;
+    }
+    @media (max-width: 940px) {
+      .cli-body { grid-template-columns: 1fr; }
+    }
+
+    /* Section heading */
+    .cli-section-title {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ash-charcoal);
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--ash-border);
+    }
+
+    /* Timeline */
+    .cli-timeline {
+      position: relative;
+      padding-left: 30px;
+      padding-bottom: 8px;
+    }
+    .cli-timeline::before {
+      content: '';
+      position: absolute;
+      left: 9px;
+      top: 8px;
+      bottom: 18px;
+      width: 2px;
+      background: var(--ash-border);
+    }
+    .cli-event {
+      position: relative;
+      margin-bottom: 18px;
+    }
+    .cli-event:last-child { margin-bottom: 0; }
+    .cli-event-dot {
+      position: absolute;
+      left: -27px;
+      top: 6px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid var(--ash-border);
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: var(--ash-muted);
+    }
+    .cli-event.is-green  .cli-event-dot { border-color: var(--ash-green); color: var(--ash-green-dark); }
+    .cli-event.is-amber  .cli-event-dot { border-color: #c08a3a; color: #8c5d10; background: #fff8e8; }
+    .cli-event.is-blue   .cli-event-dot { border-color: #3a78c0; color: #1e4f8c; background: #e8f1fb; }
+    .cli-event.is-red    .cli-event-dot { border-color: var(--ash-danger); color: var(--ash-danger); background: #fef2f2; }
+
+    .cli-event-card {
+      background: #fff;
+      border: 1px solid var(--ash-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+    .cli-event.is-green .cli-event-card { border-left: 3px solid var(--ash-green); }
+    .cli-event.is-amber .cli-event-card { border-left: 3px solid #c08a3a; }
+    .cli-event.is-blue  .cli-event-card { border-left: 3px solid #3a78c0; }
+    .cli-event.is-red   .cli-event-card { border-left: 3px solid var(--ash-danger); }
+
+    .cli-event-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .cli-event-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ash-navy);
+      flex: 1;
+      min-width: 0;
+    }
+    .cli-event-time {
+      font-size: 11px;
+      color: var(--ash-muted-soft, #999);
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+      cursor: help;
+    }
+    .cli-event-body {
+      font-size: 13px;
+      color: var(--ash-charcoal);
+      line-height: 1.5;
+      margin-top: 2px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .cli-event-body.is-quoted {
+      padding: 8px 12px;
+      background: var(--ash-cream);
+      border-radius: 4px;
+      margin-top: 6px;
+      font-size: 13px;
+      max-height: 140px;
+      overflow: hidden;
+      color: var(--ash-charcoal);
+    }
+    .cli-event-meta {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--ash-muted);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .cli-event-meta a {
+      color: var(--ash-green-dark);
+      text-decoration: none;
+    }
+    .cli-event-meta a:hover { text-decoration: underline; }
+
+    /* Sidebar */
+    .cli-side {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .cli-side-block {
+      background: #fff;
+      border: 1px solid var(--ash-border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .cli-proposal-card {
+      padding: 14px 0;
+      border-top: 1px solid var(--ash-border);
+    }
+    .cli-proposal-card:first-of-type { border-top: none; padding-top: 4px; }
+    .cli-proposal-card:last-child { padding-bottom: 0; }
+    .cli-proposal-address {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ash-navy);
+      margin-bottom: 4px;
+    }
+    .cli-proposal-meta {
+      font-size: 12px;
+      color: var(--ash-muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 6px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .cli-proposal-meta strong { color: var(--ash-green-dark); font-weight: 600; }
+    .cli-proposal-stats {
+      font-size: 12px;
+      color: var(--ash-muted);
+      margin-bottom: 8px;
+    }
+    .cli-proposal-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .cli-proposal-actions .cli-btn { padding: 5px 10px; font-size: 12px; }
+    .cli-proposal-card.is-archived { opacity: 0.65; }
+    .cli-archived-tag {
+      display: inline-flex;
+      padding: 2px 6px;
+      background: #f0f0f0;
+      color: var(--ash-muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-radius: 3px;
+      margin-left: 6px;
+    }
+
+    .cli-notes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--ash-border);
+    }
+    .cli-notes-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ash-charcoal);
+      font-weight: 700;
+    }
+    .cli-notes-edit-btn {
+      background: none;
+      border: 1px solid var(--ash-border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ash-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .cli-notes-edit-btn:hover {
+      border-color: var(--ash-green);
+      color: var(--ash-green-dark);
+      background: var(--ash-green-soft);
+    }
+    .cli-notes-body {
+      padding: 12px;
+      background: var(--ash-cream);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--ash-charcoal);
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .cli-notes-body.is-empty {
+      color: var(--ash-muted);
+      font-style: italic;
+      background: #fafafa;
+    }
+    .cli-notes-edit {
+      display: flex;
+      flex-direction: column;
+    }
+    .cli-notes-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--ash-border);
+      border-radius: 6px;
+      font: inherit;
+      font-size: 13px;
+      color: var(--ash-charcoal);
+      background: #fff;
+      resize: vertical;
+      min-height: 140px;
+      max-height: 360px;
+      line-height: 1.5;
+      box-sizing: border-box;
+    }
+    .cli-notes-textarea:focus {
+      outline: none;
+      border-color: var(--ash-green);
+      box-shadow: 0 0 0 3px var(--ash-green-soft);
+    }
+    .cli-notes-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      justify-content: flex-end;
+    }
+    .cli-notes-char {
+      font-size: 11px;
+      color: var(--ash-muted-soft, #999);
+      font-family: 'JetBrains Mono', monospace;
+      margin-right: auto;
+    }
+    .cli-notes-char.is-near-limit { color: #c08a3a; }
+    .cli-notes-char.is-at-limit   { color: var(--ash-danger); font-weight: 600; }
+    .cli-notes-hint {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--ash-muted-soft, #999);
+      font-family: 'JetBrains Mono', monospace;
+      text-align: right;
+    }
+
+    .cli-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 6px 0;
+      font-size: 13px;
+      gap: 10px;
+    }
+    .cli-info-row:not(:last-child) { border-bottom: 1px solid var(--ash-border); }
+    .cli-info-label { color: var(--ash-muted); }
+    .cli-info-value { color: var(--ash-charcoal); font-weight: 500; }
+    .cli-info-value.is-muted { color: var(--ash-muted-soft, #999); font-weight: 400; font-style: italic; }
+
+    .cli-empty-side {
+      padding: 16px;
+      text-align: center;
+      color: var(--ash-muted);
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    /* Loading + error */
+    .cli-loading {
+      padding: 80px 20px;
+      text-align: center;
+      color: var(--ash-muted);
+    }
+    .cli-spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--ash-border);
+      border-top-color: var(--ash-green);
+      border-radius: 50%;
+      animation: cli-spin 0.8s linear infinite;
+      vertical-align: -3px;
+      margin-right: 8px;
+    }
+    @keyframes cli-spin { to { transform: rotate(360deg); } }
+
+    .cli-error {
+      padding: 28px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      color: #7a1010;
+    }
+    .cli-error-title {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    /* Toast */
+    .cli-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 24px;
+      padding: 12px 16px;
+      background: var(--ash-charcoal);
+      color: #fff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.25s ease;
+      z-index: 1000;
+      pointer-events: none;
+      max-width: 360px;
+    }
+    .cli-toast.is-visible { opacity: 1; transform: translateY(0); }
+    .cli-toast.is-success { background: #167d3a; }
+    .cli-toast.is-error { background: var(--ash-danger); }
+
+    @media (max-width: 600px) {
+      .cli-header-name { font-size: 22px; }
+      .cli-stat-value { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="ash-topbar">
+  <div class="ash-topbar-inner">
+    <a href="/admin/" class="ash-brand">
+      <span class="ash-brand-bayside">Paver Portal Proposal Builder</span>
+      <span class="ash-brand-divider">/</span>
+      <span class="ash-brand-section">Admin</span>
+    </a>
+    <div class="ash-topbar-right">
+      <span class="ash-role-badge is-loading" id="ashRoleBadge">…</span>
+      <span class="ash-user-email" id="ashUserEmail"></span>
+      <a class="ash-link-back" href="/dashboard">← Editor</a>
+      <button class="ash-signout" id="ashSignOutBtn" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+<nav class="ash-tabs" id="ashTabs" aria-label="Admin sections"></nav>
+
+<main class="ash-shell">
+  <a href="/admin/clients.html" class="cli-backlink">← Back to clients</a>
+  <div id="cliContent">
+    <div class="cli-loading"><span class="cli-spinner"></span>Loading client…</div>
+  </div>
+</main>
+
+<div id="cliToast" class="cli-toast"></div>
+
+<script type="module" src="/admin/admin-shell.js"></script>
+<script type="module">
+  import { requireDesigner } from '/js/auth-util.js';
+
+  const auth = await requireDesigner();
+  if (auth) {
+    const REFRESH_MS = 60000;
+    const clientId = new URLSearchParams(window.location.search).get('id') || '';
+    const root = document.getElementById('cliContent');
+    const toastEl = document.getElementById('cliToast');
+
+    if (!clientId) {
+      root.innerHTML = `<div class="cli-error">
+        <div class="cli-error-title">Missing client ID</div>
+        <div>This page needs a <code>?id=&lt;uuid&gt;</code> query parameter. Go back to <a href="/admin/clients.html">Clients</a> and click a row to open a detail page.</div>
+      </div>`;
+    } else {
+      // ───────────────────────────────────────────────────────────────
+      // Utilities
+      // ───────────────────────────────────────────────────────────────
+      function esc(s) {
+        if (s == null) return '';
+        return String(s)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+      function fmtMoney(n, opts = {}) {
+        if (n == null) return '—';
+        const abbrev = opts.abbrev !== false;
+        const v = Number(n);
+        if (abbrev && v >= 1000000) return '$' + (v / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+        if (abbrev && v >= 10000)   return '$' + (v / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+        return '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+      }
+      function fmtMoneyFull(n) {
+        if (n == null) return '—';
+        return '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 0 });
+      }
+      function timeAgo(iso) {
+        if (!iso) return '—';
+        const then = new Date(iso).getTime();
+        const seconds = Math.floor((Date.now() - then) / 1000);
+        if (seconds < 60)    return seconds + 's ago';
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60)    return minutes + 'm ago';
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24)      return hours + 'h ago';
+        const days = Math.floor(hours / 24);
+        if (days < 30)       return days + 'd ago';
+        const months = Math.floor(days / 30);
+        if (months < 12)     return months + 'mo ago';
+        return Math.floor(months / 12) + 'y ago';
+      }
+      function fmtAbsolute(iso) {
+        if (!iso) return '';
+        return new Date(iso).toLocaleString('en-US', {
+          month: 'short', day: 'numeric', year: 'numeric',
+          hour: 'numeric', minute: '2-digit',
+        });
+      }
+      function fmtDuration(seconds) {
+        if (!seconds && seconds !== 0) return '';
+        if (seconds < 60) return Math.round(seconds) + 's';
+        const m = Math.floor(seconds / 60);
+        const s = Math.round(seconds % 60);
+        if (m < 60) return `${m}m${s ? ' ' + s + 's' : ''}`;
+        const h = Math.floor(m / 60);
+        return `${h}h ${m % 60}m`;
+      }
+      function fmtPhone(s) {
+        if (!s) return '';
+        const d = String(s).replace(/\D/g, '');
+        if (d.length === 10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+        if (d.length === 11) return `+${d[0]} (${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`;
+        return s;
+      }
+      function truncate(s, max) {
+        if (!s) return '';
+        s = String(s).replace(/\s+/g, ' ').trim();
+        return s.length > max ? s.slice(0, max - 1) + '…' : s;
+      }
+      function toast(msg, kind) {
+        toastEl.textContent = msg;
+        toastEl.className = 'cli-toast is-visible' + (kind ? ' is-' + kind : '');
+        setTimeout(() => { toastEl.className = 'cli-toast'; }, 3500);
+      }
+
+      // ───────────────────────────────────────────────────────────────
+      // Timeline event → display mapping
+      // ───────────────────────────────────────────────────────────────
+      function eventDisplay(event) {
+        const t = event.event_type;
+        const d = event.detail || {};
+        const addr = event.proposal_address;
+
+        const linkProposal = addr && event.proposal_id
+          ? `<a href="/admin/proposal.html?id=${esc(event.proposal_id)}">${esc(addr)}</a>`
+          : (addr ? esc(addr) : '');
+
+        switch (t) {
+          case 'client_created':
+            return {
+              color: 'neutral',
+              dot: '+',
+              title: 'Client added to portal',
+              body: d.email ? `Email: <strong>${esc(d.email)}</strong>` : '',
+            };
+          case 'account_activated':
+            return {
+              color: 'green',
+              dot: '✓',
+              title: 'Activated their portal account',
+              body: 'They\'ve set up their account and can now log in to the homeowner portal.',
+            };
+          case 'message_inbound':
+            return {
+              color: 'blue',
+              dot: '✉',
+              title: 'They sent you a message',
+              quoted: d.body || '',
+              meta: `<a href="/admin/conversations.html?client_id=${esc(clientId)}">Open thread →</a>`,
+            };
+          case 'message_outbound':
+            return {
+              color: 'green',
+              dot: '✉',
+              title: 'You sent a message',
+              quoted: d.body || '',
+              meta: `<a href="/admin/conversations.html?client_id=${esc(clientId)}">Open thread →</a>`,
+            };
+          case 'proposal_published': {
+            const v = d.version_number ? `v${d.version_number}` : '';
+            const canonical = d.is_canonical ? ' (canonical)' : '';
+            const title = `Proposal published ${v}${canonical}`;
+            const bodyParts = [];
+            if (addr) bodyParts.push(linkProposal);
+            if (d.bid_total != null) bodyParts.push(`<strong>${fmtMoneyFull(d.bid_total)}</strong>`);
+            if (d.change_note) bodyParts.push(`<em>${esc(d.change_note)}</em>`);
+            const meta = d.slug ? `<a href="/p/${encodeURIComponent(d.slug)}" target="_blank" rel="noopener">View public proposal →</a>` : '';
+            return { color: 'green', dot: '📄', title, body: bodyParts.join(' · '), meta };
+          }
+          case 'proposal_session': {
+            const views = d.view_count || 0;
+            const dur = fmtDuration(d.duration_seconds || 0);
+            const title = views > 1
+              ? `Viewed the proposal (${views} pages, ${dur} on site)`
+              : `Visited the proposal${dur && d.duration_seconds > 5 ? ' (' + dur + ' on site)' : ''}`;
+            return {
+              color: 'amber',
+              dot: '👁',
+              title,
+              body: linkProposal,
+            };
+          }
+          case 'substitution_pending':
+            return {
+              color: 'amber',
+              dot: '🔄',
+              title: 'Requested a material substitution',
+              body: linkProposal,
+              quoted: d.homeowner_note || '',
+            };
+          case 'substitution_approved':
+            return {
+              color: 'green',
+              dot: '✓',
+              title: 'Substitution approved',
+              body: linkProposal,
+              quoted: d.designer_response || '',
+            };
+          case 'substitution_rejected':
+            return {
+              color: 'red',
+              dot: '✗',
+              title: 'Substitution declined',
+              body: linkProposal,
+              quoted: d.designer_response || '',
+            };
+          case 'substitution_completed':
+            return {
+              color: 'green',
+              dot: '✓',
+              title: 'Substitution completed',
+              body: linkProposal,
+              quoted: d.designer_response || '',
+            };
+          case 'redesign_pending':
+            return {
+              color: 'amber',
+              dot: '🎨',
+              title: 'Requested a redesign',
+              body: linkProposal,
+              quoted: d.homeowner_note || '',
+            };
+          case 'redesign_approved':
+            return {
+              color: 'green',
+              dot: '✓',
+              title: 'Redesign approved',
+              body: linkProposal,
+              quoted: d.designer_response || '',
+            };
+          case 'redesign_rejected':
+            return {
+              color: 'red',
+              dot: '✗',
+              title: 'Redesign declined',
+              body: linkProposal,
+              quoted: d.designer_response || '',
+            };
+          case 'redesign_completed':
+            return {
+              color: 'green',
+              dot: '✓',
+              title: 'Redesign completed',
+              body: linkProposal,
+              quoted: d.designer_response || '',
+            };
+          case 'lockin_pending':
+          case 'lockin_notified': {
+            const parts = [];
+            if (d.bid_total != null) parts.push(`<strong>${fmtMoneyFull(d.bid_total)}</strong>`);
+            if (addr) parts.push(linkProposal);
+            return {
+              color: 'green',
+              dot: '🔒',
+              title: 'Clicked "Lock In My Selection"',
+              body: parts.join(' · '),
+              quoted: d.viewer_message || '',
+            };
+          }
+          case 'lockin_completed':
+            return {
+              color: 'green',
+              dot: '✓',
+              title: 'Lock-in completed',
+              body: `${fmtMoneyFull(d.bid_total)} · ${linkProposal}`,
+            };
+          case 'note_added':
+            return {
+              color: 'green',
+              dot: '📝',
+              title: 'Designer note added',
+              quoted: d.body || '',
+            };
+          case 'note_appended':
+            return {
+              color: 'green',
+              dot: '📝',
+              title: 'Designer note appended',
+              quoted: d.body || '',
+            };
+          case 'note_cleared':
+            return {
+              color: 'neutral',
+              dot: '✕',
+              title: 'Designer notes cleared',
+            };
+          default:
+            return {
+              color: 'neutral',
+              dot: '•',
+              title: t,
+              body: `<code>${esc(JSON.stringify(d).slice(0, 200))}</code>`,
+            };
+        }
+      }
+
+      // ───────────────────────────────────────────────────────────────
+      // Render
+      // ───────────────────────────────────────────────────────────────
+      function render(data) {
+        const c = data.client || {};
+        const stats = data.stats || {};
+        const proposals = data.proposals || [];
+        const timeline = (data.timeline || []).map(ev => ({ ...ev, client_id: clientId }));
+
+        const needsAccount = !c.account_setup_at;
+        document.title = (c.name || 'Client') + ' · Admin · Paver Portal Proposal Builder';
+
+        const canonicalProposal = proposals.find(p => p.canonical_slug);
+        const canonicalUrl = canonicalProposal ? `/p/${encodeURIComponent(canonicalProposal.canonical_slug)}` : null;
+
+        root.innerHTML = `
+          ${renderHeader(c, needsAccount, canonicalUrl)}
+          ${renderStatsStrip(stats)}
+          <div class="cli-body">
+            <div>
+              ${renderTimeline(timeline)}
+            </div>
+            <div class="cli-side">
+              ${renderProposalsBlock(proposals)}
+              ${renderNotesBlock(c)}
+              ${renderNurtureBlock(c)}
+              ${renderLifetimeBlock(c, stats)}
+            </div>
+          </div>
+        `;
+
+        // Wire up action buttons
+        wireUpActions(c);
+      }
+
+      function renderHeader(c, needsAccount, canonicalUrl) {
+        const statusPill = needsAccount
+          ? '<span class="cli-status-pill is-no-account">No account</span>'
+          : '<span class="cli-status-pill is-active">Active</span>';
+
+        const contactRow = [];
+        if (c.email) contactRow.push(`<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`);
+        if (c.phone) contactRow.push(`<a href="tel:${esc(c.phone)}">${esc(fmtPhone(c.phone))}</a>`);
+        if (c.address) contactRow.push(esc(c.address));
+
+        const metaRow = [];
+        metaRow.push(`Joined ${esc(timeAgo(c.created_at))}`);
+        if (c.refer_code) metaRow.push(`Refer code: <strong>${esc(c.refer_code)}</strong>`);
+        if (c.referral_credit_cents) {
+          metaRow.push(`Credit: ${fmtMoneyFull(c.referral_credit_cents / 100)}`);
+        }
+        if (c.current_nurture_phase) {
+          metaRow.push(`Nurture: <strong>${esc(c.current_nurture_phase)}</strong>`);
+        }
+
+        const actions = [];
+        actions.push(`<a class="cli-btn is-primary" href="/admin/conversations.html?client_id=${esc(c.id)}">💬 Open thread</a>`);
+        if (canonicalUrl) {
+          actions.push(`<a class="cli-btn" href="${esc(canonicalUrl)}" target="_blank" rel="noopener">View proposal</a>`);
+        }
+        if (needsAccount) {
+          actions.push(`<button class="cli-btn" id="cliResendBtn" type="button">Resend magic link</button>`);
+        }
+
+        return `
+          <div class="cli-header">
+            <div class="cli-header-main">
+              <div class="cli-header-eyebrow">CLIENT</div>
+              <h1 class="cli-header-name">
+                ${esc(c.name || 'Unknown')}
+                ${statusPill}
+              </h1>
+              <div class="cli-header-contact">${contactRow.join('<span style="color:var(--ash-muted-soft,#bbb);">·</span>')}</div>
+              <div class="cli-header-meta">${metaRow.join('<span style="color:var(--ash-muted-soft,#bbb);">·</span>')}</div>
+            </div>
+            <div class="cli-header-actions">${actions.join('')}</div>
+          </div>
+        `;
+      }
+
+      function renderStatsStrip(stats) {
+        const cells = [
+          {
+            label: 'Proposals',
+            value: stats.proposal_count || 0,
+            sub: stats.total_proposal_value ? fmtMoneyFull(stats.total_proposal_value) + ' total' : '',
+          },
+          {
+            label: 'Views',
+            value: stats.total_views || 0,
+            sub: stats.total_sessions ? `${stats.total_sessions} session${stats.total_sessions === 1 ? '' : 's'}` : '',
+          },
+          {
+            label: 'Inbound msgs',
+            value: stats.messages_inbound || 0,
+            sub: stats.unread_inbound > 0 ? `<strong style="color:var(--ash-danger);">${stats.unread_inbound} unread</strong>` : 'all replied',
+          },
+          {
+            label: 'Lock-ins',
+            value: stats.lockins_total || 0,
+            sub: stats.lockins_total > 0 ? 'clicked' : '',
+          },
+          {
+            label: 'Pending',
+            value: (stats.subs_pending || 0) + (stats.redesigns_pending || 0),
+            sub: stats.subs_pending || stats.redesigns_pending
+              ? `${stats.subs_pending || 0} sub · ${stats.redesigns_pending || 0} redesign`
+              : 'subs + redesigns',
+          },
+        ];
+        return `
+          <div class="cli-stats">
+            ${cells.map(c => `
+              <div class="cli-stat">
+                <div class="cli-stat-label">${esc(c.label)}</div>
+                <div class="cli-stat-value${c.value === 0 ? ' is-zero' : ''}">${c.value}</div>
+                ${c.sub ? `<div class="cli-stat-sub">${c.sub}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      function renderTimeline(timeline) {
+        if (timeline.length === 0) {
+          return `
+            <h2 class="cli-section-title">Timeline</h2>
+            <div class="cli-empty-side">No activity yet for this client.</div>
+          `;
+        }
+        const items = timeline.map(ev => {
+          const disp = eventDisplay(ev);
+          const bodyHtml = disp.body ? `<div class="cli-event-body">${disp.body}</div>` : '';
+          const quotedHtml = disp.quoted ? `<div class="cli-event-body is-quoted">${esc(truncate(disp.quoted, 400))}</div>` : '';
+          const metaHtml = disp.meta ? `<div class="cli-event-meta">${disp.meta}</div>` : '';
+          return `
+            <div class="cli-event is-${esc(disp.color)}">
+              <div class="cli-event-dot">${disp.dot || ''}</div>
+              <div class="cli-event-card">
+                <div class="cli-event-header">
+                  <div class="cli-event-title">${disp.title}</div>
+                  <div class="cli-event-time" title="${esc(fmtAbsolute(ev.occurred_at))}">${esc(timeAgo(ev.occurred_at))}</div>
+                </div>
+                ${bodyHtml}
+                ${quotedHtml}
+                ${metaHtml}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <h2 class="cli-section-title">Timeline · ${timeline.length} event${timeline.length === 1 ? '' : 's'}</h2>
+          <div class="cli-timeline">${items}</div>
+        `;
+      }
+
+      function renderProposalsBlock(proposals) {
+        if (proposals.length === 0) {
+          return `
+            <div class="cli-side-block">
+              <h3 class="cli-section-title">Their proposals</h3>
+              <div class="cli-empty-side">No proposals linked to this client yet.</div>
+            </div>
+          `;
+        }
+        const cards = proposals.map(p => {
+          const archived = !!p.archived_at;
+          const tag = archived ? `<span class="cli-archived-tag">Archived</span>` : '';
+          const metaParts = [];
+          if (p.bid_total_amount != null) metaParts.push(`<strong>${fmtMoneyFull(p.bid_total_amount)}</strong>`);
+          if (p.latest_version) metaParts.push(`v${p.latest_version}`);
+          if (p.published_at) metaParts.push(`Published ${timeAgo(p.published_at)}`);
+          else metaParts.push('Draft');
+
+          const statsParts = [];
+          if (p.view_count) statsParts.push(`${p.view_count} view${p.view_count === 1 ? '' : 's'}`);
+          if (p.lockin_count) statsParts.push(`${p.lockin_count} lock-in${p.lockin_count === 1 ? '' : 's'}`);
+          if (p.signed_at) statsParts.push(`Signed ${timeAgo(p.signed_at)}`);
+
+          const actions = [];
+          if (p.canonical_slug) {
+            actions.push(`<a class="cli-btn" href="/p/${encodeURIComponent(p.canonical_slug)}" target="_blank" rel="noopener">View</a>`);
+          }
+          actions.push(`<a class="cli-btn" href="/editor?id=${encodeURIComponent(p.id)}" target="_blank" rel="noopener">Editor</a>`);
+
+          return `
+            <div class="cli-proposal-card${archived ? ' is-archived' : ''}">
+              <div class="cli-proposal-address">${esc(p.project_address || '—')}${tag}</div>
+              <div class="cli-proposal-meta">${metaParts.join('<span>·</span>')}</div>
+              ${statsParts.length ? `<div class="cli-proposal-stats">${statsParts.join(' · ')}</div>` : ''}
+              <div class="cli-proposal-actions">${actions.join('')}</div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="cli-side-block">
+            <h3 class="cli-section-title">Their proposals · ${proposals.length}</h3>
+            ${cards}
+          </div>
+        `;
+      }
+
+      function renderNotesBlock(c) {
+        const hasNotes = c.notes && c.notes.trim();
+        return `
+          <div class="cli-side-block">
+            <div class="cli-notes-header">
+              <span class="cli-notes-label">Designer notes</span>
+              <button class="cli-notes-edit-btn" id="cliNotesEditBtn" type="button">${hasNotes ? '✎ Edit' : '+ Add'}</button>
+            </div>
+            <div class="cli-notes-body${hasNotes ? '' : ' is-empty'}" id="cliNotesView">${hasNotes ? esc(c.notes) : 'No notes yet. Click + Add to jot something down.'}</div>
+            <div class="cli-notes-edit" id="cliNotesEdit" style="display: none;">
+              <textarea
+                class="cli-notes-textarea"
+                id="cliNotesTextarea"
+                rows="6"
+                maxlength="50000"
+                placeholder="Called him 5/17 — wants to talk pricing after Memorial Day. Said the patio is the priority…"></textarea>
+              <div class="cli-notes-actions">
+                <span class="cli-notes-char" id="cliNotesChar">0 / 50,000</span>
+                <button class="cli-btn" id="cliNotesCancelBtn" type="button">Cancel</button>
+                <button class="cli-btn is-primary" id="cliNotesSaveBtn" type="button">Save</button>
+              </div>
+              <div class="cli-notes-hint">⌘ + Enter to save · Esc to cancel</div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderNurtureBlock(c) {
+        const rows = [];
+        rows.push({ label: 'Phase', value: c.current_nurture_phase || '—' });
+        if (c.phase_entered_at) {
+          rows.push({ label: 'Entered', value: timeAgo(c.phase_entered_at) });
+        }
+        if (c.nurture_paused_until) {
+          rows.push({ label: 'Paused until', value: fmtAbsolute(c.nurture_paused_until) });
+        }
+        if (c.nurture_opted_out_at) {
+          rows.push({ label: 'Opted out', value: timeAgo(c.nurture_opted_out_at), muted: false });
+        }
+        return `
+          <div class="cli-side-block">
+            <h3 class="cli-section-title">Nurture</h3>
+            ${rows.map(r => `
+              <div class="cli-info-row">
+                <span class="cli-info-label">${esc(r.label)}</span>
+                <span class="cli-info-value${r.muted ? ' is-muted' : ''}">${esc(r.value)}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      function renderLifetimeBlock(c, stats) {
+        const rows = [];
+        rows.push({ label: 'Joined', value: fmtAbsolute(c.created_at) });
+        if (c.account_setup_at) {
+          rows.push({ label: 'Activated', value: timeAgo(c.account_setup_at) });
+        } else {
+          rows.push({ label: 'Activated', value: 'Not yet', muted: true });
+        }
+        if (stats.last_view_at) {
+          rows.push({ label: 'Last viewed', value: timeAgo(stats.last_view_at) });
+        }
+        if (stats.last_inbound_at) {
+          rows.push({ label: 'Last inbound', value: timeAgo(stats.last_inbound_at) });
+        }
+        return `
+          <div class="cli-side-block">
+            <h3 class="cli-section-title">Lifetime</h3>
+            ${rows.map(r => `
+              <div class="cli-info-row">
+                <span class="cli-info-label">${esc(r.label)}</span>
+                <span class="cli-info-value${r.muted ? ' is-muted' : ''}">${esc(r.value)}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      // ───────────────────────────────────────────────────────────────
+      // Actions
+      // ───────────────────────────────────────────────────────────────
+      function wireUpActions(c) {
+        const resendBtn = document.getElementById('cliResendBtn');
+        if (resendBtn) {
+          resendBtn.addEventListener('click', () => sendMagicLink(c));
+        }
+
+        const editBtn   = document.getElementById('cliNotesEditBtn');
+        const cancelBtn = document.getElementById('cliNotesCancelBtn');
+        const saveBtn   = document.getElementById('cliNotesSaveBtn');
+        const textarea  = document.getElementById('cliNotesTextarea');
+
+        if (editBtn)   editBtn.addEventListener('click', () => enterNotesEditMode(c));
+        if (cancelBtn) cancelBtn.addEventListener('click', () => exitNotesEditMode(c));
+        if (saveBtn)   saveBtn.addEventListener('click', () => saveNotes(c));
+
+        if (textarea) {
+          textarea.addEventListener('input', updateNotesCharCount);
+          textarea.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+              e.preventDefault();
+              saveNotes(c);
+            } else if (e.key === 'Escape') {
+              e.preventDefault();
+              exitNotesEditMode(c);
+            }
+          });
+        }
+      }
+
+      function enterNotesEditMode(c) {
+        const viewEl    = document.getElementById('cliNotesView');
+        const editEl    = document.getElementById('cliNotesEdit');
+        const editBtn   = document.getElementById('cliNotesEditBtn');
+        const textarea  = document.getElementById('cliNotesTextarea');
+        if (!viewEl || !editEl || !textarea) return;
+
+        viewEl.style.display = 'none';
+        editEl.style.display = 'flex';
+        if (editBtn) editBtn.style.display = 'none';
+
+        textarea.value = c.notes || '';
+        updateNotesCharCount();
+        textarea.focus();
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+      }
+
+      function exitNotesEditMode() {
+        const viewEl  = document.getElementById('cliNotesView');
+        const editEl  = document.getElementById('cliNotesEdit');
+        const editBtn = document.getElementById('cliNotesEditBtn');
+        if (viewEl)  viewEl.style.display = '';
+        if (editEl)  editEl.style.display = 'none';
+        if (editBtn) editBtn.style.display = '';
+      }
+
+      function updateNotesCharCount() {
+        const ta = document.getElementById('cliNotesTextarea');
+        const char = document.getElementById('cliNotesChar');
+        if (!ta || !char) return;
+        const len = ta.value.length;
+        char.textContent = `${len.toLocaleString()} / 50,000`;
+        char.className = 'cli-notes-char';
+        if (len >= 50000)     char.classList.add('is-at-limit');
+        else if (len > 45000) char.classList.add('is-near-limit');
+      }
+
+      async function saveNotes(c) {
+        const ta        = document.getElementById('cliNotesTextarea');
+        const saveBtn   = document.getElementById('cliNotesSaveBtn');
+        const cancelBtn = document.getElementById('cliNotesCancelBtn');
+        if (!ta || !saveBtn) return;
+
+        const newNotes = ta.value;
+        saveBtn.disabled = true;
+        if (cancelBtn) cancelBtn.disabled = true;
+        saveBtn.textContent = 'Saving…';
+
+        try {
+          const resp = await fetch('/api/admin-client-notes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              client_id: c.id,
+              notes: newNotes,
+              created_by: auth.user.id,
+            }),
+          });
+          const data = await resp.json();
+          if (!resp.ok) {
+            toast(`Save failed: ${data.error || resp.status}`, 'error');
+            return;
+          }
+
+          // Update local state + view
+          c.notes = data.notes || '';
+          const viewEl = document.getElementById('cliNotesView');
+          const editBtn = document.getElementById('cliNotesEditBtn');
+          const hasNotes = c.notes && c.notes.trim();
+          if (viewEl) {
+            viewEl.textContent = hasNotes ? c.notes : 'No notes yet. Click + Add to jot something down.';
+            viewEl.className = `cli-notes-body${hasNotes ? '' : ' is-empty'}`;
+          }
+          if (editBtn) editBtn.textContent = hasNotes ? '✎ Edit' : '+ Add';
+          exitNotesEditMode();
+          toast('✓ Notes saved', 'success');
+        } catch (e) {
+          toast('Network error: ' + (e.message || e), 'error');
+        } finally {
+          saveBtn.disabled = false;
+          if (cancelBtn) cancelBtn.disabled = false;
+          saveBtn.textContent = 'Save';
+        }
+      }
+
+      async function sendMagicLink(c) {
+        const btn = document.getElementById('cliResendBtn');
+        if (!btn) return;
+        const original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        try {
+          const resp = await fetch('/api/resend-magic-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ client_id: c.id }),
+          });
+          const data = await resp.json();
+          if (!resp.ok) {
+            toast(`Couldn't send: ${data.error || resp.status}`, 'error');
+            return;
+          }
+          if (data.warning) {
+            toast(`Sent — note: ${data.warning}`, 'success');
+          } else {
+            toast(`✓ Magic link sent to ${c.email}`, 'success');
+          }
+        } catch (e) {
+          toast('Network error: ' + (e.message || e), 'error');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = original;
+        }
+      }
+
+      // ───────────────────────────────────────────────────────────────
+      // Load
+      // ───────────────────────────────────────────────────────────────
+      async function load() {
+        try {
+          const resp = await fetch(`/api/admin-client?id=${encodeURIComponent(clientId)}`, { cache: 'no-store' });
+          if (!resp.ok) {
+            const errBody = await resp.json().catch(() => ({}));
+            if (resp.status === 404) {
+              root.innerHTML = `<div class="cli-error">
+                <div class="cli-error-title">Client not found</div>
+                <div>No client exists with ID <code>${esc(clientId)}</code>. They may have been deleted, or the link is wrong.</div>
+              </div>`;
+              return;
+            }
+            root.innerHTML = `<div class="cli-error">
+              <div class="cli-error-title">Couldn't load client</div>
+              <div>${esc(errBody.error || ('HTTP ' + resp.status))}</div>
+            </div>`;
+            return;
+          }
+          const data = await resp.json();
+          render(data);
+        } catch (e) {
+          root.innerHTML = `<div class="cli-error">
+            <div class="cli-error-title">Network error</div>
+            <div>${esc(e.message || String(e))}</div>
+          </div>`;
+        }
+      }
+
+      load();
+      setInterval(() => {
+        // Skip auto-refresh while user is editing notes to avoid blowing away their draft
+        const editEl = document.getElementById('cliNotesEdit');
+        if (editEl && editEl.style.display !== 'none') return;
+        load();
+      }, REFRESH_MS);
+    }
+  }
+</script>
+
+</body>
+</html>
