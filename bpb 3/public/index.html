@@ -337,6 +337,7 @@
     <a class="nav-logo" href="/"><img src="/assets/paver-portal-logo.svg" alt="Paver Portal"></a>
     <div class="nav-links">
       <a href="#features" class="hide-m">Features</a>
+      <a href="#team" class="hide-m">Team</a>
       <a href="#pricing" class="hide-m">Pricing</a>
       <a href="/login.html">Sign in</a>
       <a class="btn" href="/signup.html">Start free trial</a>
@@ -697,6 +698,87 @@
 </section>
 
 <!-- ═══ Why ═══ -->
+
+<!-- ═══ TEAM / OWNER CONSOLE ═══ -->
+<section class="features wrap" id="team" style="padding-top:26px;">
+  <div class="sec-head">
+    <div class="mono">FOR OWNERS · TEAM</div>
+    <h2><span class="d-only">You can't run what you can't see.<br>Now you see everything.</span><span class="m-only">See everything.<br>Run everything.</span></h2>
+    <p><span class="d-only">Every draft bid, every client conversation, every designer's numbers — one owner console. Transparency into all the things that actually run a home-improvement company, without hovering over shoulders.</span><span class="m-only"><strong>Every bid, every conversation, every number — one owner screen.</strong></span></p>
+  </div>
+
+  <div class="feat">
+    <div class="feat-copy">
+      <div class="feat-num">07 · RUN THE CREW</div>
+      <h3>The owner console.</h3>
+      <p><span class="d-only">An admin account with full visibility into the daily workflow: all draft &amp; active bids across every designer, every client conversation, and a <strong>daily digest email</strong> with the team's sales stats waiting in your inbox each morning.</span><span class="m-only">Full visibility: every designer's bids, client chats, and a daily stats digest in your inbox.</span></p>
+      <ul class="checks">
+        <li>All draft &amp; active bids, team-wide, live</li>
+        <li>Every client conversation, readable in one place</li>
+        <li>Daily digest email — pipeline, wins &amp; hot leads at 7am</li>
+      </ul>
+    </div>
+    <div class="mock">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">/owner · team console</span><span class="try-tag"><i></i>Try it</span></div>
+      <div class="mock-body" style="padding-bottom:8px;">
+        <div style="display:flex; gap:6px; margin-bottom:10px;" id="teamTabs">
+          <button class="demo-btn" data-tab="pipeline" type="button">Team pipeline</button>
+          <button class="demo-btn ghost" data-tab="stats" type="button">Designer stats</button>
+          <button class="demo-btn ghost" data-tab="approve" type="button">Approvals <span id="apBadge" style="background:#b91c1c;color:#fff;border-radius:99px;padding:0 6px;font-size:10px;">1</span></button>
+        </div>
+
+        <div id="teamPanePipeline">
+          <div class="m-row"><div><div class="m-strong">Marcus · 1719 Yorktown Rd</div><div class="m-dim">Draft · edited 20 min ago</div></div><span class="m-pill warm">Draft</span><div class="m-stat"><b>$86,400</b></div></div>
+          <div class="m-row"><div><div class="m-strong">Dana · 40 Sierra Ct</div><div class="m-dim">Client asked for substitution · 1h ago</div></div><span class="m-pill gold">Action</span><div class="m-stat"><b>$42,750</b></div></div>
+          <div class="m-row"><div><div class="m-strong">Marcus · 228 Alder Ln</div><div class="m-dim">Chat: "can we start before June?"</div></div><span class="m-pill hot">Engaged</span><div class="m-stat"><b>$31,200</b></div></div>
+          <div class="m-dim" style="padding-top:8px;">📧 Daily digest: <b>$214k open · 2 hot leads · 1 bid needs review</b> — in your inbox at 7am</div>
+        </div>
+
+        <div id="teamPaneStats" style="display:none;">
+          <div class="m-row"><div><div class="m-strong">Marcus R.</div><div class="m-dim">Last login: today 7:42am</div></div><div class="m-stat"><b>$117,600</b><span class="m-dim">open · 2 hot</span></div><div class="m-stat"><b>41%</b><span class="m-dim">win rate</span></div></div>
+          <div class="m-row"><div><div class="m-strong">Dana K.</div><div class="m-dim">Last login: today 6:15am</div></div><div class="m-stat"><b>$96,700</b><span class="m-dim">open · 1 hot</span></div><div class="m-stat"><b>36%</b><span class="m-dim">win rate</span></div></div>
+          <div class="m-row"><div><div class="m-strong">Luis M.</div><div class="m-dim">Last login: yesterday 4:03pm</div></div><div class="m-stat"><b>$58,900</b><span class="m-dim">open · 0 hot</span></div><div class="m-stat"><b>29%</b><span class="m-dim">win rate</span></div></div>
+          <div class="m-dim" style="padding-top:8px;">Sales, hot leads, logins, win rates — per designer, always current.</div>
+        </div>
+
+        <div id="teamPaneApprove" style="display:none;">
+          <div class="m-row"><div><div class="m-strong">@you — Dana K.</div><div class="m-dim">"Review the Sierra number before I send? Margin looks thin at $42,750 — client is pushing on the wall."</div></div></div>
+          <div style="display:flex; gap:8px; padding:10px 0 6px;" id="apActions">
+            <button class="demo-btn" id="apApprove" type="button">✓ Approve at $42,750</button>
+            <button class="demo-btn ghost" id="apBump" type="button">Request +$1,900</button>
+          </div>
+          <div class="m-dim" id="apResult" style="min-height:16px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feat">
+    <div class="mock">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="url">white-glove setup · week one</span></div>
+      <div class="mock-body">
+        <h4>We set your team up. Personally.</h4>
+        <div class="sub">Hand-held onboarding, included with every Team plan</div>
+        <div class="m-row"><span>✓ Your brand, logo &amp; colors configured</span><span class="m-pill hot">Day 1</span></div>
+        <div class="m-row"><span>✓ Your catalogs loaded &amp; rate card built with you</span><span class="m-pill hot">Day 2</span></div>
+        <div class="m-row"><span>✓ Every designer onboarded, live on a real bid</span><span class="m-pill warm">Week 1</span></div>
+        <div class="m-row"><span>✓ Owner console &amp; daily digest tuned to you</span><span class="m-pill warm">Week 1</span></div>
+      </div>
+    </div>
+    <div class="feat-copy">
+      <div class="feat-num">08 · ZERO-LIFT START</div>
+      <h3>Hand-held onboarding. We do the setup.</h3>
+      <p><span class="d-only">Your crew doesn't have time to learn software — so the Paver Portal team does the full setup with you: brand, catalogs, rates, every designer seat, live on real bids inside week one. The 3-month minimum exists because that's how long it takes transparency to change how you run the company — and we're invested in getting you there.</span><span class="m-only">We configure everything and get every designer live inside week one.</span></p>
+      <ul class="checks">
+        <li>Full setup done <strong>with</strong> you — brand, catalogs, rates, seats</li>
+        <li>$99/mo + $19/designer · 3-month minimum</li>
+        <li>Cancel anytime after — the transparency usually sells itself</li>
+      </ul>
+      <a class="btn primary" href="/signup.html?plan=team" style="margin-top:6px; display:inline-block;">Set up my team →</a>
+    </div>
+  </div>
+</section>
+
 <section class="why">
   <div class="wrap">
     <h2>Deals don't usually die in a price war.<br>They die quiet.</h2>
@@ -733,16 +815,16 @@
     </div>
     <div class="price-card">
       <span class="mono">Team</span>
-      <div class="amount">$249<span>/mo</span> <em>+ $19/designer</em></div>
-      <div class="price-sub">Structured onboarding with the Paver Portal team</div>
+      <div class="amount">$99<span>/mo</span> <em>+ $19/designer</em></div>
+      <div class="price-sub">Hand-held onboarding — we set your whole team up · 3-month minimum</div>
       <ul class="checks">
-        <li>Admin account + designer seats</li>
-        <li>Unlimited clients across the whole team</li>
-        <li>Per-designer pipelines with clean data separation</li>
-        <li>Guided onboarding &amp; catalog setup</li>
-        <li>Custom branding company-wide</li>
+        <li>Owner console — every bid, every client conversation, live</li>
+        <li>Daily digest email with team sales stats</li>
+        <li>Designer analytics — sales, hot leads, logins</li>
+        <li>@mention the owner for reviews &amp; overrides</li>
+        <li>Hand-held onboarding — we do the full setup</li>
       </ul>
-      <a class="btn ghost" href="/signup.html?plan=team">Set up your team</a>
+      <a class="btn ghost" href="#team">See the owner console ↓</a>
     </div>
   </div>
 </section>
@@ -1054,39 +1136,7 @@
 </script>
 
 
-<script>
-// Temporary on-device diagnostic: open paverportal.com/?debug on the phone.
-// Shows viewport math and OUTLINES any element wider than the screen.
-(function () {
-  if (!/[?&]debug/.test(location.search)) return;
-  function run() {
-    var doc = document.documentElement;
-    var offenders = [];
-    var all = document.querySelectorAll('body *');
-    for (var i = 0; i < all.length; i++) {
-      var r = all[i].getBoundingClientRect();
-      if (r.width > window.innerWidth + 1 || r.right > doc.scrollWidth + 1) {
-        offenders.push(all[i]);
-        all[i].style.outline = '3px solid red';
-      }
-    }
-    var feats = document.querySelector('.features');
-    var pad = feats ? getComputedStyle(feats).paddingLeft : '?';
-    var badge = document.createElement('div');
-    badge.style.cssText = 'position:fixed;bottom:8px;left:8px;right:8px;z-index:99999;background:#b91c1c;color:#fff;font:600 11px monospace;padding:8px 10px;border-radius:8px;white-space:pre-wrap;';
-    badge.textContent =
-      'innerWidth=' + window.innerWidth +
-      '  docScrollW=' + doc.scrollWidth +
-      '  vvScale=' + (window.visualViewport ? window.visualViewport.scale.toFixed(2) : '?') +
-      '\n.features padding-left=' + pad +
-      '\noverflowers=' + offenders.length +
-      (offenders.length ? '  first: <' + offenders[0].tagName.toLowerCase() + ' class="' + (offenders[0].className || '').toString().slice(0, 60) + '">' : '');
-    document.body.appendChild(badge);
-  }
-  if (document.readyState === 'complete') setTimeout(run, 800);
-  else window.addEventListener('load', function(){ setTimeout(run, 800); });
-})();
-</script>
+
 
 <script>
 // Scroll-triggered attention: each demo card rises in, its TRY IT badge
@@ -1100,7 +1150,7 @@
 
   // primary control(s) per card, located by a distinctive descendant
   function primaryControls(card) {
-    var sels = ['#bidParseBtn', '#funRun', '#smSvg', '#portalChips button', '#proChips button', '#brandName'];
+    var sels = ['#bidParseBtn', '#funRun', '#smSvg', '#portalChips button', '#proChips button', '#brandName', '#teamTabs button'];
     var out = [];
     sels.forEach(function (sel) {
       card.querySelectorAll(sel).forEach(function (el) { out.push(el); });
@@ -1163,6 +1213,47 @@
   // hero card is already "live" — let it rise in but skip the pulses
   var hero = document.querySelector('.hero .mock');
   if (hero) interacted.add(hero);
+})();
+</script>
+
+<script>
+// Owner-console demo: tab switching + the @mention approval beat
+(function () {
+  'use strict';
+  var tabs = document.getElementById('teamTabs');
+  if (!tabs) return;
+  var panes = {
+    pipeline: document.getElementById('teamPanePipeline'),
+    stats: document.getElementById('teamPaneStats'),
+    approve: document.getElementById('teamPaneApprove'),
+  };
+  tabs.querySelectorAll('button[data-tab]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabs.querySelectorAll('button[data-tab]').forEach(function (b) {
+        b.classList.add('ghost');
+      });
+      btn.classList.remove('ghost');
+      Object.keys(panes).forEach(function (k) {
+        panes[k].style.display = k === btn.dataset.tab ? 'block' : 'none';
+      });
+    });
+  });
+  function resolve(text) {
+    var badge = document.getElementById('apBadge');
+    if (badge) badge.remove();
+    document.getElementById('apActions').style.display = 'none';
+    var res = document.getElementById('apResult');
+    res.textContent = text;
+    res.classList.add('fade-in');
+  }
+  var ap = document.getElementById('apApprove');
+  var bump = document.getElementById('apBump');
+  if (ap) ap.addEventListener('click', function () {
+    resolve('✓ Approved — Dana notified. Bid unlocked to send at $42,750.');
+  });
+  if (bump) bump.addEventListener('click', function () {
+    resolve('↗ Sent back to Dana: "Bump the wall line +$1,900 — Weston Stone ran up." Logged on the bid.');
+  });
 })();
 </script>
 </body>
