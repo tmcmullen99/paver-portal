@@ -89,8 +89,51 @@ function redirectToLogin() {
   window.location.replace('/login.html?redirect=' + next);
 }
 
+// Magic-link / recovery / invite arrivals carry tokens in the URL hash.
+// supabase-js (detectSessionInUrl) consumes them asynchronously — the sync
+// localStorage check below MUST NOT bounce to login before that happens,
+// or the token gets trapped, percent-encoded, in the redirect param.
+function hasAuthTokensInHash() {
+  const h = window.location.hash || '';
+  return h.includes('access_token=') || /[#&]type=(magiclink|recovery|invite|signup)\b/.test(h);
+}
+
+async function consumeHashThenGate() {
+  try {
+    // getSession awaits supabase-js initialization, which includes hash parsing
+    const { data } = await supabase.auth.getSession();
+    if (data && data.session) return afterHashAuth();
+    // grace window for a late-arriving SIGNED_IN event
+    const ok = await new Promise((resolve) => {
+      const timer = setTimeout(() => resolve(false), 3000);
+      const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+        if (session) {
+          clearTimeout(timer);
+          sub.subscription.unsubscribe();
+          resolve(true);
+        }
+      });
+    });
+    if (ok) afterHashAuth(); else redirectToLogin();
+  } catch (_) {
+    redirectToLogin();
+  }
+}
+
+function afterHashAuth() {
+  // strip the consumed token fragment from the address bar
+  try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (_) {}
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectAuthPill);
+  } else {
+    injectAuthPill();
+  }
+}
+
 if (!isPublicAdminPath()) {
-  if (!hasLocalSession()) {
+  if (!hasLocalSession() && hasAuthTokensInHash()) {
+    consumeHashThenGate();
+  } else if (!hasLocalSession()) {
     redirectToLogin();
   } else {
     // Async validation — covers the case where localStorage has a stale
