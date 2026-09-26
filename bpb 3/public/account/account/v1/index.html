@@ -2101,7 +2101,7 @@ function findManufacturerForMaterial(m) {
   if (!MANUFACTURERS_CACHE || !m || !m.manufacturer) return null;
   return MANUFACTURERS_CACHE.find(x => x.name === m.manufacturer) || null;
 }
-function findPaver Portal() {
+function findPaverPortal() {
   if (!MANUFACTURERS_CACHE) return null;
   return MANUFACTURERS_CACHE.find(x => x.name === 'Paver Portal') || null;
 }
@@ -2230,7 +2230,7 @@ function openMatModal(m) {
 
   // Sprint 28 · warranty cards
   const mfrInfo = findManufacturerForMaterial(m);
-  const bayInfo = findPaver Portal();
+  const bayInfo = findPaverPortal();
   let warrantyHtml = '';
   const hasMfrWarranty = mfrInfo && (mfrInfo.warranty_summary || mfrInfo.warranty_url);
   const hasBayWarranty = bayInfo && (bayInfo.warranty_summary || bayInfo.warranty_url);
