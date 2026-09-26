@@ -326,6 +326,19 @@ function render() {
 function renderBackfillStyles() {
   return `
     <style>
+      .mp-drop { border:2px dashed #d8d2c6; border-radius:12px; padding:16px 14px; text-align:center; cursor:pointer; background:#fbf9f4; transition:border-color .15s, background .15s; }
+      .mp-drop:hover, .mp-drop.is-over { border-color:#9c7440; background:#f6efe2; }
+      .mp-drop-cta { font-size:13.5px; font-weight:600; color:#33281c; }
+      .mp-drop-cta u { color:#7d5c31; }
+      .mp-drop-sub { font-size:11.5px; color:#8a8375; margin-top:3px; }
+      .mp-thumbs { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+      .mp-thumb { position:relative; width:72px; height:72px; border-radius:9px; overflow:hidden; border:1px solid #e5e0d6; }
+      .mp-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+      .mp-thumb-primary { position:absolute; left:0; right:0; bottom:0; background:rgba(51,40,28,.82); color:#f1e7d3; font-size:8.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:2px 0; text-align:center; }
+      .mp-thumb-x { position:absolute; top:3px; right:3px; width:18px; height:18px; border-radius:50%; border:0; background:rgba(0,0,0,.55); color:#fff; font-size:12px; line-height:1; cursor:pointer; }
+      .mp-cutsheet-link { color:#7d5c31; text-decoration:none; font-weight:600; }
+      .mp-cutsheet-link:hover { text-decoration:underline; }
+
       .bf-banner {
         margin: 0 0 20px;
         padding: 14px 18px;
@@ -629,7 +642,7 @@ function renderSelectedTray() {
         ${imgEl}
         <div class="mp-selected-body">
           <div class="mp-selected-name">${escapeHtml(displayName)}</div>
-          <div class="mp-selected-source">${isBelgard ? 'Belgard' : 'Third-party'}</div>
+          <div class="mp-selected-source">${isBelgard ? 'Belgard' : 'Third-party'}${data.cut_sheet_url ? ` · <a class="mp-cutsheet-link" href="${escapeHtml(data.cut_sheet_url)}" target="_blank" rel="noopener">📄 Cut sheet</a>` : ''}</div>
         </div>
         <select class="mp-selected-area" data-id="${s.id}" aria-label="Application area">
           <option value="">(application area)</option>
@@ -891,8 +904,22 @@ function openThirdPartyModal() {
           </div>
           <div class="field"><label>Product name</label><input type="text" id="tpName" placeholder="e.g. Caséta Smart Dimmer"></div>
           <div class="field"><label>Description (optional)</label><input type="text" id="tpDesc"></div>
-          <div class="field"><label>Catalog or cut-sheet URL (optional)</label><input type="text" id="tpCatalog" placeholder="https://…"></div>
-          <div class="field"><label>Image URL (optional)</label><input type="text" id="tpImage" placeholder="https://…"></div>
+          <div class="field"><label>Product photos</label>
+            <div class="mp-drop" id="tpDropImgs">
+              <input type="file" id="tpImgFiles" accept="image/*" multiple hidden>
+              <div class="mp-drop-cta">📸 Drag photos here or <u>browse</u></div>
+              <div class="mp-drop-sub">Add as many as you like — the first becomes the primary product image</div>
+            </div>
+            <div class="mp-thumbs" id="tpThumbs"></div>
+          </div>
+          <div class="field"><label>Cut sheet</label>
+            <div class="mp-drop" id="tpDropPdf">
+              <input type="file" id="tpPdfFile" accept="application/pdf,.pdf" hidden>
+              <div class="mp-drop-cta">📄 Drag the PDF cut sheet here or <u>browse</u></div>
+              <div class="mp-drop-sub" id="tpPdfName">Optional — the manufacturer's spec sheet</div>
+            </div>
+          </div>
+          <div class="field"><label>Product page URL (optional)</label><input type="text" id="tpCatalog" placeholder="https://…"></div>
           <button class="btn primary" id="tpSaveCustom">Save and add to proposal</button>
           <div id="tpCustomError" class="error-box" style="display:none;"></div>
         </div>
@@ -918,6 +945,53 @@ function openThirdPartyModal() {
     });
   });
 
+  // ─── Custom-material uploads: photo queue + cut-sheet queue ───
+  const tpImgQueue = [];
+  let tpPdfQueued = null;
+
+  function wireDrop(zoneId, inputId, onFiles) {
+    const zone = modal.querySelector('#' + zoneId);
+    const input = modal.querySelector('#' + inputId);
+    if (!zone || !input) return;
+    zone.addEventListener('click', () => input.click());
+    input.addEventListener('change', () => { onFiles(Array.from(input.files || [])); input.value = ''; });
+    ['dragover', 'dragenter'].forEach(ev => zone.addEventListener(ev, (e) => {
+      e.preventDefault(); zone.classList.add('is-over');
+    }));
+    ['dragleave', 'drop'].forEach(ev => zone.addEventListener(ev, (e) => {
+      e.preventDefault(); zone.classList.remove('is-over');
+      if (ev === 'drop') onFiles(Array.from((e.dataTransfer && e.dataTransfer.files) || []));
+    }));
+  }
+
+  function renderTpThumbs() {
+    const box = modal.querySelector('#tpThumbs');
+    if (!box) return;
+    box.innerHTML = tpImgQueue.map((f, i) => `
+      <div class="mp-thumb" data-i="${i}">
+        <img src="${URL.createObjectURL(f)}" alt="">
+        ${i === 0 ? '<span class="mp-thumb-primary">Primary</span>' : ''}
+        <button type="button" class="mp-thumb-x" data-i="${i}" aria-label="Remove">×</button>
+      </div>`).join('');
+    box.querySelectorAll('.mp-thumb-x').forEach(btn => btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tpImgQueue.splice(Number(btn.dataset.i), 1);
+      renderTpThumbs();
+    }));
+  }
+
+  wireDrop('tpDropImgs', 'tpImgFiles', (files) => {
+    files.filter(f => /^image\//.test(f.type)).forEach(f => tpImgQueue.push(f));
+    renderTpThumbs();
+  });
+  wireDrop('tpDropPdf', 'tpPdfFile', (files) => {
+    const pdf = files.find(f => f.type === 'application/pdf' || /\.pdf$/i.test(f.name));
+    if (pdf) {
+      tpPdfQueued = pdf;
+      modal.querySelector('#tpPdfName').textContent = '📎 ' + pdf.name;
+    }
+  });
+
   modal.querySelector('#tpSaveCustom')?.addEventListener('click', async () => {
     const errBox = modal.querySelector('#tpCustomError');
     errBox.style.display = 'none';
@@ -927,13 +1001,50 @@ function openThirdPartyModal() {
     const cat = modal.querySelector('#tpCat').value;
     const desc = modal.querySelector('#tpDesc').value.trim() || null;
     const catalog = modal.querySelector('#tpCatalog').value.trim() || null;
-    const image = modal.querySelector('#tpImage').value.trim() || null;
 
     if (!mfr || !name) {
       errBox.textContent = 'Manufacturer and product name are required.';
       errBox.style.display = 'block';
       return;
     }
+
+    // ─── Upload queued photos + cut sheet to catalog-media ───
+    const saveBtn = modal.querySelector('#tpSaveCustom');
+    saveBtn.disabled = true;
+    let image = null, galleryUrls = [], cutSheetUrl = null;
+    try {
+      if (tpImgQueue.length || tpPdfQueued) {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data: prof } = await supabase.from('profiles')
+          .select('company_id').eq('id', user.id).maybeSingle();
+        if (!prof || !prof.company_id) throw new Error('Could not resolve your workspace.');
+        const uploadId = (crypto.randomUUID && crypto.randomUUID()) ||
+                         ('m-' + Math.random().toString(36).slice(2));
+        const base = prof.company_id + '/materials/' + uploadId;
+        const total = tpImgQueue.length + (tpPdfQueued ? 1 : 0);
+        let done = 0;
+        const put = async (file, label) => {
+          done++;
+          saveBtn.textContent = 'Uploading ' + done + '/' + total + '…';
+          const ext = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
+          const path = base + '/' + label + '-' + done + '.' + ext;
+          const { error: upErr } = await supabase.storage.from('catalog-media')
+            .upload(path, file, { upsert: true });
+          if (upErr) throw upErr;
+          return supabase.storage.from('catalog-media').getPublicUrl(path).data.publicUrl;
+        };
+        for (const f of tpImgQueue) galleryUrls.push(await put(f, 'photo'));
+        if (tpPdfQueued) cutSheetUrl = await put(tpPdfQueued, 'cutsheet');
+        image = galleryUrls[0] || null;
+      }
+    } catch (upErr) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save and add to proposal';
+      errBox.textContent = 'Upload failed: ' + (upErr.message || upErr);
+      errBox.style.display = 'block';
+      return;
+    }
+    saveBtn.textContent = 'Saving…';
 
     // Phase 3B.1 — dual-write the new custom material to BOTH the legacy
     // third_party_materials table (so any code path still reading from it
@@ -951,7 +1062,8 @@ function openThirdPartyModal() {
       }),
       supabase.from('materials').insert({
         id: newId, manufacturer: mfr, product_name: name, category: cat,
-        description: desc, catalog_url: catalog, primary_image_url: image
+        description: desc, catalog_url: catalog, primary_image_url: image,
+        gallery_urls: galleryUrls, cut_sheet_url: cutSheetUrl
       })
     ]);
 
@@ -959,6 +1071,8 @@ function openThirdPartyModal() {
       const msg = (legacyRes.error && legacyRes.error.message) ||
                   (unifiedRes.error && unifiedRes.error.message) ||
                   'Unknown error';
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save and add to proposal';
       errBox.textContent = 'Could not save: ' + msg;
       errBox.style.display = 'block';
       return;
@@ -969,7 +1083,8 @@ function openThirdPartyModal() {
     // from materials, so this row mirrors what the next reload would show.)
     ctx.thirdParty.push({
       id: newId, manufacturer: mfr, product_name: name, category: cat,
-      description: desc, catalog_url: catalog, primary_image_url: image
+      description: desc, catalog_url: catalog, primary_image_url: image,
+      gallery_urls: galleryUrls, cut_sheet_url: cutSheetUrl
     });
     const ok = await addThirdPartyMaterial(newId);
     if (ok) openThirdPartyModal();
