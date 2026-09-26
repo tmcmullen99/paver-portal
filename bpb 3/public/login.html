@@ -437,12 +437,42 @@
     const __isInvite   = /[#&]type=invite\b/.test(__initialHash);
     const __isRecovery = /[#&]type=recovery\b/.test(__initialHash);
 
+    // ─── Rescue: token trapped in ?redirect= by an auth-gate bounce ─
+    // If a magic-link/recovery token was percent-encoded into the
+    // redirect param (a page guard raced supabase-js before the fix in
+    // supabase-client.js, or an old email link), restore the session
+    // manually and complete the journey.
+    let __rescuedRecovery = false;
+    const __rp = new URLSearchParams(window.location.search).get('redirect') || '';
+    if (__rp.includes('#access_token=')) {
+      try {
+        const frag = __rp.slice(__rp.indexOf('#') + 1);
+        const hp = new URLSearchParams(frag);
+        const access_token = hp.get('access_token');
+        const refresh_token = hp.get('refresh_token');
+        const ttype = hp.get('type') || '';
+        if (access_token && refresh_token) {
+          const { error: rescueErr } = await supabase.auth.setSession({ access_token, refresh_token });
+          if (!rescueErr) {
+            if (ttype === 'invite' || ttype === 'recovery') {
+              __rescuedRecovery = true;
+              setState('recovery');
+            } else {
+              let clean = __rp.slice(0, __rp.indexOf('#')) || '/dashboard';
+              if (!clean.startsWith('/') || clean.startsWith('//')) clean = '/dashboard';
+              window.location.replace(clean);
+            }
+          }
+        }
+      } catch (_) { /* fall through to the normal sign-in UI */ }
+    }
+
     // ─── If we already have a session, skip straight to editor ─────
     // (covers the case where someone bookmarks /login.html but is
     // already signed in — bounce them through to the editor.)
     const { data: { session: existingSession } } = await supabase.auth.getSession();
     if (existingSession) {
-      if (__isInvite || __isRecovery) {
+      if (__isInvite || __isRecovery || __rescuedRecovery) {
         // Both flows land here authenticated but without a known password.
         // Show the set-password UI; don't redirect away.
         setState('recovery');
@@ -463,7 +493,11 @@
     // ─── Helpers ───────────────────────────────────────────────────
     function getRedirectTarget() {
       const params = new URLSearchParams(window.location.search);
-      const next = params.get('redirect');
+      let next = params.get('redirect');
+      if (next) {
+        const h = next.indexOf('#');
+        if (h > -1) next = next.slice(0, h); // never re-propagate token fragments
+      }
       if (next && next.startsWith('/') && !next.startsWith('//')) {
         return next;
       }
