@@ -337,6 +337,8 @@ function renderBackfillStyles() {
       .mp-thumb-primary { position:absolute; left:0; right:0; bottom:0; background:rgba(51,40,28,.82); color:#f1e7d3; font-size:8.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:2px 0; text-align:center; }
       .mp-thumb-x { position:absolute; top:3px; right:3px; width:18px; height:18px; border-radius:50%; border:0; background:rgba(0,0,0,.55); color:#fff; font-size:12px; line-height:1; cursor:pointer; }
       .mp-cutsheet-link { color:#7d5c31; text-decoration:none; font-weight:600; }
+      .mp-selected-edit { width:28px; height:28px; border-radius:8px; border:1px solid #e5e0d6; background:#fff; color:#7d5c31; font-size:13px; cursor:pointer; margin-right:4px; }
+      .mp-selected-edit:hover { border-color:#9c7440; background:#f6efe2; }
       .mp-cutsheet-link:hover { text-decoration:underline; }
 
       .bf-banner {
@@ -648,6 +650,7 @@ function renderSelectedTray() {
           <option value="">(application area)</option>
           ${areaOpts}
         </select>
+        <button class="mp-selected-edit" data-id="${s.id}" aria-label="Edit photos &amp; cut sheet" title="Edit photos &amp; cut sheet">✎</button>
         <button class="mp-selected-remove" data-id="${s.id}" aria-label="Remove material">×</button>
       </div>
     `;
@@ -749,6 +752,10 @@ function attachEvents() {
       if (!confirm('Remove this material from the proposal?')) return;
       await removeMaterial(btn.dataset.id);
     });
+  });
+
+  c.querySelectorAll('.mp-selected-edit').forEach(btn => {
+    btn.addEventListener('click', () => openEditMaterialModal(btn.dataset.id));
   });
 
   c.querySelector('#mpAddThirdParty')?.addEventListener('click', openThirdPartyModal);
@@ -1088,6 +1095,172 @@ function openThirdPartyModal() {
     });
     const ok = await addThirdPartyMaterial(newId);
     if (ok) openThirdPartyModal();
+  });
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Edit material media — photos + cut sheet on any selected material.
+// Keeps existing gallery entries (removable), accepts new drag-drop photos,
+// replaces or keeps the cut sheet. Writes to `materials` and best-effort
+// mirrors to belgard_materials / third_party_materials where the same id
+// exists (RLS decides what the current role may touch).
+// ───────────────────────────────────────────────────────────────────────────
+function openEditMaterialModal(selectedId) {
+  const sel = ctx.selected.find(x => String(x.id) === String(selectedId));
+  if (!sel) return;
+  const isBelgard = sel.material_source === 'belgard';
+  const data = (isBelgard ? sel.belgard : sel.third_party) || {};
+  const materialId = isBelgard ? sel.belgard_material_id : sel.third_party_material_id;
+  if (!materialId) return;
+
+  // media state: kept remote urls + newly queued files
+  const items = [];
+  const seed = (Array.isArray(data.gallery_urls) && data.gallery_urls.length)
+    ? data.gallery_urls
+    : [data.primary_image_url || data.swatch_url || data.image_url].filter(Boolean);
+  seed.forEach(u => items.push({ kind: 'url', url: u }));
+  let pdfFile = null;
+  let keptCutSheet = data.cut_sheet_url || null;
+
+  const modal = ctx.container.querySelector('#mpModal');
+  if (!modal) return;
+  modal.innerHTML = `
+    <div class="mp-modal" role="document">
+      <button class="mp-modal-close" aria-label="Close">×</button>
+      <div class="mp-modal-header">
+        <span class="eyebrow">Edit material</span>
+        <h3>${escapeHtml(data.product_name || 'Material')}</h3>
+        <p class="mp-modal-sub">Photos and cut sheet. The first photo is the primary image everywhere this material appears.</p>
+      </div>
+      <div class="mp-tp-form">
+        <div class="field"><label>Photos</label>
+          <div class="mp-drop" id="emDropImgs">
+            <input type="file" id="emImgFiles" accept="image/*" multiple hidden>
+            <div class="mp-drop-cta">📸 Drag photos here or <u>browse</u></div>
+            <div class="mp-drop-sub">Drag in as many as you like</div>
+          </div>
+          <div class="mp-thumbs" id="emThumbs"></div>
+        </div>
+        <div class="field"><label>Cut sheet</label>
+          <div class="mp-drop" id="emDropPdf">
+            <input type="file" id="emPdfFile" accept="application/pdf,.pdf" hidden>
+            <div class="mp-drop-cta">📄 Drag a PDF here or <u>browse</u></div>
+            <div class="mp-drop-sub" id="emPdfName">${keptCutSheet ? '📎 Current cut sheet attached — drop a new one to replace it' : 'None yet — optional'}</div>
+          </div>
+        </div>
+        <button class="btn primary" id="emSave">Save changes</button>
+        <div id="emError" class="error-box" style="display:none;"></div>
+      </div>
+    </div>`;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  modal.querySelector('.mp-modal-close').addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+  function renderEmThumbs() {
+    const box = modal.querySelector('#emThumbs');
+    box.innerHTML = items.map((it, i) => `
+      <div class="mp-thumb" data-i="${i}">
+        <img src="${it.kind === 'url' ? escapeHtml(it.url) : URL.createObjectURL(it.file)}" alt="">
+        ${i === 0 ? '<span class="mp-thumb-primary">Primary</span>' : ''}
+        <button type="button" class="mp-thumb-x" data-i="${i}" aria-label="Remove">×</button>
+      </div>`).join('');
+    box.querySelectorAll('.mp-thumb-x').forEach(btn => btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      items.splice(Number(btn.dataset.i), 1);
+      renderEmThumbs();
+    }));
+  }
+  renderEmThumbs();
+
+  function wireEmDrop(zoneId, inputId, onFiles) {
+    const zone = modal.querySelector('#' + zoneId);
+    const input = modal.querySelector('#' + inputId);
+    zone.addEventListener('click', () => input.click());
+    input.addEventListener('change', () => { onFiles(Array.from(input.files || [])); input.value = ''; });
+    ['dragover', 'dragenter'].forEach(ev => zone.addEventListener(ev, (e) => { e.preventDefault(); zone.classList.add('is-over'); }));
+    ['dragleave', 'drop'].forEach(ev => zone.addEventListener(ev, (e) => {
+      e.preventDefault(); zone.classList.remove('is-over');
+      if (ev === 'drop') onFiles(Array.from((e.dataTransfer && e.dataTransfer.files) || []));
+    }));
+  }
+  wireEmDrop('emDropImgs', 'emImgFiles', (files) => {
+    files.filter(f => /^image\//.test(f.type)).forEach(f => items.push({ kind: 'file', file: f }));
+    renderEmThumbs();
+  });
+  wireEmDrop('emDropPdf', 'emPdfFile', (files) => {
+    const pdf = files.find(f => f.type === 'application/pdf' || /\.pdf$/i.test(f.name));
+    if (pdf) {
+      pdfFile = pdf;
+      modal.querySelector('#emPdfName').textContent = '📎 ' + pdf.name + ' (will replace the current one)';
+    }
+  });
+
+  modal.querySelector('#emSave').addEventListener('click', async () => {
+    const errBox = modal.querySelector('#emError');
+    errBox.style.display = 'none';
+    const saveBtn = modal.querySelector('#emSave');
+    saveBtn.disabled = true;
+
+    try {
+      const newFiles = items.filter(it => it.kind === 'file');
+      let cutSheetUrl = keptCutSheet;
+      if (newFiles.length || pdfFile) {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data: prof } = await supabase.from('profiles')
+          .select('company_id').eq('id', user.id).maybeSingle();
+        if (!prof || !prof.company_id) throw new Error('Could not resolve your workspace.');
+        const base = prof.company_id + '/materials/' + materialId;
+        const total = newFiles.length + (pdfFile ? 1 : 0);
+        let done = 0;
+        const put = async (file, label) => {
+          done++;
+          saveBtn.textContent = 'Uploading ' + done + '/' + total + '…';
+          const ext = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
+          const path = base + '/' + label + '-' + Date.now() + '-' + done + '.' + ext;
+          const { error: upErr } = await supabase.storage.from('catalog-media')
+            .upload(path, file, { upsert: true });
+          if (upErr) throw upErr;
+          return supabase.storage.from('catalog-media').getPublicUrl(path).data.publicUrl;
+        };
+        for (const it of items) {
+          if (it.kind === 'file') it.url = await put(it.file, 'photo');
+        }
+        if (pdfFile) cutSheetUrl = await put(pdfFile, 'cutsheet');
+      }
+      saveBtn.textContent = 'Saving…';
+
+      const gallery = items.map(it => it.url).filter(Boolean);
+      const primary = gallery[0] || null;
+
+      const { error: matErr } = await supabase.from('materials').update({
+        primary_image_url: primary,
+        gallery_urls: gallery,
+        cut_sheet_url: cutSheetUrl,
+        updated_at: new Date().toISOString()
+      }).eq('id', materialId);
+      if (matErr) throw matErr;
+
+      // best-effort mirrors (RLS may reject for non-masters — non-fatal)
+      await Promise.allSettled([
+        supabase.from('belgard_materials').update({
+          primary_image_url: primary, cut_sheet_url: cutSheetUrl
+        }).eq('id', materialId),
+        supabase.from('third_party_materials').update({
+          image_url: primary
+        }).eq('id', materialId)
+      ]);
+
+      // refresh local state + UI
+      await Promise.all([loadCatalog(), loadThirdParty(), loadSelected()]);
+      render();
+      closeModal();
+    } catch (err) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save changes';
+      errBox.textContent = 'Could not save: ' + (err.message || err);
+      errBox.style.display = 'block';
+    }
   });
 }
 
