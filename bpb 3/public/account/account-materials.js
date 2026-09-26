@@ -212,7 +212,7 @@ function findManufacturer(name) {
   const lc = name.toLowerCase();
   return MANUFACTURERS.find(m => (m.manufacturer || '').toLowerCase() === lc) || null;
 }
-function findPaver Portal() {
+function findPaverPortal() {
   return MANUFACTURERS.find(m =>
     (m.manufacturer || '').toLowerCase().includes('bayside')
   ) || null;
@@ -323,7 +323,7 @@ function openModal(mid) {
   if (!m) return;
   closeModal();
   const mfr = findManufacturer(m.manufacturer);
-  const bayside = findPaver Portal();
+  const bayside = findPaverPortal();
   const guides = filterGuidesForMaterial(m);
   const heroImg = pickImageUrl(m);
   const heroBlock = heroImg
