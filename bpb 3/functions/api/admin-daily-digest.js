@@ -6,7 +6,7 @@
  *   - Tonight's nurture preview (what'll fire at 23:00 UTC)
  *   - Last 24h nurture activity
  *
- * Auth: requires header `x-bayside-cron-secret` matching env PAVER PORTAL_CRON_SECRET.
+ * Auth: requires header `x-bayside-cron-secret` matching env BAYSIDE_CRON_SECRET.
  *
  * Query params:
  *   ?dry_run=true  — return the rendered HTML without sending
@@ -15,7 +15,7 @@
  * Env vars:
  *   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  *   RESEND_API_KEY, RESEND_FROM_EMAIL
- *   PAVER PORTAL_CRON_SECRET
+ *   BAYSIDE_CRON_SECRET
  *   PORTAL_BASE_URL
  *   DIGEST_RECIPIENT  — optional override (default tim@mcmullen.properties)
  */
@@ -40,7 +40,7 @@ export async function onRequestOptions() {
 
 export async function onRequestPost({ request, env }) {
   const provided = request.headers.get('x-bayside-cron-secret');
-  if (!env.PAVER PORTAL_CRON_SECRET || provided !== env.PAVER PORTAL_CRON_SECRET) {
+  if (!env.BAYSIDE_CRON_SECRET || provided !== env.BAYSIDE_CRON_SECRET) {
     return jsonResponse({ error: 'Unauthorized' }, 401);
   }
 
