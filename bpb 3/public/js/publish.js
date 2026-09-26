@@ -240,7 +240,7 @@ const BELGARD_MASTER_INSTALL_GUIDE_URL = 'https://www.belgard.com/wp-content/upl
 const EVERGRASS_INSTALL_GUIDE_URL = 'https://cdn.msisurfaces.com/files/flyers/evergrass-artificial-turf-pavers.pdf';
 const TRU_SCAPES_PRODUCT_GUIDE_URL = 'https://cdn.prod.website-files.com/65a1ca4354f63bd7376b5027/69e99762031d43f432f14cde_Tru%20Scapes-compressed.pdf';
 
-const PAVER PORTAL_LOGO_URL = '/assets/paver-portal-logo.svg';
+const PAVER_PORTAL_LOGO_URL = '/assets/paver-portal-logo.svg';
 const TIM_PHONE = '415-691-9272';
 const TIM_PHONE_HREF = '+14156919272';
 const TIM_EMAIL = 'tim@mcmullen.properties';
@@ -2759,7 +2759,7 @@ function buildHtmlSnapshot({ proposal, sections, materials, photos, installSecti
 </head>
 <body>
   <header class="pub-header">
-    <img src="${escapeAttr(PAVER PORTAL_LOGO_URL)}" alt="Paver Portal" class="pub-header-logo">
+    <img src="${escapeAttr(PAVER_PORTAL_LOGO_URL)}" alt="Paver Portal" class="pub-header-logo">
     <span class="pub-header-date">${escapeHtml(dateStr)}</span>
   </header>
 
