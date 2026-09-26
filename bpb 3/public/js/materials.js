@@ -1130,9 +1130,23 @@ function openEditMaterialModal(selectedId) {
       <div class="mp-modal-header">
         <span class="eyebrow">Edit material</span>
         <h3>${escapeHtml(data.product_name || 'Material')}</h3>
-        <p class="mp-modal-sub">Photos and cut sheet. The first photo is the primary image everywhere this material appears.</p>
+        <p class="mp-modal-sub">Everything here is editable — details, photos, and the cut sheet. The first photo is the primary image everywhere this material appears.</p>
       </div>
       <div class="mp-tp-form">
+        <div class="field-row">
+          <div class="field"><label>Product name</label><input type="text" id="emName" value="${escapeHtml(data.product_name || '')}"></div>
+          <div class="field"><label>Manufacturer</label><input type="text" id="emMfr" value="${escapeHtml(data.manufacturer || '')}"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Category</label>
+            <select id="emCat">
+              ${['pavers','walls','wall','natural','porcelain','decking','lighting','fencing','turf','fire-features','furniture','accessories','other']
+                 .filter((v, i, a) => a.indexOf(v) === i)
+                 .map(c => `<option value="${c}" ${((data.category || 'other') === c) ? 'selected' : ''}>${c.charAt(0).toUpperCase() + c.slice(1)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field" style="flex:2;"><label>Description</label><input type="text" id="emDesc" value="${escapeHtml(data.description || '')}"></div>
+        </div>
         <div class="field"><label>Photos</label>
           <div class="mp-drop" id="emDropImgs">
             <input type="file" id="emImgFiles" accept="image/*" multiple hidden>
@@ -1232,24 +1246,71 @@ function openEditMaterialModal(selectedId) {
 
       const gallery = items.map(it => it.url).filter(Boolean);
       const primary = gallery[0] || null;
+      const newName = (modal.querySelector('#emName').value || '').trim();
+      const newMfr = (modal.querySelector('#emMfr').value || '').trim() || null;
+      const newCat = modal.querySelector('#emCat').value || 'other';
+      const newDesc = (modal.querySelector('#emDesc').value || '').trim() || null;
+      if (!newName) throw new Error('Product name is required.');
 
-      const { error: matErr } = await supabase.from('materials').update({
+      const fields = {
+        product_name: newName,
+        manufacturer: newMfr,
+        category: newCat,
+        description: newDesc,
         primary_image_url: primary,
         gallery_urls: gallery,
         cut_sheet_url: cutSheetUrl,
         updated_at: new Date().toISOString()
-      }).eq('id', materialId);
+      };
+
+      // Direct update first. Under RLS a shared row a designer can't touch
+      // returns ZERO rows (not an error) — that's the copy-on-write signal.
+      const { data: updated, error: matErr } = await supabase.from('materials')
+        .update(fields).eq('id', materialId).select('id');
       if (matErr) throw matErr;
 
-      // best-effort mirrors (RLS may reject for non-masters — non-fatal)
-      await Promise.allSettled([
-        supabase.from('belgard_materials').update({
-          primary_image_url: primary, cut_sheet_url: cutSheetUrl
-        }).eq('id', materialId),
-        supabase.from('third_party_materials').update({
-          image_url: primary
-        }).eq('id', materialId)
-      ]);
+      if (updated && updated.length) {
+        // owned it (company custom, or founding master editing shared):
+        // mirror best-effort so every read path agrees
+        await Promise.allSettled([
+          supabase.from('belgard_materials').update({
+            product_name: newName, description: newDesc,
+            primary_image_url: primary, cut_sheet_url: cutSheetUrl
+          }).eq('id', materialId),
+          supabase.from('third_party_materials').update({
+            product_name: newName, manufacturer: newMfr,
+            category: newCat, description: newDesc, image_url: primary
+          }).eq('id', materialId)
+        ]);
+      } else {
+        // Shared catalog product + no write rights → fork a company copy
+        // and repoint THIS proposal's line to it. The shared catalog stays
+        // pristine for everyone else; your edited copy is yours.
+        const forkId = (crypto.randomUUID && crypto.randomUUID()) ||
+                       ('fk-' + Math.random().toString(36).slice(2));
+        const [forkMat, forkTp] = await Promise.all([
+          supabase.from('materials').insert({
+            id: forkId, product_name: newName, manufacturer: newMfr || data.manufacturer || null,
+            category: newCat, description: newDesc,
+            primary_image_url: primary, gallery_urls: gallery,
+            cut_sheet_url: cutSheetUrl, catalog_url: data.catalog_url || null
+          }),
+          supabase.from('third_party_materials').insert({
+            id: forkId, product_name: newName, manufacturer: newMfr || data.manufacturer || 'Custom',
+            category: newCat, description: newDesc,
+            catalog_url: data.catalog_url || null, image_url: primary
+          })
+        ]);
+        if (forkMat.error) throw forkMat.error;
+        if (forkTp.error) throw forkTp.error;
+
+        const { error: linkErr } = await supabase.from('proposal_materials').update({
+          material_source: 'third_party',
+          third_party_material_id: forkId,
+          belgard_material_id: null
+        }).eq('id', sel.id);
+        if (linkErr) throw linkErr;
+      }
 
       // refresh local state + UI
       await Promise.all([loadCatalog(), loadThirdParty(), loadSelected()]);
